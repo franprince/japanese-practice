@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next"
+import { I18nProvider } from "@/lib/i18n"
 
 import "./globals.css";
 
@@ -13,8 +14,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-screen bg-background text-foreground antialiased">
-        <Analytics />
-        {children}
+        <I18nProvider>
+          <Analytics />
+          {children}
+        </I18nProvider>
         <footer className="border-t border-border/40 bg-card/60 backdrop-blur py-8 mt-12">
           <div className="mx-auto max-w-5xl px-4 text-xs text-muted-foreground leading-relaxed space-y-1.5">
             <p className="text-sm font-medium text-foreground">Developed by Fran 🩴</p>

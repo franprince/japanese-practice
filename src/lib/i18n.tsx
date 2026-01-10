@@ -1,3 +1,5 @@
+"use client"
+
 import { createContext, useContext, useMemo, useState, useEffect, type ReactNode } from "react"
 import { translations, type Language, type TranslationKey } from "@/lib/translations"
 

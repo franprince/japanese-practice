@@ -37,7 +37,23 @@ export type TranslationKey =
   | "hiraganaLabel"
   | "katakanaLabel"
   | "bothLabel"
-  | "selectGroupsHint"
+  | "selectGroupsHint" 
+  | "wordsLabel"
+  | "clear"
+  | "numbersTitle"
+  | "numbersSubtitle"
+  | "startPractice"
+  | "startNumbers"
+  | "writeInJapanese"
+  | "useKeypadBelow"
+  | "yourAnswer"
+  | "nextNumber"
+  | "pressEnter"
+  | "toSubmit"
+  | "easy"
+  | "medium"
+  | "hard"
+  | "expert"
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -78,6 +94,22 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     katakanaLabel: "Katakana",
     bothLabel: "Both",
     selectGroupsHint: "Select at least one character group to start.",
+    wordsLabel: "Words practice",
+    startPractice: "Start practice",
+    startNumbers: "Start numbers",
+    numbersTitle: "Numbers Challenge",
+    numbersSubtitle: "Write the number in Japanese",
+    writeInJapanese: "Write in Japanese",
+    useKeypadBelow: "Use the keypad below",
+    yourAnswer: "Your answer",
+    nextNumber: "Next Number",
+    pressEnter: "Press",
+    toSubmit: "to submit",
+    clear: "Clear",
+    easy: "Easy",
+    medium: "Medium",
+    hard: "Hard",
+    expert: "Expert",
   },
   es: {
     chipLabel: "Práctica de Kana",
@@ -117,6 +149,22 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     katakanaLabel: "Katakana",
     bothLabel: "Ambos",
     selectGroupsHint: "Selecciona al menos un grupo de caracteres para comenzar.",
+    wordsLabel: "Práctica de palabras",
+    startPractice: "Comenzar práctica",
+    startNumbers: "Empezar números",
+    numbersTitle: "Desafío de Números",
+    numbersSubtitle: "Escribe el número en japonés",
+    writeInJapanese: "Escribe en japonés",
+    useKeypadBelow: "Usa el teclado de abajo",
+    yourAnswer: "Tu respuesta",
+    nextNumber: "Siguiente Número",
+    pressEnter: "Presiona",
+    toSubmit: "para enviar",
+    clear: "Borrar",
+    easy: "Fácil",
+    medium: "Intermedio",
+    hard: "Difícil",
+    expert: "Experto",
   },
   ja: {
     chipLabel: "かな練習",
@@ -156,5 +204,21 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     katakanaLabel: "カタカナ",
     bothLabel: "両方",
     selectGroupsHint: "開始するには文字グループを選択してください。",
+    wordsLabel: "単語練習",
+    startPractice: "練習を始める",
+    startNumbers: "数字を始める",
+    numbersTitle: "数字チャレンジ",
+    numbersSubtitle: "数字を日本語で書いてください",
+    writeInJapanese: "日本語で書く",
+    useKeypadBelow: "下のキーパッドを使用",
+    yourAnswer: "あなたの答え",
+    nextNumber: "次の数字",
+    pressEnter: "Enterキーを押して",
+    toSubmit: "送信",
+    clear: "クリア",
+    easy: "かんたん",
+    medium: "ふつう",
+    hard: "むずかしい",
+    expert: "エキスパート",
   },
 }
