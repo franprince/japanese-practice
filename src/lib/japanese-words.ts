@@ -194,11 +194,10 @@ export function getRandomWord(type: "hiragana" | "katakana" | "both", filter?: W
       const length = word.kana.length
       if (length < minLength || length > maxLength) return false
 
-      // Group filter - word must contain at least one character from selected groups
-      if (selectedGroups.length > 0) {
-        const hasMatchingGroup = word.groups.some((g) => selectedGroups.includes(g))
-        if (!hasMatchingGroup) return false
-      }
+      // Group filter - require that all groups for this word are within the selected set
+      if (selectedGroups.length === 0) return false
+      const allGroupsAllowed = word.groups.every((g) => selectedGroups.includes(g))
+      if (!allGroupsAllowed) return false
 
       return true
     })

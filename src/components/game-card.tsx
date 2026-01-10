@@ -17,9 +17,17 @@ interface GameCardProps {
   mode: GameMode
   filter: WordFilter // Added filter prop
   onScoreUpdate: (score: number, streak: number, correct: boolean) => void
+  suppressFocus?: boolean
+  onRequestCloseSettings?: () => void
 }
 
-export function GameCard({ mode, filter, onScoreUpdate }: GameCardProps) {
+export function GameCard({
+  mode,
+  filter,
+  onScoreUpdate,
+  suppressFocus = false,
+  onRequestCloseSettings,
+}: GameCardProps) {
   const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
   const [userInput, setUserInput] = useState("")
   const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null)
@@ -40,12 +48,21 @@ export function GameCard({ mode, filter, onScoreUpdate }: GameCardProps) {
     }
     setUserInput("")
     setFeedback(null)
-    setTimeout(() => inputRef.current?.focus(), 100)
-  }, [mode, filter])
+    setTimeout(() => {
+      if (!suppressFocus) inputRef.current?.focus()
+    }, 100)
+  }, [mode, filter, suppressFocus])
 
   useEffect(() => {
     loadNewWord()
   }, [loadNewWord])
+
+  useEffect(() => {
+    if (!suppressFocus) {
+      // when settings close, restore focus
+      setTimeout(() => inputRef.current?.focus(), 50)
+    }
+  }, [suppressFocus])
 
   const checkAnswer = () => {
     if (!currentWord || !userInput.trim()) return
@@ -152,6 +169,7 @@ export function GameCard({ mode, filter, onScoreUpdate }: GameCardProps) {
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={handleKeyDown}
+                onFocus={() => onRequestCloseSettings?.()}
                 placeholder="Type romaji..."
                 className={cn(
                   "text-center text-lg h-14 font-mono bg-background/50 border-2 transition-all",
@@ -187,6 +205,20 @@ export function GameCard({ mode, filter, onScoreUpdate }: GameCardProps) {
                   <div className="pt-2 border-t border-border/30">
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Meaning</p>
                     <p className="text-base text-foreground/90">{currentWord.meaning}</p>
+                  </div>
+                )}
+                {currentWord.kanji && (
+                  <div className="pt-2 border-t border-border/30">
+                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Kanji</p>
+                    <p className="text-lg font-medium text-foreground">{currentWord.kanji}</p>
+                    <a
+                      href={`https://jisho.org/search/${encodeURIComponent(currentWord.kanji)}%20%23kanji`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-1 inline-block text-xs text-primary hover:underline"
+                    >
+                      Show meaning ↗
+                    </a>
                   </div>
                 )}
               </div>

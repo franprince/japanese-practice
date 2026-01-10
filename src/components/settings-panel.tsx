@@ -25,25 +25,35 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
     katakana: sortGroups(relevantGroups.filter((g) => g.type === "katakana")),
   }
 
+  const toOrderNumber = (id: string) => {
+    const match = id.match(/\d+/)
+    return match ? parseInt(match[0], 10) : Number.MAX_SAFE_INTEGER
+  }
+
+  const hiraganaBase = groupsByType.hiragana
+    .filter((g) => !g.id.includes("_a"))
+    .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id))
+
+  const hiraganaAlt = groupsByType.hiragana
+    .filter((g) => g.id.includes("_a"))
+    .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id))
+
+  const katakanaBase = groupsByType.katakana
+    .filter((g) => !g.id.includes("_a"))
+    .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id))
+
+  const katakanaAlt = groupsByType.katakana
+    .filter((g) => g.id.includes("_a"))
+    .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id))
+
+  const isGroupSelected = (groupId: string, selectedGroups: string[]) => selectedGroups.includes(groupId)
+
   const toggleGroup = (groupId: string) => {
-    const newGroups = filter.selectedGroups.includes(groupId)
+    const alreadySelected = filter.selectedGroups.includes(groupId)
+    const newGroups = alreadySelected
       ? filter.selectedGroups.filter((g) => g !== groupId)
       : [...filter.selectedGroups, groupId]
     onFilterChange({ ...filter, selectedGroups: newGroups })
-  }
-
-  const selectAll = (groups: typeof relevantGroups) => {
-    const groupIds = groups.map((g) => g.id)
-    const allSelected = groupIds.every((id) => filter.selectedGroups.includes(id))
-    if (allSelected) {
-      onFilterChange({
-        ...filter,
-        selectedGroups: filter.selectedGroups.filter((g) => !groupIds.includes(g)),
-      })
-    } else {
-      const newGroups = [...new Set([...filter.selectedGroups, ...groupIds])]
-      onFilterChange({ ...filter, selectedGroups: newGroups })
-    }
   }
 
   const resetFilters = () => {
@@ -52,7 +62,21 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
 
   const GroupSection = ({ title, groups }: { title: string; groups: typeof relevantGroups }) => {
     if (groups.length === 0) return null
-    const allSelected = groups.every((g) => filter.selectedGroups.includes(g.id))
+    const effectiveSelected = new Set(filter.selectedGroups)
+
+    const groupIds = groups.map((g) => g.id)
+    const allSelected = groupIds.every((id) => effectiveSelected.has(id))
+
+    const handleSelectAll = () => {
+      const nextSelected = new Set(effectiveSelected)
+      if (allSelected) {
+        groupIds.forEach((id) => nextSelected.delete(id))
+      } else {
+        groupIds.forEach((id) => nextSelected.add(id))
+      }
+      const nextArray = [...nextSelected]
+      onFilterChange({ ...filter, selectedGroups: nextArray })
+    }
 
     return (
       <div className="space-y-3">
@@ -61,25 +85,27 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => selectAll(groups)}
+            onClick={handleSelectAll}
             className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
           >
             {allSelected ? "Deselect all" : "Select all"}
           </Button>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2">
           {groups.map((group) => (
             <button
               key={group.id}
               onClick={() => toggleGroup(group.id)}
+              aria-pressed={isGroupSelected(group.id, filter.selectedGroups)}
+              data-selected={isGroupSelected(group.id, filter.selectedGroups) ? "true" : "false"}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border",
-                filter.selectedGroups.includes(group.id)
+                "px-3 py-2 rounded-lg text-sm font-medium transition-all border w-full text-left flex justify-between items-center",
+                isGroupSelected(group.id, filter.selectedGroups)
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-secondary/50 text-muted-foreground border-border/50 hover:bg-secondary hover:text-foreground",
               )}
             >
-              <span className="mr-1.5">{group.labelJp}</span>
+              <span className="mr-2">{group.labelJp}</span>
               <span className="opacity-70">{group.label}</span>
             </button>
           ))}
@@ -88,23 +114,29 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
     )
   }
 
-  if (!isOpen) {
-    return (
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onToggle}
-        className="bg-transparent border-border/50 hover:bg-secondary/50"
-      >
-        <Settings className="w-4 h-4 mr-2" />
-        Settings
-      </Button>
-    )
-  }
-
   return (
-    <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-      <CardHeader className="pb-4">
+    <div className="w-full max-w-2xl mx-auto space-y-2">
+      <div className="flex justify-center">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onToggle}
+          className="bg-transparent border-border/50 hover:bg-secondary/50"
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          {isOpen ? "Close settings" : "Settings"}
+        </Button>
+      </div>
+      <Card
+        aria-hidden={!isOpen}
+        className={cn(
+          "border-border/50 bg-card/80 backdrop-blur-sm max-w-2xl w-full mx-auto transition-all duration-200",
+          isOpen
+            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+            : "opacity-0 -translate-y-1 scale-[0.99] pointer-events-none max-h-0 overflow-hidden",
+        )}
+      >
+        <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Practice Settings</CardTitle>
           <div className="flex items-center gap-2">
@@ -168,7 +200,10 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
                     Hiragana ひらがな
                   </h3>
                 )}
-                <GroupSection title="All Hiragana groups" groups={groupsByType.hiragana} />
+                <GroupSection title="All Hiragana groups" groups={hiraganaBase} />
+                {hiraganaAlt.length > 0 && (
+                  <GroupSection title="Alternative characters (が · ば · きゃ…)" groups={hiraganaAlt} />
+                )}
               </div>
             )}
 
@@ -179,12 +214,16 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
                     Katakana カタカナ
                   </h3>
                 )}
-                <GroupSection title="All Katakana groups" groups={groupsByType.katakana} />
+                <GroupSection title="All Katakana groups" groups={katakanaBase} />
+                {katakanaAlt.length > 0 && (
+                  <GroupSection title="Alternative characters (ガ · バ · キャ…)" groups={katakanaAlt} />
+                )}
               </div>
             )}
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  </div>
+)
 }

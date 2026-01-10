@@ -64,7 +64,13 @@ export default function Page() {
         </header>
 
         <section className="mt-10 md:mt-12">
-          <GameCard mode={mode} filter={filter} onScoreUpdate={handleScoreUpdate} />
+          <GameCard
+            mode={mode}
+            filter={filter}
+            onScoreUpdate={handleScoreUpdate}
+            suppressFocus={settingsOpen}
+            onRequestCloseSettings={() => setSettingsOpen(false)}
+          />
         </section>
 
         <section className="mt-12 text-center text-sm text-muted-foreground space-y-2">
