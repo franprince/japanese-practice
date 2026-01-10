@@ -37,7 +37,7 @@ export type TranslationKey =
   | "hiraganaLabel"
   | "katakanaLabel"
   | "bothLabel"
-  | "selectGroupsHint" 
+  | "selectGroupsHint"
   | "wordsLabel"
   | "clear"
   | "numbersTitle"
@@ -55,6 +55,16 @@ export type TranslationKey =
   | "medium"
   | "hard"
   | "expert"
+  | "kanjiTitle"
+  | "kanjiSubtitle"
+  | "whatIsReading"
+  | "correct"
+  | "incorrect"
+  | "nextKanji"
+  | "selectDifficulty"
+  | "kanjiEasyHint"
+  | "kanjiMediumHint"
+  | "kanjiHardHint"
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -112,6 +122,16 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     medium: "Medium",
     hard: "Hard",
     expert: "Expert",
+    kanjiTitle: "Kanji Challenge",
+    kanjiSubtitle: "Match the kanji with its reading",
+    whatIsReading: "What is the reading?",
+    correct: "Correct!",
+    incorrect: "Incorrect",
+    nextKanji: "Next Kanji",
+    selectDifficulty: "Select Difficulty",
+    kanjiEasyHint: "Reading + Romaji + Meaning",
+    kanjiMediumHint: "Reading + Meaning",
+    kanjiHardHint: "Reading only",
   },
   es: {
     chipLabel: "Práctica de Kana",
@@ -168,6 +188,16 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     medium: "Intermedio",
     hard: "Difícil",
     expert: "Experto",
+    kanjiTitle: "Desafío Kanji",
+    kanjiSubtitle: "Relaciona el kanji con su lectura",
+    whatIsReading: "¿Cuál es la lectura?",
+    correct: "¡Correcto!",
+    incorrect: "Incorrecto",
+    nextKanji: "Siguiente Kanji",
+    selectDifficulty: "Seleccionar Dificultad",
+    kanjiEasyHint: "Lectura + Romaji + Significado",
+    kanjiMediumHint: "Lectura + Significado",
+    kanjiHardHint: "Solo lectura",
   },
   ja: {
     chipLabel: "かな練習",
@@ -224,5 +254,15 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     medium: "ふつう",
     hard: "むずかしい",
     expert: "エキスパート",
+    kanjiTitle: "漢字チャレンジ",
+    kanjiSubtitle: "漢字の読み方を当てよう",
+    whatIsReading: "読み方は？",
+    correct: "正解！",
+    incorrect: "不正解",
+    nextKanji: "次の漢字",
+    selectDifficulty: "難易度を選択",
+    kanjiEasyHint: "読み + ローマ字 + 意味",
+    kanjiMediumHint: "読み + 意味",
+    kanjiHardHint: "読みのみ",
   },
 }
