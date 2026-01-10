@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import Link from "next/link"
 import { NumberGameCard } from "@/components/number-game-card"
 import { DifficultySelector } from "@/components/difficulty-selector"
 import { StatsDisplay } from "@/components/stats-display"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { Button } from "@/components/ui/button"
 import type { Difficulty } from "@/lib/japanese-numbers"
 import { useI18n } from "@/lib/i18n"
 
@@ -46,7 +48,14 @@ export default function NumbersPage() {
                         </h1>
                         <p className="text-muted-foreground text-xs md:text-sm">{t("numbersSubtitle")}</p>
                     </div>
-                    <LanguageSwitcher />
+                    <div className="flex items-center gap-2">
+                        <Link href="/" className="hidden sm:block">
+                            <Button variant="ghost" size="sm" className="cursor-pointer">
+                                Home
+                            </Button>
+                        </Link>
+                        <LanguageSwitcher />
+                    </div>
                 </header>
 
                 <div className="mb-6">

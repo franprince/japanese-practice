@@ -1,11 +1,13 @@
 "use client"
 
 import { useCallback, useMemo, useState } from "react"
+import Link from "next/link"
 import { GameCard } from "@/components/game-card"
 import { ModeSelector } from "@/components/mode-selector"
 import { SettingsPanel } from "@/components/settings-panel"
 import { StatsDisplay } from "@/components/stats-display"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { Button } from "@/components/ui/button"
 import { characterGroups, type WordFilter } from "@/lib/japanese-words"
 import { useI18n } from "@/lib/i18n"
 import type { GameMode } from "@/types/game"
@@ -71,6 +73,11 @@ export default function WordsPage() {
                         <p className="text-muted-foreground text-xs md:text-sm">{t("tip")}</p>
                     </div>
                     <div className="flex items-center gap-2">
+                        <Link href="/" className="hidden sm:block">
+                            <Button variant="ghost" size="sm" className="cursor-pointer">
+                                Home
+                            </Button>
+                        </Link>
                         <LanguageSwitcher />
                     </div>
                 </header>

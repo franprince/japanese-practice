@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import Link from "next/link"
 import { KanjiGameCard } from "@/components/kanji-game-card"
 import { KanjiDifficultySelector } from "@/components/kanji-difficulty-selector"
 import { StatsDisplay } from "@/components/stats-display"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { Button } from "@/components/ui/button"
 import type { KanjiDifficulty } from "@/lib/kanji-data"
 import { useI18n } from "@/lib/i18n"
 
@@ -46,7 +48,14 @@ export default function KanjiPage() {
                         </h1>
                         <p className="text-muted-foreground text-xs md:text-sm">{t("kanjiSubtitle")}</p>
                     </div>
-                    <LanguageSwitcher />
+                    <div className="flex items-center gap-2">
+                        <Link href="/" className="hidden sm:block">
+                            <Button variant="ghost" size="sm" className="cursor-pointer">
+                                Home
+                            </Button>
+                        </Link>
+                        <LanguageSwitcher />
+                    </div>
                 </header>
 
                 <div className="mb-6">
