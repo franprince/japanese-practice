@@ -108,26 +108,6 @@ function PageContent() {
                         </div>
                         <ModeSelector mode={mode} onModeChange={setMode} />
 
-                        {filter.selectedGroups.length === 0 && (
-                            <div className="flex justify-center mt-2">
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    className="cursor-pointer"
-                                    onClick={() => {
-                                        const el = document.getElementById("settings-panel")
-                                        if (el) {
-                                            el.scrollIntoView({ behavior: "smooth", block: "start" })
-                                        } else {
-                                            setSettingsOpen(true)
-                                        }
-                                    }}
-                                >
-                                    {t("settings")}
-                                </Button>
-                            </div>
-                        )}
-
                         <div className="flex justify-center mb-4">
                             <SettingsPanel
                                 mode={mode}
