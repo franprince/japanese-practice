@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Delete, CornerDownLeft } from "lucide-react"
 import { numberPadKeys } from "@/lib/japanese-numbers"
@@ -11,15 +12,51 @@ interface NumberPadProps {
   onClear: () => void
   onSubmit: () => void
   disabled?: boolean
+  shuffleNumbers: boolean
+  onShuffleChange: (checked: boolean) => void
 }
 
-export function NumberPad({ onKeyPress, onDelete, onClear, onSubmit, disabled }: NumberPadProps) {
+type NumberPadKey = (typeof numberPadKeys)[number]
+
+export function NumberPad({
+  onKeyPress,
+  onDelete,
+  onClear,
+  onSubmit,
+  disabled,
+  shuffleNumbers,
+  onShuffleChange,
+}: NumberPadProps) {
   const { t } = useI18n()
+
+  const keys: NumberPadKey[] = useMemo(() => {
+    if (!shuffleNumbers) return [...numberPadKeys] as NumberPadKey[]
+    const shuffled: NumberPadKey[] = Array.from(numberPadKeys) as NumberPadKey[]
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1))
+      const iVal = shuffled[i]!
+      const jVal = shuffled[j]!
+      shuffled[i] = jVal
+      shuffled[j] = iVal
+    }
+    return shuffled
+  }, [shuffleNumbers])
 
   return (
     <div className="w-full max-w-md mx-auto">
+      <label className="flex items-center gap-2 mb-2 text-sm text-muted-foreground cursor-pointer select-none">
+        <input
+          type="checkbox"
+          className="h-4 w-4 accent-primary cursor-pointer"
+          checked={shuffleNumbers}
+          onChange={(e) => onShuffleChange(e.target.checked)}
+          disabled={disabled}
+        />
+        <span>{t("shuffleNumbers") ?? "Shuffle keys"}</span>
+      </label>
+
       <div className="grid grid-cols-5 gap-2">
-        {numberPadKeys.map(({ char, value }) => (
+        {keys.map(({ char, value }) => (
           <Button
             key={char}
             variant="secondary"

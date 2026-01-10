@@ -48,6 +48,7 @@ export type TranslationKey =
   | "useKeypadBelow"
   | "yourAnswer"
   | "nextNumber"
+  | "shuffleNumbers"
   | "pressEnter"
   | "toSubmit"
   | "easy"
@@ -103,6 +104,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     useKeypadBelow: "Use the keypad below",
     yourAnswer: "Your answer",
     nextNumber: "Next Number",
+    shuffleNumbers: "Shuffle keys",
     pressEnter: "Press",
     toSubmit: "to submit",
     clear: "Clear",
@@ -158,6 +160,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     useKeypadBelow: "Usa el teclado de abajo",
     yourAnswer: "Tu respuesta",
     nextNumber: "Siguiente Número",
+    shuffleNumbers: "Mezclar teclas",
     pressEnter: "Presiona",
     toSubmit: "para enviar",
     clear: "Borrar",
@@ -213,6 +216,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     useKeypadBelow: "下のキーパッドを使用",
     yourAnswer: "あなたの答え",
     nextNumber: "次の数字",
+    shuffleNumbers: "キーをシャッフル",
     pressEnter: "Enterキーを押して",
     toSubmit: "送信",
     clear: "クリア",

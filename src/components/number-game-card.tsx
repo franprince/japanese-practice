@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { NumberPad } from "@/components/number-pad"
@@ -10,6 +10,7 @@ import {
   arabicToJapanese,
   japaneseToArabic,
   difficultyRanges,
+  japaneseNumbers,
   type Difficulty,
 } from "@/lib/japanese-numbers"
 import { useI18n } from "@/lib/i18n"
@@ -27,6 +28,7 @@ export function NumberGameCard({ difficulty, onScoreUpdate }: NumberGameCardProp
   const [isCorrect, setIsCorrect] = useState(false)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
+  const [shuffleNumbers, setShuffleNumbers] = useState(false)
 
   const generateNewNumber = useCallback(() => {
     const range = difficultyRanges[difficulty]
@@ -105,6 +107,15 @@ export function NumberGameCard({ difficulty, onScoreUpdate }: NumberGameCardProp
 
   const correctAnswer = arabicToJapanese(currentNumber)
 
+  const correctAnswerRomaji = useMemo(() => {
+    const toRomaji = (jp: string) =>
+      jp
+        .split("")
+        .map((char) => japaneseNumbers[char as keyof typeof japaneseNumbers]?.reading ?? char)
+        .join(" ")
+    return toRomaji(correctAnswer)
+  }, [correctAnswer])
+
   return (
     <div className="space-y-4">
       {/* Question display - always at top */}
@@ -143,7 +154,10 @@ export function NumberGameCard({ difficulty, onScoreUpdate }: NumberGameCardProp
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t("correctAnswer")}:</span>
-                <span className="text-xl font-bold text-foreground">{correctAnswer}</span>
+                <div className="text-right">
+                  <p className="text-xl font-bold text-foreground leading-tight">{correctAnswer}</p>
+                  <p className="text-xs text-muted-foreground/80 leading-tight">{correctAnswerRomaji}</p>
+                </div>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t("yourAnswer")}:</span>
@@ -176,6 +190,8 @@ export function NumberGameCard({ difficulty, onScoreUpdate }: NumberGameCardProp
               onClear={handleClear}
               onSubmit={handleSubmit}
               disabled={showResult}
+              shuffleNumbers={shuffleNumbers}
+              onShuffleChange={setShuffleNumbers}
             />
             <div className="flex justify-center">
               <Button variant="ghost" onClick={handleSkip} className="text-muted-foreground hover:text-foreground">
