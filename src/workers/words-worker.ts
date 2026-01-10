@@ -105,7 +105,9 @@ const mapEntryToWord = (entry: any, characterGroups: CharacterGroup[]): Japanese
   const kanaText = entry?.kana?.[0]?.text as string | undefined
   if (!kanaText) return null
 
-  const meaning = entry?.sense?.[0]?.gloss?.[0]?.text as string | undefined
+  const meaning = Array.isArray(entry?.sense?.[0]?.gloss)
+    ? entry.sense[0].gloss.map((g: any) => g?.text).filter(Boolean).join(", ")
+    : (entry?.sense?.[0]?.gloss?.[0]?.text as string | undefined)
   const kanji = entry?.kanji?.[0]?.text as string | undefined
 
   const type: "hiragana" | "katakana" | null = hasKatakana(kanaText)

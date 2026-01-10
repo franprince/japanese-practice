@@ -20,10 +20,12 @@ type KanaGroup = {
   characters: Record<string, string[]>
 }
 
+const CACHE_VERSION = process.env.NEXT_PUBLIC_CACHE_VERSION || "v1"
+const ENV_KEY = typeof process !== "undefined" && process.env.NODE_ENV === "development" ? "dev" : "prod"
+const CACHE_KEY = `${CACHE_VERSION}-${ENV_KEY}` // bump/override via env; dev/prod separated
 let cachedPromise: Promise<WordSets> | null = null
 const DB_NAME = "kana-words"
 const STORE_NAME = "wordSets"
-const CACHE_KEY = "v2" // bump to invalidate cached word sets after romaji fixes
 
 const spawnWorker = () => {
   return new Worker(new URL("../workers/words-worker.ts", import.meta.url), { type: "module" })
@@ -52,7 +54,9 @@ const mapEntryToWord = (
   const kanaText = entry?.kana?.[0]?.text as string | undefined
   if (!kanaText) return null
 
-  const meaning = entry?.sense?.[0]?.gloss?.[0]?.text as string | undefined
+  const meaning = Array.isArray(entry?.sense?.[0]?.gloss)
+    ? entry.sense[0].gloss.map((g: any) => g?.text).filter(Boolean).join(", ")
+    : (entry?.sense?.[0]?.gloss?.[0]?.text as string | undefined)
   const kanji = entry?.kanji?.[0]?.text as string | undefined
 
   const type: "hiragana" | "katakana" | null = hasKatakana(kanaText)
