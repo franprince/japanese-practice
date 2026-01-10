@@ -39,9 +39,8 @@ bun start
 ```
 
 ## Data & Licensing
-- Uses `data/jmdict-spa-3.6.1.json` (tracked via Git LFS).
-- Dictionary sources: JMdict/EDICT and KANJIDIC from the Electronic Dictionary Research and Development Group, used per their licence.
-- See footer links in-app for JMdict/EDICT/KANJIDIC and licence details.
+- Uses `data/jmdict-spa-3.6.1.json` from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified) (tracked via Git LFS).
+- Dictionary sources: JMdict/EDICT and KANJIDIC from the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/), used per their [licence](https://www.edrdg.org/edrdg/licence.html).
 
 ## Deployment
 The app is deployed on Vercel. To deploy:
