@@ -1,6 +1,6 @@
-import rawJmdict from "../../data/jmdict-spa-3.6.1.json";
 import { kanaDictionary } from "../../data/kanaDictionary";
 import { blacklist } from "../../data/blacklist";
+import { loadWordSets } from "./words-loader";
 
 type KanaGroup = {
   characters: Record<string, string[]>
@@ -83,92 +83,6 @@ const kanaToRomaji = (text: string) => {
   return romaji || text
 }
 
-const mapEntryToWord = (entry: any): JapaneseWord | null => {
-  const kanaText = entry?.kana?.[0]?.text as string | undefined
-  if (!kanaText) return null
-
-  const meaning = entry?.sense?.[0]?.gloss?.[0]?.text as string | undefined
-  const kanji = entry?.kanji?.[0]?.text as string | undefined
-
-  const type: "hiragana" | "katakana" | null = hasKatakana(kanaText)
-    ? "katakana"
-    : hasHiragana(kanaText)
-      ? "hiragana"
-      : null
-
-  if (!type) return null
-
-  const groups = characterGroups
-    .filter(g => g.type === type && g.characters.some(ch => kanaText.includes(ch)))
-    .map(g => g.id)
-
-  return {
-    kana: kanaText,
-    romaji: kanaToRomaji(kanaText),
-    type,
-    meaning,
-    groups,
-    kanji,
-  }
-}
-
-const jmdictWords: JapaneseWord[] = Array.isArray((rawJmdict as any)?.words)
-  ? ((rawJmdict as any).words as any[])
-      .map(mapEntryToWord)
-      .filter((w): w is JapaneseWord => w !== null)
-  : []
-
-const jmdictLookupByKana: Record<string, Pick<JapaneseWord, "meaning" | "kanji">> = jmdictWords.reduce(
-  (acc, word) => {
-    if (!acc[word.kana]) {
-      acc[word.kana] = { meaning: word.meaning, kanji: word.kanji }
-    }
-    return acc
-  },
-  {} as Record<string, Pick<JapaneseWord, "meaning" | "kanji">>,
-)
-
-const dictionaryCharWords: JapaneseWord[] = (
-  Object.entries(kanaDictionary) as [JapaneseWord["type"], Record<string, KanaGroup>][]
-).flatMap(([typeKey, groups]) => {
-  return Object.entries(groups).flatMap(([groupId, groupValue]) => {
-    const characters: Record<string, string[]> = groupValue?.characters ?? {}
-    return Object.entries(characters).map(([kana, romajiList]) => {
-      const lookup = jmdictLookupByKana[kana] || {}
-      const matchedGroups =
-        characterGroups
-          .filter(g => g.type === typeKey && g.characters.some(ch => kana.includes(ch)))
-          .map(g => g.id) || []
-
-      return {
-        kana,
-        romaji: Array.isArray(romajiList) && romajiList.length > 0 ? romajiList[0] ?? "" : "",
-        type: typeKey,
-        meaning: lookup.meaning,
-        kanji: lookup.kanji,
-        groups: matchedGroups.length ? matchedGroups : [groupId],
-      } satisfies JapaneseWord
-    })
-  })
-})
-
-const jmdictWordsWithGroups: JapaneseWord[] = jmdictWords.map(word => {
-  const groups =
-    characterGroups
-      .filter(g => g.type === word.type && g.characters.some(ch => word.kana.includes(ch)))
-      .map(g => g.id) || []
-  return { ...word, groups }
-})
-
-const mergedWords = [...dictionaryCharWords, ...jmdictWordsWithGroups].reduce<JapaneseWord[]>((acc, curr) => {
-  const exists = acc.find(w => w.kana === curr.kana && w.type === curr.type)
-  if (!exists) acc.push(curr)
-  return acc
-}, [])
-
-export const katakanaWords: JapaneseWord[] = mergedWords.filter(w => w.type === "katakana")
-export const hiraganaWords: JapaneseWord[] = mergedWords.filter(w => w.type === "hiragana")
-
 const isMeaningBlacklisted = (meaning?: string) => {
   if (!meaning) return false
   const lowerMeaning = meaning.toLowerCase()
@@ -181,7 +95,17 @@ export interface WordFilter {
   maxLength: number
 }
 
-export function getRandomWord(type: "hiragana" | "katakana" | "both", filter?: WordFilter): JapaneseWord | null {
+export async function getRandomWord(
+  type: "hiragana" | "katakana" | "both",
+  filter?: WordFilter,
+): Promise<JapaneseWord | null> {
+  const { hiraganaWords, katakanaWords } = await loadWordSets({
+    characterGroups,
+    kanaToRomaji,
+    hasHiragana,
+    hasKatakana,
+  })
+
   let words: JapaneseWord[]
 
   if (type === "hiragana") {
@@ -204,7 +128,7 @@ export function getRandomWord(type: "hiragana" | "katakana" | "both", filter?: W
       const length = word.kana.length
       if (length < minLength || length > maxLength) return false
 
-      // Group filter - require that all groups for this word are within the selected set
+      // Group filter - require selections; if none selected, exclude all
       if (selectedGroups.length === 0) return false
       const allGroupsAllowed = word.groups.every((g) => selectedGroups.includes(g))
       if (!allGroupsAllowed) return false

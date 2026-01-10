@@ -39,8 +39,8 @@ export function GameCard({
   const inputRef = useRef<HTMLInputElement>(null)
   const { t } = useI18n()
 
-  const loadNewWord = useCallback(() => {
-    const word = getRandomWord(mode, filter) // Pass filter
+  const loadNewWord = useCallback(async () => {
+    const word = await getRandomWord(mode, filter) // Pass filter
     if (word) {
       setCurrentWord(word)
       setNoWordsAvailable(false)
