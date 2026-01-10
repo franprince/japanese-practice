@@ -1,22 +1,50 @@
-# bun-react-tailwind-shadcn-template
+# Kana Words
 
-To install dependencies:
+Practice hiragana and katakana via romaji input with streaks, filters, and multilingual UI.
 
+## Features
+- Modes: Hiragana, Katakana, Both
+- Filtering: character groups, word length
+- Dynamic dictionary loading with IndexedDB cache (worker-based)
+- i18n: English, Spanish, Japanese
+- Sokuon rule support (small っ / ッ doubles the consonant)
+- Persistent preferences (language, mode, filters)
+- Shadcn-styled UI with keyboard-friendly flow
+
+## Tech Stack
+- Next.js (App Router) + React
+- Bun runtime + bunx
+- TypeScript, Tailwind CSS, shadcn/ui
+- IndexedDB + Web Workers for word loading
+
+## Getting Started
+Install dependencies:
 ```bash
 bun install
 ```
 
-To start a development server:
-
+Run dev server:
 ```bash
 bun dev
 ```
 
-To run for production:
+Build for production:
+```bash
+bun run build
+```
 
+Start production build:
 ```bash
 bun start
 ```
 
-This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
-# japanese-practice
+## Data & Licensing
+- Uses `data/jmdict-spa-3.6.1.json` (tracked via Git LFS).
+- Dictionary sources: JMdict/EDICT and KANJIDIC from the Electronic Dictionary Research and Development Group, used per their licence.
+- See footer links in-app for JMdict/EDICT/KANJIDIC and licence details.
+
+## Deployment
+The app is deployed on Vercel. To deploy:
+```bash
+vercel --prod
+```
