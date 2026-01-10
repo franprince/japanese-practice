@@ -12,7 +12,7 @@ import { getRandomWord, type JapaneseWord, type WordFilter } from "@/lib/japanes
 import { useI18n } from "@/lib/i18n"
 import { Check, X, Flame, SkipForward, Zap } from "lucide-react"
 
-type GameMode = "hiragana" | "katakana" | "both"
+import type { GameMode } from "@/types/game"
 
 interface GameCardProps {
   mode: GameMode
@@ -36,10 +36,12 @@ export function GameCard({
   const [streak, setStreak] = useState(0)
   const [totalAttempts, setTotalAttempts] = useState(0)
   const [noWordsAvailable, setNoWordsAvailable] = useState(false) // Handle empty results
+  const [isLoading, setIsLoading] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
   const { t } = useI18n()
 
   const loadNewWord = useCallback(async () => {
+    setIsLoading(true)
     const word = await getRandomWord(mode, filter) // Pass filter
     if (word) {
       setCurrentWord(word)
@@ -48,6 +50,7 @@ export function GameCard({
       setCurrentWord(null)
       setNoWordsAvailable(true)
     }
+    setIsLoading(false)
     setUserInput("")
     setFeedback(null)
     setTimeout(() => {
@@ -99,6 +102,18 @@ export function GameCard({
     setStreak(0)
     onScoreUpdate(score, 0, false)
     loadNewWord()
+  }
+
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-xl mx-auto">
+        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground animate-pulse">Loading...</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (noWordsAvailable) {
@@ -230,21 +245,21 @@ export function GameCard({
                   <Button
                     variant="outline"
                     onClick={skipWord}
-                    className="flex-1 bg-transparent border-border/50 hover:bg-secondary/50 hover:border-border"
+                    className="flex-1 bg-transparent border-border/50 hover:bg-secondary/50 hover:border-border cursor-pointer"
                   >
                     <SkipForward className="w-4 h-4 mr-2" />
                     {t("skip")}
                   </Button>
                   <Button
                     onClick={checkAnswer}
-                    className="flex-1 bg-primary hover:bg-primary/90"
+                    className="flex-1 bg-primary hover:bg-primary/90 cursor-pointer"
                     disabled={!userInput.trim()}
                   >
                     {t("check")}
                   </Button>
                 </>
               ) : (
-                <Button onClick={loadNewWord} className="w-full bg-primary hover:bg-primary/90">
+                <Button onClick={loadNewWord} className="w-full bg-primary hover:bg-primary/90 cursor-pointer">
                   {t("nextWord")}
                 </Button>
               )}

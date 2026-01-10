@@ -37,6 +37,7 @@ export type TranslationKey =
   | "hiraganaLabel"
   | "katakanaLabel"
   | "bothLabel"
+  | "selectGroupsHint"
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -76,6 +77,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     hiraganaLabel: "Hiragana",
     katakanaLabel: "Katakana",
     bothLabel: "Both",
+    selectGroupsHint: "Select at least one character group to start.",
   },
   es: {
     chipLabel: "Práctica de Kana",
@@ -114,6 +116,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     hiraganaLabel: "Hiragana",
     katakanaLabel: "Katakana",
     bothLabel: "Ambos",
+    selectGroupsHint: "Selecciona al menos un grupo de caracteres para comenzar.",
   },
   ja: {
     chipLabel: "かな練習",
@@ -152,5 +155,6 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     hiraganaLabel: "ひらがな",
     katakanaLabel: "カタカナ",
     bothLabel: "両方",
+    selectGroupsHint: "開始するには文字グループを選択してください。",
   },
 }

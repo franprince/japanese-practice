@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils"
 import { useI18n } from "@/lib/i18n"
 
-type GameMode = "hiragana" | "katakana" | "both"
+import type { GameMode } from "@/types/game"
 
 interface ModeSelectorProps {
   mode: GameMode
@@ -26,7 +26,7 @@ export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
             key={value}
             onClick={() => onModeChange(value)}
             className={cn(
-              "relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200",
+              "relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
               mode === value
                 ? "bg-primary text-primary-foreground shadow-lg"
                 : "text-muted-foreground hover:text-foreground",

@@ -1,5 +1,7 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react"
+import { createContext, useContext, useMemo, useState, useEffect, type ReactNode } from "react"
 import { translations, type Language, type TranslationKey } from "@/lib/translations"
+
+const LANG_STORAGE_KEY = "kana-words-lang"
 
 interface I18nContextValue {
   lang: Language
@@ -9,8 +11,27 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | null>(null)
 
-export function I18nProvider({ children, initialLang = "en" }: { children: ReactNode; initialLang?: Language }) {
-  const [lang, setLang] = useState<Language>(initialLang)
+const getStoredLang = (): Language | null => {
+  if (typeof window === "undefined") return null
+  const stored = localStorage.getItem(LANG_STORAGE_KEY)
+  if (stored === "en" || stored === "es" || stored === "ja") return stored
+  return null
+}
+
+export function I18nProvider({ children, initialLang = "es" }: { children: ReactNode; initialLang?: Language }) {
+  const [lang, setLangState] = useState<Language>(initialLang)
+
+  useEffect(() => {
+    const stored = getStoredLang()
+    if (stored) setLangState(stored)
+  }, [])
+
+  const setLang = (next: Language) => {
+    setLangState(next)
+    if (typeof window !== "undefined") {
+      localStorage.setItem(LANG_STORAGE_KEY, next)
+    }
+  }
 
   const t = useMemo(() => {
     return (key: TranslationKey) => translations[lang]?.[key] ?? translations.en[key] ?? key

@@ -1,20 +1,61 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import { StatsDisplay } from "@/components/stats-display";
 import { GameCard } from "@/components/game-card";
 import { ModeSelector } from "@/components/mode-selector";
 import { SettingsPanel } from "@/components/settings-panel";
+import { Button } from "@/components/ui/button";
 import type { WordFilter } from "@/lib/japanese-words";
 import { I18nProvider, useI18n } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/language-switcher";
 
-type GameMode = "hiragana" | "katakana" | "both";
+import type { GameMode } from "@/types/game";
 
 function PageContent() {
-  const [mode, setMode] = useState<GameMode>("both");
-  const [filter, setFilter] = useState<WordFilter>({ selectedGroups: [], minLength: 1, maxLength: 10 });
+  const FILTER_STORAGE_KEY = "kana-words-filter";
+  const MODE_STORAGE_KEY = "kana-words-mode";
+
+  const getStoredFilter = (): WordFilter | null => {
+    if (typeof window === "undefined") return null;
+    try {
+      const stored = localStorage.getItem(FILTER_STORAGE_KEY);
+      if (stored) return JSON.parse(stored) as WordFilter;
+    } catch {}
+    return null;
+  };
+
+  const getStoredMode = (): GameMode | null => {
+    if (typeof window === "undefined") return null;
+    const stored = localStorage.getItem(MODE_STORAGE_KEY);
+    if (stored === "hiragana" || stored === "katakana" || stored === "both") return stored;
+    return null;
+  };
+
+  const [mode, setModeState] = useState<GameMode>("hiragana");
+  const [filter, setFilterState] = useState<WordFilter>({ selectedGroups: [], minLength: 1, maxLength: 10 });
+
+  useEffect(() => {
+    const storedMode = getStoredMode();
+    if (storedMode) setModeState(storedMode);
+    const storedFilter = getStoredFilter();
+    if (storedFilter) setFilterState(storedFilter);
+  }, []);
+
+  const setMode = (next: GameMode) => {
+    setModeState(next);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(MODE_STORAGE_KEY, next);
+    }
+  };
+
+  const setFilter = (next: WordFilter) => {
+    setFilterState(next);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(next));
+    }
+  };
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
@@ -40,7 +81,7 @@ function PageContent() {
       <div className="mx-auto max-w-5xl px-4 pb-16 pt-12 md:pt-16">
         <header className="flex flex-col items-center gap-6 text-center relative">
           <div className="w-full flex justify-end">
-            <LanguageSwitcher />
+            <LanguageSwitcher className="cursor-pointer" />
           </div>
           <div className="inline-flex items-center rounded-full border border-border/60 bg-card/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground shadow-sm backdrop-blur">
             {t("chipLabel")}
@@ -50,6 +91,14 @@ function PageContent() {
             <p className="text-lg text-muted-foreground max-w-2xl">{t("heroSubtitle")}</p>
           </div>
           <ModeSelector mode={mode} onModeChange={setMode} />
+          {filter.selectedGroups.length === 0 && (
+            <div className="w-full max-w-3xl mt-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-600 flex items-start justify-between gap-3">
+              <span>{t("selectGroupsHint")}</span>
+              <Button variant="secondary" className="cursor-pointer" size="sm" onClick={() => setSettingsOpen(true)}>
+                {t("settings")}
+              </Button>
+            </div>
+          )}
 
           <div className="w-full max-w-3xl">
             <div className="flex justify-center mb-4">

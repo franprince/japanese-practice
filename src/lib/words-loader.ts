@@ -127,11 +127,15 @@ const buildWordsInMain = async (deps: LoaderDeps): Promise<WordSets> => {
     return { ...word, groups }
   })
 
-  const mergedWords = [...dictionaryCharWords, ...jmdictWordsWithGroups].reduce<JapaneseWord[]>((acc, curr) => {
-    const exists = acc.find(w => w.kana === curr.kana && w.type === curr.type)
-    if (!exists) acc.push(curr)
-    return acc
-  }, [])
+  const seen = new Map<string, boolean>()
+  const mergedWords: JapaneseWord[] = []
+  for (const word of [...dictionaryCharWords, ...jmdictWordsWithGroups]) {
+    const key = `${word.kana}|${word.type}`
+    if (!seen.has(key)) {
+      seen.set(key, true)
+      mergedWords.push(word)
+    }
+  }
 
   return {
     katakanaWords: mergedWords.filter(w => w.type === "katakana"),

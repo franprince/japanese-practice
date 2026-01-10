@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
@@ -6,7 +7,7 @@ import { characterGroups, type WordFilter } from "@/lib/japanese-words"
 import { Settings, X, RotateCcw } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
-type GameMode = "hiragana" | "katakana" | "both"
+import type { GameMode } from "@/types/game"
 
 interface SettingsPanelProps {
   mode: GameMode
@@ -18,35 +19,47 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }: SettingsPanelProps) {
   const { t } = useI18n()
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isOpen) return
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        onToggle()
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [isOpen, onToggle])
+
   const sortGroups = (groups: typeof characterGroups) => [...groups].sort((a, b) => a.label.localeCompare(b.label))
-
-  const relevantGroups = sortGroups(characterGroups.filter((g) => (mode === "both" ? true : g.type === mode)))
-
-  const groupsByType = {
-    hiragana: sortGroups(relevantGroups.filter((g) => g.type === "hiragana")),
-    katakana: sortGroups(relevantGroups.filter((g) => g.type === "katakana")),
-  }
 
   const toOrderNumber = (id: string) => {
     const match = id.match(/\d+/)
     return match ? parseInt(match[0], 10) : Number.MAX_SAFE_INTEGER
   }
 
-  const hiraganaBase = groupsByType.hiragana
-    .filter((g) => !g.id.includes("_a"))
-    .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id))
-
-  const hiraganaAlt = groupsByType.hiragana
-    .filter((g) => g.id.includes("_a"))
-    .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id))
-
-  const katakanaBase = groupsByType.katakana
-    .filter((g) => !g.id.includes("_a"))
-    .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id))
-
-  const katakanaAlt = groupsByType.katakana
-    .filter((g) => g.id.includes("_a"))
-    .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id))
+  const { hiraganaBase, hiraganaAlt, katakanaBase, katakanaAlt } = useMemo(() => {
+    const relevantGroups = sortGroups(characterGroups.filter((g) => (mode === "both" ? true : g.type === mode)))
+    const groupsByType = {
+      hiragana: sortGroups(relevantGroups.filter((g) => g.type === "hiragana")),
+      katakana: sortGroups(relevantGroups.filter((g) => g.type === "katakana")),
+    }
+    return {
+      hiraganaBase: groupsByType.hiragana
+        .filter((g) => !g.id.includes("_a"))
+        .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
+      hiraganaAlt: groupsByType.hiragana
+        .filter((g) => g.id.includes("_a"))
+        .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
+      katakanaBase: groupsByType.katakana
+        .filter((g) => !g.id.includes("_a"))
+        .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
+      katakanaAlt: groupsByType.katakana
+        .filter((g) => g.id.includes("_a"))
+        .sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
+    }
+  }, [mode])
 
   const isGroupSelected = (groupId: string, selectedGroups: string[]) => selectedGroups.includes(groupId)
 
@@ -62,7 +75,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
     onFilterChange({ selectedGroups: [], minLength: 1, maxLength: 10 })
   }
 
-  const GroupSection = ({ title, groups }: { title: string; groups: typeof relevantGroups }) => {
+  const GroupSection = ({ title, groups }: { title: string; groups: typeof characterGroups }) => {
     if (groups.length === 0) return null
     const effectiveSelected = new Set(filter.selectedGroups)
 
@@ -88,7 +101,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
             variant="ghost"
             size="sm"
             onClick={handleSelectAll}
-            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+            className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
           >
             {allSelected ? t("deselectAll") : t("selectAll")}
           </Button>
@@ -101,7 +114,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
               aria-pressed={isGroupSelected(group.id, filter.selectedGroups)}
               data-selected={isGroupSelected(group.id, filter.selectedGroups) ? "true" : "false"}
               className={cn(
-                "px-3 py-2 rounded-lg text-sm font-medium transition-all border w-full text-left flex justify-between items-center",
+                "px-3 py-2 rounded-lg text-sm font-medium transition-all border w-full text-left flex justify-between items-center cursor-pointer",
                 isGroupSelected(group.id, filter.selectedGroups)
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-secondary/50 text-muted-foreground border-border/50 hover:bg-secondary hover:text-foreground",
@@ -117,13 +130,13 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-2">
+    <div ref={panelRef} className="w-full max-w-2xl mx-auto space-y-2">
       <div className="flex justify-center">
         <Button
           variant="outline"
           size="sm"
           onClick={onToggle}
-          className="bg-transparent border-border/50 hover:bg-secondary/50"
+          className="bg-transparent border-border/50 hover:bg-secondary/50 cursor-pointer"
         >
           <Settings className="w-4 h-4 mr-2" />
           {isOpen ? t("closeSettings") : t("settings")}
@@ -195,6 +208,12 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
             )}
           </div>
           <p className="text-xs text-muted-foreground">{t("charactersDescription")}</p>
+          {filter.selectedGroups.length === 0 && (
+            <div className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/40 rounded-md px-3 py-2 flex items-start gap-2">
+              <span className="mt-[2px]">⚠️</span>
+              <span>{t("selectGroupsHint")}</span>
+            </div>
+          )}
 
           <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
             {(mode === "hiragana" || mode === "both") && (
