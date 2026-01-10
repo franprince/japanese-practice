@@ -1,6 +1,7 @@
 import fs from "fs"
 import path from "path"
 import { kanaDictionary, type KanaDictionary, type KanaGroup } from "../data/kanaDictionary"
+import { blacklist } from "../data/blacklist"
 import type { JapaneseWord } from "../src/lib/japanese-words"
 
 const WORDSET_VERSION = process.env.WORDSET_VERSION || process.env.NEXT_PUBLIC_WORDSET_VERSION || "v1"
@@ -11,6 +12,17 @@ const hiraToKata = (char: string) => {
   // hiragana block: 3040-309F; katakana starts at 30A0
   return String.fromCharCode(code + 0x60)
 }
+const kataToHira = (text: string) =>
+  Array.from(text)
+    .map(ch => {
+      const code = ch.charCodeAt(0)
+      // katakana block: 30A0-30FF; hiragana starts at 3040 (subtract 0x60)
+      if (code >= 0x30a0 && code <= 0x30ff) {
+        return String.fromCharCode(code - 0x60)
+      }
+      return ch
+    })
+    .join("")
 
 const hasHiragana = (text: string) => /[\u3040-\u309F]/.test(text)
 const hasKatakana = (text: string) => /[\u30A0-\u30FF]/.test(text)
@@ -93,6 +105,11 @@ const mapEntryToWord = (entry: any): JapaneseWord | null => {
     : (entry?.sense?.[0]?.gloss?.[0]?.text as string | undefined)
   const kanji = entry?.kanji?.[0]?.text as string | undefined
 
+  const lowerMeaning = meaning?.toLowerCase() ?? ""
+  const isBlacklisted =
+    lowerMeaning && blacklist.some(term => term.trim() && lowerMeaning.includes(term.toLowerCase()))
+  if (isBlacklisted) return null
+
   const type: "hiragana" | "katakana" | null = hasKatakana(kanaText)
     ? "katakana"
     : hasHiragana(kanaText)
@@ -174,9 +191,16 @@ const buildWordSet = async () => {
     }
   }
 
+  const hiraganaWords = mergedWords.filter(w => w.type === "hiragana")
+  const katakanaWords = mergedWords.filter(w => w.type === "katakana")
+
+  const hiraSet = new Set(hiraganaWords.map(w => w.kana))
+  const bothForms = katakanaWords.filter(w => hiraSet.has(kataToHira(w.kana)))
+
   const payload = {
-    hiraganaWords: mergedWords.filter(w => w.type === "hiragana"),
-    katakanaWords: mergedWords.filter(w => w.type === "katakana"),
+    hiraganaWords,
+    katakanaWords,
+    bothForms,
   }
 
   await fs.promises.mkdir(path.dirname(OUTPUT_PATH), { recursive: true })

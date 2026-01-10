@@ -14,7 +14,7 @@ export type LoaderDeps = {
   hasKatakana: (text: string) => boolean
 }
 
-export type WordSets = { hiraganaWords: JapaneseWord[]; katakanaWords: JapaneseWord[] }
+export type WordSets = { hiraganaWords: JapaneseWord[]; katakanaWords: JapaneseWord[]; bothForms?: JapaneseWord[] }
 
 type KanaGroup = {
   characters: Record<string, string[]>
@@ -27,6 +27,17 @@ const CACHE_KEY = `${CACHE_VERSION}-${ENV_KEY}` // bump/override via env; dev/pr
 let cachedPromise: Promise<WordSets> | null = null
 const DB_NAME = "kana-words"
 const STORE_NAME = "wordSets"
+
+const kataToHira = (text: string) =>
+  Array.from(text)
+    .map(ch => {
+      const code = ch.charCodeAt(0)
+      if (code >= 0x30a0 && code <= 0x30ff) {
+        return String.fromCharCode(code - 0x60)
+      }
+      return ch
+    })
+    .join("")
 
 const spawnWorker = () => {
   return new Worker(new URL("../workers/words-worker.ts", import.meta.url), { type: "module" })

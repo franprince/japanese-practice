@@ -119,7 +119,7 @@ export async function getRandomWord(
   type: "hiragana" | "katakana" | "both",
   filter?: WordFilter,
 ): Promise<JapaneseWord | null> {
-  const { hiraganaWords, katakanaWords } = await loadWordSets({
+  const { hiraganaWords, katakanaWords, bothForms } = await loadWordSets({
     characterGroups,
     kanaToRomaji,
     hasHiragana,
@@ -133,7 +133,11 @@ export async function getRandomWord(
   } else if (type === "katakana") {
     words = katakanaWords
   } else {
-    words = [...hiraganaWords, ...katakanaWords]
+    const combined = [...hiraganaWords, ...katakanaWords]
+    if (bothForms && bothForms.length > 0) {
+      combined.push(...bothForms)
+    }
+    words = combined
   }
 
   // Global blacklist filter based on meaning
