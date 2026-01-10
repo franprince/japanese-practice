@@ -1,1 +1,1 @@
-export const blacklist: string[] = ["semen", "pene", "vagina", "caca", "vulva", "sexual", "sexo"]
+export const blacklist: string[] = ["semen", "pene", "vagina", "caca", "vulva", "sexual", "sexo", "eréctil"]

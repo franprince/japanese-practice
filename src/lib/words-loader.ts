@@ -20,6 +20,7 @@ type KanaGroup = {
   characters: Record<string, string[]>
 }
 
+const WORDSET_VERSION = process.env.NEXT_PUBLIC_WORDSET_VERSION || "v1"
 const CACHE_VERSION = process.env.NEXT_PUBLIC_CACHE_VERSION || "v1"
 const ENV_KEY = typeof process !== "undefined" && process.env.NODE_ENV === "development" ? "dev" : "prod"
 const CACHE_KEY = `${CACHE_VERSION}-${ENV_KEY}` // bump/override via env; dev/prod separated
@@ -181,11 +182,28 @@ const writeCache = async (data: WordSets) => {
   })
 }
 
+const fetchPrebuiltWordset = async (): Promise<WordSets | null> => {
+  try {
+    const res = await fetch(`/wordset-${WORDSET_VERSION}.json`, { cache: "force-cache" })
+    if (!res.ok) return null
+    const json = (await res.json()) as WordSets
+    if (!json?.hiraganaWords || !json?.katakanaWords) return null
+    return json
+  } catch {
+    return null
+  }
+}
+
 export const loadWordSets = (_deps: LoaderDeps): Promise<WordSets> => {
   if (!cachedPromise) {
     cachedPromise = (async () => {
       const cached = await readCache().catch(() => null)
       if (cached) return cached
+      const prebuilt = await fetchPrebuiltWordset()
+      if (prebuilt) {
+        writeCache(prebuilt).catch(() => undefined)
+        return prebuilt
+      }
       const canUseWorker = false // temporarily disable worker to avoid port issues
       const fresh = canUseWorker ? await buildWordsInWorker() : await buildWordsInMain(_deps)
       writeCache(fresh).catch(() => undefined)
