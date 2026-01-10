@@ -1,5 +1,6 @@
 import rawJmdict from "../../data/jmdict-spa-3.6.1.json";
 import { kanaDictionary } from "../../data/kanaDictionary";
+import { blacklist } from "../../data/blacklist";
 
 type KanaGroup = {
   characters: Record<string, string[]>
@@ -168,6 +169,12 @@ const mergedWords = [...dictionaryCharWords, ...jmdictWordsWithGroups].reduce<Ja
 export const katakanaWords: JapaneseWord[] = mergedWords.filter(w => w.type === "katakana")
 export const hiraganaWords: JapaneseWord[] = mergedWords.filter(w => w.type === "hiragana")
 
+const isMeaningBlacklisted = (meaning?: string) => {
+  if (!meaning) return false
+  const lowerMeaning = meaning.toLowerCase()
+  return blacklist.some(term => term.trim() && lowerMeaning.includes(term.toLowerCase()))
+}
+
 export interface WordFilter {
   selectedGroups: string[]
   minLength: number
@@ -184,6 +191,9 @@ export function getRandomWord(type: "hiragana" | "katakana" | "both", filter?: W
   } else {
     words = [...hiraganaWords, ...katakanaWords]
   }
+
+  // Global blacklist filter based on meaning
+  words = words.filter(word => !isMeaningBlacklisted(word.meaning))
 
   // Apply filters
   if (filter) {
