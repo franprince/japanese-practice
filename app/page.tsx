@@ -7,16 +7,19 @@ import { GameCard } from "@/components/game-card";
 import { ModeSelector } from "@/components/mode-selector";
 import { SettingsPanel } from "@/components/settings-panel";
 import type { WordFilter } from "@/lib/japanese-words";
+import { I18nProvider, useI18n } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 type GameMode = "hiragana" | "katakana" | "both";
 
-export default function Page() {
+function PageContent() {
   const [mode, setMode] = useState<GameMode>("both");
   const [filter, setFilter] = useState<WordFilter>({ selectedGroups: [], minLength: 1, maxLength: 10 });
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { t } = useI18n();
 
   const modeLabel = useMemo(() => {
     if (mode === "hiragana") return "ひらがな";
@@ -35,15 +38,16 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-5xl px-4 pb-16 pt-12 md:pt-16">
-        <header className="flex flex-col items-center gap-6 text-center">
+        <header className="flex flex-col items-center gap-6 text-center relative">
+          <div className="w-full flex justify-end">
+            <LanguageSwitcher />
+          </div>
           <div className="inline-flex items-center rounded-full border border-border/60 bg-card/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground shadow-sm backdrop-blur">
-            Kana Practice
+            {t("chipLabel")}
           </div>
           <div className="space-y-3">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl">Master Japanese Kana</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
-              Drill romaji for hiragana and katakana words with streaks, filters, and quick mode switching.
-            </p>
+            <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl">{t("heroTitle")}</h1>
+            <p className="text-lg text-muted-foreground max-w-2xl">{t("heroSubtitle")}</p>
           </div>
           <ModeSelector mode={mode} onModeChange={setMode} />
 
@@ -75,14 +79,23 @@ export default function Page() {
 
         <section className="mt-12 text-center text-sm text-muted-foreground space-y-2">
           <p>
-            Mode: <span className="font-medium text-foreground">{modeLabel}</span>
+            {t("modeLabel")}: <span className="font-medium text-foreground">{modeLabel}</span>
           </p>
           <p className="text-xs">
-            Tip: Press <kbd className="rounded border bg-white/70 px-1 py-0.5 text-[11px]">Enter</kbd> to check or move
-            to the next word. Use filters to target specific character groups.
+            {t("tip").replace("Enter", "")}
+            <kbd className="rounded border bg-white/70 px-1 py-0.5 text-[11px]">Enter</kbd>
+            {t("tip").includes("Enter") ? "" : ""}
           </p>
         </section>
       </div>
     </main>
+  );
+}
+
+export default function Page() {
+  return (
+    <I18nProvider>
+      <PageContent />
+    </I18nProvider>
   );
 }

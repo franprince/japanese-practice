@@ -4,6 +4,7 @@ import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
 import { characterGroups, type WordFilter } from "@/lib/japanese-words"
 import { Settings, X, RotateCcw } from "lucide-react"
+import { useI18n } from "@/lib/i18n"
 
 type GameMode = "hiragana" | "katakana" | "both"
 
@@ -16,6 +17,7 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }: SettingsPanelProps) {
+  const { t } = useI18n()
   const sortGroups = (groups: typeof characterGroups) => [...groups].sort((a, b) => a.label.localeCompare(b.label))
 
   const relevantGroups = sortGroups(characterGroups.filter((g) => (mode === "both" ? true : g.type === mode)))
@@ -88,7 +90,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
             onClick={handleSelectAll}
             className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
           >
-            {allSelected ? "Deselect all" : "Select all"}
+            {allSelected ? t("deselectAll") : t("selectAll")}
           </Button>
         </div>
         <div className="flex flex-col gap-2">
@@ -124,7 +126,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
           className="bg-transparent border-border/50 hover:bg-secondary/50"
         >
           <Settings className="w-4 h-4 mr-2" />
-          {isOpen ? "Close settings" : "Settings"}
+          {isOpen ? t("closeSettings") : t("settings")}
         </Button>
       </div>
       <Card
@@ -138,7 +140,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
       >
         <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Practice Settings</CardTitle>
+          <CardTitle className="text-lg">{t("practiceSettings")}</CardTitle>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -147,7 +149,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
               className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
             >
               <RotateCcw className="w-3 h-3 mr-1" />
-              Reset
+              {t("reset")}
             </Button>
             <Button variant="ghost" size="icon" onClick={onToggle} className="h-8 w-8">
               <X className="w-4 h-4" />
@@ -159,7 +161,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
         {/* Word Length */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium">Word Length</h4>
+            <h4 className="text-sm font-medium">{t("wordLength")}</h4>
             <span className="text-sm text-muted-foreground tabular-nums">
               {filter.minLength} - {filter.maxLength} characters
             </span>
@@ -185,12 +187,14 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
         {/* Character Groups */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium">Character Groups</h4>
+            <h4 className="text-sm font-medium">{t("characters")}</h4>
             {filter.selectedGroups.length > 0 && (
-              <span className="text-xs text-primary">{filter.selectedGroups.length} selected</span>
+              <span className="text-xs text-primary">
+                {filter.selectedGroups.length} {t("selectedCount")}
+              </span>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">Select which character rows to include. Leave empty for all.</p>
+          <p className="text-xs text-muted-foreground">{t("charactersDescription")}</p>
 
           <div className="space-y-6 max-h-[400px] overflow-y-auto pr-2">
             {(mode === "hiragana" || mode === "both") && (
@@ -200,9 +204,9 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
                     Hiragana ひらがな
                   </h3>
                 )}
-                <GroupSection title="All Hiragana groups" groups={hiraganaBase} />
+                <GroupSection title={t("allHiragana")} groups={hiraganaBase} />
                 {hiraganaAlt.length > 0 && (
-                  <GroupSection title="Alternative characters (が · ば · きゃ…)" groups={hiraganaAlt} />
+                  <GroupSection title={t("altHiragana")} groups={hiraganaAlt} />
                 )}
               </div>
             )}
@@ -214,9 +218,9 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
                     Katakana カタカナ
                   </h3>
                 )}
-                <GroupSection title="All Katakana groups" groups={katakanaBase} />
+                <GroupSection title={t("allKatakana")} groups={katakanaBase} />
                 {katakanaAlt.length > 0 && (
-                  <GroupSection title="Alternative characters (ガ · バ · キャ…)" groups={katakanaAlt} />
+                  <GroupSection title={t("altKatakana")} groups={katakanaAlt} />
                 )}
               </div>
             )}

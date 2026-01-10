@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/lib/i18n"
 
 type GameMode = "hiragana" | "katakana" | "both"
 
@@ -10,10 +11,11 @@ interface ModeSelectorProps {
 }
 
 export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
+  const { t } = useI18n()
   const modes: { value: GameMode; label: string; japanese: string }[] = [
-    { value: "hiragana", label: "Hiragana", japanese: "ひらがな" },
-    { value: "katakana", label: "Katakana", japanese: "カタカナ" },
-    { value: "both", label: "Both", japanese: "両方" },
+    { value: "hiragana", label: t("hiraganaLabel"), japanese: "ひらがな" },
+    { value: "katakana", label: t("katakanaLabel"), japanese: "カタカナ" },
+    { value: "both", label: t("bothLabel"), japanese: "両方" },
   ]
 
   return (

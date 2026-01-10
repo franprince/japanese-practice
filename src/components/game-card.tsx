@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { getRandomWord, type JapaneseWord, type WordFilter } from "@/lib/japanese-words"
+import { useI18n } from "@/lib/i18n"
 import { Check, X, Flame, SkipForward, Zap } from "lucide-react"
 
 type GameMode = "hiragana" | "katakana" | "both"
@@ -36,6 +37,7 @@ export function GameCard({
   const [totalAttempts, setTotalAttempts] = useState(0)
   const [noWordsAvailable, setNoWordsAvailable] = useState(false) // Handle empty results
   const inputRef = useRef<HTMLInputElement>(null)
+  const { t } = useI18n()
 
   const loadNewWord = useCallback(() => {
     const word = getRandomWord(mode, filter) // Pass filter
@@ -104,10 +106,8 @@ export function GameCard({
       <div className="w-full max-w-xl mx-auto">
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">No words match your current filters.</p>
-            <p className="text-sm text-muted-foreground/70">
-              Try adjusting the character groups or word length settings.
-            </p>
+            <p className="text-muted-foreground mb-4">{t("noWordsTitle")}</p>
+            <p className="text-sm text-muted-foreground/70">{t("noWordsBody")}</p>
           </CardContent>
         </Card>
       </div>
@@ -170,7 +170,7 @@ export function GameCard({
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 onFocus={() => onRequestCloseSettings?.()}
-                placeholder="Type romaji..."
+                placeholder={t("placeholder")}
                 className={cn(
                   "text-center text-lg h-14 font-mono bg-background/50 border-2 transition-all",
                   feedback === "correct" && "border-success",
@@ -198,18 +198,18 @@ export function GameCard({
             {feedback && (
               <div className="text-center p-4 bg-secondary/50 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200 border border-border/50 space-y-2">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Correct answer</p>
+                  <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("correctAnswer")}</p>
                   <p className="text-xl font-mono font-semibold text-primary">{currentWord.romaji}</p>
                 </div>
                 {currentWord.meaning && (
                   <div className="pt-2 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Meaning</p>
+                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("meaning")}</p>
                     <p className="text-base text-foreground/90">{currentWord.meaning}</p>
                   </div>
                 )}
                 {currentWord.kanji && (
                   <div className="pt-2 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">Kanji</p>
+                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("kanji")}</p>
                     <p className="text-lg font-medium text-foreground">{currentWord.kanji}</p>
                     <a
                       href={`https://jisho.org/search/${encodeURIComponent(currentWord.kanji)}%20%23kanji`}
@@ -217,7 +217,7 @@ export function GameCard({
                       rel="noreferrer"
                       className="mt-1 inline-block text-xs text-primary hover:underline"
                     >
-                      Show meaning ↗
+                      {t("showMeaning")}
                     </a>
                   </div>
                 )}
@@ -233,19 +233,19 @@ export function GameCard({
                     className="flex-1 bg-transparent border-border/50 hover:bg-secondary/50 hover:border-border"
                   >
                     <SkipForward className="w-4 h-4 mr-2" />
-                    Skip
+                    {t("skip")}
                   </Button>
                   <Button
                     onClick={checkAnswer}
                     className="flex-1 bg-primary hover:bg-primary/90"
                     disabled={!userInput.trim()}
                   >
-                    Check
+                    {t("check")}
                   </Button>
                 </>
               ) : (
                 <Button onClick={loadNewWord} className="w-full bg-primary hover:bg-primary/90">
-                  Next Word
+                  {t("nextWord")}
                 </Button>
               )}
             </div>
@@ -256,7 +256,7 @@ export function GameCard({
       {/* Accuracy */}
       {totalAttempts > 0 && (
         <p className="text-center text-xs text-muted-foreground mt-6 tabular-nums">
-          Accuracy: {Math.round((score / totalAttempts) * 100)}%
+          {t("accuracy")}: {Math.round((score / totalAttempts) * 100)}%
         </p>
       )}
     </div>
