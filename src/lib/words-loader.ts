@@ -23,7 +23,7 @@ type KanaGroup = {
 let cachedPromise: Promise<WordSets> | null = null
 const DB_NAME = "kana-words"
 const STORE_NAME = "wordSets"
-const CACHE_KEY = "v1"
+const CACHE_KEY = "v2" // bump to invalidate cached word sets after romaji fixes
 
 const spawnWorker = () => {
   return new Worker(new URL("../workers/words-worker.ts", import.meta.url), { type: "module" })

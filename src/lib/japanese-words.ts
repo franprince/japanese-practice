@@ -68,13 +68,33 @@ const kanaToRomaji = (text: string) => {
   let i = 0
   const normalized = text || ""
   while (i < normalized.length) {
+    const char = normalized[i]
+
+    // Handle sokuon (small tsu) by doubling the next consonant sound
+    if (char === "っ" || char === "ッ") {
+      // Look ahead to the next kana chunk (prioritize digraph)
+      const nextTri = normalized.slice(i + 1, i + 3)
+      const nextChar = normalized[i + 1]
+      const nextMapped =
+        (nextTri && kanaRomajiMap[nextTri]) ||
+        (nextChar && (kanaRomajiMap[nextChar] || kanaRomajiMap[hiraToKata(nextChar)])) ||
+        ""
+      if (nextMapped) {
+        const first = nextMapped[0] ?? ""
+        if (/[bcdfghjklmnpqrstvwxyz]/i.test(first)) {
+          romaji += first
+        }
+      }
+      i += 1
+      continue
+    }
+
     const tri = normalized.slice(i, i + 2)
     if (kanaRomajiMap[tri]) {
       romaji += kanaRomajiMap[tri]
       i += 2
       continue
     }
-    const char = normalized[i]
     if (!char) break
     const mapped = kanaRomajiMap[char] || kanaRomajiMap[hiraToKata(char)] || ""
     romaji += mapped
