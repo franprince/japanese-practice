@@ -118,13 +118,14 @@ export interface WordFilter {
 export async function getRandomWord(
   type: "hiragana" | "katakana" | "both",
   filter?: WordFilter,
+  lang?: "en" | "es" | "ja",
 ): Promise<JapaneseWord | null> {
   const { hiraganaWords, katakanaWords, bothForms } = await loadWordSets({
     characterGroups,
     kanaToRomaji,
     hasHiragana,
     hasKatakana,
-  })
+  }, lang)
 
   let words: JapaneseWord[]
 

@@ -38,11 +38,11 @@ export function GameCard({
   const [noWordsAvailable, setNoWordsAvailable] = useState(false) // Handle empty results
   const [isLoading, setIsLoading] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   const loadNewWord = useCallback(async () => {
     setIsLoading(true)
-    const word = await getRandomWord(mode, filter) // Pass filter
+    const word = await getRandomWord(mode, filter, lang) // Pass filter and lang
     if (word) {
       setCurrentWord(word)
       setNoWordsAvailable(false)
@@ -56,7 +56,7 @@ export function GameCard({
     setTimeout(() => {
       if (!suppressFocus) inputRef.current?.focus()
     }, 100)
-  }, [mode, filter, suppressFocus])
+  }, [mode, filter, suppressFocus, lang])
 
   useEffect(() => {
     loadNewWord()

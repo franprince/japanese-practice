@@ -5,7 +5,12 @@ import { blacklist } from "../data/blacklist"
 import type { JapaneseWord } from "../src/lib/japanese-words"
 
 const WORDSET_VERSION = process.env.WORDSET_VERSION || process.env.NEXT_PUBLIC_WORDSET_VERSION || "v1"
-const OUTPUT_PATH = path.join(process.cwd(), "public", `wordset-${WORDSET_VERSION}.json`)
+const WORDSET_LANG = (process.env.WORDSET_LANG || process.env.NEXT_PUBLIC_WORDSET_LANG || "es").toLowerCase()
+const SOURCE_FILE =
+  WORDSET_LANG === "en"
+    ? "jmdict-eng-3.6.2.json"
+    : "jmdict-spa-3.6.1.json" // default to Spanish if unknown
+const OUTPUT_PATH = path.join(process.cwd(), "public", `wordset-${WORDSET_LANG}-${WORDSET_VERSION}.json`)
 
 const hiraToKata = (char: string) => {
   const code = char.charCodeAt(0)
@@ -133,7 +138,7 @@ const mapEntryToWord = (entry: any): JapaneseWord | null => {
 }
 
 const buildWordSet = async () => {
-  const raw = await fs.promises.readFile(path.join(process.cwd(), "data", "jmdict-spa-3.6.1.json"), "utf8")
+  const raw = await fs.promises.readFile(path.join(process.cwd(), "data", SOURCE_FILE), "utf8")
   const parsed = JSON.parse(raw)
   const entries = Array.isArray(parsed?.default?.words ?? parsed?.words) ? (parsed.default?.words ?? parsed.words) : []
 

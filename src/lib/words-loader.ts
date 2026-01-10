@@ -14,17 +14,22 @@ export type LoaderDeps = {
   hasKatakana: (text: string) => boolean
 }
 
-export type WordSets = { hiraganaWords: JapaneseWord[]; katakanaWords: JapaneseWord[]; bothForms?: JapaneseWord[] }
+export type WordSets = {
+  hiraganaWords: JapaneseWord[]
+  katakanaWords: JapaneseWord[]
+  bothForms?: JapaneseWord[]
+}
 
 type KanaGroup = {
   characters: Record<string, string[]>
 }
 
 const WORDSET_VERSION = process.env.NEXT_PUBLIC_WORDSET_VERSION || "v1"
+const WORDSET_LANG = (process.env.NEXT_PUBLIC_WORDSET_LANG || "es").toLowerCase()
 const CACHE_VERSION = process.env.NEXT_PUBLIC_CACHE_VERSION || "v1"
 const ENV_KEY = typeof process !== "undefined" && process.env.NODE_ENV === "development" ? "dev" : "prod"
-const CACHE_KEY = `${CACHE_VERSION}-${ENV_KEY}` // bump/override via env; dev/prod separated
-let cachedPromise: Promise<WordSets> | null = null
+const cacheKey = (lang: string) => `${CACHE_VERSION}-${ENV_KEY}-${lang}` // bump/override via env; dev/prod/lang separated
+const cachedPromises: Record<string, Promise<WordSets>> = {}
 const DB_NAME = "kana-words"
 const STORE_NAME = "wordSets"
 
@@ -169,33 +174,33 @@ const openDb = (): Promise<IDBDatabase> =>
     req.onerror = () => reject(req.error)
   })
 
-const readCache = async (): Promise<WordSets | null> => {
+const readCache = async (lang: string): Promise<WordSets | null> => {
   if (typeof indexedDB === "undefined") return null
   const db = await openDb()
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readonly")
     const store = tx.objectStore(STORE_NAME)
-    const req = store.get(CACHE_KEY)
+    const req = store.get(cacheKey(lang))
     req.onsuccess = () => resolve((req.result as WordSets) ?? null)
     req.onerror = () => reject(req.error)
   })
 }
 
-const writeCache = async (data: WordSets) => {
+const writeCache = async (lang: string, data: WordSets) => {
   if (typeof indexedDB === "undefined") return
   const db = await openDb()
   return new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readwrite")
     const store = tx.objectStore(STORE_NAME)
-    const req = store.put(data, CACHE_KEY)
+    const req = store.put(data, cacheKey(lang))
     req.onsuccess = () => resolve()
     req.onerror = () => reject(req.error)
   })
 }
 
-const fetchPrebuiltWordset = async (): Promise<WordSets | null> => {
+const fetchPrebuiltWordset = async (lang: string): Promise<WordSets | null> => {
   try {
-    const res = await fetch(`/wordset-${WORDSET_VERSION}.json`, { cache: "force-cache" })
+    const res = await fetch(`/wordset-${lang}-${WORDSET_VERSION}.json`, { cache: "force-cache" })
     if (!res.ok) return null
     const json = (await res.json()) as WordSets
     if (!json?.hiraganaWords || !json?.katakanaWords) return null
@@ -205,21 +210,29 @@ const fetchPrebuiltWordset = async (): Promise<WordSets | null> => {
   }
 }
 
-export const loadWordSets = (_deps: LoaderDeps): Promise<WordSets> => {
-  if (!cachedPromise) {
-    cachedPromise = (async () => {
-      const cached = await readCache().catch(() => null)
+const normalizeLang = (lang: string | undefined): string => {
+  const lower = (lang || WORDSET_LANG || "es").toLowerCase()
+  if (lower === "ja") return "en" // fall back to english dataset for Japanese UI
+  if (lower === "en" || lower === "es") return lower
+  return "es"
+}
+
+export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets> => {
+  const datasetLang = normalizeLang(lang)
+  if (!cachedPromises[datasetLang]) {
+    cachedPromises[datasetLang] = (async () => {
+      const cached = await readCache(datasetLang).catch(() => null)
       if (cached) return cached
-      const prebuilt = await fetchPrebuiltWordset()
+      const prebuilt = await fetchPrebuiltWordset(datasetLang)
       if (prebuilt) {
-        writeCache(prebuilt).catch(() => undefined)
+        writeCache(datasetLang, prebuilt).catch(() => undefined)
         return prebuilt
       }
       const canUseWorker = false // temporarily disable worker to avoid port issues
       const fresh = canUseWorker ? await buildWordsInWorker() : await buildWordsInMain(_deps)
-      writeCache(fresh).catch(() => undefined)
+      writeCache(datasetLang, fresh).catch(() => undefined)
       return fresh
     })()
   }
-  return cachedPromise
+  return cachedPromises[datasetLang]
 }
