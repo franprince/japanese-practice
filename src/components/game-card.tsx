@@ -120,9 +120,26 @@ export function GameCard({
     return (
       <div className="w-full max-w-xl mx-auto">
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">{t("noWordsTitle")}</p>
-            <p className="text-sm text-muted-foreground/70">{t("noWordsBody")}</p>
+          <CardContent className="py-12 text-center space-y-4">
+            <div>
+              <p className="text-muted-foreground mb-2">{t("noWordsTitle")}</p>
+              <p className="text-sm text-muted-foreground/70">{t("noWordsBody")}</p>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="cursor-pointer"
+              onClick={() => {
+                const el = document.getElementById("settings-panel")
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "start" })
+                } else {
+                  onRequestCloseSettings?.()
+                }
+              }}
+            >
+              {t("settings")}
+            </Button>
           </CardContent>
         </Card>
       </div>

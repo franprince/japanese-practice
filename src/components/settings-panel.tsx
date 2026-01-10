@@ -19,18 +19,6 @@ interface SettingsPanelProps {
 
 export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }: SettingsPanelProps) {
   const { t } = useI18n()
-  const panelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!isOpen) return
-    const handleClickOutside = (event: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
-        onToggle()
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [isOpen, onToggle])
 
   const sortGroups = (groups: typeof characterGroups) => [...groups].sort((a, b) => a.label.localeCompare(b.label))
 
@@ -130,18 +118,7 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
   }
 
   return (
-    <div ref={panelRef} className="w-full max-w-2xl mx-auto space-y-2">
-      <div className="flex justify-center">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onToggle}
-          className="bg-transparent border-border/50 hover:bg-secondary/50 cursor-pointer"
-        >
-          <Settings className="w-4 h-4 mr-2" />
-          {isOpen ? t("closeSettings") : t("settings")}
-        </Button>
-      </div>
+    <div id="settings-panel" className="w-full max-w-2xl mx-auto space-y-2 mt-8 md:mt-10">
       <Card
         aria-hidden={!isOpen}
         className={cn(

@@ -19,7 +19,7 @@ export function ModeSelector({ mode, onModeChange }: ModeSelectorProps) {
   ]
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center mt-8 md:mt-10">
       <div className="inline-flex items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50">
         {modes.map(({ value, label, japanese }) => (
           <button
