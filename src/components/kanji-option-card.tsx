@@ -1,11 +1,11 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import type { Kanji, KanjiDifficulty } from "@/lib/kanji-data"
+import type { KanjiEntry, KanjiDifficulty } from "@/lib/kanji-data"
 import type { Language } from "@/lib/translations"
 
 interface KanjiOptionCardProps {
-  kanji: Kanji
+  kanji: KanjiEntry
   difficulty: KanjiDifficulty
   language: Language
   isSelected: boolean
@@ -26,7 +26,7 @@ export function KanjiOptionCard({
   disabled,
 }: KanjiOptionCardProps) {
   const showMeaning = difficulty === "easy" || difficulty === "medium"
-  const showRomaji = difficulty === "easy"
+  const meaning = kanji.meaning_es && language === "es" ? kanji.meaning_es : kanji.meaning_en
 
   return (
     <button
@@ -44,14 +44,11 @@ export function KanjiOptionCard({
       )}
     >
       <div className="flex flex-col gap-1">
-        {/* Japanese reading - always shown */}
-        <span className="text-xl font-medium">{kanji.reading}</span>
-
-        {/* Romaji - only on easy */}
-        {showRomaji && <span className="text-sm text-muted-foreground font-mono">{kanji.romaji}</span>}
+        {/* Kanji character */}
+        <span className="text-xl font-medium">{kanji.char}</span>
 
         {/* Meaning - on easy and medium */}
-        {showMeaning && <span className="text-xs text-muted-foreground/80 mt-1">{kanji.meaning[language]}</span>}
+        {showMeaning && <span className="text-xs text-muted-foreground/80 mt-1">{meaning ?? "—"}</span>}
       </div>
     </button>
   )

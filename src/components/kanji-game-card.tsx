@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { KanjiOptionCard } from "./kanji-option-card"
-import { getRandomKanji, getRandomOptions, type Kanji, type KanjiDifficulty } from "@/lib/kanji-data"
+import { getRandomKanji, getRandomOptions, loadKanjiSet, type KanjiEntry, type KanjiDifficulty } from "@/lib/kanji-data"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Check, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
@@ -14,26 +14,39 @@ interface KanjiGameCardProps {
 
 export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps) {
   const { t, lang } = useI18n()
-  const [currentKanji, setCurrentKanji] = useState<Kanji | null>(null)
-  const [options, setOptions] = useState<Kanji[]>([])
-  const [selectedOption, setSelectedOption] = useState<Kanji | null>(null)
+  const [kanjiSet, setKanjiSet] = useState<KanjiEntry[]>([])
+  const [currentKanji, setCurrentKanji] = useState<KanjiEntry | null>(null)
+  const [options, setOptions] = useState<KanjiEntry[]>([])
+  const [selectedOption, setSelectedOption] = useState<KanjiEntry | null>(null)
   const [isRevealed, setIsRevealed] = useState(false)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
 
-  const loadNewKanji = useCallback(() => {
-    const newKanji = getRandomKanji(currentKanji ?? undefined)
-    setCurrentKanji(newKanji)
-    setOptions(getRandomOptions(newKanji, 3))
-    setSelectedOption(null)
-    setIsRevealed(false)
-  }, [currentKanji])
+  useEffect(() => {
+    loadKanjiSet()
+      .then(setKanjiSet)
+      .catch(() => setKanjiSet([]))
+  }, [])
+
+  const loadNewKanji = useCallback(
+    (exclude?: KanjiEntry | null) => {
+      if (!kanjiSet.length) return
+      const newKanji = getRandomKanji(kanjiSet, exclude ?? undefined)
+      setCurrentKanji(newKanji)
+      setOptions(getRandomOptions(kanjiSet, newKanji, 3))
+      setSelectedOption(null)
+      setIsRevealed(false)
+    },
+    [kanjiSet],
+  )
 
   useEffect(() => {
-    loadNewKanji()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (kanjiSet.length) {
+      loadNewKanji()
+    }
+  }, [kanjiSet, loadNewKanji])
 
-  const handleOptionClick = (option: Kanji) => {
+  const handleOptionClick = (option: KanjiEntry) => {
     if (isRevealed) return
     setSelectedOption(option)
   }
@@ -41,7 +54,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
   const handleSubmit = useCallback(() => {
     if (!selectedOption || !currentKanji) return
 
-    const isCorrect = selectedOption.kanji === currentKanji.kanji
+    const isCorrect = selectedOption.char === currentKanji.char
     setIsRevealed(true)
 
     if (isCorrect) {
@@ -58,8 +71,8 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
   }, [selectedOption, currentKanji, score, streak, onScoreUpdate])
 
   const handleNext = useCallback(() => {
-    loadNewKanji()
-  }, [loadNewKanji])
+    loadNewKanji(currentKanji)
+  }, [loadNewKanji, currentKanji])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -78,7 +91,8 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
 
   if (!currentKanji) return null
 
-  const isCorrect = selectedOption?.kanji === currentKanji.kanji
+  const isCorrect = selectedOption?.char === currentKanji.char
+  const meaning = lang === "es" ? currentKanji.meaning_es ?? currentKanji.meaning_en : currentKanji.meaning_en ?? currentKanji.meaning_es
 
   return (
     <div className="space-y-6">
@@ -86,9 +100,9 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
       <div className="bg-card border border-border/50 rounded-2xl p-6 md:p-8 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
 
-        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{t("whatIsReading")}</p>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{t("meaning")}</p>
 
-        <div className="text-7xl md:text-9xl font-bold mb-4 relative">{currentKanji.kanji}</div>
+        <div className="text-7xl md:text-9xl font-bold mb-4 relative">{currentKanji.char}</div>
 
         {/* Result feedback */}
         {isRevealed && (
@@ -104,11 +118,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
               </span>
             </div>
             <div className="text-sm text-muted-foreground">
-              <span className="font-medium">{currentKanji.reading}</span>
-              <span className="mx-2">•</span>
-              <span className="font-mono">{currentKanji.romaji}</span>
-              <span className="mx-2">•</span>
-              <span>{currentKanji.meaning[lang]}</span>
+              <span>{meaning ?? t("meaning")}</span>
             </div>
           </div>
         )}
@@ -118,12 +128,12 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
       <div className="grid grid-cols-1 gap-3">
         {options.map((option) => (
           <KanjiOptionCard
-            key={option.kanji}
+            key={option.char}
             kanji={option}
             difficulty={difficulty}
             language={lang}
-            isSelected={selectedOption?.kanji === option.kanji}
-            isCorrect={isRevealed ? option.kanji === currentKanji.kanji : null}
+            isSelected={selectedOption?.char === option.char}
+            isCorrect={isRevealed ? option.char === currentKanji.char : null}
             isRevealed={isRevealed}
             onClick={() => handleOptionClick(option)}
             disabled={isRevealed}
