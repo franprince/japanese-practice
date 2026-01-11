@@ -5,6 +5,7 @@ export interface KanjiEntry {
   meaning_en: string | null
   meaning_es: string | null
   reading?: string | null
+  jlpt?: string | null
 }
 
 const datasetVersion = process.env.NEXT_PUBLIC_KANJISET_VERSION

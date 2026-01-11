@@ -24,9 +24,23 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
 
   useEffect(() => {
     loadKanjiSet()
+      .then(list => list.filter(k => k.reading))
+      .then(list => {
+        // Difficulty-based JLPT filtering
+        const allowedJlpt =
+          difficulty === "easy"
+            ? new Set(["jlpt-n5", "jlpt-n4"])
+            : difficulty === "medium"
+              ? new Set(["jlpt-n5", "jlpt-n4", "jlpt-n3"])
+              : new Set(["jlpt-n5", "jlpt-n4", "jlpt-n3", "jlpt-n2", "jlpt-n1"])
+        return list.filter(k => {
+          if (!k.jlpt) return false
+          return allowedJlpt.has(k.jlpt.toLowerCase())
+        })
+      })
       .then(setKanjiSet)
       .catch(() => setKanjiSet([]))
-  }, [])
+  }, [difficulty])
 
   const loadNewKanji = useCallback(
     (exclude?: KanjiEntry | null) => {
@@ -46,29 +60,34 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
     }
   }, [kanjiSet, loadNewKanji])
 
+  const handleSubmit = useCallback(
+    (option?: KanjiEntry) => {
+      const choice = option ?? selectedOption
+      if (!choice || !currentKanji) return
+
+      const isCorrect = choice.char === currentKanji.char
+      setSelectedOption(choice)
+      setIsRevealed(true)
+
+      if (isCorrect) {
+        const streakBonus = Math.floor(streak / 5) * 5
+        const newScore = score + 10 + streakBonus
+        const newStreak = streak + 1
+        setScore(newScore)
+        setStreak(newStreak)
+        onScoreUpdate(newScore, newStreak, true)
+      } else {
+        setStreak(0)
+        onScoreUpdate(score, 0, false)
+      }
+    },
+    [selectedOption, currentKanji, score, streak, onScoreUpdate],
+  )
+
   const handleOptionClick = (option: KanjiEntry) => {
     if (isRevealed) return
-    setSelectedOption(option)
+    handleSubmit(option)
   }
-
-  const handleSubmit = useCallback(() => {
-    if (!selectedOption || !currentKanji) return
-
-    const isCorrect = selectedOption.char === currentKanji.char
-    setIsRevealed(true)
-
-    if (isCorrect) {
-      const streakBonus = Math.floor(streak / 5) * 5
-      const newScore = score + 10 + streakBonus
-      const newStreak = streak + 1
-      setScore(newScore)
-      setStreak(newStreak)
-      onScoreUpdate(newScore, newStreak, true)
-    } else {
-      setStreak(0)
-      onScoreUpdate(score, 0, false)
-    }
-  }, [selectedOption, currentKanji, score, streak, onScoreUpdate])
 
   const handleNext = useCallback(() => {
     loadNewKanji(currentKanji)
@@ -79,15 +98,13 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
       if (e.key === "Enter") {
         if (isRevealed) {
           handleNext()
-        } else if (selectedOption) {
-          handleSubmit()
         }
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isRevealed, selectedOption]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isRevealed, handleNext])
 
   if (!currentKanji) return null
 
@@ -147,14 +164,10 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
 
       {/* Action Button */}
       <div className="flex justify-center">
-        {isRevealed ? (
+        {isRevealed && (
           <Button onClick={handleNext} size="lg" className="gap-2">
             {t("nextKanji")}
             <ArrowRight className="w-4 h-4" />
-          </Button>
-        ) : (
-          <Button onClick={handleSubmit} disabled={!selectedOption} size="lg" className="gap-2">
-            {t("check")}
           </Button>
         )}
       </div>
