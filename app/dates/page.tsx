@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react"
 import Link from "next/link"
-import { DateGameCard } from "@/components/date-game-card"
-import { DateModeSelector } from "@/components/date-mode-selector"
+import { DateGameCard } from "@/components/dates/date-game-card"
+import { DateModeSelector } from "@/components/dates/date-mode-selector"
 import { StatsDisplay } from "@/components/stats-display"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"

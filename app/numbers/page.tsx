@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react"
 import Link from "next/link"
-import { NumberGameCard } from "@/components/number-game-card"
-import { DifficultySelector } from "@/components/difficulty-selector"
+import { NumberGameCard } from "@/components/numbers/number-game-card"
+import { DifficultySelector } from "@/components/numbers/difficulty-selector"
 import { StatsDisplay } from "@/components/stats-display"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"

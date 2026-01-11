@@ -2,9 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react"
 import Link from "next/link"
-import { GameCard } from "@/components/game-card"
-import { ModeSelector } from "@/components/mode-selector"
-import { SettingsPanel } from "@/components/settings-panel"
+import { GameCard } from "@/components/words/game-card"
+import { ModeSelector } from "@/components/words/mode-selector"
+import { SettingsPanel } from "@/components/words/settings-panel"
 import { StatsDisplay } from "@/components/stats-display"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"

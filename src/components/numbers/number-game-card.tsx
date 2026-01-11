@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { NumberPad } from "@/components/number-pad"
+import { NumberPad } from "@/components/numbers/number-pad"
 import { ArrowRight, SkipForward } from "lucide-react"
 import {
   generateRandomNumber,

@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react"
 import Link from "next/link"
-import { KanjiGameCard } from "@/components/kanji-game-card"
-import { KanjiDifficultySelector } from "@/components/kanji-difficulty-selector"
+import { KanjiGameCard } from "@/components/kanji/kanji-game-card"
+import { KanjiDifficultySelector } from "@/components/kanji/kanji-difficulty-selector"
 import { StatsDisplay } from "@/components/stats-display"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"
