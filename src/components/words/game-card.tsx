@@ -246,7 +246,7 @@ export function GameCard({
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("kanji")}</p>
                     <p className="text-lg font-medium text-foreground">{currentWord.kanji}</p>
                     <a
-                      href={`https://jisho.org/search/${encodeURIComponent(currentWord.kanji)}%20%23kanji`}
+                      href={`https://jisho.org/search/${encodeURIComponent(currentWord.kanji)}`}
                       target="_blank"
                       rel="noreferrer"
                       className="mt-1 inline-block text-xs text-primary hover:underline"

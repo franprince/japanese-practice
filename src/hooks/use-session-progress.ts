@@ -13,7 +13,7 @@ export function useSessionProgress({ defaultTargetCount = 10 }: SessionProgressO
     const [answeredCount, setAnsweredCount] = useState(0)
     const [correctCount, setCorrectCount] = useState(0)
     const [sessionId, setSessionId] = useState(0)
-    const [playMode, setPlayMode] = useState<PlayMode>("infinite")
+    const [playMode, setPlayMode] = useState<PlayMode>("session")
     const [targetCount, setTargetCount] = useState<number>(defaultTargetCount)
     const [sessionComplete, setSessionComplete] = useState(false)
 
