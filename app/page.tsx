@@ -1,6 +1,7 @@
 "use client"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { ThemeSwitcher } from "@/components/theme-switcher"
 import { GameSelectorCard } from "@/components/game-selector-card"
 import { useI18n } from "@/lib/i18n"
 
@@ -57,7 +58,8 @@ export default function HomePage() {
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-3 tracking-tight">日本語</h1>
               <div className="h-1 w-20 bg-primary" />
             </div>
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex gap-2">
+              <ThemeSwitcher />
               <LanguageSwitcher />
             </div>
           </div>
