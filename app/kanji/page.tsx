@@ -41,20 +41,18 @@ export default function KanjiPage() {
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
 
             <div className="container max-w-2xl mx-auto px-4 py-6 md:py-10 relative">
-                <header className="flex items-center justify-between mb-6">
+                <header className="mb-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <Button asChild variant="ghost" size="sm" className="shrink-0 cursor-pointer -ml-3">
+                            <Link href="/">← Home</Link>
+                        </Button>
+                        <LanguageSwitcher />
+                    </div>
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-balance bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text">
                             {t("kanjiTitle")}
                         </h1>
                         <p className="text-muted-foreground text-xs md:text-sm">{t("kanjiSubtitle")}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Link href="/" className="hidden sm:block">
-                            <Button variant="ghost" size="sm" className="cursor-pointer">
-                                Home
-                            </Button>
-                        </Link>
-                        <LanguageSwitcher />
                     </div>
                 </header>
 
