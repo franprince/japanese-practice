@@ -21,10 +21,22 @@ const shuffle = <T,>(arr: T[]) => {
   return copy
 }
 
+let kanjiCache: Promise<KanjiEntry[]> | null = null
+
 export async function loadKanjiSet(): Promise<KanjiEntry[]> {
-  const res = await fetch(datasetUrl, { cache: "no-store" })
-  if (!res.ok) throw new Error("Failed to load kanji dataset")
-  return (await res.json()) as KanjiEntry[]
+  if (kanjiCache) return kanjiCache
+  
+  kanjiCache = fetch(datasetUrl, { cache: "no-store" })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to load kanji dataset")
+      return res.json() as Promise<KanjiEntry[]>
+    })
+    .catch(err => {
+      kanjiCache = null
+      throw err
+    })
+  
+  return kanjiCache
 }
 
 export function getRandomKanji(list: KanjiEntry[], exclude?: KanjiEntry) {
