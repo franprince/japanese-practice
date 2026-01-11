@@ -59,21 +59,24 @@ export default function WordsPage() {
     )
 
     const handleModeChange = (nextMode: GameMode) => {
-        setMode(nextMode)
-        // For custom mode, open settings and keep current selection; for others, auto-select relevant groups
+        // Custom: open popover and avoid resetting the game so the menu stays open
         if (nextMode === "custom") {
+            setMode(nextMode)
             setCustomSettingsOpen(true)
-        } else {
-            setCustomSettingsOpen(false)
-            const allowedGroups =
-                nextMode === "both"
-                    ? characterGroups.map((g) => g.id)
-                    : characterGroups.filter((g) => g.type === nextMode).map((g) => g.id)
-            setFilter((prev) => ({
-                ...prev,
-                selectedGroups: allowedGroups,
-            }))
+            return
         }
+
+        // Preset modes: close popover, auto-select relevant groups, and reset session
+        setCustomSettingsOpen(false)
+        setMode(nextMode)
+        const allowedGroups =
+            nextMode === "both"
+                ? characterGroups.map((g) => g.id)
+                : characterGroups.filter((g) => g.type === nextMode).map((g) => g.id)
+        setFilter((prev) => ({
+            ...prev,
+            selectedGroups: allowedGroups,
+        }))
         resetSession()
         setBestStreak(0)
     }

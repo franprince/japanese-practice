@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
@@ -22,9 +22,16 @@ export function WordsSettingsPopover({
   onOpenChange,
 }: WordsSettingsPopoverProps) {
   const { t } = useI18n()
+  const [draftFilter, setDraftFilter] = useState<WordFilter>(filter)
+
+  useEffect(() => {
+    if (open) {
+      setDraftFilter(filter)
+    }
+  }, [filter, open])
 
   const resetFilters = () => {
-    onFilterChange({ ...filter, minLength: 1, maxLength: 10, selectedGroups: [] })
+    setDraftFilter({ ...filter, minLength: 1, maxLength: 10, selectedGroups: [] })
   }
 
   const toOrderNumber = (id: string) => {
@@ -48,28 +55,28 @@ export function WordsSettingsPopover({
   const allKatakana = [...katakanaBase, ...katakanaAlt]
 
   const toggleGroup = (groupId: string) => {
-    const alreadySelected = filter.selectedGroups.includes(groupId)
+    const alreadySelected = draftFilter.selectedGroups.includes(groupId)
     const newGroups = alreadySelected
-      ? filter.selectedGroups.filter((g) => g !== groupId)
-      : [...filter.selectedGroups, groupId]
-    onFilterChange({ ...filter, selectedGroups: newGroups })
+      ? draftFilter.selectedGroups.filter((g) => g !== groupId)
+      : [...draftFilter.selectedGroups, groupId]
+    setDraftFilter({ ...draftFilter, selectedGroups: newGroups })
   }
 
   const selectAllGroups = (type: "hiragana" | "katakana") => {
     const groups = type === "hiragana" ? allHiragana : allKatakana
     const groupIds = groups.map((g) => g.id)
-    const allSelected = groupIds.every((id) => filter.selectedGroups.includes(id))
-    
+    const allSelected = groupIds.every((id) => draftFilter.selectedGroups.includes(id))
+
     if (allSelected) {
-      onFilterChange({ ...filter, selectedGroups: filter.selectedGroups.filter((g) => !groupIds.includes(g)) })
+      setDraftFilter({ ...draftFilter, selectedGroups: draftFilter.selectedGroups.filter((g) => !groupIds.includes(g)) })
     } else {
-      const newGroups = new Set([...filter.selectedGroups, ...groupIds])
-      onFilterChange({ ...filter, selectedGroups: Array.from(newGroups) })
+      const newGroups = new Set([...draftFilter.selectedGroups, ...groupIds])
+      setDraftFilter({ ...draftFilter, selectedGroups: Array.from(newGroups) })
     }
   }
 
-  const selectedHiraganaCount = allHiragana.filter((g) => filter.selectedGroups.includes(g.id)).length
-  const selectedKatakanaCount = allKatakana.filter((g) => filter.selectedGroups.includes(g.id)).length
+  const selectedHiraganaCount = allHiragana.filter((g) => draftFilter.selectedGroups.includes(g.id)).length
+  const selectedKatakanaCount = allKatakana.filter((g) => draftFilter.selectedGroups.includes(g.id)).length
 
   if (!open) return null
 
@@ -99,20 +106,20 @@ export function WordsSettingsPopover({
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("wordLength")}</p>
             <span className="text-xs text-muted-foreground tabular-nums">
-              {filter.minLength} - {filter.maxLength}
+              {draftFilter.minLength} - {draftFilter.maxLength}
             </span>
           </div>
           <div className="px-1">
             <Slider
-              value={[filter.minLength, filter.maxLength]}
+              value={[draftFilter.minLength, draftFilter.maxLength]}
               min={1}
               max={10}
               step={1}
               onValueChange={([min, max]) =>
-                onFilterChange({
-                  ...filter,
-                  minLength: min ?? filter.minLength,
-                  maxLength: max ?? filter.maxLength,
+                setDraftFilter({
+                  ...draftFilter,
+                  minLength: min ?? draftFilter.minLength,
+                  maxLength: max ?? draftFilter.maxLength,
                 })
               }
               className="w-full"
@@ -124,7 +131,7 @@ export function WordsSettingsPopover({
         <div className="space-y-3 pt-2 border-t border-border/50">
           <p className="text-xs text-muted-foreground">{t("charactersDescription")}</p>
           
-          {filter.selectedGroups.length === 0 && (
+          {draftFilter.selectedGroups.length === 0 && (
             <div className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/40 rounded-md px-3 py-2">
               {t("selectGroupsHint")}
             </div>
@@ -149,7 +156,7 @@ export function WordsSettingsPopover({
                   title={group.labelJp}
                   className={cn(
                     "px-1.5 py-1 rounded text-xs transition-colors",
-                    filter.selectedGroups.includes(group.id)
+                    draftFilter.selectedGroups.includes(group.id)
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                   )}
@@ -168,7 +175,7 @@ export function WordsSettingsPopover({
                     title={group.labelJp}
                     className={cn(
                       "px-1.5 py-1 rounded text-xs transition-colors",
-                      filter.selectedGroups.includes(group.id)
+                      draftFilter.selectedGroups.includes(group.id)
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                     )}
@@ -199,7 +206,7 @@ export function WordsSettingsPopover({
                   title={group.labelJp}
                   className={cn(
                     "px-1.5 py-1 rounded text-xs transition-colors",
-                    filter.selectedGroups.includes(group.id)
+                    draftFilter.selectedGroups.includes(group.id)
                       ? "bg-primary text-primary-foreground"
                       : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                   )}
@@ -218,7 +225,7 @@ export function WordsSettingsPopover({
                     title={group.labelJp}
                     className={cn(
                       "px-1.5 py-1 rounded text-xs transition-colors",
-                      filter.selectedGroups.includes(group.id)
+                      draftFilter.selectedGroups.includes(group.id)
                         ? "bg-primary text-primary-foreground"
                         : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                     )}
@@ -229,6 +236,27 @@ export function WordsSettingsPopover({
               </div>
             )}
           </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-2 pt-2 border-t border-border/50">
+          <Button
+            size="sm"
+            onClick={resetFilters}
+            className="h-8 px-3 text-xs"
+          >
+            {t("reset")}
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              onFilterChange(draftFilter)
+              onOpenChange(false)
+            }}
+            className="h-8 px-3 text-xs"
+          >
+            {t("apply")}
+          </Button>
         </div>
       </div>
     </>
