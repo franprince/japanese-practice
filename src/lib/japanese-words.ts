@@ -63,7 +63,7 @@ const hasKatakana = (text: string) => /[\u30A0-\u30FF]/.test(text)
 const hiraToKata = (text: string) =>
   text.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60))
 
-const kanaToRomaji = (text: string) => {
+export const kanaToRomaji = (text: string) => {
   let romaji = ""
   let i = 0
   const normalized = text || ""

@@ -24,6 +24,7 @@ export type TranslationKey =
   | "noWordsBody"
   | "correctAnswer"
   | "meaning"
+  | "reading"
   | "kanji"
   | "showMeaning"
   | "placeholder"
@@ -91,6 +92,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     noWordsBody: "Try adjusting the character groups or word length settings.",
     correctAnswer: "Correct answer",
     meaning: "Meaning",
+    reading: "Reading",
     kanji: "Kanji",
     showMeaning: "Show meaning ↗",
     placeholder: "Type romaji...",
@@ -157,6 +159,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     noWordsBody: "Prueba ajustando los grupos de caracteres o la longitud.",
     correctAnswer: "Respuesta correcta",
     meaning: "Significado",
+    reading: "Lectura",
     kanji: "Kanji",
     showMeaning: "Ver significado ↗",
     placeholder: "Escribe el rōmaji...",
@@ -223,6 +226,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     noWordsBody: "文字グループや文字数を調整してください。",
     correctAnswer: "正解",
     meaning: "意味",
+    reading: "読み",
     kanji: "漢字",
     showMeaning: "意味を見る ↗",
     placeholder: "ローマ字を入力...",

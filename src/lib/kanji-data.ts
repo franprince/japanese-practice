@@ -4,9 +4,11 @@ export interface KanjiEntry {
   char: string
   meaning_en: string | null
   meaning_es: string | null
+  reading?: string | null
 }
 
-const datasetUrl = "/api/kanjiset"
+const datasetVersion = process.env.NEXT_PUBLIC_KANJISET_VERSION
+const datasetUrl = `/api/kanjiset${datasetVersion ? `?v=${datasetVersion}` : ""}`
 
 const shuffle = <T,>(arr: T[]) => {
   const copy = [...arr]
@@ -19,14 +21,10 @@ const shuffle = <T,>(arr: T[]) => {
   return copy
 }
 
-let cached: KanjiEntry[] | null = null
-
 export async function loadKanjiSet(): Promise<KanjiEntry[]> {
-  if (cached) return cached
-  const res = await fetch(datasetUrl, { cache: "force-cache" })
+  const res = await fetch(datasetUrl, { cache: "no-store" })
   if (!res.ok) throw new Error("Failed to load kanji dataset")
-  cached = (await res.json()) as KanjiEntry[]
-  return cached
+  return (await res.json()) as KanjiEntry[]
 }
 
 export function getRandomKanji(list: KanjiEntry[], exclude?: KanjiEntry) {

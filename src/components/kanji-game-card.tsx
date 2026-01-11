@@ -93,6 +93,9 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
 
   const isCorrect = selectedOption?.char === currentKanji.char
   const meaning = lang === "es" ? currentKanji.meaning_es ?? currentKanji.meaning_en : currentKanji.meaning_en ?? currentKanji.meaning_es
+  const showMeaning = difficulty === "easy" || difficulty === "medium"
+  const showReading = difficulty === "easy" || difficulty === "hard"
+  const promptLabel = showMeaning && showReading ? `${t("meaning")} / ${t("reading")}` : showMeaning ? t("meaning") : t("reading")
 
   return (
     <div className="space-y-6">
@@ -100,7 +103,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
       <div className="bg-card border border-border/50 rounded-2xl p-6 md:p-8 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
 
-        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{t("meaning")}</p>
+        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{promptLabel}</p>
 
         <div className="text-7xl md:text-9xl font-bold mb-4 relative">{currentKanji.char}</div>
 
@@ -117,8 +120,9 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
                 {isCorrect ? t("correct") : t("incorrect")}
               </span>
             </div>
-            <div className="text-sm text-muted-foreground">
-              <span>{meaning ?? t("meaning")}</span>
+            <div className="text-sm text-muted-foreground flex flex-col gap-1">
+              {showMeaning && <span>{meaning ?? t("meaning")}</span>}
+              {showReading && <span className="uppercase tracking-wide">{currentKanji.reading ?? t("reading")}</span>}
             </div>
           </div>
         )}
