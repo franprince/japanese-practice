@@ -102,7 +102,12 @@ export default function DatesPage() {
                 )}
 
                 <div className="mb-6">
-                    <DateGameCard key={`${key}-${sessionId}`} mode={mode} onScoreUpdate={handleScoreUpdate} />
+                    <DateGameCard
+                        key={`${key}-${sessionId}`}
+                        mode={mode}
+                        onScoreUpdate={handleScoreUpdate}
+                        disableNext={sessionComplete && playMode === "session"}
+                    />
                 </div>
 
                 <div className="mb-6">

@@ -10,24 +10,28 @@ import { useI18n } from "@/lib/i18n"
 interface DateGameCardProps {
   mode: DateMode
   onScoreUpdate: (score: number, streak: number, correct: boolean) => void
+  disableNext?: boolean
 }
 
-export function DateGameCard({ mode, onScoreUpdate }: DateGameCardProps) {
+export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateGameCardProps) {
   const [question, setQuestion] = useState<DateQuestion | null>(null)
   const [userInput, setUserInput] = useState("")
   const [showResult, setShowResult] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
+  const enterOnResultRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const { t } = useI18n()
 
   const generateNewQuestion = useCallback(() => {
+    if (disableNext) return
+    enterOnResultRef.current = false
     setQuestion(generateDateQuestion(mode))
     setUserInput("")
     setShowResult(false)
     setIsCorrect(false)
-  }, [mode])
+  }, [mode, disableNext])
 
   useEffect(() => {
     generateNewQuestion()
@@ -40,14 +44,14 @@ export function DateGameCard({ mode, onScoreUpdate }: DateGameCardProps) {
   }, [showResult, question])
 
   const handleSubmit = () => {
-    if (!question || !userInput.trim()) return
+    if (!question) return
 
-    const normalizedInput = userInput.trim().toLowerCase()
+    const userAnswer = userInput.trim().toLowerCase()
     const normalizedAnswer = question.answer.toLowerCase()
     const normalizedRomaji = question.romaji.toLowerCase().replace(/\s+/g, "")
 
     // Accept both hiragana and romaji answers
-    const correct = normalizedInput === normalizedAnswer || normalizedInput === normalizedRomaji
+    const correct = userAnswer === normalizedAnswer || userAnswer === normalizedRomaji
 
     setIsCorrect(correct)
     setShowResult(true)
@@ -71,13 +75,27 @@ export function DateGameCard({ mode, onScoreUpdate }: DateGameCardProps) {
     generateNewQuestion()
   }
 
+  const handleDelete = () => {
+    setUserInput(userInput.slice(0, -1))
+  }
+
+  const handleClear = () => {
+    setUserInput("")
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      if (showResult) {
-        generateNewQuestion()
-      } else {
+      if (showResult && !disableNext) {
+        e.preventDefault()
+        enterOnResultRef.current = true
+      } else if (!showResult) {
         handleSubmit()
       }
+    } else if (e.key === "Backspace" && !showResult) {
+      e.preventDefault()
+      handleDelete()
+    } else if (e.key === "Escape" && !showResult) {
+      handleClear()
     }
   }
 
@@ -102,6 +120,20 @@ export function DateGameCard({ mode, onScoreUpdate }: DateGameCardProps) {
         return t("month")
       case "full":
         return t("date")
+    }
+  }
+
+  const handleInputChange = (value: string) => {
+    if (showResult) return
+    setUserInput(value)
+  }
+
+  const handleKeyUp = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && showResult && !disableNext) {
+        if (!enterOnResultRef.current) return
+        e.preventDefault()
+        enterOnResultRef.current = false
+        generateNewQuestion()
     }
   }
 
@@ -132,14 +164,16 @@ export function DateGameCard({ mode, onScoreUpdate }: DateGameCardProps) {
           ref={inputRef}
           type="text"
           value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
+          onChange={(e) => handleInputChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={showResult}
+          onKeyUp={handleKeyUp}
+          readOnly={showResult}
+          aria-disabled={showResult}
           placeholder={t("typeHiraganaOrRomaji")}
           className={`
             w-full px-4 py-3 text-lg text-center rounded-xl border-2 bg-background
             placeholder:text-muted-foreground/50 focus:outline-none transition-all
-            ${showResult ? "opacity-50 cursor-not-allowed" : "border-border focus:border-primary"}
+            ${showResult ? "border-border opacity-60" : "border-border focus:border-primary"}
           `}
         />
       </div>
@@ -171,8 +205,11 @@ export function DateGameCard({ mode, onScoreUpdate }: DateGameCardProps) {
       <div className="flex gap-3">
         {showResult ? (
           <button
-            onClick={generateNewQuestion}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
+            onClick={() => {
+              if (!disableNext) generateNewQuestion()
+            }}
+            disabled={disableNext}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {t("nextDate")}
             <ArrowRight className="w-4 h-4" />
