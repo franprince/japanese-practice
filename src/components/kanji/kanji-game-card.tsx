@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { KanjiOptionCard } from "./kanji-option-card"
 import { getRandomKanji, getRandomOptions, loadKanjiSet, type KanjiEntry, type KanjiDifficulty } from "@/lib/kanji-data"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Check, X } from "lucide-react"
+import { ArrowRight, Check, Info, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
 interface KanjiGameCardProps {
@@ -110,6 +110,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
 
   const isCorrect = selectedOption?.char === currentKanji.char
   const meaning = lang === "es" ? currentKanji.meaning_es ?? currentKanji.meaning_en : currentKanji.meaning_en ?? currentKanji.meaning_es
+  const usedEnglishMeaning = lang === "es" && !currentKanji.meaning_es && !!currentKanji.meaning_en
   const showMeaning = difficulty === "easy" || difficulty === "medium"
   const showReading = difficulty === "easy" || difficulty === "hard"
   const promptLabel = t("kanji")
@@ -146,7 +147,20 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
               )}
             </div>
             <div className="text-sm text-muted-foreground flex flex-col gap-1">
-              {showMeaning && <span>{meaning ?? t("meaning")}</span>}
+              {showMeaning && (
+                <span className="inline-flex items-center gap-2">
+                  {meaning ?? t("meaning")}
+                  {usedEnglishMeaning && (
+                    <span
+                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/80 border border-border/50 rounded-full px-2 py-[2px]"
+                      title="Meaning shown in English (missing Spanish translation)"
+                    >
+                      <Info className="w-3 h-3" />
+                      <span>EN</span>
+                    </span>
+                  )}
+                </span>
+              )}
               {showReading && <span className="uppercase tracking-wide">{currentKanji.reading ?? t("reading")}</span>}
             </div>
           </div>

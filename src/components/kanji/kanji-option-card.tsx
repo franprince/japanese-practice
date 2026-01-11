@@ -1,5 +1,7 @@
 "use client"
 
+import { Info } from "lucide-react"
+
 import { cn } from "@/lib/utils"
 import { kanaToRomaji } from "@/lib/japanese-words"
 import type { KanjiEntry, KanjiDifficulty } from "@/lib/kanji-data"
@@ -29,6 +31,7 @@ export function KanjiOptionCard({
   const showMeaning = difficulty === "easy" || difficulty === "medium"
   const showReading = difficulty === "easy"
   const meaning = kanji.meaning_es && language === "es" ? kanji.meaning_es : kanji.meaning_en
+  const usedEnglishMeaning = language === "es" && !kanji.meaning_es && !!kanji.meaning_en
   const romajiReading = kanji.reading ? kanaToRomaji(kanji.reading) : "—"
 
   return (
@@ -53,7 +56,20 @@ export function KanjiOptionCard({
         {/* Meaning / reading depending on difficulty */}
         <div className="flex flex-col text-xs text-muted-foreground/80 mt-1 leading-tight gap-0.5">
           {showReading && <span className="uppercase tracking-wide">{romajiReading}</span>}
-          {showMeaning && <span>{meaning ?? "—"}</span>}
+          {showMeaning && (
+            <span className="inline-flex items-center gap-2">
+              {meaning ?? "—"}
+              {usedEnglishMeaning && (
+                <span
+                  className="inline-flex items-center gap-1 text-[10px] text-muted-foreground/80 border border-border/50 rounded-full px-2 py-[1px]"
+                  title="Meaning shown in English (missing Spanish translation)"
+                >
+                  <Info className="w-3 h-3" />
+                  <span>EN</span>
+                </span>
+              )}
+            </span>
+          )}
         </div>
       </div>
     </button>
