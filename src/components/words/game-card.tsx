@@ -243,7 +243,7 @@ export function GameCard({
                 )}
                 {currentWord.kanji && (
                   <div className="pt-2 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("kanji")}</p>
+                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("word")}</p>
                     <p className="text-lg font-medium text-foreground">{currentWord.kanji}</p>
                     <a
                       href={`https://jisho.org/search/${encodeURIComponent(currentWord.kanji)}`}

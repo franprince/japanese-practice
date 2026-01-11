@@ -34,6 +34,7 @@ export type TranslationKey =
   | "correctAnswer"
   | "meaning"
   | "reading"
+  | "word"
   | "kanji"
   | "showMeaning"
   | "placeholder"
@@ -156,6 +157,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     correctAnswer: "Correct answer",
     meaning: "Meaning",
     reading: "Reading",
+    word: "Word",
     kanji: "Kanji",
     showMeaning: "Show meaning in jisho.org ↗",
     placeholder: "Type romaji...",
@@ -261,6 +263,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     correctAnswer: "Respuesta correcta",
     meaning: "Significado",
     reading: "Lectura",
+    word: "Palabra",
     kanji: "Kanji",
     showMeaning: "Ver significado en jisho.org ↗",
     placeholder: "Escribe el rōmaji...",
@@ -366,6 +369,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     correctAnswer: "正解",
     meaning: "意味",
     reading: "読み",
+    word: "単語",
     kanji: "漢字",
     showMeaning: "意味を見る (jisho.org) ↗",
     placeholder: "ローマ字を入力...",
