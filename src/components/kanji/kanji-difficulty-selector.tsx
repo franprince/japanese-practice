@@ -12,7 +12,7 @@ export function KanjiDifficultySelector({ difficulty, onDifficultyChange }: Kanj
   const { t } = useI18n()
 
   const difficulties: { value: KanjiDifficulty; label: string; hint: string; level: string }[] = [
-    { value: "easy", label: t("easy"), hint: t("kanjiEasyHint"), level: "JLPT N5–N4" },
+    { value: "easy", label: t("easy"), hint: t("kanjiEasyHint"), level: "JLPT N5" },
     { value: "medium", label: t("medium"), hint: t("kanjiMediumHint"), level: "JLPT N5–N3" },
     { value: "hard", label: t("hard"), hint: t("kanjiHardHint"), level: "JLPT N5–N1" },
   ]

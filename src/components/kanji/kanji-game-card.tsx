@@ -30,7 +30,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
         // Difficulty-based JLPT filtering
         const allowedJlpt =
           difficulty === "easy"
-            ? new Set(["jlpt-n5", "jlpt-n4"])
+            ? new Set(["jlpt-n5"])
             : difficulty === "medium"
               ? new Set(["jlpt-n5", "jlpt-n4", "jlpt-n3"])
               : new Set(["jlpt-n5", "jlpt-n4", "jlpt-n3", "jlpt-n2", "jlpt-n1"])
