@@ -24,7 +24,7 @@ export default function Page() {
                     </div>
                 </header>
 
-                <div className="grid gap-6 md:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2">
                     <Link href="/words" className="block h-full">
                         <div className="h-full rounded-2xl border border-border/60 bg-card/70 p-6 shadow-sm hover:shadow-lg transition-shadow flex flex-col gap-2">
                             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("wordsLabel") ?? "Words"}</p>
@@ -61,6 +61,20 @@ export default function Page() {
                             <div className="mt-auto pt-2">
                                 <Button variant="default" className="inline-flex items-center gap-2 hover:bg-primary/90">
                                     {t("nextKanji") ?? "Start kanji"}
+                                    <ArrowRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    </Link>
+
+                    <Link href="/dates" className="block h-full">
+                        <div className="h-full rounded-2xl border border-border/60 bg-card/70 p-6 shadow-sm hover:shadow-lg transition-shadow flex flex-col gap-2">
+                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("datesTitle")}</p>
+                            <h2 className="text-2xl font-semibold text-foreground">{t("datesSubtitle")}</h2>
+                            <p className="text-muted-foreground">{t("writeFullDate")}</p>
+                            <div className="mt-auto pt-2">
+                                <Button variant="outline" className="inline-flex items-center gap-2 hover:bg-primary/10 hover:text-primary">
+                                    {t("nextDate") ?? "Start dates"}
                                     <ArrowRight className="h-4 w-4" />
                                 </Button>
                             </div>

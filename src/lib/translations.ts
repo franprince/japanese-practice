@@ -66,6 +66,19 @@ export type TranslationKey =
   | "kanjiEasyHint"
   | "kanjiMediumHint"
   | "kanjiHardHint"
+  | "datesTitle"
+  | "datesSubtitle"
+  | "daysOnly"
+  | "monthsOnly"
+  | "fullDates"
+  | "dayOfMonth"
+  | "month"
+  | "date"
+  | "writeFullDate"
+  | "writeDayReading"
+  | "writeMonthReading"
+  | "typeHiraganaOrRomaji"
+  | "nextDate"
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -134,6 +147,19 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     kanjiEasyHint: "Reading + Romaji + Meaning",
     kanjiMediumHint: "Reading + Meaning",
     kanjiHardHint: "Reading only",
+    datesTitle: "Dates Challenge",
+    datesSubtitle: "Write dates in Japanese",
+    daysOnly: "Days",
+    monthsOnly: "Months",
+    fullDates: "Full Dates",
+    dayOfMonth: "Day of month",
+    month: "Month",
+    date: "Full date",
+    writeFullDate: "Write the full date reading",
+    writeDayReading: "Write the day reading in hiragana",
+    writeMonthReading: "Write the month reading in hiragana",
+    typeHiraganaOrRomaji: "Type hiragana or romaji...",
+    nextDate: "Next Date",
   },
   es: {
     chipLabel: "Práctica de Kana",
@@ -201,6 +227,19 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     kanjiEasyHint: "Lectura + Romaji + Significado",
     kanjiMediumHint: "Lectura + Significado",
     kanjiHardHint: "Solo lectura",
+    datesTitle: "Desafío de Fechas",
+    datesSubtitle: "Escribe fechas en japonés",
+    daysOnly: "Días",
+    monthsOnly: "Meses",
+    fullDates: "Fechas",
+    dayOfMonth: "Día del mes",
+    month: "Mes",
+    date: "Fecha completa",
+    writeFullDate: "Escribe la lectura completa de la fecha",
+    writeDayReading: "Escribe la lectura del día en hiragana",
+    writeMonthReading: "Escribe la lectura del mes en hiragana",
+    typeHiraganaOrRomaji: "Escribe hiragana o romaji...",
+    nextDate: "Siguiente Fecha",
   },
   ja: {
     chipLabel: "かな練習",
@@ -268,5 +307,18 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     kanjiEasyHint: "読み + ローマ字 + 意味",
     kanjiMediumHint: "読み + 意味",
     kanjiHardHint: "読みのみ",
+    datesTitle: "日付チャレンジ",
+    datesSubtitle: "日付を日本語で書いてください",
+    daysOnly: "日",
+    monthsOnly: "月",
+    fullDates: "日付",
+    dayOfMonth: "日",
+    month: "月",
+    date: "日付",
+    writeFullDate: "日付の読み方を書いてください",
+    writeDayReading: "日の読み方をひらがなで書いてください",
+    writeMonthReading: "月の読み方をひらがなで書いてください",
+    typeHiraganaOrRomaji: "ひらがなかローマ字を入力...",
+    nextDate: "次の日付",
   },
 }
