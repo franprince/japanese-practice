@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { NumberGameCard } from "@/components/numbers/number-game-card"
 import { DifficultySelector } from "@/components/numbers/difficulty-selector"
@@ -15,14 +15,14 @@ import { SessionSummaryCard } from "@/components/session/session-summary-card"
 
 export default function NumbersPage() {
     const [difficulty, setDifficulty] = useState<Difficulty>("easy")
-    const [key, setKey] = useState(0)
+    const [sessionId, setSessionId] = useState(() => Math.random().toString(36).slice(2))
+    const [numbersMode, setNumbersMode] = useState<"arabicToKanji" | "kanjiToArabic">("arabicToKanji")
     const {
         score,
         streak,
         bestStreak,
         answeredCount,
         correctCount,
-        sessionId,
         playMode,
         targetCount,
         sessionComplete,
@@ -34,8 +34,8 @@ export default function NumbersPage() {
     } = useSessionProgress()
     const { t } = useI18n()
 
-    const handleScoreUpdate = useCallback(
-        (newScore: number, newStreak: number, correct: boolean) => {
+    const handleScoreUpdate = useMemo(
+        () => (newScore: number, newStreak: number, correct: boolean) => {
             handleSessionScoreUpdate(newScore, newStreak, correct)
         },
         [handleSessionScoreUpdate],
@@ -43,7 +43,7 @@ export default function NumbersPage() {
 
     const handleDifficultyChange = (newDifficulty: Difficulty) => {
         setDifficulty(newDifficulty)
-        setKey((prev) => prev + 1)
+        setSessionId(Math.random().toString(36).slice(2))
         resetSession()
     }
 
@@ -85,6 +85,23 @@ export default function NumbersPage() {
 
                 <DifficultySelector difficulty={difficulty} onDifficultyChange={setDifficulty} />
 
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                    <Button
+                        variant={numbersMode === "arabicToKanji" ? "default" : "outline"}
+                        className="w-full justify-center"
+                        onClick={() => setNumbersMode("arabicToKanji")}
+                    >
+                        {t("numbersModeArabicToKanji")}
+                    </Button>
+                    <Button
+                        variant={numbersMode === "kanjiToArabic" ? "default" : "outline"}
+                        className="w-full justify-center"
+                        onClick={() => setNumbersMode("kanjiToArabic")}
+                    >
+                        {t("numbersModeKanjiToArabic")}
+                    </Button>
+                </div>
+
                 {sessionComplete && playMode === "session" && (
                     <div className="mb-6 mt-4">
                         <SessionSummaryCard
@@ -105,8 +122,9 @@ export default function NumbersPage() {
 
                 <div className="mt-6 mb-6">
                     <NumberGameCard
-                        key={`${difficulty}-${sessionId}`}
+                        key={`${difficulty}-${numbersMode}-${sessionId}`}
                         difficulty={difficulty}
+                        mode={numbersMode}
                         onScoreUpdate={handleScoreUpdate}
                         disableNext={sessionComplete && playMode === "session"}
                     />
@@ -114,10 +132,6 @@ export default function NumbersPage() {
 
                 <div className="mb-6">
                     <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
-                </div>
-
-                <div className="space-y-4">
-                    <DifficultySelector difficulty={difficulty} onDifficultyChange={handleDifficultyChange} />
                 </div>
 
                 <footer className="mt-10 text-center">

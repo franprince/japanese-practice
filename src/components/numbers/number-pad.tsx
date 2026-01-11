@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Delete, CornerDownLeft } from "lucide-react"
-import { numberPadKeys } from "@/lib/japanese-numbers"
+import { numberPadKeysArabic, numberPadKeysKanji } from "@/lib/japanese-numbers"
 import { useI18n } from "@/lib/i18n"
 
 interface NumberPadProps {
@@ -14,9 +14,11 @@ interface NumberPadProps {
   disabled?: boolean
   shuffleNumbers: boolean
   onShuffleChange: (checked: boolean) => void
+  keys?: readonly NumberPadKey[]
+  disableShuffle?: boolean
 }
 
-type NumberPadKey = (typeof numberPadKeys)[number]
+type NumberPadKey = (typeof numberPadKeysKanji)[number] | (typeof numberPadKeysArabic)[number]
 
 export function NumberPad({
   onKeyPress,
@@ -26,6 +28,8 @@ export function NumberPad({
   disabled,
   shuffleNumbers,
   onShuffleChange,
+  keys = numberPadKeysKanji,
+  disableShuffle = false,
 }: NumberPadProps) {
   const { t } = useI18n()
   const [hasMounted, setHasMounted] = useState(false)
@@ -34,10 +38,11 @@ export function NumberPad({
     setHasMounted(true)
   }, [])
 
-  const keys: NumberPadKey[] = useMemo(() => {
+  const renderedKeys: NumberPadKey[] = useMemo(() => {
+    const base = Array.from(keys) as NumberPadKey[]
     // Avoid SSR/client mismatch by only shuffling after mount
-    if (!shuffleNumbers || !hasMounted) return [...numberPadKeys] as NumberPadKey[]
-    const shuffled: NumberPadKey[] = Array.from(numberPadKeys) as NumberPadKey[]
+    if (!shuffleNumbers || !hasMounted) return base
+    const shuffled: NumberPadKey[] = Array.from(base) as NumberPadKey[]
     for (let i = shuffled.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1))
       const iVal = shuffled[i]!
@@ -46,7 +51,7 @@ export function NumberPad({
       shuffled[j] = iVal
     }
     return shuffled
-  }, [shuffleNumbers, hasMounted])
+  }, [keys, shuffleNumbers, hasMounted])
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -56,13 +61,13 @@ export function NumberPad({
           className="h-4 w-4 accent-primary cursor-pointer"
           checked={shuffleNumbers}
           onChange={(e) => onShuffleChange(e.target.checked)}
-          disabled={disabled}
+          disabled={disabled || disableShuffle}
         />
         <span>{t("shuffleNumbers") ?? "Shuffle keys"}</span>
       </label>
 
       <div className="grid grid-cols-5 gap-2">
-        {keys.map(({ char, value }) => (
+        {renderedKeys.map(({ char, value }) => (
           <Button
             key={char}
             variant="secondary"

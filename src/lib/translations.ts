@@ -53,9 +53,12 @@ export type TranslationKey =
   | "clear"
   | "numbersTitle"
   | "numbersSubtitle"
+  | "numbersModeArabicToKanji"
+  | "numbersModeKanjiToArabic"
   | "startPractice"
   | "startNumbers"
   | "writeInJapanese"
+  | "writeInArabic"
   | "useKeypadBelow"
   | "yourAnswer"
   | "nextNumber"
@@ -173,11 +176,14 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     bothLabel: "Both",
     selectGroupsHint: "Select at least one character group to start.",
     wordsLabel: "Words practice",
-    startPractice: "Start practice",
-    startNumbers: "Start numbers",
+    startPractice: "Start Practice",
+    startNumbers: "Start Numbers",
     numbersTitle: "Numbers Challenge",
-    numbersSubtitle: "Write the number in Japanese",
+    numbersSubtitle: "Write the number in Japanese with flexible difficulty and keypad input.",
     writeInJapanese: "Write in Japanese",
+    numbersModeArabicToKanji: "Arabic → Kanji",
+    numbersModeKanjiToArabic: "Kanji → Arabic",
+    writeInArabic: "Write in Arabic",
     useKeypadBelow: "Use the keypad below",
     yourAnswer: "Your answer",
     nextNumber: "Next Number",
@@ -283,7 +289,10 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     startNumbers: "Empezar números",
     numbersTitle: "Desafío de Números",
     numbersSubtitle: "Escribe el número en japonés",
+    numbersModeArabicToKanji: "Arábigo → Kanji",
+    numbersModeKanjiToArabic: "Kanji → Arábigo",
     writeInJapanese: "Escribe en japonés",
+    writeInArabic: "Escribe en arábigos",
     useKeypadBelow: "Usa el teclado de abajo",
     yourAnswer: "Tu respuesta",
     nextNumber: "Siguiente Número",
@@ -389,7 +398,10 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     startNumbers: "数字を始める",
     numbersTitle: "数字チャレンジ",
     numbersSubtitle: "数字を日本語で書いてください",
+    numbersModeArabicToKanji: "アラビア数字 → 漢数字",
+    numbersModeKanjiToArabic: "漢数字 → アラビア数字",
     writeInJapanese: "日本語で書く",
+    writeInArabic: "アラビア数字で書く",
     useKeypadBelow: "下のキーパッドを使用",
     yourAnswer: "あなたの答え",
     nextNumber: "次の数字",

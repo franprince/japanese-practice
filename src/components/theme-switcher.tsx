@@ -30,7 +30,7 @@ export function ThemeSwitcher() {
         <ChevronDown className="w-4 h-4" />
       </Button>
       
-      <div className="absolute right-0 top-full mt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+      <div className="absolute right-0 top-full mt-1 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
         <div className="bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg overflow-hidden">
           {themes.map((themeOption) => (
             <button

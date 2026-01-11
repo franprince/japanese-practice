@@ -229,4 +229,17 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  button:not(:disabled),
+  [role="button"],
+  a[href],
+  input[type="checkbox"],
+  input[type="radio"] {
+    @apply cursor-pointer;
+  }
+
+  [aria-disabled="true"],
+  button:disabled {
+    @apply cursor-not-allowed;
+  }
 }

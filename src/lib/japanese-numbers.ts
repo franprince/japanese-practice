@@ -19,7 +19,7 @@ export const japaneseNumbers = {
 } as const
 
 // Number pad keys for input
-export const numberPadKeys = [
+export const numberPadKeysKanji = [
     { char: "一", value: "一" },
     { char: "二", value: "二" },
     { char: "三", value: "三" },
@@ -34,6 +34,19 @@ export const numberPadKeys = [
     { char: "千", value: "千" },
     { char: "万", value: "万" },
     { char: "〇", value: "〇" },
+] as const
+
+export const numberPadKeysArabic = [
+    { char: "1", value: "1" },
+    { char: "2", value: "2" },
+    { char: "3", value: "3" },
+    { char: "4", value: "4" },
+    { char: "5", value: "5" },
+    { char: "6", value: "6" },
+    { char: "7", value: "7" },
+    { char: "8", value: "8" },
+    { char: "9", value: "9" },
+    { char: "0", value: "0" },
 ] as const
 
 // Function to convert Arabic number to Japanese
