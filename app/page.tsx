@@ -51,19 +51,19 @@ export default function HomePage() {
       </div>
 
       <div className="container max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 relative">
-        <header className="flex items-start justify-between mb-20 gap-8">
-          <div className="flex-1">
-            <div className="mb-6">
+        <header className="mb-20">
+          <div className="flex items-start justify-between mb-6 gap-4">
+            <div className="flex-1">
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-3 tracking-tight">日本語</h1>
-              <div className="h-1 w-20 bg-primary mb-6" />
+              <div className="h-1 w-20 bg-primary" />
             </div>
-            <p className="text-lg md:text-xl text-white/70 max-w-md leading-relaxed font-light">
-              {t("heroTagline")}
-            </p>
+            <div className="flex-shrink-0">
+              <LanguageSwitcher />
+            </div>
           </div>
-          <div className="flex-shrink-0">
-            <LanguageSwitcher />
-          </div>
+          <p className="text-lg md:text-xl text-white/70 md:max-w-md leading-relaxed font-light">
+            {t("heroTagline")}
+          </p>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-20">
@@ -80,7 +80,7 @@ export default function HomePage() {
           ))}
         </div>
 
-        <footer className="mt-20 pt-12 border-t border-white/10">
+        <footer className="mt-20 pt-12 pb-8 border-t border-white/10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
             <div>
               <div className="text-4xl mb-4">学</div>
