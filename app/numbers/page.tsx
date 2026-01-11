@@ -68,7 +68,7 @@ export default function NumbersPage() {
                 </header>
 
                 {/* Compact controls row */}
-                <div className="flex flex-wrap items-center gap-3 mb-4">
+                <div className="flex flex-wrap items-center justify-start gap-2 sm:gap-3 mb-4">
                     {/* Settings popover (play mode + questions) */}
                     <GameSettingsPopover
                         playMode={playMode}
@@ -85,10 +85,10 @@ export default function NumbersPage() {
                     <DifficultySelector difficulty={difficulty} onDifficultyChange={setDifficulty} />
 
                     {/* Mode toggle */}
-                    <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1">
+                    <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1 gap-1 w-full sm:w-auto">
                         <button
                             onClick={() => setNumbersMode("arabicToKanji")}
-                            className={`rounded-full px-2 py-1 text-xs font-medium transition-colors whitespace-nowrap ${
+                            className={`rounded-full px-2 py-1 text-xs font-medium transition-colors whitespace-nowrap w-full sm:w-auto ${
                                 numbersMode === "arabicToKanji"
                                     ? "bg-primary text-primary-foreground"
                                     : "text-muted-foreground hover:text-foreground"
@@ -98,7 +98,7 @@ export default function NumbersPage() {
                         </button>
                         <button
                             onClick={() => setNumbersMode("kanjiToArabic")}
-                            className={`rounded-full px-2 py-1 text-xs font-medium transition-colors whitespace-nowrap ${
+                            className={`rounded-full px-2 py-1 text-xs font-medium transition-colors whitespace-nowrap w-full sm:w-auto ${
                                 numbersMode === "kanjiToArabic"
                                     ? "bg-primary text-primary-foreground"
                                     : "text-muted-foreground hover:text-foreground"

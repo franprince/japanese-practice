@@ -51,19 +51,21 @@ export default function HomePage() {
         <div className="absolute bottom-40 left-20 w-24 h-24 rounded-full border border-accent/10 blur-sm" />
       </div>
 
-      <div className="container max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 relative">
-        <header className="mb-20">
-          <div className="flex items-start justify-between mb-6 gap-4">
+      <div className="container max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16 relative">
+        <header className="mb-12 md:mb-20">
+          <div className="flex flex-col-reverse md:flex-row md:items-start md:justify-between mb-6 gap-4 md:gap-6">
             <div className="flex-1">
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-3 tracking-tight">日本語</h1>
-              <div className="h-1 w-20 bg-primary" />
+              <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light text-white mb-2 sm:mb-3 tracking-tight">
+                日本語
+              </h1>
+              <div className="h-1 w-16 sm:w-20 bg-primary" />
             </div>
-            <div className="flex-shrink-0 flex gap-2">
+            <div className="flex-shrink-0 flex flex-wrap items-center gap-2">
               <ThemeSwitcher />
               <LanguageSwitcher />
             </div>
           </div>
-          <p className="text-lg md:text-xl text-white/70 md:max-w-md leading-relaxed font-light">
+          <p className="text-base sm:text-lg md:text-xl text-white/70 md:max-w-md leading-relaxed font-light">
             {t("heroTagline")}
           </p>
         </header>
