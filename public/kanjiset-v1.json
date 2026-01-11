@@ -50,7 +50,7 @@
     "char_count": "12819",
     "id": 4,
     "meaning_en": "to hear",
-    "meaning_es": null,
+    "meaning_es": "escuchar",
     "reading": "きく",
     "jlpt": "jlpt-n5"
   },
@@ -314,7 +314,7 @@
     "char_count": "4523",
     "id": 28,
     "meaning_en": "to sell",
-    "meaning_es": null,
+    "meaning_es": "vender",
     "reading": "うる",
     "jlpt": "jlpt-n5"
   },
@@ -1766,7 +1766,7 @@
     "char_count": "1678",
     "id": 160,
     "meaning_en": "near, close, short (distance)",
-    "meaning_es": null,
+    "meaning_es": "cerca, cercano (distancia corta)",
     "reading": "ちかい",
     "jlpt": "jlpt-n5"
   },
@@ -1909,7 +1909,7 @@
     "char_count": "1552",
     "id": 173,
     "meaning_en": "marriage",
-    "meaning_es": null,
+    "meaning_es": "matrimonio",
     "reading": "けっこん",
     "jlpt": "jlpt-n5"
   },
@@ -2569,7 +2569,7 @@
     "char_count": "1183",
     "id": 233,
     "meaning_en": "last year",
-    "meaning_es": null,
+    "meaning_es": "año pasado",
     "reading": "きょねん",
     "jlpt": "jlpt-n5"
   },
@@ -2865,8 +2865,8 @@
     "char": "空",
     "char_count": "1093",
     "id": 260,
-    "meaning_en": "emptiness",
-    "meaning_es": "vacío",
+    "meaning_en": "sky, empty, void, vacant, vacuum",
+    "meaning_es": "cielo, vacío",
     "reading": "そら",
     "jlpt": "jlpt-n5"
   },
@@ -3163,7 +3163,7 @@
     "char_count": "992",
     "id": 287,
     "meaning_en": "opposite side, other side",
-    "meaning_es": null,
+    "meaning_es": "lado opuesto, otro lado",
     "reading": "むこう",
     "jlpt": "jlpt-n5"
   },
@@ -3229,7 +3229,7 @@
     "char_count": "969",
     "id": 293,
     "meaning_en": "to put, to place",
-    "meaning_es": null,
+    "meaning_es": "poner, colocar",
     "reading": "おく",
     "jlpt": "jlpt-n5"
   },
@@ -3977,7 +3977,7 @@
     "char_count": "741",
     "id": 361,
     "meaning_en": "to differ (from), to be different, to be distinct, to be unlike, to vary, to disagree (with)",
-    "meaning_es": null,
+    "meaning_es": "diferir, ser diferente, variar, no estar de acuerdo",
     "reading": "ちがう",
     "jlpt": "jlpt-n5"
   },
@@ -5363,7 +5363,7 @@
     "char_count": "498",
     "id": 487,
     "meaning_en": "to return, to come home, to go home, to go back",
-    "meaning_es": null,
+    "meaning_es": "volver, regresar a casa",
     "reading": "かえる",
     "jlpt": "jlpt-n5"
   },
@@ -5495,7 +5495,7 @@
     "char_count": "486",
     "id": 499,
     "meaning_en": "to ferry across (e.g. a river), to carry across, to traverse",
-    "meaning_es": null,
+    "meaning_es": "cruzar, atravesar, transportar al otro lado",
     "reading": "わたす",
     "jlpt": "jlpt-n5"
   },
@@ -5506,7 +5506,7 @@
     "char_count": "480",
     "id": 500,
     "meaning_en": "movie, film, motion picture",
-    "meaning_es": null,
+    "meaning_es": "película, filme",
     "reading": "えいが",
     "jlpt": "jlpt-n5"
   },
@@ -5946,7 +5946,7 @@
     "char_count": "425",
     "id": 540,
     "meaning_en": "shopping, purchased goods",
-    "meaning_es": null,
+    "meaning_es": "compras, artículos comprados",
     "reading": "かいもの",
     "jlpt": "jlpt-n5"
   },
@@ -5968,7 +5968,7 @@
     "char_count": "424",
     "id": 542,
     "meaning_en": "to be absent, to take a day off",
-    "meaning_es": null,
+    "meaning_es": "estar ausente, tomarse un día libre",
     "reading": "やすむ",
     "jlpt": "jlpt-n5"
   },
@@ -6540,7 +6540,7 @@
     "char_count": "375",
     "id": 594,
     "meaning_en": "to hear",
-    "meaning_es": null,
+    "meaning_es": "escuchar",
     "reading": "きく",
     "jlpt": "jlpt-n5"
   },
@@ -6584,7 +6584,7 @@
     "char_count": "372",
     "id": 598,
     "meaning_en": "big, large, great",
-    "meaning_es": null,
+    "meaning_es": "grande",
     "reading": "おおきい",
     "jlpt": "jlpt-n5"
   },
@@ -6595,7 +6595,7 @@
     "char_count": "370",
     "id": 599,
     "meaning_en": "to work, to labor, to labour",
-    "meaning_es": null,
+    "meaning_es": "trabajar, laborar",
     "reading": "はたらく",
     "jlpt": "jlpt-n5"
   },
@@ -6815,7 +6815,7 @@
     "char_count": "354",
     "id": 619,
     "meaning_en": "to be shut, to close, to be closed",
-    "meaning_es": null,
+    "meaning_es": "cerrarse, estar cerrado",
     "reading": "しまる",
     "jlpt": "jlpt-n5"
   },
@@ -7310,7 +7310,7 @@
     "char_count": "312",
     "id": 664,
     "meaning_en": "to wait",
-    "meaning_es": null,
+    "meaning_es": "esperar",
     "reading": "まつ",
     "jlpt": "jlpt-n5"
   },
@@ -7398,7 +7398,7 @@
     "char_count": "307",
     "id": 672,
     "meaning_en": "lesson, class, teaching, instruction, classwork, schoolwork",
-    "meaning_es": null,
+    "meaning_es": "clase, lección, enseñanza, trabajo escolar",
     "reading": "じゅぎょう",
     "jlpt": "jlpt-n5"
   },
@@ -7761,7 +7761,7 @@
     "char_count": "282",
     "id": 705,
     "meaning_en": "slow",
-    "meaning_es": null,
+    "meaning_es": "lento",
     "reading": "おそい",
     "jlpt": "jlpt-n5"
   },
@@ -7827,7 +7827,7 @@
     "char_count": "279",
     "id": 711,
     "meaning_en": "to tie, to fasten, to tighten",
-    "meaning_es": null,
+    "meaning_es": "atar, sujetar, apretar",
     "reading": "しめる",
     "jlpt": "jlpt-n5"
   },
@@ -8058,7 +8058,7 @@
     "char_count": "269",
     "id": 732,
     "meaning_en": "to close, to shut",
-    "meaning_es": null,
+    "meaning_es": "cerrar",
     "reading": "しめる",
     "jlpt": "jlpt-n5"
   },
@@ -8146,7 +8146,7 @@
     "char_count": "261",
     "id": 740,
     "meaning_en": "to use (a tool, method, etc.), to make use of, to put to use",
-    "meaning_es": null,
+    "meaning_es": "usar, emplear, utilizar",
     "reading": "つかう",
     "jlpt": "jlpt-n5"
   },
@@ -9191,7 +9191,7 @@
     "char_count": "202",
     "id": 835,
     "meaning_en": "post office",
-    "meaning_es": null,
+    "meaning_es": "oficina de correos",
     "reading": "ゆうびんきょく",
     "jlpt": "jlpt-n5"
   },
@@ -9268,7 +9268,7 @@
     "char_count": "196",
     "id": 842,
     "meaning_en": "to take lessons in, to be taught, to learn (from a teacher), to study (under a teacher), to get training in",
-    "meaning_es": null,
+    "meaning_es": "aprender, tomar clases, recibir enseñanza",
     "reading": "ならう",
     "jlpt": "jlpt-n5"
   },
@@ -9400,7 +9400,7 @@
     "char_count": "192",
     "id": 854,
     "meaning_en": "photograph, photo, picture, photography",
-    "meaning_es": null,
+    "meaning_es": "fotografía, foto",
     "reading": "しゃしん",
     "jlpt": "jlpt-n5"
   },
@@ -9411,7 +9411,7 @@
     "char_count": "192",
     "id": 855,
     "meaning_en": "to return, to come home, to go home, to go back",
-    "meaning_es": null,
+    "meaning_es": "volver, regresar a casa",
     "reading": "かえる",
     "jlpt": "jlpt-n5"
   },
@@ -9532,7 +9532,7 @@
     "char_count": "186",
     "id": 866,
     "meaning_en": "to see, to look, to watch, to view, to observe",
-    "meaning_es": null,
+    "meaning_es": "ver, mirar, observar",
     "reading": "みる",
     "jlpt": "jlpt-n5"
   },
@@ -9620,7 +9620,7 @@
     "char_count": "183",
     "id": 874,
     "meaning_en": "to cross over, to go across",
-    "meaning_es": null,
+    "meaning_es": "cruzar, atravesar",
     "reading": "わたる",
     "jlpt": "jlpt-n5"
   },
@@ -10170,7 +10170,7 @@
     "char_count": "164",
     "id": 924,
     "meaning_en": "to call out (to), to call, to invoke",
-    "meaning_es": null,
+    "meaning_es": "llamar, invocar",
     "reading": "よぶ",
     "jlpt": "jlpt-n5"
   },
@@ -10445,7 +10445,7 @@
     "char_count": "153",
     "id": 949,
     "meaning_en": "to request, to beg, to ask",
-    "meaning_es": null,
+    "meaning_es": "pedir, solicitar",
     "reading": "たのむ",
     "jlpt": "jlpt-n5"
   },
@@ -10582,17 +10582,6 @@
     "jlpt": "jlpt-n3"
   },
   {
-    "rank": "686",
-    "code_point_hex": "8ce3",
-    "char": "賣",
-    "char_count": "147",
-    "id": 962,
-    "meaning_en": "sell, \n            betray, \n            show off",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
     "rank": "687",
     "code_point_hex": "7adc",
     "char": "竜",
@@ -10632,7 +10621,7 @@
     "char_count": "145",
     "id": 966,
     "meaning_en": "to take (a photograph)",
-    "meaning_es": null,
+    "meaning_es": "tomar una fotografía",
     "reading": "とる",
     "jlpt": "jlpt-n5"
   },
@@ -10698,7 +10687,7 @@
     "char_count": "141",
     "id": 972,
     "meaning_en": "birthday",
-    "meaning_es": null,
+    "meaning_es": "cumpleaños",
     "reading": "たんじょうび",
     "jlpt": "jlpt-n5"
   },
@@ -10811,17 +10800,6 @@
     "meaning_es": null,
     "reading": "あつかう",
     "jlpt": "jlpt-n3"
-  },
-  {
-    "rank": "694",
-    "code_point_hex": "9686",
-    "char": "隆",
-    "char_count": "138",
-    "id": 983,
-    "meaning_en": "Takashi",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "694",
@@ -11160,7 +11138,7 @@
     "char_count": "131",
     "id": 1014,
     "meaning_en": "to be troubled, to have difficulty, to be in a fix, to be at a loss, to be stumped, to be embarrassed",
-    "meaning_es": null,
+    "meaning_es": "estar preocupado, tener dificultades",
     "reading": "こまる",
     "jlpt": "jlpt-n5"
   },
@@ -11424,7 +11402,7 @@
     "char_count": "126",
     "id": 1038,
     "meaning_en": "to swim",
-    "meaning_es": null,
+    "meaning_es": "nadar",
     "reading": "およぐ",
     "jlpt": "jlpt-n5"
   },
@@ -11544,8 +11522,8 @@
     "char": "襲",
     "char_count": "124",
     "id": 1049,
-    "meaning_en": "pile",
-    "meaning_es": null,
+    "meaning_en": "attack, advance on, succeed to, pile, heap",
+    "meaning_es": "ataque, avance, éxito, pila, montón",
     "reading": "かさね",
     "jlpt": null
   },
@@ -11556,7 +11534,7 @@
     "char_count": "124",
     "id": 1050,
     "meaning_en": "manuscript",
-    "meaning_es": null,
+    "meaning_es": "manuscrito",
     "reading": "こう",
     "jlpt": null
   },
@@ -11776,7 +11754,7 @@
     "char_count": "118",
     "id": 1070,
     "meaning_en": "spacious, vast, wide",
-    "meaning_es": null,
+    "meaning_es": "amplio, espacioso",
     "reading": "ひろい",
     "jlpt": "jlpt-n5"
   },
@@ -11955,17 +11933,6 @@
     "meaning_es": "carga",
     "reading": "に",
     "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "720",
-    "code_point_hex": "8a89",
-    "char": "誉",
-    "char_count": "112",
-    "id": 1087,
-    "meaning_en": "Nakajima Homare",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "720",
@@ -12876,7 +12843,7 @@
     "char_count": "88",
     "id": 1170,
     "meaning_en": "to borrow",
-    "meaning_es": null,
+    "meaning_es": "pedir prestado",
     "reading": "かりる",
     "jlpt": "jlpt-n5"
   },
@@ -13459,7 +13426,7 @@
     "char_count": "77",
     "id": 1223,
     "meaning_en": "coffee shop, tearoom, coffee lounge, coffeehouse, cafe",
-    "meaning_es": null,
+    "meaning_es": "cafetería",
     "reading": "きっさてん",
     "jlpt": "jlpt-n5"
   },
@@ -13549,17 +13516,6 @@
     "meaning_en": "willow (any tree of genus Salix)",
     "meaning_es": null,
     "reading": "やなぎ",
-    "jlpt": null
-  },
-  {
-    "rank": "757",
-    "code_point_hex": "6fa4",
-    "char": "澤",
-    "char_count": "75",
-    "id": 1232,
-    "meaning_en": "Aki Sawada",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -13778,7 +13734,7 @@
     "char_count": "70",
     "id": 1252,
     "meaning_en": "to make sound (of an animal), to call, to cry, to whine, to sing, to chirp",
-    "meaning_es": null,
+    "meaning_es": "emitir sonido (animal), cantar/chillar/píar",
     "reading": "なく",
     "jlpt": "jlpt-n5"
   },
@@ -14317,7 +14273,7 @@
     "char_count": "63",
     "id": 1301,
     "meaning_en": "to sing",
-    "meaning_es": null,
+    "meaning_es": "cantar",
     "reading": "うたう",
     "jlpt": "jlpt-n5"
   },
@@ -14339,7 +14295,7 @@
     "char_count": "63",
     "id": 1303,
     "meaning_en": "spacious, vast, wide",
-    "meaning_es": null,
+    "meaning_es": "amplio, espacioso",
     "reading": "ひろい",
     "jlpt": "jlpt-n5"
   },
@@ -14944,7 +14900,7 @@
     "char_count": "55",
     "id": 1358,
     "meaning_en": "to cross over, to go across",
-    "meaning_es": null,
+    "meaning_es": "cruzar, atravesar",
     "reading": "わたる",
     "jlpt": "jlpt-n5"
   },
@@ -15098,7 +15054,7 @@
     "char_count": "53",
     "id": 1372,
     "meaning_en": "nicely, properly, well, skillfully, skilfully",
-    "meaning_es": null,
+    "meaning_es": "bien, correctamente, con destreza",
     "reading": "よく",
     "jlpt": "jlpt-n5"
   },
@@ -15516,7 +15472,7 @@
     "char_count": "47",
     "id": 1410,
     "meaning_en": "to sit (down), to have a seat, to be seated, to kneel (on the floor)",
-    "meaning_es": null,
+    "meaning_es": "sentarse, tomar asiento",
     "reading": "すわる",
     "jlpt": "jlpt-n5"
   },
@@ -15929,17 +15885,6 @@
   },
   {
     "rank": "789",
-    "code_point_hex": "572d",
-    "char": "圭",
-    "char_count": "42",
-    "id": 1448,
-    "meaning_en": "Racks and quandles",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "789",
     "code_point_hex": "82b3",
     "char": "芳",
     "char_count": "42",
@@ -16143,7 +16088,7 @@
     "char_count": "40",
     "id": 1467,
     "meaning_en": "dark, gloomy, murky",
-    "meaning_es": null,
+    "meaning_es": "oscuro, sombrío",
     "reading": "くらい",
     "jlpt": "jlpt-n5"
   },
@@ -16231,7 +16176,7 @@
     "char_count": "39",
     "id": 1475,
     "meaning_en": "to run",
-    "meaning_es": null,
+    "meaning_es": "correr",
     "reading": "はしる",
     "jlpt": "jlpt-n5"
   },
@@ -16376,17 +16321,6 @@
     "meaning_en": "ear (of a cereal plant)",
     "meaning_es": "mazorca",
     "reading": "ほ",
-    "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "794",
-    "code_point_hex": "5a20",
-    "char": "娠",
-    "char_count": "37",
-    "id": 1489,
-    "meaning_en": "with child, \n            pregnancy",
-    "meaning_es": "con hijo, embarazo",
-    "reading": null,
     "jlpt": "jlpt-n1"
   },
   {
@@ -16946,7 +16880,7 @@
     "char_count": "33",
     "id": 1540,
     "meaning_en": "to polish, to shine, to burnish, to scour, to scrub, to brush (teeth), to grind (e.g. a lens)",
-    "meaning_es": null,
+    "meaning_es": "pulir, frotar, cepillar",
     "reading": "みがく",
     "jlpt": "jlpt-n5"
   },
@@ -17122,7 +17056,7 @@
     "char_count": "31",
     "id": 1556,
     "meaning_en": "entrance, front door, entryway, entranceway, entry hall, vestibule, porch, foyer, mud room",
-    "meaning_es": null,
+    "meaning_es": "entrada, recibidor",
     "reading": "げんかん",
     "jlpt": "jlpt-n5"
   },
@@ -17496,7 +17430,7 @@
     "char_count": "29",
     "id": 1590,
     "meaning_en": "cleaning, sweeping, dusting, scrubbing",
-    "meaning_es": null,
+    "meaning_es": "limpieza, barrido",
     "reading": "そうじ",
     "jlpt": "jlpt-n5"
   },
@@ -17705,7 +17639,7 @@
     "char_count": "27",
     "id": 1609,
     "meaning_en": "sweet-tasting, sweet, sugary, sugared",
-    "meaning_es": null,
+    "meaning_es": "dulce",
     "reading": "あまい",
     "jlpt": "jlpt-n5"
   },
@@ -17817,17 +17751,6 @@
     "meaning_en": "(small) boat",
     "meaning_es": null,
     "reading": "てい",
-    "jlpt": null
-  },
-  {
-    "rank": "804",
-    "code_point_hex": "8061",
-    "char": "聡",
-    "char_count": "27",
-    "id": 1620,
-    "meaning_en": "14927 Satoshi",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -17997,17 +17920,6 @@
   },
   {
     "rank": "805",
-    "code_point_hex": "6f58",
-    "char": "潘",
-    "char_count": "26",
-    "id": 1636,
-    "meaning_en": "Pan Jinlian",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "805",
     "code_point_hex": "60a9",
     "char": "悩",
     "char_count": "26",
@@ -18035,7 +17947,7 @@
     "char_count": "26",
     "id": 1639,
     "meaning_en": "to polish, to shine, to burnish, to scour, to scrub, to brush (teeth), to grind (e.g. a lens)",
-    "meaning_es": null,
+    "meaning_es": "pulir, frotar, cepillar",
     "reading": "みがく",
     "jlpt": "jlpt-n5"
   },
@@ -18277,7 +18189,7 @@
     "char_count": "24",
     "id": 1661,
     "meaning_en": "to memorize, to memorise, to commit to memory, to learn by heart, to bear in mind, to remember",
-    "meaning_es": null,
+    "meaning_es": "memorizar, recordar",
     "reading": "おぼえる",
     "jlpt": "jlpt-n5"
   },
@@ -18299,7 +18211,7 @@
     "char_count": "24",
     "id": 1663,
     "meaning_en": "thick, deep, heavy",
-    "meaning_es": null,
+    "meaning_es": "espeso, grueso, denso",
     "reading": "あつい",
     "jlpt": "jlpt-n5"
   },
@@ -18367,17 +18279,6 @@
     "meaning_en": "giraffe (Giraffa camelopardalis)",
     "meaning_es": null,
     "reading": "きりん",
-    "jlpt": null
-  },
-  {
-    "rank": "807",
-    "code_point_hex": "9e9f",
-    "char": "麟",
-    "char_count": "24",
-    "id": 1670,
-    "meaning_en": "Linluo, Pingtung",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -18580,17 +18481,6 @@
   },
   {
     "rank": "810",
-    "code_point_hex": "53eb",
-    "char": "叫",
-    "char_count": "21",
-    "id": 1689,
-    "meaning_en": "Retribution (2006 film)",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "810",
     "code_point_hex": "6163",
     "char": "慣",
     "char_count": "21",
@@ -18684,7 +18574,7 @@
     "char_count": "21",
     "id": 1698,
     "meaning_en": "to pull, to tug, to lead (e.g. a horse)",
-    "meaning_es": null,
+    "meaning_es": "tirar, jalar, guiar",
     "reading": "ひく",
     "jlpt": "jlpt-n5"
   },
@@ -18739,7 +18629,7 @@
     "char_count": "20",
     "id": 1703,
     "meaning_en": "to get tired, to tire, to get fatigued, to become exhausted, to grow weary",
-    "meaning_es": null,
+    "meaning_es": "cansarse",
     "reading": "つかれる",
     "jlpt": "jlpt-n5"
   },
@@ -19130,17 +19020,6 @@
   },
   {
     "rank": "812",
-    "code_point_hex": "6068",
-    "char": "恨",
-    "char_count": "19",
-    "id": 1739,
-    "meaning_en": "Han (cultural)",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "812",
     "code_point_hex": "8358",
     "char": "荘",
     "char_count": "19",
@@ -19306,17 +19185,6 @@
   },
   {
     "rank": "813",
-    "code_point_hex": "8218",
-    "char": "舘",
-    "char_count": "18",
-    "id": 1755,
-    "meaning_en": "Shingo Tachi",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "813",
     "code_point_hex": "9699",
     "char": "隙",
     "char_count": "18",
@@ -19333,7 +19201,7 @@
     "char_count": "18",
     "id": 1757,
     "meaning_en": "painful, sore",
-    "meaning_es": null,
+    "meaning_es": "doloroso",
     "reading": "いたい",
     "jlpt": "jlpt-n5"
   },
@@ -19533,17 +19401,6 @@
     "meaning_en": "large ship",
     "meaning_es": null,
     "reading": "つむ",
-    "jlpt": null
-  },
-  {
-    "rank": "814",
-    "code_point_hex": "9e97",
-    "char": "麗",
-    "char_count": "17",
-    "id": 1776,
-    "meaning_en": "Uruha (musician)",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -19828,7 +19685,7 @@
     "char_count": "16",
     "id": 1802,
     "meaning_en": "to call out (to), to call, to invoke",
-    "meaning_es": null,
+    "meaning_es": "llamar, invocar, gritar",
     "reading": "よぶ",
     "jlpt": "jlpt-n5"
   },
@@ -19929,17 +19786,6 @@
     "meaning_en": "ghee (held to be the greatest of all flavours), the ultimate truth of Buddhism, nirvana",
     "meaning_es": null,
     "reading": "だいご",
-    "jlpt": null
-  },
-  {
-    "rank": "815",
-    "code_point_hex": "9190",
-    "char": "醐",
-    "char_count": "16",
-    "id": 1812,
-    "meaning_en": "boiled butter",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -20252,28 +20098,6 @@
   },
   {
     "rank": "817",
-    "code_point_hex": "646f",
-    "char": "摯",
-    "char_count": "14",
-    "id": 1841,
-    "meaning_en": "Emperor Zhi",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "817",
-    "code_point_hex": "760d",
-    "char": "瘍",
-    "char_count": "14",
-    "id": 1842,
-    "meaning_en": "swelling, \n            boil, \n            tumor",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "817",
     "code_point_hex": "4ff5",
     "char": "俵",
     "char_count": "14",
@@ -20444,7 +20268,7 @@
     "char_count": "14",
     "id": 1858,
     "meaning_en": "next year",
-    "meaning_es": null,
+    "meaning_es": "próximo año",
     "reading": "らいねん",
     "jlpt": "jlpt-n5"
   },
@@ -20703,17 +20527,6 @@
   },
   {
     "rank": "818",
-    "code_point_hex": "8389",
-    "char": "莉",
-    "char_count": "13",
-    "id": 1882,
-    "meaning_en": "jasmine",
-    "meaning_es": "jazmín",
-    "reading": null,
-    "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "818",
     "code_point_hex": "6367",
     "char": "捧",
     "char_count": "13",
@@ -20807,7 +20620,7 @@
     "char_count": "13",
     "id": 1891,
     "meaning_en": "to pull, to tug, to lead (e.g. a horse)",
-    "meaning_es": null,
+    "meaning_es": "tirar, jalar, guiar",
     "reading": "ひく",
     "jlpt": "jlpt-n5"
   },
@@ -21060,7 +20873,7 @@
     "char_count": "12",
     "id": 1914,
     "meaning_en": "bustling, busy, crowded, lively, prosperous, thriving",
-    "meaning_es": null,
+    "meaning_es": "bullicioso, animado",
     "reading": "にぎやか",
     "jlpt": "jlpt-n5"
   },
@@ -21206,17 +21019,6 @@
     "meaning_es": null,
     "reading": "ほめる",
     "jlpt": "jlpt-n4"
-  },
-  {
-    "rank": "820",
-    "code_point_hex": "7d18",
-    "char": "紘",
-    "char_count": "11",
-    "id": 1928,
-    "meaning_en": "large",
-    "meaning_es": "grande",
-    "reading": null,
-    "jlpt": "jlpt-n1"
   },
   {
     "rank": "820",
@@ -21775,7 +21577,7 @@
     "char_count": "10",
     "id": 1979,
     "meaning_en": "school",
-    "meaning_es": null,
+    "meaning_es": "escuela",
     "reading": "がっこう",
     "jlpt": "jlpt-n5"
   },
@@ -21987,17 +21789,6 @@
     "meaning_es": "brote",
     "reading": "め",
     "jlpt": "jlpt-n3"
-  },
-  {
-    "rank": "822",
-    "code_point_hex": "5d14",
-    "char": "崔",
-    "char_count": "9",
-    "id": 1999,
-    "meaning_en": "Choi Jeong",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "822",
@@ -22452,17 +22243,6 @@
   },
   {
     "rank": "823",
-    "code_point_hex": "9a28",
-    "char": "騨",
-    "char_count": "8",
-    "id": 2041,
-    "meaning_en": "dappled grey horse",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "823",
     "code_point_hex": "69cd",
     "char": "槍",
     "char_count": "8",
@@ -22694,17 +22474,6 @@
   },
   {
     "rank": "823",
-    "code_point_hex": "80aa",
-    "char": "肪",
-    "char_count": "8",
-    "id": 2063,
-    "meaning_en": "obese, \n            fat",
-    "meaning_es": "obeso, gordo",
-    "reading": null,
-    "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "823",
     "code_point_hex": "7881",
     "char": "碁",
     "char_count": "8",
@@ -22815,17 +22584,6 @@
   },
   {
     "rank": "823",
-    "code_point_hex": "98ce",
-    "char": "风",
-    "char_count": "8",
-    "id": 2074,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "823",
     "code_point_hex": "7ca5",
     "char": "粥",
     "char_count": "8",
@@ -22925,17 +22683,6 @@
   },
   {
     "rank": "824",
-    "code_point_hex": "564c",
-    "char": "噌",
-    "char_count": "7",
-    "id": 2084,
-    "meaning_en": "boisterous",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "824",
     "code_point_hex": "8499",
     "char": "蒙",
     "char_count": "7",
@@ -23024,17 +22771,6 @@
   },
   {
     "rank": "824",
-    "code_point_hex": "8058",
-    "char": "聘",
-    "char_count": "7",
-    "id": 2093,
-    "meaning_en": "Heichinrou",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "824",
     "code_point_hex": "6492",
     "char": "撒",
     "char_count": "7",
@@ -23086,17 +22822,6 @@
     "meaning_en": "evening",
     "meaning_es": "atardecer",
     "reading": "よい",
-    "jlpt": null
-  },
-  {
-    "rank": "824",
-    "code_point_hex": "7690",
-    "char": "皐",
-    "char_count": "7",
-    "id": 2099,
-    "meaning_en": "Gao of Xia",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -23392,7 +23117,7 @@
     "char_count": "6",
     "id": 2126,
     "meaning_en": "busy, occupied, hectic",
-    "meaning_es": null,
+    "meaning_es": "ocupado, atareado",
     "reading": "いそがしい",
     "jlpt": "jlpt-n5"
   },
@@ -23449,17 +23174,6 @@
     "meaning_en": "birch (esp. Japanese white birch)",
     "meaning_es": "abedul",
     "reading": "かば",
-    "jlpt": null
-  },
-  {
-    "rank": "825",
-    "code_point_hex": "79ae",
-    "char": "禮",
-    "char_count": "6",
-    "id": 2132,
-    "meaning_en": "social custom, \n            manners, \n            courtesy, \n            rites",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -23695,17 +23409,6 @@
   },
   {
     "rank": "825",
-    "code_point_hex": "5f45",
-    "char": "彅",
-    "char_count": "6",
-    "id": 2154,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "825",
     "code_point_hex": "64ec",
     "char": "擬",
     "char_count": "6",
@@ -23794,17 +23497,6 @@
   },
   {
     "rank": "825",
-    "code_point_hex": "589f",
-    "char": "墟",
-    "char_count": "6",
-    "id": 2163,
-    "meaning_en": "ruins",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "825",
     "code_point_hex": "8305",
     "char": "茅",
     "char_count": "6",
@@ -23845,17 +23537,6 @@
     "meaning_en": "the top (e.g. top ten)",
     "meaning_es": null,
     "reading": "けつ",
-    "jlpt": null
-  },
-  {
-    "rank": "825",
-    "code_point_hex": "932e",
-    "char": "錮",
-    "char_count": "6",
-    "id": 2168,
-    "meaning_en": "confinement, \n            to tie",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -24014,28 +23695,6 @@
   },
   {
     "rank": "826",
-    "code_point_hex": "6d9b",
-    "char": "涛",
-    "char_count": "5",
-    "id": 2183,
-    "meaning_en": "waves, \n            billows",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "826",
-    "code_point_hex": "5d11",
-    "char": "崑",
-    "char_count": "5",
-    "id": 2184,
-    "meaning_en": "Kunlun Mountains",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "826",
     "code_point_hex": "4fb6",
     "char": "侶",
     "char_count": "5",
@@ -24052,7 +23711,7 @@
     "char_count": "5",
     "id": 2186,
     "meaning_en": "to request, to beg, to ask",
-    "meaning_es": null,
+    "meaning_es": "pedir, solicitar",
     "reading": "たのむ",
     "jlpt": "jlpt-n5"
   },
@@ -24065,17 +23724,6 @@
     "meaning_en": "responding to a demand, answering a request",
     "meaning_es": null,
     "reading": "おうじゅ",
-    "jlpt": null
-  },
-  {
-    "rank": "826",
-    "code_point_hex": "6c76",
-    "char": "汶",
-    "char_count": "5",
-    "id": 2188,
-    "meaning_en": "river in Shandong province",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -24487,17 +24135,6 @@
   },
   {
     "rank": "826",
-    "code_point_hex": "9646",
-    "char": "陆",
-    "char_count": "5",
-    "id": 2226,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "826",
     "code_point_hex": "7fc1",
     "char": "翁",
     "char_count": "5",
@@ -24517,17 +24154,6 @@
     "meaning_es": "bandeja",
     "reading": "ぼん",
     "jlpt": "jlpt-n2"
-  },
-  {
-    "rank": "826",
-    "code_point_hex": "9f99",
-    "char": "龙",
-    "char_count": "5",
-    "id": 2229,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "826",
@@ -24627,17 +24253,6 @@
     "meaning_es": "señal, indicación, presagio, síntoma",
     "reading": "きざし",
     "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "827",
-    "code_point_hex": "689d",
-    "char": "條",
-    "char_count": "4",
-    "id": 2239,
-    "meaning_en": "article, \n            counter for articles, clauses, paragraphs, etc., \n            twig, \n            ray of light",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "827",
@@ -25015,17 +24630,6 @@
   },
   {
     "rank": "827",
-    "code_point_hex": "621a",
-    "char": "戚",
-    "char_count": "4",
-    "id": 2274,
-    "meaning_en": "Qi Faren",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "827",
     "code_point_hex": "6893",
     "char": "梓",
     "char_count": "4",
@@ -25257,28 +24861,6 @@
   },
   {
     "rank": "827",
-    "code_point_hex": "8e4a",
-    "char": "蹊",
-    "char_count": "4",
-    "id": 2296,
-    "meaning_en": "path",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "827",
-    "code_point_hex": "8017",
-    "char": "耗",
-    "char_count": "4",
-    "id": 2297,
-    "meaning_en": "decrease",
-    "meaning_es": "disminuir",
-    "reading": null,
-    "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "827",
     "code_point_hex": "51db",
     "char": "凛",
     "char_count": "4",
@@ -25405,7 +24987,7 @@
     "char_count": "4",
     "id": 2309,
     "meaning_en": "company, corporation, firm",
-    "meaning_es": null,
+    "meaning_es": "empresa, compañía",
     "reading": "かいしゃ",
     "jlpt": "jlpt-n5"
   },
@@ -25433,17 +25015,6 @@
   },
   {
     "rank": "827",
-    "code_point_hex": "548b",
-    "char": "咋",
-    "char_count": "4",
-    "id": 2312,
-    "meaning_en": "shout, \n            chew, \n            eat",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "827",
     "code_point_hex": "80e4",
     "char": "胤",
     "char_count": "4",
@@ -25460,7 +25031,7 @@
     "char_count": "4",
     "id": 2314,
     "meaning_en": "dark, gloomy, murky",
-    "meaning_es": null,
+    "meaning_es": "oscuro, sombrío",
     "reading": "くらい",
     "jlpt": "jlpt-n5"
   },
@@ -25482,7 +25053,7 @@
     "char_count": "4",
     "id": 2316,
     "meaning_en": "to hear",
-    "meaning_es": null,
+    "meaning_es": "escuchar",
     "reading": "きく",
     "jlpt": "jlpt-n5"
   },
@@ -25507,17 +25078,6 @@
     "meaning_es": null,
     "reading": "ぬれる",
     "jlpt": "jlpt-n4"
-  },
-  {
-    "rank": "827",
-    "code_point_hex": "6d19",
-    "char": "洙",
-    "char_count": "4",
-    "id": 2319,
-    "meaning_en": "name of a Chinese river",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "827",
@@ -25548,7 +25108,7 @@
     "char_count": "3",
     "id": 2322,
     "meaning_en": "for the first time",
-    "meaning_es": null,
+    "meaning_es": "por primera vez",
     "reading": "はじめて",
     "jlpt": "jlpt-n5"
   },
@@ -25570,7 +25130,7 @@
     "char_count": "3",
     "id": 2324,
     "meaning_en": "morning",
-    "meaning_es": null,
+    "meaning_es": "mañana",
     "reading": "あさ",
     "jlpt": "jlpt-n5"
   },
@@ -25702,20 +25262,9 @@
     "char_count": "3",
     "id": 2336,
     "meaning_en": "to run",
-    "meaning_es": null,
+    "meaning_es": "correr",
     "reading": "はしる",
     "jlpt": "jlpt-n5"
-  },
-  {
-    "rank": "828",
-    "code_point_hex": "5733",
-    "char": "圳",
-    "char_count": "3",
-    "id": 2337,
-    "meaning_en": "furrow in field, \n            small drainage",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "828",
@@ -25803,17 +25352,6 @@
     "meaning_en": "sincerity and kindheartedness, honesty and simplicity",
     "meaning_es": null,
     "reading": "とんこう",
-    "jlpt": null
-  },
-  {
-    "rank": "828",
-    "code_point_hex": "5152",
-    "char": "兒",
-    "char_count": "3",
-    "id": 2346,
-    "meaning_en": "Hideo Kodama",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -25969,17 +25507,6 @@
     "meaning_es": null,
     "reading": "さかのぼる",
     "jlpt": "jlpt-n2"
-  },
-  {
-    "rank": "828",
-    "code_point_hex": "5b2c",
-    "char": "嬬",
-    "char_count": "3",
-    "id": 2361,
-    "meaning_en": "mistress, \n            weak",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "828",
@@ -26208,7 +25735,7 @@
     "char_count": "3",
     "id": 2382,
     "meaning_en": "enjoyable, fun, pleasant, happy, delightful",
-    "meaning_es": null,
+    "meaning_es": "agradable, divertido, placentero",
     "reading": "たのしい",
     "jlpt": "jlpt-n5"
   },
@@ -26296,7 +25823,7 @@
     "char_count": "3",
     "id": 2390,
     "meaning_en": "to drink, to swallow, to take (medicine)",
-    "meaning_es": null,
+    "meaning_es": "beber, tragar, tomar (medicina)",
     "reading": "のむ",
     "jlpt": "jlpt-n5"
   },
@@ -26384,7 +25911,7 @@
     "char_count": "3",
     "id": 2398,
     "meaning_en": "to run",
-    "meaning_es": null,
+    "meaning_es": "correr",
     "reading": "はしる",
     "jlpt": "jlpt-n5"
   },
@@ -26456,17 +25983,6 @@
   },
   {
     "rank": "828",
-    "code_point_hex": "73c2",
-    "char": "珂",
-    "char_count": "3",
-    "id": 2405,
-    "meaning_en": "jewel",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "828",
     "code_point_hex": "6063",
     "char": "恣",
     "char_count": "3",
@@ -26489,28 +26005,6 @@
   },
   {
     "rank": "828",
-    "code_point_hex": "9884",
-    "char": "预",
-    "char_count": "3",
-    "id": 2408,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "828",
-    "code_point_hex": "53d1",
-    "char": "发",
-    "char_count": "3",
-    "id": 2409,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "828",
     "code_point_hex": "66fe",
     "char": "曾",
     "char_count": "3",
@@ -26527,7 +26021,7 @@
     "char_count": "3",
     "id": 2411,
     "meaning_en": "strong, potent, competent, domineering, tough",
-    "meaning_es": null,
+    "meaning_es": "fuerte, potente",
     "reading": "つよい",
     "jlpt": "jlpt-n5"
   },
@@ -26577,17 +26071,6 @@
   },
   {
     "rank": "828",
-    "code_point_hex": "71c1",
-    "char": "燁",
-    "char_count": "3",
-    "id": 2416,
-    "meaning_en": "bright, \n            glorious, \n            splendid, \n            flame",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "828",
     "code_point_hex": "73ca",
     "char": "珊",
     "char_count": "3",
@@ -26596,17 +26079,6 @@
     "meaning_es": null,
     "reading": "サンチ",
     "jlpt": null
-  },
-  {
-    "rank": "828",
-    "code_point_hex": "745a",
-    "char": "瑚",
-    "char_count": "3",
-    "id": 2418,
-    "meaning_en": "ancestral offering receptacle, \n            coral",
-    "meaning_es": "receptáculo de ofrenda ancestral, coral",
-    "reading": null,
-    "jlpt": "jlpt-n1"
   },
   {
     "rank": "828",
@@ -26717,17 +26189,6 @@
     "meaning_es": null,
     "reading": "こり",
     "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "8d73",
-    "char": "赳",
-    "char_count": "2",
-    "id": 2429,
-    "meaning_en": "strong and brave",
-    "meaning_es": "fuerte y valiente",
-    "reading": null,
-    "jlpt": "jlpt-n1"
   },
   {
     "rank": "829",
@@ -26863,17 +26324,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "660a",
-    "char": "昊",
-    "char_count": "2",
-    "id": 2442,
-    "meaning_en": "sky, \n            big",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "5cfb",
     "char": "峻",
     "char_count": "2",
@@ -26995,17 +26445,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "5289",
-    "char": "劉",
-    "char_count": "2",
-    "id": 2454,
-    "meaning_en": "Liu Ling",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "7ac8",
     "char": "竈",
     "char_count": "2",
@@ -27057,17 +26496,6 @@
     "meaning_en": "duo (ancient Chinese bell with a clapper and a long handle)",
     "meaning_es": null,
     "reading": "たく",
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "5dbc",
-    "char": "嶼",
-    "char_count": "2",
-    "id": 2460,
-    "meaning_en": "island",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -27149,17 +26577,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "582f",
-    "char": "堯",
-    "char_count": "2",
-    "id": 2468,
-    "meaning_en": "Emperor Yao",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "76c3",
     "char": "盃",
     "char_count": "2",
@@ -27178,17 +26595,6 @@
     "meaning_en": "bleaching",
     "meaning_es": null,
     "reading": "さらし",
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "95a4",
-    "char": "閤",
-    "char_count": "2",
-    "id": 2471,
-    "meaning_en": "small side gate",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -27336,17 +26742,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "90a8",
-    "char": "邨",
-    "char_count": "2",
-    "id": 2485,
-    "meaning_en": "village, \n            hamlet, \n            rustic",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "85e9",
     "char": "藩",
     "char_count": "2",
@@ -27479,17 +26874,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "5629",
-    "char": "嘩",
-    "char_count": "2",
-    "id": 2498,
-    "meaning_en": "noisy",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "6c70",
     "char": "汰",
     "char_count": "2",
@@ -27545,28 +26929,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "8068",
-    "char": "聨",
-    "char_count": "2",
-    "id": 2504,
-    "meaning_en": "party, \n            gang, \n            clique",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "783a",
-    "char": "砺",
-    "char_count": "2",
-    "id": 2505,
-    "meaning_en": "whetstone, \n            polish",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "984e",
     "char": "顎",
     "char_count": "2",
@@ -27618,17 +26980,6 @@
     "meaning_en": "betel (Piper betle)",
     "meaning_es": null,
     "reading": "きんま",
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "84bb",
-    "char": "蒻",
-    "char_count": "2",
-    "id": 2511,
-    "meaning_en": "a kind of water plant",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -27743,17 +27094,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "5271",
-    "char": "剱",
-    "char_count": "2",
-    "id": 2522,
-    "meaning_en": "Tsurugisaki Lighthouse",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "8154",
     "char": "腔",
     "char_count": "2",
@@ -27828,17 +27168,6 @@
     "meaning_es": null,
     "reading": "うつる",
     "jlpt": "jlpt-n4"
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "7e8c",
-    "char": "續",
-    "char_count": "2",
-    "id": 2530,
-    "meaning_en": "Sanshiro Sugata Part II",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "829",
@@ -27963,17 +27292,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "7538",
-    "char": "甸",
-    "char_count": "2",
-    "id": 2542,
-    "meaning_en": "region around the imperial capital, \n            outskirts",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "71be",
     "char": "熾",
     "char_count": "2",
@@ -27992,17 +27310,6 @@
     "meaning_en": "brilliance",
     "meaning_es": null,
     "reading": "かんぱつ",
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "5d17",
-    "char": "崗",
-    "char_count": "2",
-    "id": 2545,
-    "meaning_en": "Gangxia North Station",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -28084,28 +27391,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "6cc4",
-    "char": "泄",
-    "char_count": "2",
-    "id": 2553,
-    "meaning_en": "Xie of Xia",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "7483",
-    "char": "璃",
-    "char_count": "2",
-    "id": 2554,
-    "meaning_en": "glassy, \n            lapis lazuli",
-    "meaning_es": "vítreo, lapislázuli",
-    "reading": null,
-    "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "829",
     "code_point_hex": "68b5",
     "char": "梵",
     "char_count": "2",
@@ -28113,50 +27398,6 @@
     "meaning_en": "Brahman (ultimate reality of the universe in Hinduism)",
     "meaning_es": null,
     "reading": "ぼん",
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "5361",
-    "char": "卡",
-    "char_count": "2",
-    "id": 2556,
-    "meaning_en": "card, \n            punch card, \n            calorie",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "6c14",
-    "char": "气",
-    "char_count": "2",
-    "id": 2557,
-    "meaning_en": "Radical 84",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "5e94",
-    "char": "应",
-    "char_count": "2",
-    "id": 2558,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "8fea",
-    "char": "迪",
-    "char_count": "2",
-    "id": 2559,
-    "meaning_en": "Disneyland Resort Line",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -28172,17 +27413,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "9b43",
-    "char": "魃",
-    "char_count": "2",
-    "id": 2561,
-    "meaning_en": "(god of) drought",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "8b01",
     "char": "謁",
     "char_count": "2",
@@ -28194,17 +27424,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "5c9b",
-    "char": "岛",
-    "char_count": "2",
-    "id": 2563,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "50b3",
     "char": "傳",
     "char_count": "2",
@@ -28212,17 +27431,6 @@
     "meaning_en": "handing down (information), legend, tradition, folklore, transmission",
     "meaning_es": null,
     "reading": "でんしょう",
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "6c8c",
-    "char": "沌",
-    "char_count": "2",
-    "id": 2565,
-    "meaning_en": "primeval chaos",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -28249,61 +27457,6 @@
   },
   {
     "rank": "829",
-    "code_point_hex": "83b2",
-    "char": "莲",
-    "char_count": "2",
-    "id": 2568,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "53bf",
-    "char": "县",
-    "char_count": "2",
-    "id": 2569,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "6c79",
-    "char": "汹",
-    "char_count": "2",
-    "id": 2570,
-    "meaning_en": "turbulent, \n            noisy, \n            restless",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "88ad",
-    "char": "袭",
-    "char_count": "2",
-    "id": 2571,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "51fb",
-    "char": "击",
-    "char_count": "2",
-    "id": 2572,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "829",
     "code_point_hex": "5eb5",
     "char": "庵",
     "char_count": "2",
@@ -28322,17 +27475,6 @@
     "meaning_en": "trench, dugout",
     "meaning_es": null,
     "reading": "ざんごう",
-    "jlpt": null
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "8076",
-    "char": "聶",
-    "char_count": "2",
-    "id": 2575,
-    "meaning_en": "Nie Yuan",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -28433,17 +27575,6 @@
     "meaning_es": "herida",
     "reading": "きず",
     "jlpt": "jlpt-n3"
-  },
-  {
-    "rank": "829",
-    "code_point_hex": "803f",
-    "char": "耿",
-    "char_count": "2",
-    "id": 2585,
-    "meaning_en": "Geng Huichang",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "829",
@@ -28584,7 +27715,7 @@
     "char_count": "1",
     "id": 2598,
     "meaning_en": "to enter, to come in, to go in, to get in, to arrive",
-    "meaning_es": null,
+    "meaning_es": "entrar, ingresar",
     "reading": "はいる",
     "jlpt": "jlpt-n5"
   },
@@ -28608,17 +27739,6 @@
     "meaning_en": "urging one to drink more good wine during a banquet",
     "meaning_es": null,
     "reading": "ゆうしょう",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5d5c",
-    "char": "嵜",
-    "char_count": "1",
-    "id": 2601,
-    "meaning_en": "Shinsuke Sakimoto",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -28788,39 +27908,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "8af6",
-    "char": "諶",
-    "char_count": "1",
-    "id": 2617,
-    "meaning_en": "Chen Long",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "7490",
-    "char": "璐",
-    "char_count": "1",
-    "id": 2618,
-    "meaning_en": "beautiful variety of jade",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "8446",
-    "char": "葆",
-    "char_count": "1",
-    "id": 2619,
-    "meaning_en": "dense growth, \n            keep, \n            adhere to, \n            conceal",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "67a1",
     "char": "枡",
     "char_count": "1",
@@ -28828,17 +27915,6 @@
     "meaning_en": "measuring container",
     "meaning_es": "\"masu\": recipiente cuadrado de madera para medir líquidos o cereales por volumen",
     "reading": "ます",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "6853",
-    "char": "桓",
-    "char_count": "1",
-    "id": 2621,
-    "meaning_en": "Huan Jie",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -28851,17 +27927,6 @@
     "meaning_es": "exactamente, precisamente, justo, exacto, oportunamente, afortunadamente",
     "reading": "ちょうど",
     "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "59f6",
-    "char": "姶",
-    "char_count": "1",
-    "id": 2623,
-    "meaning_en": "Aira Caldera",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -29079,7 +28144,7 @@
     "char_count": "1",
     "id": 2643,
     "meaning_en": "to cross over, to go across",
-    "meaning_es": null,
+    "meaning_es": "cruzar, atravesar",
     "reading": "わたる",
     "jlpt": "jlpt-n5"
   },
@@ -29195,17 +28260,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "9189",
-    "char": "醉",
-    "char_count": "1",
-    "id": 2654,
-    "meaning_en": "Drunken Angel",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "81e5",
     "char": "臥",
     "char_count": "1",
@@ -29283,23 +28337,12 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "699c",
-    "char": "榜",
-    "char_count": "1",
-    "id": 2662,
-    "meaning_en": "rudder, \n            oar, \n            name plate",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "52c1",
     "char": "勁",
     "char_count": "1",
     "id": 2663,
     "meaning_en": "strong, potent, competent, domineering, tough",
-    "meaning_es": null,
+    "meaning_es": "fuerte, potente",
     "reading": "つよい",
     "jlpt": "jlpt-n5"
   },
@@ -29334,17 +28377,6 @@
     "meaning_en": "luan (mythical Chinese bird)",
     "meaning_es": null,
     "reading": "らん",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "91e9",
-    "char": "釩",
-    "char_count": "1",
-    "id": 2667,
-    "meaning_en": "Vanadium (element)",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -29404,17 +28436,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "5700",
-    "char": "圀",
-    "char_count": "1",
-    "id": 2673,
-    "meaning_en": "country",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "847a",
     "char": "葺",
     "char_count": "1",
@@ -29455,17 +28476,6 @@
     "meaning_en": "inconsistency, discord, conflict, discrepancy, contradiction, failure, frustration",
     "meaning_es": null,
     "reading": "そご",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "9f6c",
-    "char": "齬",
-    "char_count": "1",
-    "id": 2678,
-    "meaning_en": "irregular teeth",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -29624,17 +28634,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "64bc",
-    "char": "撼",
-    "char_count": "1",
-    "id": 2693,
-    "meaning_en": "move",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "51c9",
     "char": "凉",
     "char_count": "1",
@@ -29701,17 +28700,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "63c4",
-    "char": "揄",
-    "char_count": "1",
-    "id": 2700,
-    "meaning_en": "pull, \n            tease, \n            play with",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "505a",
     "char": "做",
     "char_count": "1",
@@ -29745,17 +28733,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "5121",
-    "char": "儡",
-    "char_count": "1",
-    "id": 2704,
-    "meaning_en": "defeat",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "7435",
     "char": "琵",
     "char_count": "1",
@@ -29763,17 +28740,6 @@
     "meaning_en": "Lake Biwa, Biwako",
     "meaning_es": null,
     "reading": "びわこ",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "7436",
-    "char": "琶",
-    "char_count": "1",
-    "id": 2706,
-    "meaning_en": "Pazhou Station",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -29910,17 +28876,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "7473",
-    "char": "瑳",
-    "char_count": "1",
-    "id": 2719,
-    "meaning_en": "polish, \n            brilliant white luster of a gem, \n            artful smile",
-    "meaning_es": "pulir, brillante blancura de una gema, sonrisa astuta",
-    "reading": null,
-    "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "830",
     "code_point_hex": "58ec",
     "char": "壬",
     "char_count": "1",
@@ -30028,17 +28983,6 @@
     "meaning_es": null,
     "reading": "ためらう",
     "jlpt": "jlpt-n2"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "8e87",
-    "char": "躇",
-    "char_count": "1",
-    "id": 2730,
-    "meaning_en": "hesitate",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -30295,17 +29239,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "8703",
-    "char": "蜃",
-    "char_count": "1",
-    "id": 2754,
-    "meaning_en": "Shen (clam-monster)",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "81c6",
     "char": "臆",
     "char_count": "1",
@@ -30355,20 +29288,9 @@
     "char_count": "1",
     "id": 2759,
     "meaning_en": "to wait",
-    "meaning_es": null,
+    "meaning_es": "esperar",
     "reading": "まつ",
     "jlpt": "jlpt-n5"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "62ac",
-    "char": "抬",
-    "char_count": "1",
-    "id": 2760,
-    "meaning_en": "lift, \n            carry",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -30380,17 +29302,6 @@
     "meaning_es": "(un) hábito (a menudo un mal hábito)",
     "reading": "くせ",
     "jlpt": "jlpt-n3"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "7c43",
-    "char": "籃",
-    "char_count": "1",
-    "id": 2762,
-    "meaning_en": "basket",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -30482,17 +29393,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "6dc5",
-    "char": "淅",
-    "char_count": "1",
-    "id": 2771,
-    "meaning_en": "Xichuan County",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "8f5f",
     "char": "轟",
     "char_count": "1",
@@ -30523,17 +29423,6 @@
     "meaning_es": "pollito",
     "reading": "ひよこ",
     "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "68a0",
-    "char": "梠",
-    "char_count": "1",
-    "id": 2775,
-    "meaning_en": "a kind of quince",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -30647,17 +29536,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "8ba1",
-    "char": "计",
-    "char_count": "1",
-    "id": 2786,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "676d",
     "char": "杭",
     "char_count": "1",
@@ -30665,39 +29543,6 @@
     "meaning_en": "stake",
     "meaning_es": "estaca",
     "reading": "くい",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "707e",
-    "char": "灾",
-    "char_count": "1",
-    "id": 2788,
-    "meaning_en": "calamity, \n            disaster, \n            catastrophe",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "7ea7",
-    "char": "级",
-    "char_count": "1",
-    "id": 2789,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "54cd",
-    "char": "响",
-    "char_count": "1",
-    "id": 2790,
-    "meaning_en": "make sound, \n            make noise, \n            sound",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -30713,28 +29558,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "5e86",
-    "char": "庆",
-    "char_count": "1",
-    "id": 2792,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "7ea2",
-    "char": "红",
-    "char_count": "1",
-    "id": 2793,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "65af",
     "char": "斯",
     "char_count": "1",
@@ -30743,50 +29566,6 @@
     "meaning_es": null,
     "reading": "この",
     "jlpt": "jlpt-n3"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "4e50",
-    "char": "乐",
-    "char_count": "1",
-    "id": 2795,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "56ed",
-    "char": "园",
-    "char_count": "1",
-    "id": 2796,
-    "meaning_en": "garden, \n            park, \n            orchard",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5f00",
-    "char": "开",
-    "char_count": "1",
-    "id": 2797,
-    "meaning_en": "open, \n            initiate, \n            begin, \n            start",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "4eea",
-    "char": "仪",
-    "char_count": "1",
-    "id": 2798,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -30841,39 +29620,6 @@
     "meaning_en": "imperial decree",
     "meaning_es": "decreto imperial",
     "reading": "みことのり",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "8fbe",
-    "char": "达",
-    "char_count": "1",
-    "id": 2804,
-    "meaning_en": "arrive at, \n            reach, \n            intelligent, \n            smooth, \n            slippery",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "7ef4",
-    "char": "维",
-    "char_count": "1",
-    "id": 2805,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "743c",
-    "char": "琼",
-    "char_count": "1",
-    "id": 2806,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -30955,17 +29701,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "51b3",
-    "char": "决",
-    "char_count": "1",
-    "id": 2814,
-    "meaning_en": "decide, \n            determine, \n            judge",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "53c3",
     "char": "參",
     "char_count": "1",
@@ -30974,105 +29709,6 @@
     "meaning_es": "3",
     "reading": "さん",
     "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "65f6",
-    "char": "时",
-    "char_count": "1",
-    "id": 2816,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "8bb8",
-    "char": "许",
-    "char_count": "1",
-    "id": 2817,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "4e30",
-    "char": "丰",
-    "char_count": "1",
-    "id": 2818,
-    "meaning_en": "abundant, \n            lush, \n            bountiful, \n            plenty, \n            fat face, \n            luxurious growth of grass",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "6ee8",
-    "char": "滨",
-    "char_count": "1",
-    "id": 2819,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5377",
-    "char": "卷",
-    "char_count": "1",
-    "id": 2820,
-    "meaning_en": "volume, \n            book, \n            part",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "521b",
-    "char": "创",
-    "char_count": "1",
-    "id": 2821,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "7eaa",
-    "char": "纪",
-    "char_count": "1",
-    "id": 2822,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5f55",
-    "char": "录",
-    "char_count": "1",
-    "id": 2823,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "52bf",
-    "char": "势",
-    "char_count": "1",
-    "id": 2824,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -31087,39 +29723,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "53a6",
-    "char": "厦",
-    "char_count": "1",
-    "id": 2826,
-    "meaning_en": "Xiamen University",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "95e8",
-    "char": "门",
-    "char_count": "1",
-    "id": 2827,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "95fd",
-    "char": "闽",
-    "char_count": "1",
-    "id": 2828,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "7ca4",
     "char": "粤",
     "char_count": "1",
@@ -31127,39 +29730,6 @@
     "meaning_en": "Yue (kingdom in ancient China; 6th century-334 BCE)",
     "meaning_es": null,
     "reading": "えつ",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "79ef",
-    "char": "积",
-    "char_count": "1",
-    "id": 2830,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "6781",
-    "char": "极",
-    "char_count": "1",
-    "id": 2831,
-    "meaning_en": "extreme, \n            utmost, \n            furthest, \n            final",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5907",
-    "char": "备",
-    "char_count": "1",
-    "id": 2832,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -31194,17 +29764,6 @@
     "meaning_es": null,
     "reading": "あう",
     "jlpt": "jlpt-n2"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "8521",
-    "char": "蔡",
-    "char_count": "1",
-    "id": 2836,
-    "meaning_en": "2240 Tsai",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -31274,17 +29833,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "606a",
-    "char": "恪",
-    "char_count": "1",
-    "id": 2843,
-    "meaning_en": "carefulness",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "694a",
     "char": "楊",
     "char_count": "1",
@@ -31292,17 +29840,6 @@
     "meaning_en": "willow (any tree of genus Salix)",
     "meaning_es": null,
     "reading": "やなぎ",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "4f7c",
-    "char": "佼",
-    "char_count": "1",
-    "id": 2845,
-    "meaning_en": "beautiful, \n            clever, \n            deceive, \n            sly",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -31472,17 +30009,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "6350",
-    "char": "捐",
-    "char_count": "1",
-    "id": 2861,
-    "meaning_en": "throw away",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "5fff",
     "char": "忿",
     "char_count": "1",
@@ -31535,28 +30061,6 @@
     "meaning_es": "nota",
     "reading": "ちゅう",
     "jlpt": "jlpt-n3"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "6555",
-    "char": "敕",
-    "char_count": "1",
-    "id": 2867,
-    "meaning_en": "an imperial order or decree",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "6641",
-    "char": "晁",
-    "char_count": "1",
-    "id": 2868,
-    "meaning_en": "Chao Gai",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -31615,17 +30119,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "80f1",
-    "char": "胱",
-    "char_count": "1",
-    "id": 2874,
-    "meaning_en": "bladder",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "6a59",
     "char": "橙",
     "char_count": "1",
@@ -31648,17 +30141,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "74da",
-    "char": "瓚",
-    "char_count": "1",
-    "id": 2877,
-    "meaning_en": "ceremonial libation cup",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "700b",
     "char": "瀋",
     "char_count": "1",
@@ -31670,17 +30152,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "8f9c",
-    "char": "辜",
-    "char_count": "1",
-    "id": 2879,
-    "meaning_en": "Koo Chen-fu",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "7e82",
     "char": "纂",
     "char_count": "1",
@@ -31688,17 +30159,6 @@
     "meaning_en": "usurpation",
     "meaning_es": null,
     "reading": "さんだつ",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "8463",
-    "char": "董",
-    "char_count": "1",
-    "id": 2881,
-    "meaning_en": "Dong Yanmei",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -31743,17 +30203,6 @@
     "meaning_en": "infusing (tea)",
     "meaning_es": "John",
     "reading": "せん",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "6636",
-    "char": "昶",
-    "char_count": "1",
-    "id": 2886,
-    "meaning_en": "long day, \n            clear",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -31835,17 +30284,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "6d36",
-    "char": "洶",
-    "char_count": "1",
-    "id": 2894,
-    "meaning_en": "gush forth, \n            surge",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "6c23",
     "char": "氣",
     "char_count": "1",
@@ -31868,28 +30306,6 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "665a",
-    "char": "晚",
-    "char_count": "1",
-    "id": 2897,
-    "meaning_en": "night, \n            evening, \n            late",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "745b",
-    "char": "瑛",
-    "char_count": "1",
-    "id": 2898,
-    "meaning_en": "Ei-Q",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "5e7f",
     "char": "广",
     "char_count": "1",
@@ -31897,17 +30313,6 @@
     "meaning_en": "kanji \"dotted cliff\" radical (radical 53)",
     "meaning_es": null,
     "reading": "まだれ",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "4e1c",
-    "char": "东",
-    "char_count": "1",
-    "id": 2900,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -31923,23 +30328,12 @@
   },
   {
     "rank": "830",
-    "code_point_hex": "658c",
-    "char": "斌",
-    "char_count": "1",
-    "id": 2902,
-    "meaning_en": "beautiful, \n            harmony of appearance",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
     "code_point_hex": "9ebf",
     "char": "麿",
     "char_count": "1",
     "id": 2903,
-    "meaning_en": "I",
-    "meaning_es": null,
+    "meaning_en": "I, you",
+    "meaning_es": "yo, tú",
     "reading": "まろ",
     "jlpt": null
   },
@@ -31960,7 +30354,7 @@
     "char": "汝",
     "char_count": "1",
     "id": 2905,
-    "meaning_en": "blockhead!",
+    "meaning_en": "you, thou",
     "meaning_es": "tú (coloquial)",
     "reading": "なんじ",
     "jlpt": null
@@ -31983,19 +30377,8 @@
     "char_count": "1",
     "id": 2907,
     "meaning_en": "temporary (suspension) bridge",
-    "meaning_es": null,
+    "meaning_es": "puente de suspensión temporal",
     "reading": "えつり",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "591b",
-    "char": "夛",
-    "char_count": "1",
-    "id": 2908,
-    "meaning_en": "much, \n            many, \n            more than, \n            over",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -32008,17 +30391,6 @@
     "meaning_es": "raya",
     "reading": "しま",
     "jlpt": "jlpt-n2"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "576e",
-    "char": "坮",
-    "char_count": "1",
-    "id": 2910,
-    "meaning_en": "platform, \n            unit, \n            term of address",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -32037,53 +30409,9 @@
     "char": "閘",
     "char_count": "1",
     "id": 2912,
-    "meaning_en": "lock gate",
-    "meaning_es": null,
+    "meaning_en": "water gate, lock",
+    "meaning_es": "puerta de agua, cerradura",
     "reading": "こうもん",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5433",
-    "char": "吳",
-    "char_count": "1",
-    "id": 2913,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "90b1",
-    "char": "邱",
-    "char_count": "1",
-    "id": 2914,
-    "meaning_en": "Khoo Fuk-lung",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "8aaa",
-    "char": "說",
-    "char_count": "1",
-    "id": 2915,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5a77",
-    "char": "婷",
-    "char_count": "1",
-    "id": 2916,
-    "meaning_en": "pretty, \n            attractive, \n            graceful",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -32093,7 +30421,7 @@
     "char_count": "1",
     "id": 2917,
     "meaning_en": "pea green, yellow-green",
-    "meaning_es": null,
+    "meaning_es": "verde pálido, verde amarillento",
     "reading": "きみどり",
     "jlpt": null
   },
@@ -32104,7 +30432,7 @@
     "char_count": "1",
     "id": 2918,
     "meaning_en": "as the sound of surging water",
-    "meaning_es": null,
+    "meaning_es": "como el sonido de agua que corre",
     "reading": "ほうはい",
     "jlpt": null
   },
@@ -32115,19 +30443,8 @@
     "char_count": "1",
     "id": 2919,
     "meaning_en": "ancient Chinese unit of weight equivalent to 30 catties (15 kg)",
-    "meaning_es": null,
+    "meaning_es": "unidad de peso antigua china equivalente a 30 catties (15 kg)",
     "reading": "きん",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5f91",
-    "char": "徑",
-    "char_count": "1",
-    "id": 2920,
-    "meaning_en": "path, \n            diameter, \n            method",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   },
   {
@@ -32170,7 +30487,7 @@
     "char_count": "1",
     "id": 2924,
     "meaning_en": "anus",
-    "meaning_es": null,
+    "meaning_es": "ano",
     "reading": "こうもん",
     "jlpt": null
   },
@@ -32184,28 +30501,6 @@
     "meaning_es": "solapa",
     "reading": "えり",
     "jlpt": "jlpt-n1"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5a1f",
-    "char": "娟",
-    "char_count": "1",
-    "id": 2926,
-    "meaning_en": "beauty of face",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "6046",
-    "char": "恆",
-    "char_count": "1",
-    "id": 2927,
-    "meaning_en": "constant, \n            regular, \n            persistent",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -32236,7 +30531,7 @@
     "char_count": "1",
     "id": 2930,
     "meaning_en": "cotton rose (Hibiscus mutabilis), Confederate rose, dixie rosemallow",
-    "meaning_es": null,
+    "meaning_es": "rosa de algodón (Hibiscus mutabilis), rosa confederada, dixie rosemallow",
     "reading": "ふよう",
     "jlpt": null
   },
@@ -32247,7 +30542,7 @@
     "char_count": "1",
     "id": 2931,
     "meaning_en": "bamboo screen",
-    "meaning_es": null,
+    "meaning_es": "puerta de bambú",
     "reading": "すだれ",
     "jlpt": null
   },
@@ -32258,20 +30553,9 @@
     "char_count": "1",
     "id": 2932,
     "meaning_en": "satisfaction, contentment, gratification",
-    "meaning_es": null,
+    "meaning_es": "satisfacción, gratificación",
     "reading": "まんぞく",
     "jlpt": "jlpt-n3"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "58d3",
-    "char": "壓",
-    "char_count": "1",
-    "id": 2933,
-    "meaning_en": "pressure",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -32280,42 +30564,9 @@
     "char_count": "1",
     "id": 2934,
     "meaning_en": "to request, to beg, to ask",
-    "meaning_es": null,
+    "meaning_es": "pedir, solicitar",
     "reading": "たのむ",
     "jlpt": "jlpt-n5"
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "5f48",
-    "char": "彈",
-    "char_count": "1",
-    "id": 2935,
-    "meaning_en": "bullet, \n            twang, \n            flip, \n            snap",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "99ae",
-    "char": "馮",
-    "char_count": "1",
-    "id": 2936,
-    "meaning_en": "Feng Fei",
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "555f",
-    "char": "啟",
-    "char_count": "1",
-    "id": 2937,
-    "meaning_en": null,
-    "meaning_es": null,
-    "reading": null,
-    "jlpt": null
   },
   {
     "rank": "830",
@@ -32324,19 +30575,8 @@
     "char_count": "1",
     "id": 2938,
     "meaning_en": "wealth, prosperity, and arrogant splendor (splendour), (living sumptuously) intoxicated by wealth and power, luxury",
-    "meaning_es": null,
+    "meaning_es": "riqueza, prosperidad, y soberbia, (vivir sumptuosamente) intoxicado por la riqueza y el poder, lujo",
     "reading": "えいようえいが",
-    "jlpt": null
-  },
-  {
-    "rank": "830",
-    "code_point_hex": "52de",
-    "char": "勞",
-    "char_count": "1",
-    "id": 2939,
-    "meaning_en": "thank for, \n            reward for",
-    "meaning_es": null,
-    "reading": null,
     "jlpt": null
   }
 ]

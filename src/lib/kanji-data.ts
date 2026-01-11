@@ -8,8 +8,7 @@ export interface KanjiEntry {
   jlpt?: string | null
 }
 
-const datasetVersion = process.env.NEXT_PUBLIC_KANJISET_VERSION
-const datasetUrl = `/api/kanjiset${datasetVersion ? `?v=${datasetVersion}` : ""}`
+const datasetUrl = "/api/kanjiset"
 
 const shuffle = <T,>(arr: T[]) => {
   const copy = [...arr]

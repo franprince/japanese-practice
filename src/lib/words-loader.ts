@@ -24,10 +24,9 @@ type KanaGroup = {
   characters: Record<string, string[]>
 }
 
-const WORDSET_VERSION = process.env.NEXT_PUBLIC_WORDSET_VERSION || "v1"
-const WORDSET_LANG = (process.env.NEXT_PUBLIC_WORDSET_LANG || "es").toLowerCase()
-const CACHE_VERSION = process.env.NEXT_PUBLIC_CACHE_VERSION || "v1"
-const ENV_KEY = typeof process !== "undefined" && process.env.NODE_ENV === "development" ? "dev" : "prod"
+const WORDSET_LANG = "es".toLowerCase()
+const CACHE_VERSION = "v1"
+const ENV_KEY = "prod"
 const cacheKey = (lang: string) => `${CACHE_VERSION}-${ENV_KEY}-${lang}` // bump/override via env; dev/prod/lang separated
 const cachedPromises: Record<string, Promise<WordSets>> = {}
 const DB_NAME = "kana-words"
@@ -200,7 +199,7 @@ const writeCache = async (lang: string, data: WordSets) => {
 
 const fetchPrebuiltWordset = async (lang: string): Promise<WordSets | null> => {
   try {
-    const res = await fetch(`/wordset-${lang}-${WORDSET_VERSION}.json`, { cache: "force-cache" })
+    const res = await fetch(`/api/wordset?lang=${lang}`, { cache: "no-store" })
     if (!res.ok) return null
     const json = (await res.json()) as WordSets
     if (!json?.hiraganaWords || !json?.katakanaWords) return null

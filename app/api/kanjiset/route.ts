@@ -3,24 +3,31 @@ import fs from "fs/promises"
 import path from "path"
 
 const resolveDatasetPath = async () => {
-  const dataDir = path.join(process.cwd(), "data")
-  const explicit = process.env.KANJISET_VERSION
-  if (explicit) return path.join(dataDir, `kanjiset-${explicit}.json`)
+  const publicDir = path.join(process.cwd(), "public")
 
   try {
-    const files = await fs.readdir(dataDir)
-    const candidates = files.filter(f => /^kanjiset-.*\.json$/.test(f)).sort().reverse()
-    if (candidates.length) return path.join(dataDir, candidates[0]!)
+    const files = await fs.readdir(publicDir)
+    const candidates = files
+      .filter(f => /^kanjiset-v\d+\.json$/i.test(f))
+      .sort((a, b) => {
+        const va = parseInt(a.match(/v(\d+)/i)?.[1] ?? "0", 10)
+        const vb = parseInt(b.match(/v(\d+)/i)?.[1] ?? "0", 10)
+        return vb - va // highest version first
+      })
+    if (candidates.length) return path.join(publicDir, candidates[0]!)
   } catch (err) {
-    console.warn("Failed to list kanjiset files, falling back to default", err)
+    console.warn("Failed to list kanjiset files", err)
   }
 
-  return path.join(dataDir, "kanjiset-v2.json")
+  return null
 }
 
 export async function GET() {
   try {
     const filePath = await resolveDatasetPath()
+    if (!filePath) {
+      return NextResponse.json({ error: "No kanjiset dataset found" }, { status: 404 })
+    }
     const raw = await fs.readFile(filePath, "utf8")
     const data = JSON.parse(raw)
     return NextResponse.json(data)
