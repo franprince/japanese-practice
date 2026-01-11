@@ -94,6 +94,16 @@ export type TranslationKey =
   | "pillar.mindfulness.body"
   | "pillar.path.title"
   | "pillar.path.body"
+  | "playModeInfinite"
+  | "playModeSession"
+  | "questionsLabel"
+  | "questionsLeft"
+  | "sessionCompleteTitle"
+  | "sessionTargetLabel"
+  | "sessionCorrectLabel"
+  | "sessionAccuracyLabel"
+  | "sessionRestart"
+  | "sessionSwitchToInfinite"
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -115,6 +125,16 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "pillar.mindfulness.body": "Focused practice with clear feedback and meaningful progress tracking",
     "pillar.path.title": "Path",
     "pillar.path.body": "Your journey to Japanese fluency starts with a single character",
+    playModeInfinite: "Infinite",
+    playModeSession: "Session",
+    questionsLabel: "Questions",
+    questionsLeft: "{count} left",
+    sessionCompleteTitle: "Session complete",
+    sessionTargetLabel: "Target",
+    sessionCorrectLabel: "Correct",
+    sessionAccuracyLabel: "Accuracy",
+    sessionRestart: "Restart session",
+    sessionSwitchToInfinite: "Switch to Infinite",
     modeLabel: "Mode",
     tip: "Tip: Press Enter to check or move to the next word. Use filters to target specific character groups.",
     settings: "Settings",
@@ -210,6 +230,16 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "pillar.mindfulness.body": "Práctica enfocada con retroalimentación clara y seguimiento significativo del progreso",
     "pillar.path.title": "Camino",
     "pillar.path.body": "Tu camino hacia la fluidez del japonés empieza con un solo carácter",
+    playModeInfinite: "Infinito",
+    playModeSession: "Sesión",
+    questionsLabel: "Preguntas",
+    questionsLeft: "Quedan {count}",
+    sessionCompleteTitle: "Sesión completa",
+    sessionTargetLabel: "Objetivo",
+    sessionCorrectLabel: "Correctas",
+    sessionAccuracyLabel: "Precisión",
+    sessionRestart: "Reiniciar sesión",
+    sessionSwitchToInfinite: "Cambiar a Infinito",
     modeLabel: "Modo",
     tip: "Tip: Presiona Enter para comprobar o pasar a la siguiente palabra. Usa los filtros para elegir grupos específicos.",
     settings: "Ajustes",
@@ -304,7 +334,17 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "pillar.mindfulness.title": "心",
     "pillar.mindfulness.body": "明確なフィードバックと的確な進捗管理で集中して練習できます",
     "pillar.path.title": "道",
-    "pillar.path.body": "日本語習得への旅路は一つの文字から始まります",
+    "pillar.path.body": "日本語流暢への旅は一文字から始まります",
+    playModeInfinite: "無制限",
+    playModeSession: "セッション",
+    questionsLabel: "問題数",
+    questionsLeft: "残り {count}",
+    sessionCompleteTitle: "セッション完了",
+    sessionTargetLabel: "目標",
+    sessionCorrectLabel: "正解",
+    sessionAccuracyLabel: "正答率",
+    sessionRestart: "セッションをリスタート",
+    sessionSwitchToInfinite: "無制限モードへ",
     modeLabel: "モード",
     tip: "ヒント: Enterキーで答えを確認または次の単語へ。フィルターで練習範囲を絞れます。",
     settings: "設定",

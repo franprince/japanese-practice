@@ -28,7 +28,7 @@ export function NumberGameCard({ difficulty, onScoreUpdate }: NumberGameCardProp
   const [isCorrect, setIsCorrect] = useState(false)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
-  const [shuffleNumbers, setShuffleNumbers] = useState(false)
+  const [shuffleNumbers, setShuffleNumbers] = useState(true)
 
   const generateNewNumber = useCallback(() => {
     const range = difficultyRanges[difficulty]

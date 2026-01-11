@@ -15,6 +15,12 @@ export default function KanjiPage() {
     const [score, setScore] = useState(0)
     const [streak, setStreak] = useState(0)
     const [bestStreak, setBestStreak] = useState(0)
+    const [answeredCount, setAnsweredCount] = useState(0)
+    const [correctCount, setCorrectCount] = useState(0)
+    const [sessionId, setSessionId] = useState(0)
+    const [playMode, setPlayMode] = useState<"infinite" | "session">("infinite")
+    const [targetCount, setTargetCount] = useState<number>(10)
+    const [sessionComplete, setSessionComplete] = useState(false)
     const [key, setKey] = useState(0)
     const { t } = useI18n()
 
@@ -25,8 +31,18 @@ export default function KanjiPage() {
             if (newStreak > bestStreak) {
                 setBestStreak(newStreak)
             }
+            setAnsweredCount((prev) => {
+                const next = prev + 1
+                if (playMode === "session" && next >= targetCount) {
+                    setSessionComplete(true)
+                }
+                return next
+            })
+            if (correct) {
+                setCorrectCount((prev) => prev + 1)
+            }
         },
-        [bestStreak],
+        [bestStreak, playMode, targetCount],
     )
 
     const handleDifficultyChange = (newDifficulty: KanjiDifficulty) => {
@@ -35,6 +51,20 @@ export default function KanjiPage() {
         setScore(0)
         setStreak(0)
     }
+
+    const resetSession = (mode?: "infinite" | "session") => {
+        setSessionId((prev) => prev + 1)
+        setScore(0)
+        setStreak(0)
+        setBestStreak(0)
+        setAnsweredCount(0)
+        setCorrectCount(0)
+        setSessionComplete(false)
+        if (mode) setPlayMode(mode)
+    }
+
+    const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0
+    const remainingQuestions = playMode === "session" ? Math.max(targetCount - answeredCount, 0) : undefined
 
     return (
         <main className="min-h-screen bg-background relative">
@@ -56,8 +86,70 @@ export default function KanjiPage() {
                     </div>
                 </header>
 
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1">
+                        <Button
+                            variant={playMode === "infinite" ? "default" : "ghost"}
+                            size="sm"
+                            className="rounded-full"
+                            onClick={() => resetSession("infinite")}
+                        >
+                            {t("playModeInfinite")}
+                        </Button>
+                        <Button
+                            variant={playMode === "session" ? "default" : "ghost"}
+                            size="sm"
+                            className="rounded-full"
+                            onClick={() => resetSession("session")}
+                        >
+                            {t("playModeSession")}
+                        </Button>
+                    </div>
+                    {playMode === "session" && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <span>{t("questionsLabel")}:</span>
+                            <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1">
+                                {[5, 10, 15, 20].map((count) => (
+                                    <Button
+                                        key={count}
+                                        variant={targetCount === count ? "default" : "ghost"}
+                                        size="sm"
+                                        className="rounded-full"
+                                        onClick={() => {
+                                            setTargetCount(count)
+                                            resetSession()
+                                        }}
+                                    >
+                                        {count}
+                                    </Button>
+                                ))}
+                            </div>
+                            <span className="text-xs text-muted-foreground/80">
+                                {t("questionsLeft").replace("{count}", String(remainingQuestions))}
+                            </span>
+                        </div>
+                    )}
+                </div>
+
                 <div className="mb-6">
-                    <KanjiGameCard key={key} difficulty={difficulty} onScoreUpdate={handleScoreUpdate} />
+                    {sessionComplete && playMode === "session" ? (
+                        <div className="rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm space-y-4 text-center">
+                            <h2 className="text-xl font-semibold text-foreground">{t("sessionCompleteTitle")}</h2>
+                            <p className="text-sm text-muted-foreground">
+                                {t("sessionTargetLabel")}: {targetCount} • {t("sessionCorrectLabel")}: {correctCount} • {t("sessionAccuracyLabel")}: {accuracy}%
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                <Button className="cursor-pointer" onClick={() => resetSession()}>
+                                    {t("sessionRestart")}
+                                </Button>
+                                <Button variant="secondary" className="cursor-pointer" onClick={() => resetSession("infinite")}>
+                                    {t("sessionSwitchToInfinite")}
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <KanjiGameCard key={`${key}-${sessionId}`} difficulty={difficulty} onScoreUpdate={handleScoreUpdate} />
+                    )}
                 </div>
 
                 <div className="mb-6">

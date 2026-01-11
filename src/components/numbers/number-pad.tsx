@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Delete, CornerDownLeft } from "lucide-react"
 import { numberPadKeys } from "@/lib/japanese-numbers"
@@ -28,9 +28,15 @@ export function NumberPad({
   onShuffleChange,
 }: NumberPadProps) {
   const { t } = useI18n()
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    setHasMounted(true)
+  }, [])
 
   const keys: NumberPadKey[] = useMemo(() => {
-    if (!shuffleNumbers) return [...numberPadKeys] as NumberPadKey[]
+    // Avoid SSR/client mismatch by only shuffling after mount
+    if (!shuffleNumbers || !hasMounted) return [...numberPadKeys] as NumberPadKey[]
     const shuffled: NumberPadKey[] = Array.from(numberPadKeys) as NumberPadKey[]
     for (let i = shuffled.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1))
@@ -40,7 +46,7 @@ export function NumberPad({
       shuffled[j] = iVal
     }
     return shuffled
-  }, [shuffleNumbers])
+  }, [shuffleNumbers, hasMounted])
 
   return (
     <div className="w-full max-w-md mx-auto">
