@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { characterGroups, type WordFilter } from "@/lib/japanese-words"
 import { useI18n } from "@/lib/i18n"
 import type { GameMode } from "@/types/game"
+import { useSessionProgress } from "@/hooks/use-session-progress"
 
 export default function WordsPage() {
     const { t } = useI18n()
@@ -25,42 +26,34 @@ export default function WordsPage() {
 
     const [mode, setMode] = useState<GameMode>("hiragana")
     const [filter, setFilter] = useState<WordFilter>(defaultFilter)
-    const [score, setScore] = useState(0)
-    const [streak, setStreak] = useState(0)
-    const [bestStreak, setBestStreak] = useState(0)
-    const [answeredCount, setAnsweredCount] = useState(0)
-    const [correctCount, setCorrectCount] = useState(0)
-    const [sessionId, setSessionId] = useState(0)
-    const [playMode, setPlayMode] = useState<"infinite" | "session">("infinite")
-    const [targetCount, setTargetCount] = useState<number>(10)
-    const [sessionComplete, setSessionComplete] = useState(false)
+    const {
+        score,
+        streak,
+        bestStreak,
+        answeredCount,
+        correctCount,
+        sessionId,
+        playMode,
+        targetCount,
+        sessionComplete,
+        accuracy,
+        remainingQuestions,
+        handleScoreUpdate,
+        resetSession,
+        setTargetCount,
+        setSessionComplete,
+        setBestStreak,
+    } = useSessionProgress()
     const [settingsOpen, setSettingsOpen] = useState(false)
 
-    const handleScoreUpdate = useCallback(
+    const handleScoreUpdateWithUi = useCallback(
         (newScore: number, newStreak: number, correct: boolean) => {
-            setScore(newScore)
-            setStreak(newStreak)
-            if (newStreak > bestStreak) {
-                setBestStreak(newStreak)
-            }
-
-            // Track answered counts for session mode
-            setAnsweredCount((prev) => {
-                const next = prev + 1
-                if (playMode === "session" && next >= targetCount) {
-                    setSessionComplete(true)
-                }
-                return next
-            })
-            if (correct) {
-                setCorrectCount((prev) => prev + 1)
-            }
-
+            handleScoreUpdate(newScore, newStreak, correct)
             if (!correct) {
                 setSettingsOpen(false)
             }
         },
-        [bestStreak, playMode, targetCount],
+        [handleScoreUpdate],
     )
 
     const handleModeChange = (nextMode: GameMode) => {
@@ -74,27 +67,13 @@ export default function WordsPage() {
             ...prev,
             selectedGroups: prev.selectedGroups.filter((g) => allowedGroups.includes(g)),
         }))
-        setScore(0)
-        setStreak(0)
+        resetSession()
+        setBestStreak(0)
     }
 
     const handleFilterChange = (next: WordFilter) => {
         setFilter(next)
     }
-
-    const resetSession = (mode?: "infinite" | "session") => {
-        setSessionId((prev) => prev + 1)
-        setScore(0)
-        setStreak(0)
-        setBestStreak(0)
-        setAnsweredCount(0)
-        setCorrectCount(0)
-        setSessionComplete(false)
-        if (mode) setPlayMode(mode)
-    }
-
-    const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0
-    const remainingQuestions = playMode === "session" ? Math.max(targetCount - answeredCount, 0) : undefined
 
     return (
         <main className="min-h-screen bg-background relative">
@@ -184,7 +163,7 @@ export default function WordsPage() {
                             key={sessionId}
                             mode={mode}
                             filter={filter}
-                            onScoreUpdate={handleScoreUpdate}
+                            onScoreUpdate={handleScoreUpdateWithUi}
                             onRequestCloseSettings={() => setSettingsOpen(false)}
                         />
                     )}

@@ -9,62 +9,41 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"
 import type { KanjiDifficulty } from "@/lib/kanji-data"
 import { useI18n } from "@/lib/i18n"
+import { useSessionProgress } from "@/hooks/use-session-progress"
 
 export default function KanjiPage() {
     const [difficulty, setDifficulty] = useState<KanjiDifficulty>("easy")
-    const [score, setScore] = useState(0)
-    const [streak, setStreak] = useState(0)
-    const [bestStreak, setBestStreak] = useState(0)
-    const [answeredCount, setAnsweredCount] = useState(0)
-    const [correctCount, setCorrectCount] = useState(0)
-    const [sessionId, setSessionId] = useState(0)
-    const [playMode, setPlayMode] = useState<"infinite" | "session">("infinite")
-    const [targetCount, setTargetCount] = useState<number>(10)
-    const [sessionComplete, setSessionComplete] = useState(false)
     const [key, setKey] = useState(0)
+    const {
+        score,
+        streak,
+        bestStreak,
+        answeredCount,
+        correctCount,
+        sessionId,
+        playMode,
+        targetCount,
+        sessionComplete,
+        accuracy,
+        remainingQuestions,
+        handleScoreUpdate: handleSessionScoreUpdate,
+        resetSession,
+        setTargetCount,
+    } = useSessionProgress()
     const { t } = useI18n()
 
     const handleScoreUpdate = useCallback(
         (newScore: number, newStreak: number, correct: boolean) => {
-            setScore(newScore)
-            setStreak(newStreak)
-            if (newStreak > bestStreak) {
-                setBestStreak(newStreak)
-            }
-            setAnsweredCount((prev) => {
-                const next = prev + 1
-                if (playMode === "session" && next >= targetCount) {
-                    setSessionComplete(true)
-                }
-                return next
-            })
-            if (correct) {
-                setCorrectCount((prev) => prev + 1)
-            }
+            handleSessionScoreUpdate(newScore, newStreak, correct)
         },
-        [bestStreak, playMode, targetCount],
+        [handleSessionScoreUpdate],
     )
 
     const handleDifficultyChange = (newDifficulty: KanjiDifficulty) => {
         setDifficulty(newDifficulty)
         setKey((prev) => prev + 1)
-        setScore(0)
-        setStreak(0)
+        resetSession()
     }
-
-    const resetSession = (mode?: "infinite" | "session") => {
-        setSessionId((prev) => prev + 1)
-        setScore(0)
-        setStreak(0)
-        setBestStreak(0)
-        setAnsweredCount(0)
-        setCorrectCount(0)
-        setSessionComplete(false)
-        if (mode) setPlayMode(mode)
-    }
-
-    const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0
-    const remainingQuestions = playMode === "session" ? Math.max(targetCount - answeredCount, 0) : undefined
 
     return (
         <main className="min-h-screen bg-background relative">
