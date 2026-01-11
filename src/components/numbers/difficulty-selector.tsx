@@ -1,35 +1,34 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { useI18n } from "@/lib/i18n"
 import { difficultyRanges, type Difficulty } from "@/lib/japanese-numbers"
 
 interface DifficultySelectorProps {
-    difficulty: Difficulty
-    onDifficultyChange: (difficulty: Difficulty) => void
+  difficulty: Difficulty
+  onDifficultyChange: (difficulty: Difficulty) => void
 }
 
+const difficulties: Difficulty[] = ["easy", "medium", "hard", "expert"]
+
 export function DifficultySelector({ difficulty, onDifficultyChange }: DifficultySelectorProps) {
-    const { t } = useI18n()
+  const { t } = useI18n()
 
-    const difficulties: Difficulty[] = ["easy", "medium", "hard", "expert"]
-
-    return (
-        <div className="flex flex-wrap justify-center gap-2">
-            {difficulties.map((d) => (
-                <Button
-                    key={d}
-                    variant={difficulty === d ? "default" : "outline"}
-                    onClick={() => onDifficultyChange(d)}
-                    className={`px-4 py-2 text-sm transition-all ${difficulty === d
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "hover:bg-primary/10 hover:border-primary/50"
-                        }`}
-                >
-                    <span className="font-medium">{t(d)}</span>
-                    <span className="ml-2 text-xs opacity-70">({difficultyRanges[d].label})</span>
-                </Button>
-            ))}
-        </div>
-    )
+  return (
+    <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1">
+      {difficulties.map((d) => (
+        <button
+          key={d}
+          onClick={() => onDifficultyChange(d)}
+          className={`rounded-full px-2 py-1 text-xs font-medium transition-colors whitespace-nowrap ${
+            difficulty === d
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {t(d)}
+          <span className="ml-1 opacity-60">({difficultyRanges[d].label})</span>
+        </button>
+      ))}
+    </div>
+  )
 }

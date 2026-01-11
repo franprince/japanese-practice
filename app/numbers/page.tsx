@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import { NumberGameCard } from "@/components/numbers/number-game-card"
 import { DifficultySelector } from "@/components/numbers/difficulty-selector"
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import type { Difficulty } from "@/lib/japanese-numbers"
 import { useI18n } from "@/lib/i18n"
 import { useSessionProgress } from "@/hooks/use-session-progress"
-import { PlayModeControls } from "@/components/session/play-mode-controls"
+import { NumbersSettingsPopover } from "@/components/numbers/numbers-settings-popover"
 import { SessionSummaryCard } from "@/components/session/session-summary-card"
 
 export default function NumbersPage() {
@@ -67,39 +67,46 @@ export default function NumbersPage() {
                     </div>
                 </header>
 
-                <PlayModeControls
-                    playMode={playMode}
-                    onSelectMode={(mode) => resetSession(mode)}
-                    isSession={playMode === "session"}
-                    targetCount={targetCount}
-                    onSelectCount={(count) => {
-                        setTargetCount(count)
-                        resetSession()
-                    }}
-                    remainingQuestions={remainingQuestions}
-                    infiniteLabel={t("playModeInfinite")}
-                    sessionLabel={t("playModeSession")}
-                    questionsLabel={t("questionsLabel")}
-                    questionsLeftLabel={t("questionsLeft")}
-                />
+                {/* Compact controls row */}
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                    {/* Settings popover (play mode + questions) */}
+                    <NumbersSettingsPopover
+                        playMode={playMode}
+                        onSelectMode={resetSession}
+                        targetCount={targetCount}
+                        onSelectCount={(count) => {
+                            setTargetCount(count)
+                            resetSession()
+                        }}
+                        remainingQuestions={remainingQuestions ?? 0}
+                    />
 
-                <DifficultySelector difficulty={difficulty} onDifficultyChange={setDifficulty} />
+                    {/* Difficulty toggle */}
+                    <DifficultySelector difficulty={difficulty} onDifficultyChange={setDifficulty} />
 
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                    <Button
-                        variant={numbersMode === "arabicToKanji" ? "default" : "outline"}
-                        className="w-full justify-center"
-                        onClick={() => setNumbersMode("arabicToKanji")}
-                    >
-                        {t("numbersModeArabicToKanji")}
-                    </Button>
-                    <Button
-                        variant={numbersMode === "kanjiToArabic" ? "default" : "outline"}
-                        className="w-full justify-center"
-                        onClick={() => setNumbersMode("kanjiToArabic")}
-                    >
-                        {t("numbersModeKanjiToArabic")}
-                    </Button>
+                    {/* Mode toggle */}
+                    <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1">
+                        <button
+                            onClick={() => setNumbersMode("arabicToKanji")}
+                            className={`rounded-full px-2 py-1 text-xs font-medium transition-colors whitespace-nowrap ${
+                                numbersMode === "arabicToKanji"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "text-muted-foreground hover:text-foreground"
+                            }`}
+                        >
+                            {t("numbersModeArabicToKanji")}
+                        </button>
+                        <button
+                            onClick={() => setNumbersMode("kanjiToArabic")}
+                            className={`rounded-full px-2 py-1 text-xs font-medium transition-colors whitespace-nowrap ${
+                                numbersMode === "kanjiToArabic"
+                                    ? "bg-primary text-primary-foreground"
+                                    : "text-muted-foreground hover:text-foreground"
+                            }`}
+                        >
+                            {t("numbersModeKanjiToArabic")}
+                        </button>
+                    </div>
                 </div>
 
                 {sessionComplete && playMode === "session" && (
