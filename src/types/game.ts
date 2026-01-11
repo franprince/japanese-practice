@@ -1,1 +1,1 @@
-export type GameMode = "hiragana" | "katakana" | "both"
+export type GameMode = "hiragana" | "katakana" | "both" | "custom"

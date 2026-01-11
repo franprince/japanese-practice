@@ -21,19 +21,16 @@ export function DateModeSelector({ mode, onModeChange }: DateModeSelectorProps) 
   ]
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="inline-flex items-center gap-0.5 p-1 rounded-full bg-card/70 border border-border/60">
       {modes.map(({ value, labelKey, icon }) => (
         <button
           key={value}
           onClick={() => onModeChange(value)}
-          className={`
-            flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all
-            ${
-              mode === value
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
-                : "bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground"
-            }
-          `}
+          className={`flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+            mode === value
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
         >
           {icon}
           <span className="hidden sm:inline">{t(labelKey as any)}</span>

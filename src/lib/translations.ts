@@ -108,6 +108,7 @@ export type TranslationKey =
   | "sessionAccuracyLabel"
   | "sessionRestart"
   | "sessionSwitchToInfinite"
+  | "custom"
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -139,6 +140,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     sessionAccuracyLabel: "Accuracy",
     sessionRestart: "Restart session",
     sessionSwitchToInfinite: "Switch to Infinite",
+    custom: "Custom",
     modeLabel: "Mode",
     tip: "Tip: Press Enter to check or move to the next word. Use filters to target specific character groups.",
     settings: "Settings",
@@ -248,6 +250,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     sessionAccuracyLabel: "Precisión",
     sessionRestart: "Reiniciar sesión",
     sessionSwitchToInfinite: "Cambiar a Infinito",
+    custom: "Personalizado",
     modeLabel: "Modo",
     tip: "Tip: Presiona Enter para comprobar o pasar a la siguiente palabra. Usa los filtros para elegir grupos específicos.",
     settings: "Ajustes",
@@ -357,6 +360,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     sessionAccuracyLabel: "正答率",
     sessionRestart: "セッションをリスタート",
     sessionSwitchToInfinite: "無制限モードへ",
+    custom: "カスタム",
     modeLabel: "モード",
     tip: "ヒント: Enterキーで答えを確認または次の単語へ。フィルターで練習範囲を絞れます。",
     settings: "設定",

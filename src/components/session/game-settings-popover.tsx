@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useI18n } from "@/lib/i18n"
 import type { PlayMode } from "@/hooks/use-session-progress"
 
-interface NumbersSettingsPopoverProps {
+interface GameSettingsPopoverProps {
   playMode: PlayMode
   onSelectMode: (mode: PlayMode) => void
   targetCount: number
@@ -14,13 +14,13 @@ interface NumbersSettingsPopoverProps {
   remainingQuestions: number
 }
 
-export function NumbersSettingsPopover({
+export function GameSettingsPopover({
   playMode,
   onSelectMode,
   targetCount,
   onSelectCount,
   remainingQuestions,
-}: NumbersSettingsPopoverProps) {
+}: GameSettingsPopoverProps) {
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
 
@@ -29,7 +29,7 @@ export function NumbersSettingsPopover({
       <Button
         variant="ghost"
         size="icon"
-        className="h-9 w-9 rounded-full"
+        className="h-8 w-8 md:h-9 md:w-9 rounded-full"
         onClick={() => setOpen((prev) => !prev)}
         aria-label={t("settings")}
       >
@@ -42,13 +42,13 @@ export function NumbersSettingsPopover({
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 
           {/* Popover */}
-          <div className="absolute left-0 top-full mt-2 z-50 w-64 rounded-xl border border-border/50 bg-card/95 backdrop-blur-sm p-4 shadow-lg space-y-4">
+          <div className="absolute left-0 top-full mt-2 z-50 w-56 md:w-64 rounded-xl border border-border/50 bg-card/95 backdrop-blur-sm p-3 md:p-4 shadow-lg space-y-3 md:space-y-4">
             {/* Play mode */}
             <div>
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t("modeLabel")}</p>
               <div className="inline-flex rounded-full border border-border/60 bg-secondary/30 p-1 w-full">
                 <button
-                  className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                  className={`flex-1 rounded-full px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm font-medium transition-colors ${
                     playMode === "infinite" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                   onClick={() => onSelectMode("infinite")}
@@ -56,7 +56,7 @@ export function NumbersSettingsPopover({
                   {t("playModeInfinite")}
                 </button>
                 <button
-                  className={`flex-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                  className={`flex-1 rounded-full px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm font-medium transition-colors ${
                     playMode === "session" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                   onClick={() => onSelectMode("session")}
@@ -70,11 +70,11 @@ export function NumbersSettingsPopover({
             {playMode === "session" && (
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t("questionsLabel")}</p>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5 md:gap-2">
                   {[5, 10, 15, 20].map((count) => (
                     <button
                       key={count}
-                      className={`flex-1 rounded-lg py-1.5 text-sm font-medium border transition-colors ${
+                      className={`flex-1 rounded-lg py-1 md:py-1.5 text-xs md:text-sm font-medium border transition-colors ${
                         targetCount === count
                           ? "bg-primary text-primary-foreground border-primary"
                           : "border-border/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"

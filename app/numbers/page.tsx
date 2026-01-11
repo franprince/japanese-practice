@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import type { Difficulty } from "@/lib/japanese-numbers"
 import { useI18n } from "@/lib/i18n"
 import { useSessionProgress } from "@/hooks/use-session-progress"
-import { NumbersSettingsPopover } from "@/components/numbers/numbers-settings-popover"
+import { GameSettingsPopover } from "@/components/session/game-settings-popover"
 import { SessionSummaryCard } from "@/components/session/session-summary-card"
 
 export default function NumbersPage() {
@@ -70,7 +70,7 @@ export default function NumbersPage() {
                 {/* Compact controls row */}
                 <div className="flex flex-wrap items-center gap-3 mb-4">
                     {/* Settings popover (play mode + questions) */}
-                    <NumbersSettingsPopover
+                    <GameSettingsPopover
                         playMode={playMode}
                         onSelectMode={resetSession}
                         targetCount={targetCount}

@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useRef } from "react"
+import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
 import { characterGroups, type WordFilter } from "@/lib/japanese-words"
-import { Settings, X, RotateCcw } from "lucide-react"
+import { RotateCcw } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 
 import type { GameMode } from "@/types/game"
@@ -13,11 +12,9 @@ interface SettingsPanelProps {
   mode: GameMode
   filter: WordFilter
   onFilterChange: (filter: WordFilter) => void
-  isOpen: boolean
-  onToggle: () => void
 }
 
-export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }: SettingsPanelProps) {
+export function SettingsPanel({ mode, filter, onFilterChange }: SettingsPanelProps) {
   const { t } = useI18n()
 
   const sortGroups = (groups: typeof characterGroups) => [...groups].sort((a, b) => a.label.localeCompare(b.label))
@@ -119,71 +116,29 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
 
   return (
     <div id="settings-panel" className="w-full max-w-2xl mx-auto space-y-2 mt-8 md:mt-10">
-      <Card
-        aria-hidden={!isOpen}
-        className={cn(
-          "border-border/50 bg-card/80 backdrop-blur-sm max-w-2xl w-full mx-auto transition-all duration-200",
-          isOpen
-            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
-            : "opacity-0 -translate-y-1 scale-[0.99] pointer-events-none max-h-0 overflow-hidden",
-        )}
-      >
+      <Card className="border-border/50 bg-card/80 backdrop-blur-sm max-w-2xl w-full mx-auto">
         <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{t("practiceSettings")}</CardTitle>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={resetFilters}
-              className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
-            >
-              <RotateCcw className="w-3 h-3 mr-1" />
-              {t("reset")}
-            </Button>
-            <Button variant="ghost" size="icon" onClick={onToggle} className="h-8 w-8">
-              <X className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Word Length */}
-        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium">{t("wordLength")}</h4>
-            <span className="text-sm text-muted-foreground tabular-nums">
-              {filter.minLength} - {filter.maxLength} characters
-            </span>
+            <CardTitle className="text-lg">{t("characters")}</CardTitle>
+            <div className="flex items-center gap-2">
+              {filter.selectedGroups.length > 0 && (
+                <span className="text-xs text-primary">
+                  {filter.selectedGroups.length} {t("selectedCount")}
+                </span>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetFilters}
+                className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                {t("reset")}
+              </Button>
+            </div>
           </div>
-          <div className="px-1">
-            <Slider
-              value={[filter.minLength, filter.maxLength]}
-              min={1}
-              max={10}
-              step={1}
-              onValueChange={([min, max]) =>
-                onFilterChange({
-                  ...filter,
-                  minLength: min ?? filter.minLength,
-                  maxLength: max ?? filter.maxLength,
-                })
-              }
-              className="w-full"
-            />
-          </div>
-        </div>
-
-        {/* Character Groups */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium">{t("characters")}</h4>
-            {filter.selectedGroups.length > 0 && (
-              <span className="text-xs text-primary">
-                {filter.selectedGroups.length} {t("selectedCount")}
-              </span>
-            )}
-          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <p className="text-xs text-muted-foreground">{t("charactersDescription")}</p>
           {filter.selectedGroups.length === 0 && (
             <div className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/40 rounded-md px-3 py-2 flex items-start gap-2">
@@ -221,9 +176,8 @@ export function SettingsPanel({ mode, filter, onFilterChange, isOpen, onToggle }
               </div>
             )}
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-)
+        </CardContent>
+      </Card>
+    </div>
+  )
 }

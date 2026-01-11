@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import type { DateMode } from "@/lib/japanese-dates"
 import { useI18n } from "@/lib/i18n"
 import { useSessionProgress } from "@/hooks/use-session-progress"
-import { PlayModeControls } from "@/components/session/play-mode-controls"
+import { GameSettingsPopover } from "@/components/session/game-settings-popover"
 import { SessionSummaryCard } from "@/components/session/session-summary-card"
 
 export default function DatesPage() {
@@ -67,21 +67,20 @@ export default function DatesPage() {
                     </div>
                 </header>
 
-                <PlayModeControls
-                    playMode={playMode}
-                    onSelectMode={(mode) => resetSession(mode)}
-                    isSession={playMode === "session"}
-                    targetCount={targetCount}
-                    onSelectCount={(count) => {
-                        setTargetCount(count)
-                        resetSession()
-                    }}
-                    remainingQuestions={remainingQuestions}
-                    infiniteLabel={t("playModeInfinite")}
-                    sessionLabel={t("playModeSession")}
-                    questionsLabel={t("questionsLabel")}
-                    questionsLeftLabel={t("questionsLeft")}
-                />
+                {/* Compact controls row */}
+                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-4">
+                    <GameSettingsPopover
+                        playMode={playMode}
+                        onSelectMode={resetSession}
+                        targetCount={targetCount}
+                        onSelectCount={(count) => {
+                            setTargetCount(count)
+                            resetSession()
+                        }}
+                        remainingQuestions={remainingQuestions ?? 0}
+                    />
+                    <DateModeSelector mode={mode} onModeChange={handleModeChange} />
+                </div>
 
                 {sessionComplete && playMode === "session" && (
                     <div className="mb-6 mt-4">
@@ -112,10 +111,6 @@ export default function DatesPage() {
 
                 <div className="mb-6">
                     <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
-                </div>
-
-                <div className="space-y-4">
-                    <DateModeSelector mode={mode} onModeChange={handleModeChange} />
                 </div>
 
                 <footer className="mt-10 text-center">
