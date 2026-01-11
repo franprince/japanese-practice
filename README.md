@@ -52,6 +52,23 @@ bun start
 - Source: KANJIDIC (via jmdict-simplified repo).
 - Build: filtered by JLPT levels (N5–N1) with readings and meanings; stored inline in `src/lib/kanji-data.ts`.
 - Fields: `char`, `reading`, `meaning_en`, `meaning_es` (Spanish may be missing for some entries and will fall back to English), `jlpt`.
+- Maintenance scripts (Bun):
+  - Build dataset fallback pipeline (Jisho API + Playwright scrape):  
+    ```bash
+    bunx tsx scripts/build-kanjiset.ts
+    ```
+  - Report JLPT entries missing Spanish (configurable):  
+    ```bash
+    # defaults: --input data/kanjiset-v7.json --output data/kanjiset-missing-es.json --jlpt jlpt-n1
+    bunx tsx scripts/report-n1-missing-es.ts --input data/kanjiset-v7.json --jlpt jlpt-n1 --output data/kanjiset-n1-missing-es.json
+    ```
+    - Interactive mode: if `--input`/`--output` are omitted, it will list detected `kanjiset-v*.json` files (latest default), prompt to choose, and auto-rename output to avoid overwrites.
+  - Merge translated entries into a dataset (ID-based merge):  
+    ```bash
+    # defaults: --input data/kanjiset-v7.json --translations data/kanjiset-n1-missing-es.json --output data/kanjiset-v7-merged.json
+    bunx tsx scripts/merge-n1-translations.ts --input data/kanjiset-v7.json --translations data/kanjiset-n1-missing-es.json --output data/kanjiset-v7-merged.json
+    ```
+    - Interactive mode: if args are omitted, it will list detected datasets and translation JSONs, pick the latest by default, and write to a non-overwriting `*-merged.json` (auto-suffixed if needed).
 
 ### Numbers & Dates
 - Numbers: generated procedurally in-app; no external dataset.
