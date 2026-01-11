@@ -4,6 +4,15 @@ export type TranslationKey =
   | "chipLabel"
   | "heroTitle"
   | "heroSubtitle"
+  | "heroTagline"
+  | "games.romaji.title"
+  | "games.romaji.description"
+  | "games.numbers.title"
+  | "games.numbers.description"
+  | "games.kanji.title"
+  | "games.kanji.description"
+  | "games.dates.title"
+  | "games.dates.description"
   | "modeLabel"
   | "tip"
   | "settings"
@@ -79,12 +88,33 @@ export type TranslationKey =
   | "writeMonthReading"
   | "typeHiraganaOrRomaji"
   | "nextDate"
+  | "pillar.learning.title"
+  | "pillar.learning.body"
+  | "pillar.mindfulness.title"
+  | "pillar.mindfulness.body"
+  | "pillar.path.title"
+  | "pillar.path.body"
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
     chipLabel: "Kana Practice",
     heroTitle: "Master Japanese Kana",
     heroSubtitle: "Drill romaji for hiragana and katakana words with streaks, filters, and quick mode switching.",
+    heroTagline: "Master the art of Japanese through carefully crafted games. Each challenge brings you closer to fluency.",
+    "games.romaji.title": "Romaji Practice",
+    "games.romaji.description": "Drill romaji for hiragana and katakana words with streaks, filters, and quick mode switching.",
+    "games.numbers.title": "Numbers Challenge",
+    "games.numbers.description": "Write the number in Japanese with flexible difficulty and keypad input.",
+    "games.kanji.title": "Kanji Challenge",
+    "games.kanji.description": "Match kanji with their readings and meanings across multiple difficulty levels.",
+    "games.dates.title": "Dates Challenge",
+    "games.dates.description": "Write day and month readings or full dates in Japanese.",
+    "pillar.learning.title": "Learning",
+    "pillar.learning.body": "Progressive difficulty levels designed to build mastery steadily",
+    "pillar.mindfulness.title": "Mindfulness",
+    "pillar.mindfulness.body": "Focused practice with clear feedback and meaningful progress tracking",
+    "pillar.path.title": "Path",
+    "pillar.path.body": "Your journey to Japanese fluency starts with a single character",
     modeLabel: "Mode",
     tip: "Tip: Press Enter to check or move to the next word. Use filters to target specific character groups.",
     settings: "Settings",
@@ -165,6 +195,21 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     chipLabel: "Práctica de Kana",
     heroTitle: "Domina los kana japoneses",
     heroSubtitle: "Practica el rōmaji para palabras en hiragana y katakana con rachas, filtros y cambio rápido de modo.",
+    heroTagline: "Domina el arte del japonés con juegos cuidadosamente diseñados. Cada desafío te acerca más a la fluidez.",
+    "games.romaji.title": "Práctica de Rōmaji",
+    "games.romaji.description": "Practica el rōmaji para palabras en hiragana y katakana con rachas, filtros y cambio rápido de modo.",
+    "games.numbers.title": "Desafío de Números",
+    "games.numbers.description": "Escribe el número en japonés con dificultad flexible y teclado en pantalla.",
+    "games.kanji.title": "Desafío Kanji",
+    "games.kanji.description": "Relaciona el kanji con su lectura y significado en varios niveles de dificultad.",
+    "games.dates.title": "Desafío de Fechas",
+    "games.dates.description": "Escribe las lecturas de días, meses o fechas completas en japonés.",
+    "pillar.learning.title": "Aprendizaje",
+    "pillar.learning.body": "Niveles de dificultad progresivos pensados para construir dominio paso a paso",
+    "pillar.mindfulness.title": "Atención plena",
+    "pillar.mindfulness.body": "Práctica enfocada con retroalimentación clara y seguimiento significativo del progreso",
+    "pillar.path.title": "Camino",
+    "pillar.path.body": "Tu camino hacia la fluidez del japonés empieza con un solo carácter",
     modeLabel: "Modo",
     tip: "Tip: Presiona Enter para comprobar o pasar a la siguiente palabra. Usa los filtros para elegir grupos específicos.",
     settings: "Ajustes",
@@ -245,6 +290,21 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     chipLabel: "かな練習",
     heroTitle: "日本語のかなをマスターしよう",
     heroSubtitle: "ひらがな・カタカナの単語でローマ字入力を練習。連続正解やフィルターで効率アップ。",
+    heroTagline: "練り上げられたゲームで日本語を極めよう。挑戦するたびに流暢さへと近づきます。",
+    "games.romaji.title": "ローマ字練習",
+    "games.romaji.description": "ひらがな・カタカナ単語のローマ字入力を、連続正解やフィルターで効率的に練習できます。",
+    "games.numbers.title": "数字チャレンジ",
+    "games.numbers.description": "難易度を切り替えて、日本語で数字を書きます。キーパッド入力にも対応。",
+    "games.kanji.title": "漢字チャレンジ",
+    "games.kanji.description": "漢字と読み・意味を組み合わせて、難易度別にチャレンジ。",
+    "games.dates.title": "日付チャレンジ",
+    "games.dates.description": "日や月、日付全体の読み方を日本語で書きます。",
+    "pillar.learning.title": "学び",
+    "pillar.learning.body": "段階的な難易度で着実に実力を積み重ねていきます",
+    "pillar.mindfulness.title": "心",
+    "pillar.mindfulness.body": "明確なフィードバックと的確な進捗管理で集中して練習できます",
+    "pillar.path.title": "道",
+    "pillar.path.body": "日本語習得への旅路は一つの文字から始まります",
     modeLabel: "モード",
     tip: "ヒント: Enterキーで答えを確認または次の単語へ。フィルターで練習範囲を絞れます。",
     settings: "設定",

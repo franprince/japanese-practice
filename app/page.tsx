@@ -1,87 +1,105 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { Button } from "@/components/ui/button";
-import { useI18n } from "@/lib/i18n";
-import { ArrowRight } from "lucide-react";
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { GameSelectorCard } from "@/components/game-selector-card"
+import { useI18n } from "@/lib/i18n"
 
-export default function Page() {
-    const { t } = useI18n();
-    return (
-        <main className="min-h-screen bg-background text-foreground">
-            <div className="mx-auto max-w-4xl px-4 pb-16 pt-12 md:pt-16">
-                <header className="flex flex-col gap-4 mb-10">
-                    <div className="w-full flex justify-end">
-                        <LanguageSwitcher className="cursor-pointer" />
-                    </div>
-                    <div className="space-y-3 text-left">
-                        <p className="inline-flex items-center rounded-full border border-border/60 bg-card/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground shadow-sm backdrop-blur">
-                            {t("chipLabel")}
-                        </p>
-                        <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl">{t("heroTitle")}</h1>
-                        <p className="text-lg text-muted-foreground max-w-2xl">{t("heroSubtitle")}</p>
-                    </div>
-                </header>
+export default function HomePage() {
+  const { t } = useI18n()
 
-                <div className="grid gap-6 md:grid-cols-2">
-                    <Link href="/words" className="block h-full">
-                        <div className="h-full rounded-2xl border border-border/60 bg-card/70 p-6 shadow-sm hover:shadow-lg transition-shadow flex flex-col gap-2">
-                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("wordsLabel") ?? "Words"}</p>
-                            <h2 className="text-2xl font-semibold text-foreground">{t("heroTitle")}</h2>
-                            <p className="text-muted-foreground">{t("heroSubtitle")}</p>
-                            <div className="mt-auto pt-2">
-                                <Button variant="default" className="inline-flex items-center gap-2 hover:bg-primary/90">
-                                    {t("startPractice") ?? "Start words"}
-                                    <ArrowRight className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    </Link>
+  const games = [
+    {
+      title: t("games.romaji.title") || "Romaji Challenge",
+      description: t("games.romaji.description") || "Convert hiragana and katakana to romaji",
+      href: "/words",
+      icon: "あ",
+      gradient: "bg-gradient-to-br from-primary/30 via-black to-black",
+    },
+    {
+      title: t("games.numbers.title") || "Number Master",
+      description: t("games.numbers.description") || "Learn to write numbers in Japanese",
+      href: "/numbers",
+      icon: "数",
+      gradient: "bg-gradient-to-br from-accent/25 via-black to-black",
+    },
+    {
+      title: t("games.kanji.title") || "Kanji Challenge",
+      description: t("games.kanji.description") || "Master kanji readings and meanings",
+      href: "/kanji",
+      icon: "漢",
+      gradient: "bg-gradient-to-br from-primary/25 via-black to-black",
+    },
+    {
+      title: t("games.dates.title") || "Date Master",
+      description: t("games.dates.description") || "Practice reading and writing dates",
+      href: "/dates",
+      icon: "日",
+      gradient: "bg-gradient-to-br from-accent/20 via-black to-black",
+    },
+  ]
 
-                    <Link href="/numbers" className="block h-full">
-                        <div className="h-full rounded-2xl border border-border/60 bg-card/70 p-6 shadow-sm hover:shadow-lg transition-shadow flex flex-col gap-2">
-                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("numbersTitle")}</p>
-                            <h2 className="text-2xl font-semibold text-foreground">{t("numbersSubtitle")}</h2>
-                            <p className="text-muted-foreground">{t("writeInJapanese")}</p>
-                            <div className="mt-auto pt-2">
-                                <Button variant="outline" className="inline-flex items-center gap-2 hover:bg-primary/10 hover:text-primary">
-                                    {t("startNumbers") ?? "Start numbers"}
-                                    <ArrowRight className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    </Link>
+  return (
+    <main className="min-h-screen bg-background relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Mountain-like shapes in background */}
+        <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        <div className="absolute bottom-0 right-0 w-2/3 h-1/3 bg-gradient-to-t from-accent/3 via-transparent to-transparent" />
 
-                    <Link href="/kanji" className="block h-full">
-                        <div className="h-full rounded-2xl border border-border/60 bg-card/70 p-6 shadow-sm hover:shadow-lg transition-shadow flex flex-col gap-2">
-                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("kanjiTitle")}</p>
-                            <h2 className="text-2xl font-semibold text-foreground">{t("kanjiSubtitle")}</h2>
-                            <p className="text-muted-foreground">{t("whatIsReading")}</p>
-                            <div className="mt-auto pt-2">
-                                <Button variant="default" className="inline-flex items-center gap-2 hover:bg-primary/90">
-                                    {t("nextKanji") ?? "Start kanji"}
-                                    <ArrowRight className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    </Link>
+        {/* Subtle circular elements (inspired by Japanese moon) */}
+        <div className="absolute top-20 right-10 w-32 h-32 rounded-full border border-primary/10 blur-sm" />
+        <div className="absolute bottom-40 left-20 w-24 h-24 rounded-full border border-accent/10 blur-sm" />
+      </div>
 
-                    <Link href="/dates" className="block h-full">
-                        <div className="h-full rounded-2xl border border-border/60 bg-card/70 p-6 shadow-sm hover:shadow-lg transition-shadow flex flex-col gap-2">
-                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t("datesTitle")}</p>
-                            <h2 className="text-2xl font-semibold text-foreground">{t("datesSubtitle")}</h2>
-                            <p className="text-muted-foreground">{t("writeFullDate")}</p>
-                            <div className="mt-auto pt-2">
-                                <Button variant="outline" className="inline-flex items-center gap-2 hover:bg-primary/10 hover:text-primary">
-                                    {t("nextDate") ?? "Start dates"}
-                                    <ArrowRight className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    </Link>
-                </div>
+      <div className="container max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16 relative">
+        <header className="flex items-start justify-between mb-20 gap-8">
+          <div className="flex-1">
+            <div className="mb-6">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-3 tracking-tight">日本語</h1>
+              <div className="h-1 w-20 bg-primary mb-6" />
             </div>
-        </main>
-    );
+            <p className="text-lg md:text-xl text-white/70 max-w-md leading-relaxed font-light">
+              {t("heroTagline")}
+            </p>
+          </div>
+          <div className="flex-shrink-0">
+            <LanguageSwitcher />
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-20">
+          {games.map((game, index) => (
+            <GameSelectorCard
+              key={game.href}
+              title={game.title}
+              description={game.description}
+              href={game.href}
+              icon={game.icon}
+              gradient={game.gradient}
+              index={index}
+            />
+          ))}
+        </div>
+
+        <footer className="mt-20 pt-12 border-t border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
+            <div>
+              <div className="text-4xl mb-4">学</div>
+              <h3 className="font-light text-white/80 mb-2 text-lg">{t("pillar.learning.title")}</h3>
+              <p className="text-sm text-white/50 leading-relaxed">{t("pillar.learning.body")}</p>
+            </div>
+            <div>
+              <div className="text-4xl mb-4">心</div>
+              <h3 className="font-light text-white/80 mb-2 text-lg">{t("pillar.mindfulness.title")}</h3>
+              <p className="text-sm text-white/50 leading-relaxed">{t("pillar.mindfulness.body")}</p>
+            </div>
+            <div>
+              <div className="text-4xl mb-4">道</div>
+              <h3 className="font-light text-white/80 mb-2 text-lg">{t("pillar.path.title")}</h3>
+              <p className="text-sm text-white/50 leading-relaxed">{t("pillar.path.body")}</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </main>
+  )
 }
