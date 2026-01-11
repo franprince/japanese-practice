@@ -1,6 +1,7 @@
 import { kanaDictionary } from "../../data/kanaDictionary";
 import { blacklist } from "../../data/blacklist";
 import { loadWordSets } from "./words-loader";
+import type { GameMode } from "@/types/game";
 
 type KanaGroup = {
   characters: Record<string, string[]>
@@ -116,7 +117,7 @@ export interface WordFilter {
 }
 
 export async function getRandomWord(
-  type: "hiragana" | "katakana" | "both",
+  type: GameMode,
   filter?: WordFilter,
   lang?: "en" | "es" | "ja",
 ): Promise<JapaneseWord | null> {
