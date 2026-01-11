@@ -11,10 +11,10 @@ interface KanjiDifficultySelectorProps {
 export function KanjiDifficultySelector({ difficulty, onDifficultyChange }: KanjiDifficultySelectorProps) {
   const { t } = useI18n()
 
-  const difficulties: { value: KanjiDifficulty; label: string; hint: string }[] = [
-    { value: "easy", label: t("easy"), hint: t("kanjiEasyHint") },
-    { value: "medium", label: t("medium"), hint: t("kanjiMediumHint") },
-    { value: "hard", label: t("hard"), hint: t("kanjiHardHint") },
+  const difficulties: { value: KanjiDifficulty; label: string; hint: string; level: string }[] = [
+    { value: "easy", label: t("easy"), hint: t("kanjiEasyHint"), level: "JLPT N5–N4" },
+    { value: "medium", label: t("medium"), hint: t("kanjiMediumHint"), level: "JLPT N5–N3" },
+    { value: "hard", label: t("hard"), hint: t("kanjiHardHint"), level: "JLPT N5–N1" },
   ]
 
   return (
@@ -32,10 +32,15 @@ export function KanjiDifficultySelector({ difficulty, onDifficultyChange }: Kanj
             }`}
           >
             <div className="font-semibold">{d.label}</div>
-            <div
-              className={`text-xs mt-0.5 ${difficulty === d.value ? "text-primary-foreground/80" : "text-muted-foreground"}`}
-            >
-              {d.hint}
+            <div className="flex flex-wrap items-center gap-2 mt-1 text-xs">
+              <span
+                className={`rounded-full px-2 py-0.5 border ${
+                  difficulty === d.value ? "border-primary/50 text-primary-foreground/90 bg-primary/20" : "border-border/60 text-muted-foreground"
+                }`}
+              >
+                {d.level}
+              </span>
+              <span className={difficulty === d.value ? "text-primary-foreground/80" : "text-muted-foreground"}>{d.hint}</span>
             </div>
           </button>
         ))}

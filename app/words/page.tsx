@@ -12,6 +12,8 @@ import { characterGroups, type WordFilter } from "@/lib/japanese-words"
 import { useI18n } from "@/lib/i18n"
 import type { GameMode } from "@/types/game"
 import { useSessionProgress } from "@/hooks/use-session-progress"
+import { PlayModeControls } from "@/components/session/play-mode-controls"
+import { SessionSummaryCard } from "@/components/session/session-summary-card"
 
 export default function WordsPage() {
     const { t } = useI18n()
@@ -95,78 +97,51 @@ export default function WordsPage() {
                     </div>
                 </header>
 
-                <div className="flex flex-wrap items-center gap-3 mb-4">
-                    <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1">
-                        <Button
-                            variant={playMode === "infinite" ? "default" : "ghost"}
-                            size="sm"
-                            className="rounded-full"
-                            onClick={() => resetSession("infinite")}
-                        >
-                            {t("playModeInfinite")}
-                        </Button>
-                        <Button
-                            variant={playMode === "session" ? "default" : "ghost"}
-                            size="sm"
-                            className="rounded-full"
-                            onClick={() => resetSession("session")}
-                        >
-                            {t("playModeSession")}
-                        </Button>
-                    </div>
-                    {playMode === "session" && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{t("questionsLabel")}:</span>
-                            <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1">
-                                {[5, 10, 15, 20].map((count) => (
-                                    <Button
-                                        key={count}
-                                        variant={targetCount === count ? "default" : "ghost"}
-                                        size="sm"
-                                        className="rounded-full"
-                                        onClick={() => {
-                                            setTargetCount(count)
-                                            resetSession()
-                                        }}
-                                    >
-                                        {count}
-                                    </Button>
-                                ))}
-                            </div>
-                            <span className="text-xs text-muted-foreground/80">
-                                {t("questionsLeft").replace("{count}", String(remainingQuestions))}
-                            </span>
-                        </div>
-                    )}
-                </div>
+                <PlayModeControls
+                    playMode={playMode}
+                    onSelectMode={(mode) => resetSession(mode)}
+                    isSession={playMode === "session"}
+                    targetCount={targetCount}
+                    onSelectCount={(count) => {
+                        setTargetCount(count)
+                        resetSession()
+                    }}
+                    remainingQuestions={remainingQuestions}
+                    infiniteLabel={t("playModeInfinite")}
+                    sessionLabel={t("playModeSession")}
+                    questionsLabel={t("questionsLabel")}
+                    questionsLeftLabel={t("questionsLeft")}
+                />
 
                 <ModeSelector mode={mode} onModeChange={handleModeChange} />
 
                 <div className="mt-6 mb-6">
-                    {sessionComplete && playMode === "session" ? (
-                        <div className="rounded-2xl border border-border/60 bg-card/80 p-6 shadow-sm space-y-4 text-center">
-                            <h2 className="text-xl font-semibold text-foreground">{t("sessionCompleteTitle")}</h2>
-                            <p className="text-sm text-muted-foreground">
-                                {t("sessionTargetLabel")}: {targetCount} • {t("sessionCorrectLabel")}: {correctCount} • {t("sessionAccuracyLabel")}: {accuracy}%
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                                <Button className="cursor-pointer" onClick={() => resetSession()}>
-                                    {t("sessionRestart")}
-                                </Button>
-                                <Button variant="secondary" className="cursor-pointer" onClick={() => resetSession("infinite")}>
-                                    {t("sessionSwitchToInfinite")}
-                                </Button>
-                            </div>
+                    {sessionComplete && playMode === "session" && (
+                        <div className="mb-6">
+                            <SessionSummaryCard
+                                title={t("sessionCompleteTitle")}
+                                targetLabel={t("sessionTargetLabel")}
+                                correctLabel={t("sessionCorrectLabel")}
+                                accuracyLabel={t("sessionAccuracyLabel")}
+                                targetCount={targetCount}
+                                correctCount={correctCount}
+                                accuracy={accuracy}
+                                onRestart={() => resetSession()}
+                                onSwitchToInfinite={() => resetSession("infinite")}
+                                restartLabel={t("sessionRestart")}
+                                switchLabel={t("sessionSwitchToInfinite")}
+                            />
                         </div>
-                    ) : (
-                        <GameCard
-                            key={sessionId}
-                            mode={mode}
-                            filter={filter}
-                            onScoreUpdate={handleScoreUpdateWithUi}
-                            onRequestCloseSettings={() => setSettingsOpen(false)}
-                        />
                     )}
+
+                    <GameCard
+                        key={sessionId}
+                        mode={mode}
+                        filter={filter}
+                        onScoreUpdate={handleScoreUpdateWithUi}
+                        onRequestCloseSettings={() => setSettingsOpen(false)}
+                        disableNext={sessionComplete && playMode === "session"}
+                    />
                 </div>
 
                 <div className="mb-6">

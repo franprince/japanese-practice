@@ -10,9 +10,10 @@ import { useI18n } from "@/lib/i18n"
 interface KanjiGameCardProps {
   difficulty: KanjiDifficulty
   onScoreUpdate: (score: number, streak: number, correct: boolean) => void
+  disableNext?: boolean
 }
 
-export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps) {
+export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }: KanjiGameCardProps) {
   const { t, lang } = useI18n()
   const [kanjiSet, setKanjiSet] = useState<KanjiEntry[]>([])
   const [currentKanji, setCurrentKanji] = useState<KanjiEntry | null>(null)
@@ -90,21 +91,20 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
   }
 
   const handleNext = useCallback(() => {
+    if (disableNext) return
     loadNewKanji(currentKanji)
-  }, [loadNewKanji, currentKanji])
+  }, [loadNewKanji, currentKanji, disableNext])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter") {
-        if (isRevealed) {
-          handleNext()
-        }
+      if (e.key === "Enter" && isRevealed && !disableNext) {
+        handleNext()
       }
     }
 
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isRevealed, handleNext])
+  }, [isRevealed, handleNext, disableNext])
 
   if (!currentKanji) return null
 
@@ -112,7 +112,8 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
   const meaning = lang === "es" ? currentKanji.meaning_es ?? currentKanji.meaning_en : currentKanji.meaning_en ?? currentKanji.meaning_es
   const showMeaning = difficulty === "easy" || difficulty === "medium"
   const showReading = difficulty === "easy" || difficulty === "hard"
-  const promptLabel = showMeaning && showReading ? `${t("meaning")} / ${t("reading")}` : showMeaning ? t("meaning") : t("reading")
+  const promptLabel = t("kanji")
+  const levelLabel = currentKanji.jlpt ? currentKanji.jlpt.toUpperCase().replace("JLPT-", "JLPT ") : null
 
   return (
     <div className="space-y-6">
@@ -131,11 +132,18 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
               isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"
             }`}
           >
-            <div className="flex items-center justify-center gap-2 mb-2">
-              {isCorrect ? <Check className="w-5 h-5 text-green-500" /> : <X className="w-5 h-5 text-red-500" />}
-              <span className={isCorrect ? "text-green-500" : "text-red-500"}>
-                {isCorrect ? t("correct") : t("incorrect")}
-              </span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                {isCorrect ? <Check className="w-5 h-5 text-green-500" /> : <X className="w-5 h-5 text-red-500" />}
+                <span className={isCorrect ? "text-green-500" : "text-red-500"}>
+                  {isCorrect ? t("correct") : t("incorrect")}
+                </span>
+              </div>
+              {levelLabel && (
+                <span className="text-[10px] px-2 py-1 rounded-full border border-border/50 text-muted-foreground uppercase tracking-wide">
+                  {levelLabel}
+                </span>
+              )}
             </div>
             <div className="text-sm text-muted-foreground flex flex-col gap-1">
               {showMeaning && <span>{meaning ?? t("meaning")}</span>}
@@ -165,7 +173,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate }: KanjiGameCardProps)
       {/* Action Button */}
       <div className="flex justify-center">
         {isRevealed && (
-          <Button onClick={handleNext} size="lg" className="gap-2">
+          <Button onClick={handleNext} size="lg" className="gap-2" disabled={disableNext}>
             {t("nextKanji")}
             <ArrowRight className="w-4 h-4" />
           </Button>

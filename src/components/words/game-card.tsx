@@ -20,6 +20,7 @@ interface GameCardProps {
   onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   suppressFocus?: boolean
   onRequestCloseSettings?: () => void
+  disableNext?: boolean
 }
 
 export function GameCard({
@@ -28,6 +29,7 @@ export function GameCard({
   onScoreUpdate,
   suppressFocus = false,
   onRequestCloseSettings,
+  disableNext = false,
 }: GameCardProps) {
   const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
   const [userInput, setUserInput] = useState("")
@@ -276,7 +278,13 @@ export function GameCard({
                   </Button>
                 </>
               ) : (
-                <Button onClick={loadNewWord} className="w-full bg-primary hover:bg-primary/90 cursor-pointer">
+                <Button
+                  onClick={() => {
+                    if (!disableNext) loadNewWord()
+                  }}
+                  className="w-full bg-primary hover:bg-primary/90 cursor-pointer"
+                  disabled={disableNext}
+                >
                   {t("nextWord")}
                 </Button>
               )}

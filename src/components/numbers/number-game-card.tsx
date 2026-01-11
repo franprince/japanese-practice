@@ -18,9 +18,10 @@ import { useI18n } from "@/lib/i18n"
 interface NumberGameCardProps {
   difficulty: Difficulty
   onScoreUpdate: (score: number, streak: number, correct: boolean) => void
+  disableNext?: boolean
 }
 
-export function NumberGameCard({ difficulty, onScoreUpdate }: NumberGameCardProps) {
+export function NumberGameCard({ difficulty, onScoreUpdate, disableNext = false }: NumberGameCardProps) {
   const { t } = useI18n()
   const [currentNumber, setCurrentNumber] = useState<number>(1)
   const [userAnswer, setUserAnswer] = useState("")
@@ -76,6 +77,7 @@ export function NumberGameCard({ difficulty, onScoreUpdate }: NumberGameCardProp
   }
 
   const handleNext = () => {
+    if (disableNext) return
     generateNewNumber()
   }
 
@@ -177,6 +179,7 @@ export function NumberGameCard({ difficulty, onScoreUpdate }: NumberGameCardProp
             <Button
               onClick={handleNext}
               className="w-full max-w-md h-14 text-lg font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+              disabled={disableNext}
             >
               {t("nextNumber")}
               <ArrowRight className="ml-2 h-5 w-5" />
