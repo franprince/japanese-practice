@@ -21,19 +21,30 @@ export function WordsSettingsPopover({
   open,
   onOpenChange,
 }: WordsSettingsPopoverProps) {
+  useEffect(() => {
+    if (open) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = "hidden"
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          onOpenChange(false)
+        }
+      }
+      window.addEventListener("keydown", handleKeyDown)
+      return () => {
+        document.body.style.overflow = prev
+        window.removeEventListener("keydown", handleKeyDown)
+      }
+    }
+  }, [open])
+
   const { t } = useI18n()
   const [draftFilter, setDraftFilter] = useState<WordFilter>(filter)
-  const [readyToClose, setReadyToClose] = useState(false)
 
   useEffect(() => {
     if (open) {
       setDraftFilter(filter)
-
-      return () => {
-        setReadyToClose(false)
-      }
     }
-    setReadyToClose(false)
   }, [filter, open])
 
   const resetFilters = () => {
@@ -91,9 +102,7 @@ export function WordsSettingsPopover({
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-40"
-        onPointerDown={() => {
-          if (readyToClose) onOpenChange(false)
-        }}
+        onPointerDown={() => onOpenChange(false)}
       />
 
       {/* Popover */}
