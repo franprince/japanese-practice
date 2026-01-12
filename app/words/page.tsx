@@ -87,7 +87,7 @@ export default function WordsPage() {
 
     return (
         <main className="min-h-screen bg-background relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
 
             <div className="container max-w-3xl mx-auto px-4 py-6 md:py-10 relative">
                 <header className="mb-6">
@@ -98,7 +98,7 @@ export default function WordsPage() {
                         <LanguageSwitcher />
                     </div>
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-balance bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text">
+                        <h1 className="text-2xl md:text-3xl font-bold text-balance bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text">
                             {t("wordsLabel")}
                         </h1>
                         <p className="text-muted-foreground text-xs md:text-sm">{t("tip")}</p>

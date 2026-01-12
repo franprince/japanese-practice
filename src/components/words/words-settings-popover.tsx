@@ -102,7 +102,7 @@ export function WordsSettingsPopover({
         onPointerDown={(e) => e.stopPropagation()}
       >
         {/* Header + actions pinned at top */}
-        <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-border/50 p-3 md:p-4 relative">
+        <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-border/50 p-3 md:p-4">
           <Button
             variant="ghost"
             size="icon"
