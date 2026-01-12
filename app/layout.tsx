@@ -7,8 +7,8 @@ import { ThemeProvider } from "@/lib/theme-context"
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kana Words",
-  description: "Practice kana with a simple web app.",
+  title: "Nihongo renshū | 日本語 練習",
+  description: "Practice Japanese",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
