@@ -5,6 +5,7 @@ import Link from "next/link"
 import { NumberGameCard } from "@/components/numbers/number-game-card"
 import { DifficultySelector } from "@/components/numbers/difficulty-selector"
 import { StatsDisplay } from "@/components/stats-display"
+import { RemainingBadge } from "@/components/session/remaining-badge"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"
 import type { Difficulty } from "@/lib/japanese-numbers"
@@ -141,13 +142,7 @@ export default function NumbersPage() {
                 </div>
 
                 <div className="mb-6">
-                    {remainingLabel && (
-                        <div className="flex justify-center mb-2">
-                            <div className="text-xs font-medium text-foreground px-3 py-1 rounded-full bg-secondary/70 border border-border/60">
-                                {remainingLabel}
-                            </div>
-                        </div>
-                    )}
+                    <RemainingBadge label={remainingLabel} />
                     <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
                 </div>
 

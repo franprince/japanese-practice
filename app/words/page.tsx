@@ -5,6 +5,7 @@ import Link from "next/link"
 import { GameCard } from "@/components/words/game-card"
 import { ModeSelector } from "@/components/words/mode-selector"
 import { StatsDisplay } from "@/components/stats-display"
+import { RemainingBadge } from "@/components/session/remaining-badge"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { Button } from "@/components/ui/button"
 import { characterGroups, type WordFilter } from "@/lib/japanese-words"
@@ -165,13 +166,7 @@ export default function WordsPage() {
                 </div>
 
                 <div className="mb-6">
-                    {remainingLabel && (
-                        <div className="flex justify-center mb-2">
-                            <div className="text-xs font-medium text-foreground px-3 py-1 rounded-full bg-secondary/70 border border-border/60">
-                                {remainingLabel}
-                            </div>
-                        </div>
-                    )}
+                    <RemainingBadge label={remainingLabel} />
                     <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
                 </div>
 
