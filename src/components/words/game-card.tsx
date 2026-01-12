@@ -203,7 +203,6 @@ export function GameCard({
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onFocus={() => onRequestCloseSettings?.()}
                 placeholder={t("placeholder")}
                 className={cn(
                   "text-center text-lg h-14 font-mono bg-background/50 border-2 transition-all",
