@@ -47,9 +47,12 @@ export default function KanjiPage() {
         resetSession()
     }
 
+    const remainingLabel =
+        playMode === "session" ? `${Math.max(remainingQuestions ?? 0, 0)} rounds left` : null
+
     return (
         <main className="min-h-screen bg-background relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
 
             <div className="container max-w-2xl mx-auto px-4 py-6 md:py-10 relative">
                 <header className="mb-6">
@@ -60,7 +63,7 @@ export default function KanjiPage() {
                         <LanguageSwitcher />
                     </div>
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-balance bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text">
+                        <h1 className="text-2xl md:text-3xl font-bold text-balance bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text">
                             {t("kanjiTitle")}
                         </h1>
                         <p className="text-muted-foreground text-xs md:text-sm">{t("kanjiSubtitle")}</p>
@@ -110,6 +113,13 @@ export default function KanjiPage() {
                 </div>
 
                 <div className="mb-6">
+                    {remainingLabel && (
+                        <div className="flex justify-center mb-2">
+                            <div className="text-xs font-medium text-foreground px-3 py-1 rounded-full bg-secondary/70 border border-border/60">
+                                {remainingLabel}
+                            </div>
+                        </div>
+                    )}
                     <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
                 </div>
 

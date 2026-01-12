@@ -85,6 +85,9 @@ export default function WordsPage() {
         setFilter(next)
     }
 
+    const remainingLabel =
+        playMode === "session" ? `${Math.max(remainingQuestions ?? 0, 0)} rounds left` : null
+
     return (
         <main className="min-h-screen bg-background relative">
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
@@ -160,6 +163,13 @@ export default function WordsPage() {
                 </div>
 
                 <div className="mb-6">
+                    {remainingLabel && (
+                        <div className="flex justify-center mb-2">
+                            <div className="text-xs font-medium text-foreground px-3 py-1 rounded-full bg-secondary/70 border border-border/60">
+                                {remainingLabel}
+                            </div>
+                        </div>
+                    )}
                     <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
                 </div>
 
