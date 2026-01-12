@@ -37,6 +37,7 @@ export function GameCard({
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
   const [totalAttempts, setTotalAttempts] = useState(0)
+  const [correctAttempts, setCorrectAttempts] = useState(0)
   const [noWordsAvailable, setNoWordsAvailable] = useState(false) // Handle empty results
   const [isLoading, setIsLoading] = useState(true)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -83,6 +84,7 @@ export function GameCard({
       const newStreak = streak + 1
       setScore(newScore)
       setStreak(newStreak)
+      setCorrectAttempts((prev) => prev + 1)
       onScoreUpdate(newScore, newStreak, true)
     } else {
       setStreak(0)
@@ -105,6 +107,9 @@ export function GameCard({
     onScoreUpdate(score, 0, false)
     loadNewWord()
   }
+
+  const accuracyPercent =
+    totalAttempts > 0 ? Math.min(100, Math.max(0, Math.round((correctAttempts / totalAttempts) * 100))) : 0
 
   if (isLoading) {
     return (
@@ -295,7 +300,7 @@ export function GameCard({
       {/* Accuracy */}
       {totalAttempts > 0 && (
         <p className="text-center text-xs text-muted-foreground mt-6 tabular-nums">
-          {t("accuracy")}: {Math.round((score / totalAttempts) * 100)}%
+          {t("accuracy")}: {accuracyPercent}%
         </p>
       )}
     </div>
