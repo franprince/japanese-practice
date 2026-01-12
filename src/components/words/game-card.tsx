@@ -40,6 +40,7 @@ export function GameCard({
   const [correctAttempts, setCorrectAttempts] = useState(0)
   const [noWordsAvailable, setNoWordsAvailable] = useState(false) // Handle empty results
   const [isLoading, setIsLoading] = useState(true)
+  const [displayRomaji, setDisplayRomaji] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
   const { t, lang } = useI18n()
 
@@ -48,9 +49,11 @@ export function GameCard({
     const word = await getRandomWord(mode, filter, lang) // Pass filter and lang
     if (word) {
       setCurrentWord(word)
+      setDisplayRomaji(word.romaji)
       setNoWordsAvailable(false)
     } else {
       setCurrentWord(null)
+      setDisplayRomaji("")
       setNoWordsAvailable(true)
     }
     setIsLoading(false)
@@ -75,7 +78,21 @@ export function GameCard({
   const checkAnswer = () => {
     if (!currentWord || !userInput.trim()) return
 
-    const isCorrect = userInput.toLowerCase().trim() === currentWord.romaji.toLowerCase()
+    const normalizedUser = userInput.toLowerCase().trim()
+    const normalizedAnswer = currentWord.romaji.toLowerCase().trim()
+
+    let isCorrect = normalizedUser === normalizedAnswer
+    let shownAnswer = normalizedAnswer
+
+    // Accept "wa" when the word ends with the particle は (e.g., こんにちは -> konnichiwa)
+    if (!isCorrect && currentWord.kana.endsWith("は") && normalizedAnswer.endsWith("ha")) {
+      const alt = normalizedAnswer.slice(0, -2) + "wa"
+      if (normalizedUser === alt) {
+        isCorrect = true
+        shownAnswer = alt
+      }
+    }
+    setDisplayRomaji(shownAnswer)
     setFeedback(isCorrect ? "correct" : "incorrect")
     setTotalAttempts((prev) => prev + 1)
 
@@ -237,7 +254,7 @@ export function GameCard({
               <div className="text-center p-4 bg-secondary/50 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200 border border-border/50 space-y-2">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("correctAnswer")}</p>
-                  <p className="text-xl font-mono font-semibold text-primary">{currentWord.romaji}</p>
+                  <p className="text-xl font-mono font-semibold text-primary">{displayRomaji || currentWord.romaji}</p>
                 </div>
                 {currentWord.meaning && (
                   <div className="pt-2 border-t border-border/30">
