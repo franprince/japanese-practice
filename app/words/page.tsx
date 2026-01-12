@@ -86,7 +86,9 @@ export default function WordsPage() {
     }
 
     const remainingLabel =
-        playMode === "session" ? `${Math.max(remainingQuestions ?? 0, 0)} rounds left` : null
+        playMode === "session"
+            ? t("roundsLeft").replace("{count}", String(Math.max(remainingQuestions ?? 0, 0)))
+            : null
 
     return (
         <main className="min-h-screen bg-background relative">
