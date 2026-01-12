@@ -56,7 +56,7 @@ export default function HomePage() {
           <div className="flex flex-col-reverse md:flex-row md:items-start md:justify-between mb-6 gap-4 md:gap-6">
             <div className="flex-1">
               <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light text-white mb-2 sm:mb-3 tracking-tight">
-                日本語
+                日本語 練習
               </h1>
               <div className="h-1 w-16 sm:w-20 bg-primary" />
             </div>
