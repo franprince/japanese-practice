@@ -48,8 +48,8 @@ export function ThemeSwitcher() {
       </Button>
       
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-48 z-50">
-          <div className="bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg overflow-hidden">
+        <div className="absolute top-full mt-1 z-50 w-56 max-w-[calc(100vw-1.5rem)] left-0 sm:left-auto sm:right-0">
+          <div className="bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg overflow-hidden max-h-[70vh] overflow-y-auto">
             {themes.map((themeOption) => (
               <button
                 key={themeOption.value}
