@@ -102,12 +102,12 @@ export function WordsSettingsPopover({
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-40"
-        onPointerDown={() => onOpenChange(false)}
+        onPointerDown={(e) => e.preventDefault()}
       />
 
       {/* Popover */}
       <div
-        className="fixed left-1/2 top-24 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[24rem] sm:w-80 sm:max-w-none md:w-96 rounded-xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-lg overflow-hidden max-h-[calc(100vh-3rem)]"
+        className="fixed left-1/2 top-24 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[24rem] sm:w-80 sm:max-w-none md:w-96 rounded-xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-lg max-h-[calc(100vh-3rem)] overflow-y-auto touch-pan-y"
         onPointerDown={(e) => e.stopPropagation()}
       >
         {/* Header + actions pinned at top */}
@@ -147,7 +147,7 @@ export function WordsSettingsPopover({
           </div>
         </div>
 
-        <div className="overflow-y-auto p-3 md:p-4 space-y-4 pb-6 max-h-[calc(100vh-10rem)]">
+        <div className="p-3 md:p-4 space-y-4 pb-14">
           {/* Word length slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
