@@ -1,11 +1,12 @@
 /// <reference lib="webworker" />
 
 import kanaDictionaryData from "../../data/kanaDictionary.json"
-import type { KanaDictionary, KanaGroup } from "../../src/types/kana"
+import type { KanaGroup } from "../types/kana"
+
+
+type KanaDictionary = Record<string, Record<string, KanaGroup>>
 
 const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary
-
-
 
 type CharacterGroup = {
   id: string
