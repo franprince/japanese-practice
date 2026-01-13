@@ -64,7 +64,7 @@ export default function NumbersPage() {
                         remainingQuestions={0}
                     />
 
-                    <DifficultySelector difficulty={difficulty} onDifficultyChange={setDifficulty} />
+                    <DifficultySelector difficulty={difficulty} onDifficultyChange={handleDifficultyChange} />
 
                     {/* Mode toggle */}
                     <div className="inline-flex rounded-full border border-border/60 bg-card/70 p-1 gap-1 w-full sm:w-auto">
