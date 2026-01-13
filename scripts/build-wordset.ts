@@ -1,8 +1,8 @@
 import fs from "fs"
 import path from "path"
-import kanaDictionaryData from "../data/kanaDictionary.json"
+import kanaDictionaryData from "../src/lib/data/kanaDictionary.json"
 import type { KanaDictionary, KanaGroup } from "../src/types/kana"
-import { blacklist } from "../data/blacklist"
+import { blacklist } from "../src/lib/data/blacklist"
 import type { JapaneseWord } from "../src/lib/japanese-words"
 
 const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary
