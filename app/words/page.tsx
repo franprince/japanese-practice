@@ -1,23 +1,38 @@
 "use client"
 
 import { useCallback, useMemo, useState } from "react"
-import Link from "next/link"
 import { GameCard } from "@/components/words/game-card"
 import { ModeSelector } from "@/components/words/mode-selector"
-import { StatsDisplay } from "@/components/stats-display"
-import { RemainingBadge } from "@/components/session/remaining-badge"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { Button } from "@/components/ui/button"
+import { StatsDisplay } from "@/components/game/stats-display"
+import { RemainingBadge } from "@/components/game/remaining-badge"
 import { characterGroups, type WordFilter } from "@/lib/japanese-words"
-import { useI18n } from "@/lib/i18n"
 import type { GameMode } from "@/types/game"
-import { useSessionProgress } from "@/hooks/use-session-progress"
-import { GameSettingsPopover } from "@/components/session/game-settings-popover"
+import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { WordsSettingsPopover } from "@/components/words/words-settings-popover"
-import { SessionSummaryCard } from "@/components/session/session-summary-card"
+import { SessionSummaryCard } from "@/components/game/session-summary-card"
+import { GamePageLayout } from "@/components/layouts/game-page-layout"
+import { useGamePage } from "@/hooks/use-game-page"
 
 export default function WordsPage() {
-    const { t } = useI18n()
+    const {
+        score,
+        streak,
+        bestStreak,
+        sessionId,
+        playMode,
+        targetCount,
+        sessionComplete,
+        correctCount,
+        accuracy,
+        handleScoreUpdate,
+        resetSession,
+        setTargetCount,
+        setBestStreak,
+        remainingLabel,
+        sessionSummaryProps,
+        t,
+    } = useGamePage()
+
     const defaultFilter = useMemo<WordFilter>(
         () => ({
             selectedGroups: characterGroups.map((group) => group.id),
@@ -29,24 +44,6 @@ export default function WordsPage() {
 
     const [mode, setMode] = useState<GameMode>("hiragana")
     const [filter, setFilter] = useState<WordFilter>(defaultFilter)
-    const {
-        score,
-        streak,
-        bestStreak,
-        answeredCount,
-        correctCount,
-        sessionId,
-        playMode,
-        targetCount,
-        sessionComplete,
-        accuracy,
-        remainingQuestions,
-        handleScoreUpdate,
-        resetSession,
-        setTargetCount,
-        setSessionComplete,
-        setBestStreak,
-    } = useSessionProgress()
     const [customSettingsOpen, setCustomSettingsOpen] = useState(false)
 
     const handleScoreUpdateWithUi = useCallback(
@@ -86,33 +83,12 @@ export default function WordsPage() {
         setFilter(next)
     }
 
-    const remainingLabel =
-        playMode === "session"
-            ? t("roundsLeft").replace("{count}", String(Math.max(remainingQuestions ?? 0, 0)))
-            : null
-
     return (
-        <main className="min-h-screen bg-background relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
-
-            <div className="container max-w-3xl mx-auto px-4 py-6 md:py-10 relative">
-                <header className="mb-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <Button asChild variant="ghost" size="sm" className="shrink-0 cursor-pointer -ml-3">
-                            <Link href="/">← Home</Link>
-                        </Button>
-                        <LanguageSwitcher />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-balance bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text">
-                            {t("wordsLabel")}
-                        </h1>
-                        <p className="text-muted-foreground text-xs md:text-sm">{t("tip")}</p>
-                    </div>
-                </header>
-
-                {/* Compact controls row */}
-                <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-4 relative">
+        <GamePageLayout
+            title={t("wordsLabel")}
+            subtitle={t("tip")}
+            controls={
+                <>
                     <GameSettingsPopover
                         playMode={playMode}
                         onSelectMode={resetSession}
@@ -121,7 +97,7 @@ export default function WordsPage() {
                             setTargetCount(count)
                             resetSession()
                         }}
-                        remainingQuestions={remainingQuestions ?? 0}
+                        remainingQuestions={0}
                     />
                     <ModeSelector
                         mode={mode}
@@ -134,43 +110,33 @@ export default function WordsPage() {
                         open={customSettingsOpen}
                         onOpenChange={setCustomSettingsOpen}
                     />
-                </div>
-
-                <div className="mt-6 mb-6">
-                    {sessionComplete && playMode === "session" && (
-                        <div className="mb-6">
-                            <SessionSummaryCard
-                                title={t("sessionCompleteTitle")}
-                                targetLabel={t("sessionTargetLabel")}
-                                correctLabel={t("sessionCorrectLabel")}
-                                accuracyLabel={t("sessionAccuracyLabel")}
-                                targetCount={targetCount}
-                                correctCount={correctCount}
-                                accuracy={accuracy}
-                                onRestart={() => resetSession()}
-                                onSwitchToInfinite={() => resetSession("infinite")}
-                                restartLabel={t("sessionRestart")}
-                                switchLabel={t("sessionSwitchToInfinite")}
-                            />
-                        </div>
-                    )}
-
-                    <GameCard
-                        key={sessionId}
-                        mode={mode}
-                        filter={filter}
-                        onScoreUpdate={handleScoreUpdateWithUi}
-                        onRequestCloseSettings={() => setCustomSettingsOpen(false)}
-                        disableNext={sessionComplete && playMode === "session"}
-                    />
-                </div>
-
-                <div className="mb-6">
+                </>
+            }
+            stats={
+                <>
                     <RemainingBadge label={remainingLabel} />
                     <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
+                </>
+            }
+        >
+            {sessionComplete && playMode === "session" && (
+                <div className="mb-6">
+                    <SessionSummaryCard
+                        {...sessionSummaryProps}
+                        onRestart={() => resetSession()}
+                        onSwitchToInfinite={() => resetSession("infinite")}
+                    />
                 </div>
+            )}
 
-            </div>
-        </main>
+            <GameCard
+                key={sessionId}
+                mode={mode}
+                filter={filter}
+                onScoreUpdate={handleScoreUpdateWithUi}
+                onRequestCloseSettings={() => setCustomSettingsOpen(false)}
+                disableNext={sessionComplete && playMode === "session"}
+            />
+        </GamePageLayout>
     )
 }

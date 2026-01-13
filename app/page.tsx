@@ -4,40 +4,19 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { GameSelectorCard } from "@/components/game-selector-card"
 import { useI18n } from "@/lib/i18n"
+import { GAMES } from "@/lib/game-registry"
 
 export default function HomePage() {
   const { t } = useI18n()
 
-  const games = [
-    {
-      title: t("games.romaji.title") || "Romaji Challenge",
-      description: t("games.romaji.description") || "Convert hiragana and katakana to romaji",
-      href: "/words",
-      icon: "あ",
-      gradient: "bg-gradient-to-br from-primary/30 via-black to-black",
-    },
-    {
-      title: t("games.numbers.title") || "Number Master",
-      description: t("games.numbers.description") || "Learn to write numbers in Japanese",
-      href: "/numbers",
-      icon: "数",
-      gradient: "bg-gradient-to-br from-accent/25 via-black to-black",
-    },
-    {
-      title: t("games.kanji.title") || "Kanji Challenge",
-      description: t("games.kanji.description") || "Master kanji readings and meanings",
-      href: "/kanji",
-      icon: "漢",
-      gradient: "bg-gradient-to-br from-primary/25 via-black to-black",
-    },
-    {
-      title: t("games.dates.title") || "Date Master",
-      description: t("games.dates.description") || "Practice reading and writing dates",
-      href: "/dates",
-      icon: "日",
-      gradient: "bg-gradient-to-br from-accent/20 via-black to-black",
-    },
-  ]
+  const games = GAMES.map(game => ({
+    title: t(game.titleKey as any) || game.id,
+    description: t(game.descriptionKey as any) || "",
+    href: game.href,
+    icon: game.icon,
+    gradient: game.gradient,
+  }))
+
 
   return (
     <main className="min-h-screen bg-background relative overflow-hidden">
