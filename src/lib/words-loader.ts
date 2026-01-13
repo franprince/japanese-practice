@@ -24,8 +24,8 @@ export type WordSets = {
 
 const WORDSET_LANG = "es".toLowerCase()
 const CACHE_VERSION = "v1"
-const ENV_KEY = "prod"
-const cacheKey = (lang: string) => `${CACHE_VERSION}-${ENV_KEY}-${lang}`
+const CACHE_NAMESPACE = "prod"
+const getCacheKey = (lang: string) => `${CACHE_VERSION}-${CACHE_NAMESPACE}-${lang}`
 const cachedPromises: Record<string, Promise<WordSets>> = {}
 const DB_NAME = "kana-words"
 const STORE_NAME = "wordSets"
@@ -169,7 +169,7 @@ const readCache = async (lang: string): Promise<WordSets | null> => {
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readonly")
       const store = tx.objectStore(STORE_NAME)
-      const req = store.get(cacheKey(lang))
+      const req = store.get(getCacheKey(lang))
       req.onsuccess = () => resolve((req.result as WordSets) ?? null)
       req.onerror = () => reject(req.error)
     })
@@ -186,7 +186,7 @@ const writeCache = async (lang: string, data: WordSets) => {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readwrite")
       const store = tx.objectStore(STORE_NAME)
-      const req = store.put(data, cacheKey(lang))
+      const req = store.put(data, getCacheKey(lang))
       req.onsuccess = () => resolve()
       req.onerror = () => reject(req.error)
     })
