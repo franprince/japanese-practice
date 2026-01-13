@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "kanji:build": "bunx tsx scripts/build-kanjiset.ts"
+    "kanji:build": "bunx tsx scripts/build-kanjiset.ts",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -74,6 +75,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "happy-dom": "^20.1.0",
+    "husky": "^9.1.7",
     "playwright": "^1.49.1",
     "postcss": "^8.5",
     "tailwindcss": "^4.1.9",
