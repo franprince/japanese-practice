@@ -37,7 +37,13 @@ export async function GET(request: Request) {
   try {
     const raw = await fs.readFile(filePath, "utf8")
     const data = JSON.parse(raw)
-    return NextResponse.json(data)
+
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        "Content-Type": "application/json",
+      },
+    })
   } catch (err) {
     console.error("Failed to read wordset file", err)
     return NextResponse.json({ error: "Failed to read wordset" }, { status: 500 })
