@@ -1,10 +1,8 @@
 /// <reference lib="webworker" />
 
 import kanaDictionaryData from "../../data/kanaDictionary.json"
+import type { KanaGroup } from "../types/kana"
 
-type KanaGroup = {
-  characters: Record<string, string[]>
-}
 
 type KanaDictionary = Record<string, Record<string, KanaGroup>>
 
