@@ -4,7 +4,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { I18nProvider } from "@/lib/i18n"
 import { ThemeProvider } from "@/lib/theme-context"
-import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import "./globals.css";
 
