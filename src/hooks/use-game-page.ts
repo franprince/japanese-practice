@@ -1,4 +1,3 @@
-import { useCallback, useMemo } from "react"
 import { useI18n } from "@/lib/i18n"
 import { useSessionProgress } from "./use-session-progress"
 
@@ -30,40 +29,26 @@ export function useGamePage() {
     } = sessionProgress
 
     /**
-     * Memoized score update handler
-     */
-    const handleScoreUpdate = useCallback(
-        (newScore: number, newStreak: number, correct: boolean) => {
-            handleSessionScoreUpdate(newScore, newStreak, correct)
-        },
-        [handleSessionScoreUpdate]
-    )
-
-    /**
      * Computed remaining label for session mode
      */
-    const remainingLabel = useMemo(() => {
-        if (playMode !== "session") return null
-        return t("roundsLeft").replace("{count}", String(Math.max(remainingQuestions ?? 0, 0)))
-    }, [playMode, remainingQuestions, t])
+    const remainingLabel = playMode === "session"
+        ? t("roundsLeft").replace("{count}", String(Math.max(remainingQuestions ?? 0, 0)))
+        : null
 
     /**
      * Props for SessionSummaryCard component
      */
-    const sessionSummaryProps = useMemo(
-        () => ({
-            title: t("sessionCompleteTitle"),
-            targetLabel: t("sessionTargetLabel"),
-            correctLabel: t("sessionCorrectLabel"),
-            accuracyLabel: t("sessionAccuracyLabel"),
-            targetCount,
-            correctCount,
-            accuracy,
-            restartLabel: t("sessionRestart"),
-            switchLabel: t("sessionSwitchToInfinite"),
-        }),
-        [t, targetCount, correctCount, accuracy]
-    )
+    const sessionSummaryProps = {
+        title: t("sessionCompleteTitle"),
+        targetLabel: t("sessionTargetLabel"),
+        correctLabel: t("sessionCorrectLabel"),
+        accuracyLabel: t("sessionAccuracyLabel"),
+        targetCount,
+        correctCount,
+        accuracy,
+        restartLabel: t("sessionRestart"),
+        switchLabel: t("sessionSwitchToInfinite"),
+    }
 
     return {
         // Session progress state
@@ -86,7 +71,7 @@ export function useGamePage() {
         setBestStreak,
 
         // Computed values
-        handleScoreUpdate,
+        handleScoreUpdate: handleSessionScoreUpdate,
         remainingLabel,
         sessionSummaryProps,
 

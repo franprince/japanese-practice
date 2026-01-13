@@ -1,1 +1,2 @@
 bun test src
+bun run wordset:build

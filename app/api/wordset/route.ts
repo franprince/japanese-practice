@@ -34,13 +34,25 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Wordset not found" }, { status: 404 })
   }
 
+  // Extract version from filename for ETag
+  const filename = path.basename(filePath)
+  const match = filename.match(/wordset-.*-v(\d+)\.json$/i)
+  const version = match ? match[1] : "0"
+  const etag = `"${version}"`
+
+  // Check ETag
+  if (request.headers.get("if-none-match") === etag) {
+    return new NextResponse(null, { status: 304 })
+  }
+
   try {
     const raw = await fs.readFile(filePath, "utf8")
     const data = JSON.parse(raw)
 
     return NextResponse.json(data, {
       headers: {
-        "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        "Cache-Control": "no-cache", // Forces validation with ETag every time
+        "ETag": etag,
         "Content-Type": "application/json",
       },
     })

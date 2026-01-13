@@ -7,13 +7,11 @@ import type { JapaneseWord } from "../src/lib/japanese-words"
 
 const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary
 
-const WORDSET_VERSION = process.env.WORDSET_VERSION || process.env.NEXT_PUBLIC_WORDSET_VERSION || "v1"
 const WORDSET_LANG = (process.env.WORDSET_LANG || process.env.NEXT_PUBLIC_WORDSET_LANG || "es").toLowerCase()
 const SOURCE_FILE =
   WORDSET_LANG === "en"
     ? "jmdict-eng-3.6.2.json"
     : "jmdict-spa-3.6.1.json" // default to Spanish if unknown
-const OUTPUT_PATH = path.join(process.cwd(), "public", `wordset-${WORDSET_LANG}-${WORDSET_VERSION}.json`)
 
 const hiraToKata = (char: string) => {
   const code = char.charCodeAt(0)
@@ -211,9 +209,49 @@ const buildWordSet = async () => {
     bothForms,
   }
 
-  await fs.promises.mkdir(path.dirname(OUTPUT_PATH), { recursive: true })
-  await fs.promises.writeFile(OUTPUT_PATH, JSON.stringify(payload))
-  console.log(`wordset written to ${OUTPUT_PATH} (version ${WORDSET_VERSION})`)
+  // Determine version and filename logic
+  const publicDir = path.join(process.cwd(), "public")
+  await fs.promises.mkdir(publicDir, { recursive: true })
+
+  // Find latest existing version for this language
+  const existingFiles = await fs.promises.readdir(publicDir)
+  const versionRegex = new RegExp(`^wordset-${WORDSET_LANG}-v(\\d+)\\.json$`)
+
+  let latestVersion = 0
+  let latestFile = ""
+
+  for (const file of existingFiles) {
+    const match = file.match(versionRegex)
+    if (match) {
+      const ver = parseInt(match[1]!, 10)
+      if (ver > latestVersion) {
+        latestVersion = ver
+        latestFile = file
+      }
+    }
+  }
+
+  // Generate new payload string
+  const payloadStr = JSON.stringify(payload)
+
+  // Check if we have an existing file and if content matches
+  if (latestFile) {
+    const existingPath = path.join(publicDir, latestFile)
+    const existingContent = await fs.promises.readFile(existingPath, "utf8")
+
+    if (payloadStr === existingContent) {
+      console.log(`No changes detected for ${WORDSET_LANG} (keeping ${latestFile})`)
+      return
+    }
+  }
+
+  // If different or no file exists, bump version
+  const newVersion = latestVersion + 1
+  const newFilename = `wordset-${WORDSET_LANG}-v${newVersion}.json`
+  const newPath = path.join(publicDir, newFilename)
+
+  await fs.promises.writeFile(newPath, payloadStr)
+  console.log(`Wordset updated: ${newFilename}`)
 }
 
 buildWordSet().catch(err => {
