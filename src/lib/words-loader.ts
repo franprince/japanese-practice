@@ -1,6 +1,9 @@
 // ... (imports remain)
-import { kanaDictionary } from "../../data/kanaDictionary"
+import kanaDictionaryData from "../../data/kanaDictionary.json";
+import type { KanaDictionary, KanaGroup } from "@/types/kana";
 import type { JapaneseWord } from "./japanese-words"
+
+const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary;
 
 export type LoaderDeps = {
   characterGroups: Array<{
@@ -19,10 +22,6 @@ export type WordSets = {
   hiraganaWords: JapaneseWord[]
   katakanaWords: JapaneseWord[]
   bothForms?: JapaneseWord[]
-}
-
-type KanaGroup = {
-  characters: Record<string, string[]>
 }
 
 const WORDSET_LANG = "es".toLowerCase()

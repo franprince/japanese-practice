@@ -1,11 +1,10 @@
-import { kanaDictionary } from "../../data/kanaDictionary";
+import kanaDictionaryData from "../../data/kanaDictionary.json";
+import type { KanaDictionary, KanaGroup } from "@/types/kana";
 import { blacklist } from "../../data/blacklist";
 import { loadWordSets } from "./words-loader";
 import type { GameMode } from "@/types/game";
 
-type KanaGroup = {
-  characters: Record<string, string[]>
-}
+const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary;
 
 export interface JapaneseWord {
   kana: string
