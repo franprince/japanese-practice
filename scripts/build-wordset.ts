@@ -1,8 +1,11 @@
 import fs from "fs"
 import path from "path"
-import { kanaDictionary, type KanaDictionary, type KanaGroup } from "../data/kanaDictionary"
+import kanaDictionaryData from "../data/kanaDictionary.json"
+import type { KanaDictionary, KanaGroup } from "../src/types/kana"
 import { blacklist } from "../data/blacklist"
 import type { JapaneseWord } from "../src/lib/japanese-words"
+
+const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary
 
 const WORDSET_VERSION = process.env.WORDSET_VERSION || process.env.NEXT_PUBLIC_WORDSET_VERSION || "v1"
 const WORDSET_LANG = (process.env.WORDSET_LANG || process.env.NEXT_PUBLIC_WORDSET_LANG || "es").toLowerCase()
