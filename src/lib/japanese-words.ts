@@ -1,10 +1,13 @@
-import kanaDictionaryData from "../../data/kanaDictionary.json";
-import type { KanaDictionary, KanaGroup } from "@/types/kana";
 import { blacklist } from "../../data/blacklist";
 import { loadWordSets } from "./words-loader";
 import type { GameMode } from "@/types/game";
-
-const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary;
+import {
+  getCharacterGroups,
+  getKanaRomajiMap,
+  getCharacterGroupsSync,
+  getKanaRomajiMapSync,
+  type CharacterGroup as LoaderCharacterGroup
+} from "./data/kana-dictionary-loader";
 
 export interface JapaneseWord {
   kana: string
@@ -15,47 +18,15 @@ export interface JapaneseWord {
   kanji?: string
 }
 
-export interface CharacterGroup {
-  id: string
-  label: string
-  labelJp: string
-  type: "hiragana" | "katakana"
-  characters: string[]
-}
+// Re-export CharacterGroup type from loader
+export type CharacterGroup = LoaderCharacterGroup
 
-const buildCharacterGroups = (): CharacterGroup[] =>
-  Object.entries(kanaDictionary).flatMap(([typeKey, groups]) =>
-    Object.entries(groups as Record<string, KanaGroup>).map(([groupId, group]) => {
-      const characters = Object.keys(group.characters)
-      const firstKana = characters[0] || groupId
-      const firstRomaji = (group.characters[firstKana] ?? [groupId])[0] ?? groupId
-      const typeLabel = typeKey === "hiragana" ? "Hiragana" : "Katakana"
-      return {
-        id: groupId,
-        label: `${typeLabel} · ${firstRomaji}`,
-        labelJp: characters.join(" / "),
-        type: typeKey as CharacterGroup["type"],
-        characters,
-      }
-    }),
-  )
+// Lazy-loaded data - use getCharacterGroups() and getKanaRomajiMap() for async access
+// For backwards compatibility, export sync versions (will be empty until loaded)
+export const characterGroups: CharacterGroup[] = getCharacterGroupsSync()
 
-const buildKanaRomajiMap = (): Record<string, string> => {
-  const map: Record<string, string> = {}
-    ; (Object.values(kanaDictionary) as Record<string, KanaGroup>[]).forEach(groups => {
-      Object.values(groups).forEach((group: KanaGroup) => {
-        Object.entries(group.characters).forEach(([kana, romajiList]) => {
-          if (!map[kana]) {
-            map[kana] = Array.isArray(romajiList) && romajiList.length > 0 ? romajiList[0] ?? "" : ""
-          }
-        })
-      })
-    })
-  return map
-}
-
-export const characterGroups: CharacterGroup[] = buildCharacterGroups()
-const kanaRomajiMap: Record<string, string> = buildKanaRomajiMap()
+// Internal helper to get kana romaji map synchronously
+const getKanaRomajiMapInternal = (): Record<string, string> => getKanaRomajiMapSync()
 
 const hasHiragana = (text: string) => /[\u3040-\u309F]/.test(text)
 const hasKatakana = (text: string) => /[\u30A0-\u30FF]/.test(text)
@@ -64,6 +35,7 @@ const hiraToKata = (text: string) =>
   text.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60))
 
 export const kanaToRomaji = (text: string) => {
+  const kanaRomajiMap = getKanaRomajiMapInternal()
   let romaji = ""
   let i = 0
   const normalized = text || ""
@@ -120,8 +92,11 @@ export async function getRandomWord(
   filter?: WordFilter,
   lang?: "en" | "es" | "ja",
 ): Promise<JapaneseWord | null> {
+  // Ensure character groups are loaded before we need them
+  const loadedCharacterGroups = await getCharacterGroups()
+
   const { hiraganaWords, katakanaWords, bothForms } = await loadWordSets({
-    characterGroups,
+    characterGroups: loadedCharacterGroups,
     kanaToRomaji,
     hasHiragana,
     hasKatakana,
@@ -175,11 +150,12 @@ export function getGroupsByType(type: "hiragana" | "katakana" | "both"): Charact
   }
   return characterGroups
 }
-export function getRandomCharacter(
+export async function getRandomCharacter(
   type: GameMode,
   filter?: WordFilter,
-): JapaneseWord | null {
-  // Determine the target type for this specific character generation
+): Promise<JapaneseWord | null> {
+  const loadedCharacterGroups = await getCharacterGroups()
+
   let targetType: "hiragana" | "katakana" = "hiragana"
   if (type === "both") {
     targetType = Math.random() > 0.5 ? "hiragana" : "katakana"
@@ -189,36 +165,57 @@ export function getRandomCharacter(
     targetType = "hiragana"
   }
 
-  // Get all available characters based on mode and filter
-  let groups = characterGroups.filter((g) => g.type === targetType)
+  let groups = loadedCharacterGroups.filter((g) => g.type === targetType)
 
-  // Filter by selected groups
-  if (filter) {
+  // Apply group filter
+  if (filter?.selectedGroups !== undefined) {
     if (filter.selectedGroups.length === 0) return null
     groups = groups.filter((g) => filter.selectedGroups.includes(g.id))
   }
 
+  // Apply weighted filtering for special groups when many groups are selected
+  // Special groups are h_group16_a through h_group26_a (hiragana combos)
+  // and k_group18_a onwards (katakana combos)
+  if (filter?.selectedGroups) {
+    const totalGroups = loadedCharacterGroups.filter((g) => g.type === targetType).length
+    const selectedCount = filter.selectedGroups.filter(id => {
+      const group = loadedCharacterGroups.find(g => g.id === id)
+      return group?.type === targetType
+    }).length
+    const selectionRatio = selectedCount / totalGroups
+
+    // Only apply weighting when more than 50% of groups are selected
+    if (selectionRatio > 0.5) {
+      const specialGroupPattern = /h_(group1[6-9]|group2[0-6])_a$|k_(group1[8-9]|group[2-3][0-9])_a$/
+
+      // Filter out some special groups (keep ~40% of them)
+      groups = groups.filter(g => {
+        const isSpecialGroup = specialGroupPattern.test(g.id)
+        if (isSpecialGroup) {
+          // Keep only 40% of special groups
+          return Math.random() < 0.4
+        }
+        return true
+      })
+    }
+  }
+
   if (groups.length === 0) return null
 
-  // Determine random length based on filter or default to 1
-  const minLen = Math.max(1, filter?.minLength ?? 1)
-  const maxLen = Math.max(minLen, filter?.maxLength ?? 1)
-  const length = Math.floor(Math.random() * (maxLen - minLen + 1)) + minLen
+  const length = filter?.minLength
+    ? Math.floor(Math.random() * (filter.maxLength - filter.minLength + 1)) + filter.minLength
+    : 1
 
   let kana = ""
   let romaji = ""
-  let usedGroups: string[] = []
+  const usedGroups: string[] = []
 
-  // To avoid infinite loops if groups are somehow empty after filtering (checked above), 
-  // we do a simple loop.
   for (let i = 0; i < length; i++) {
-    // Pick a random group
     const randomGroup = groups[Math.floor(Math.random() * groups.length)]
     if (!randomGroup) break
 
-    // Pick a random character from the group
     const char = randomGroup.characters[Math.floor(Math.random() * randomGroup.characters.length)]
-    if (!char) break // Should not happen
+    if (!char) continue
 
     kana += char
     romaji += kanaToRomaji(char)
@@ -226,6 +223,8 @@ export function getRandomCharacter(
       usedGroups.push(randomGroup.id)
     }
   }
+
+  if (!kana) return null
 
   return {
     kana,

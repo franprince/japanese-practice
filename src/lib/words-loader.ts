@@ -1,9 +1,7 @@
 // ... (imports remain)
-import kanaDictionaryData from "../../data/kanaDictionary.json";
-import type { KanaDictionary, KanaGroup } from "@/types/kana";
 import type { JapaneseWord } from "./japanese-words"
-
-const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary;
+import { loadKanaDictionary } from "./data/kana-dictionary-loader"
+import type { KanaGroup } from "@/types/kana"
 
 export type LoaderDeps = {
   characterGroups: Array<{
@@ -73,6 +71,9 @@ export const mapEntryToWord = (
 
 const buildWordsInMain = async (deps: LoaderDeps): Promise<WordSets> => {
   // ... (implementation same as before)
+  // Load dictionary asynchronously
+  const kanaDictionary = await loadKanaDictionary()
+
   const rawJmdict = await import("../../data/jmdict-spa-3.6.1.json")
 
   // Cast to any to handle the JSON structure safely
@@ -145,9 +146,17 @@ const buildWordsInMain = async (deps: LoaderDeps): Promise<WordSets> => {
 
 const openDb = (): Promise<IDBDatabase> =>
   new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1)
+    if (typeof indexedDB === "undefined") {
+      reject(new Error("IndexedDB not available"))
+      return
+    }
+    const req = indexedDB.open(DB_NAME, 2) // Version 2 for consistency with kanji-data
     req.onupgradeneeded = () => {
-      req.result.createObjectStore(STORE_NAME)
+      const db = req.result
+      // Only create the store if it doesn't exist
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME)
+      }
     }
     req.onsuccess = () => resolve(req.result)
     req.onerror = () => reject(req.error)
