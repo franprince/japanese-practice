@@ -32,7 +32,7 @@ export function DateModeSelector({ mode, onModeChange }: DateModeSelectorProps) 
             }`}
         >
           {icon}
-          <span className="hidden sm:inline">{t(labelKey as any)}</span>
+          <span>{t(labelKey as any)}</span>
         </button>
       ))}
     </div>
