@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { getRandomWord, getRandomCharacter, type JapaneseWord, type WordFilter } from "@/lib/japanese-words"
+import { validateAnswer } from "@/lib/japanese-input"
 import { useI18n } from "@/lib/i18n"
 import { Check, X, Flame, SkipForward, Zap, Type, Shuffle } from "lucide-react"
 
@@ -93,20 +94,13 @@ export function GameCard({
   const checkAnswer = () => {
     if (!currentWord || !userInput.trim()) return
 
-    const normalizedUser = userInput.toLowerCase().trim()
-    const normalizedAnswer = currentWord.romaji.toLowerCase().trim()
+    // Use centralized validation logic that handles particles and romanization variants
+    const isCorrect = validateAnswer(userInput, currentWord)
 
-    let isCorrect = normalizedUser === normalizedAnswer
-    let shownAnswer = normalizedAnswer
+    // If correct but not exact match, you might want to show the canonical answer
+    // For now we just show the canonical answer if correct.
+    const shownAnswer = currentWord.romaji.toLowerCase().trim()
 
-    // Accept "wa" when the word ends with the particle は (e.g., こんにちは -> konnichiwa)
-    if (!isCorrect && currentWord.kana.endsWith("は") && normalizedAnswer.endsWith("ha")) {
-      const alt = normalizedAnswer.slice(0, -2) + "wa"
-      if (normalizedUser === alt) {
-        isCorrect = true
-        shownAnswer = alt
-      }
-    }
     setDisplayRomaji(shownAnswer)
     setFeedback(isCorrect ? "correct" : "incorrect")
     setTotalAttempts((prev) => prev + 1)
