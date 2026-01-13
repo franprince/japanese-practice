@@ -9,7 +9,7 @@ describe('japanese-dates', () => {
             expect(result.answer).toBeDefined()
             expect(result.romaji).toBeDefined()
 
-            // Check if it matches one of the days
+
             const match = Object.values(daysOfWeek).find(d => d.romaji === result.display)
             expect(match).toBeDefined()
             expect(match?.reading).toBe(result.answer)
@@ -17,7 +17,7 @@ describe('japanese-dates', () => {
 
         test('uses translation when translator provided', () => {
             const mockT = (key: string) => `Translated: ${key}`
-            // @ts-ignore - mockT has wider type string vs TranslationKey, technically compatible in runtime
+
             const result = generateWeekDayQuestion(mockT)
             expect(result.display).toContain('Translated: day.')
         })
@@ -27,14 +27,14 @@ describe('japanese-dates', () => {
         test('returns a day question', () => {
             const result = generateWeekDaysQuestion()
             expect(result.display).toBeDefined()
-            // Should be one of the days
+
             const match = Object.values(daysOfWeek).find(d => d.romaji === result.display)
             expect(match).toBeDefined()
         })
 
         test('uses translation when translator provided', () => {
             const mockT = (key: string) => `Translated: ${key}`
-            // @ts-ignore
+
             const result = generateWeekDaysQuestion(mockT)
             expect(result.display).toContain('Translated: day.')
         })
@@ -43,14 +43,14 @@ describe('japanese-dates', () => {
     describe('generateMonthQuestion', () => {
         test('returns a month question with name if translator provided', () => {
             const mockT = (key: string) => `Translated: ${key}`
-            // @ts-ignore
+
             const result = generateMonthQuestion(mockT)
             expect(result.display).toContain('Translated: month.')
         })
 
         test('returns a month question with English name if no translator', () => {
             const result = generateMonthQuestion()
-            // Should assume English month name e.g. "January"
+
             const monthNames = ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"]
             expect(monthNames).toContain(result.display)

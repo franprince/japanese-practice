@@ -51,7 +51,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
     const normalizedAnswer = question.answer.toLowerCase()
     const normalizedRomaji = question.romaji.toLowerCase().replace(/\s+/g, "")
 
-    // Accept both hiragana and romaji answers
+
     const correct = userAnswer === normalizedAnswer || userAnswer === normalizedRomaji
 
     setIsCorrect(correct)
@@ -143,13 +143,13 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         ${showResult ? (isCorrect ? "border-green-500/50 shadow-lg shadow-green-500/10" : "border-red-500/50 shadow-lg shadow-red-500/10") : "border-border"}
       `}
     >
-      {/* Mode indicator */}
+
       <div className="flex items-center justify-center gap-2 mb-4 text-muted-foreground text-sm">
         {getModeIcon()}
         <span>{getModeLabel()}</span>
       </div>
 
-      {/* Display Toggle (Only for Months and Week Days) */}
+
       {(mode === "months" || mode === "week_days") && (
         <div className="absolute top-4 right-4 md:top-6 md:right-6">
           <button
@@ -162,7 +162,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         </div>
       )}
 
-      {/* Question display */}
+
       <div className="text-center mb-6">
         <div className="text-6xl md:text-7xl font-bold text-foreground mb-2 font-mono">
           {mode === "months" && showNumbers ? question.displayNumber : question.display}
@@ -172,7 +172,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         {mode === "week_days" && <p className="text-sm text-muted-foreground">{t("writeWeekDay")}</p>}
       </div>
 
-      {/* Input */}
+
       <div className="mb-4">
         <input
           ref={inputRef}
@@ -192,7 +192,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         />
       </div>
 
-      {/* Result panel */}
+
       {showResult && (
         <div
           className={`
@@ -215,7 +215,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         </div>
       )}
 
-      {/* Actions */}
+
       <div className="flex gap-3">
         {showResult ? (
           <button

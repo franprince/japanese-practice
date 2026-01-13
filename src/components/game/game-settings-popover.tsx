@@ -48,17 +48,15 @@ export function GameSettingsPopover({
               <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t("modeLabel")}</p>
               <div className="inline-flex rounded-full border border-border/60 bg-secondary/30 p-1 w-full">
                 <button
-                  className={`flex-1 rounded-full px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm font-medium transition-colors ${
-                    playMode === "infinite" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`flex-1 rounded-full px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm font-medium transition-colors ${playMode === "infinite" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
                   onClick={() => onSelectMode("infinite")}
                 >
                   {t("playModeInfinite")}
                 </button>
                 <button
-                  className={`flex-1 rounded-full px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm font-medium transition-colors ${
-                    playMode === "session" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`flex-1 rounded-full px-2 md:px-3 py-1 md:py-1.5 text-xs md:text-sm font-medium transition-colors ${playMode === "session" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
                   onClick={() => onSelectMode("session")}
                 >
                   {t("playModeSession")}
@@ -74,20 +72,17 @@ export function GameSettingsPopover({
                   {[5, 10, 15, 20].map((count) => (
                     <button
                       key={count}
-                      className={`flex-1 rounded-lg py-1 md:py-1.5 text-xs md:text-sm font-medium border transition-colors ${
-                        targetCount === count
+                      className={`flex-1 rounded-lg py-1 md:py-1.5 text-xs md:text-sm font-medium border transition-colors ${targetCount === count
                           ? "bg-primary text-primary-foreground border-primary"
                           : "border-border/50 text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                      }`}
+                        }`}
                       onClick={() => onSelectCount(count)}
                     >
                       {count}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-muted-foreground/70 mt-2">
-                  {t("questionsLeft").replace("{count}", String(remainingQuestions))}
-                </p>
+
               </div>
             )}
           </div>

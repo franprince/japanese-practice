@@ -1,9 +1,4 @@
-// Japanese date data with readings and romaji
-// Days of the month have special/irregular readings
 
-export type DateDifficulty = "easy" | "medium" | "hard"
-
-// Days of the month (1-31) with their readings
 export const daysOfMonth: Record<number, { reading: string; romaji: string }> = {
   1: { reading: "ついたち", romaji: "tsuitachi" },
   2: { reading: "ふつか", romaji: "futsuka" },
@@ -38,7 +33,7 @@ export const daysOfMonth: Record<number, { reading: string; romaji: string }> = 
   31: { reading: "さんじゅういちにち", romaji: "sanjuuichinichi" },
 }
 
-// Months (1-12) with their readings
+
 export const months: Record<number, { reading: string; romaji: string; kanji: string }> = {
   1: { reading: "いちがつ", romaji: "ichigatsu", kanji: "一月" },
   2: { reading: "にがつ", romaji: "nigatsu", kanji: "二月" },
@@ -56,7 +51,7 @@ export const months: Record<number, { reading: string; romaji: string; kanji: st
 
 import type { TranslationKey } from "./translations"
 
-// Days of the week
+
 export const daysOfWeek: Record<number, { reading: string; romaji: string; kanji: string; labelKey: TranslationKey }> = {
   0: { reading: "にちようび", romaji: "nichiyoubi", kanji: "日曜日", labelKey: "day.sunday" },
   1: { reading: "げつようび", romaji: "getsuyoubi", kanji: "月曜日", labelKey: "day.monday" },
@@ -70,15 +65,15 @@ export const daysOfWeek: Record<number, { reading: string; romaji: string; kanji
 export type DateMode = "months" | "full" | "week_days"
 
 export interface DateQuestion {
-  display: string // Default display
-  displayName: string // Name representation (e.g. "January", "Sunday")
-  displayNumber: string // Number representation (e.g. "1")
-  answer: string // Expected hiragana answer
-  romaji: string // Romaji version for hints
-  kanji?: string // Kanji version if applicable
+  display: string
+  displayName: string
+  displayNumber: string
+  answer: string
+  romaji: string
+  kanji?: string
 }
 
-// Generate a random day question (1-31)
+
 export function generateDayQuestion(): DateQuestion {
   const day = Math.floor(Math.random() * 31) + 1
   const dayData = daysOfMonth[day]
@@ -87,14 +82,14 @@ export function generateDayQuestion(): DateQuestion {
   }
   return {
     display: `${day}`,
-    displayName: `${day}`, // For number mode, name matches number or similar
+    displayName: `${day}`,
     displayNumber: `${day}`,
     answer: dayData.reading,
     romaji: dayData.romaji,
   }
 }
 
-// Generate a random month question
+
 export function generateMonthQuestion(t?: (key: TranslationKey) => string): DateQuestion {
   const month = Math.floor(Math.random() * 12) + 1
   const monthData = months[month]
@@ -114,9 +109,7 @@ export function generateMonthQuestion(t?: (key: TranslationKey) => string): Date
       display = t(monthKeys[monthIndex])
     }
   } else {
-    // Fallback to English names if no translator? Or keep number? 
-    // User said "show the name of the month instead of the number".
-    // Let's fallback to English names.
+
     const monthNames = ["January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"]
     const monthIndex = month - 1
@@ -127,7 +120,7 @@ export function generateMonthQuestion(t?: (key: TranslationKey) => string): Date
 
   return {
     display,
-    displayName: display, // This is already the name (English or translated)
+    displayName: display,
     displayNumber: `${month}`,
     answer: monthData.reading,
     romaji: monthData.romaji,
@@ -135,7 +128,7 @@ export function generateMonthQuestion(t?: (key: TranslationKey) => string): Date
   }
 }
 
-// Generate a full date question (month + day)
+
 export function generateFullDateQuestion(): DateQuestion {
   const month = Math.floor(Math.random() * 12) + 1
   const day = Math.floor(Math.random() * 31) + 1
@@ -155,7 +148,7 @@ export function generateFullDateQuestion(): DateQuestion {
   }
 }
 
-// Generate a day of the week question
+
 export function generateWeekDayQuestion(t?: (key: TranslationKey) => string): DateQuestion {
   const dayIndex = Math.floor(Math.random() * 7)
   const dayData = daysOfWeek[dayIndex]
@@ -167,16 +160,15 @@ export function generateWeekDayQuestion(t?: (key: TranslationKey) => string): Da
   return {
     display: t ? t(dayData.labelKey) : dayData.romaji,
     displayName: t ? t(dayData.labelKey) : dayData.romaji,
-    displayNumber: `${dayIndex + 1}`, // Assuming Sunday=1
+    displayNumber: `${dayIndex + 1}`,
     answer: dayData.reading,
     romaji: dayData.romaji,
     kanji: dayData.kanji,
   }
 }
 
-// Generate a random week day question (wrapper for consistency)
+
 export function generateWeekDaysQuestion(t?: (key: TranslationKey) => string): DateQuestion {
-  // Just reuse the week day generator, no months mixing
   return generateWeekDayQuestion(t)
 }
 
