@@ -1,3 +1,4 @@
+// ... (imports remain)
 import { kanaDictionary } from "../../data/kanaDictionary"
 import type { JapaneseWord } from "./japanese-words"
 
@@ -27,44 +28,18 @@ type KanaGroup = {
 const WORDSET_LANG = "es".toLowerCase()
 const CACHE_VERSION = "v1"
 const ENV_KEY = "prod"
-const cacheKey = (lang: string) => `${CACHE_VERSION}-${ENV_KEY}-${lang}` // bump/override via env; dev/prod/lang separated
+const cacheKey = (lang: string) => `${CACHE_VERSION}-${ENV_KEY}-${lang}`
 const cachedPromises: Record<string, Promise<WordSets>> = {}
 const DB_NAME = "kana-words"
 const STORE_NAME = "wordSets"
 
-const kataToHira = (text: string) =>
-  Array.from(text)
-    .map(ch => {
-      const code = ch.charCodeAt(0)
-      if (code >= 0x30a0 && code <= 0x30ff) {
-        return String.fromCharCode(code - 0x60)
-      }
-      return ch
-    })
-    .join("")
+// Removed worker code
 
-const spawnWorker = () => {
-  return new Worker(new URL("../workers/words-worker.ts", import.meta.url), { type: "module" })
-}
-
-const buildWordsInWorker = async (): Promise<WordSets> => {
-  const worker = spawnWorker()
-  return new Promise((resolve, reject) => {
-    worker.onmessage = (event) => {
-      resolve(event.data as WordSets)
-      worker.terminate()
-    }
-    worker.onerror = (err) => {
-      worker.terminate()
-      reject(err)
-    }
-  })
-}
-
-const mapEntryToWord = (
+export const mapEntryToWord = (
   entry: any,
   deps: LoaderDeps,
 ): JapaneseWord | null => {
+  // ... (implementation same as before)
   const { kanaToRomaji, hasHiragana, hasKatakana, characterGroups } = deps
 
   const kanaText = entry?.kana?.[0]?.text as string | undefined
@@ -98,12 +73,18 @@ const mapEntryToWord = (
 }
 
 const buildWordsInMain = async (deps: LoaderDeps): Promise<WordSets> => {
+  // ... (implementation same as before)
   const rawJmdict = await import("../../data/jmdict-spa-3.6.1.json")
-  const jmdictWords: JapaneseWord[] = Array.isArray((rawJmdict as any)?.default?.words ?? (rawJmdict as any)?.words)
-    ? (((rawJmdict as any)?.default?.words ?? (rawJmdict as any)?.words) as any[])
-        .map(entry => mapEntryToWord(entry, deps))
-        .filter((w): w is JapaneseWord => w !== null)
-    : []
+
+  // Cast to any to handle the JSON structure safely
+  const rawData: any = rawJmdict
+  const wordsList: any[] = Array.isArray(rawData?.default?.words)
+    ? rawData.default.words
+    : (Array.isArray(rawData?.words) ? rawData.words : [])
+
+  const jmdictWords: JapaneseWord[] = wordsList
+    .map(entry => mapEntryToWord(entry, deps))
+    .filter((w): w is JapaneseWord => w !== null)
 
   const jmdictLookupByKana: Record<string, Pick<JapaneseWord, "meaning" | "kanji">> = jmdictWords.reduce(
     (acc, word) => {
@@ -175,26 +156,35 @@ const openDb = (): Promise<IDBDatabase> =>
 
 const readCache = async (lang: string): Promise<WordSets | null> => {
   if (typeof indexedDB === "undefined") return null
-  const db = await openDb()
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readonly")
-    const store = tx.objectStore(STORE_NAME)
-    const req = store.get(cacheKey(lang))
-    req.onsuccess = () => resolve((req.result as WordSets) ?? null)
-    req.onerror = () => reject(req.error)
-  })
+  try {
+    const db = await openDb()
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readonly")
+      const store = tx.objectStore(STORE_NAME)
+      const req = store.get(cacheKey(lang))
+      req.onsuccess = () => resolve((req.result as WordSets) ?? null)
+      req.onerror = () => reject(req.error)
+    })
+  } catch (e) {
+    console.error("Cache read failed", e)
+    return null
+  }
 }
 
 const writeCache = async (lang: string, data: WordSets) => {
   if (typeof indexedDB === "undefined") return
-  const db = await openDb()
-  return new Promise<void>((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite")
-    const store = tx.objectStore(STORE_NAME)
-    const req = store.put(data, cacheKey(lang))
-    req.onsuccess = () => resolve()
-    req.onerror = () => reject(req.error)
-  })
+  try {
+    const db = await openDb()
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite")
+      const store = tx.objectStore(STORE_NAME)
+      const req = store.put(data, cacheKey(lang))
+      req.onsuccess = () => resolve()
+      req.onerror = () => reject(req.error)
+    })
+  } catch (e) {
+    console.error("Cache write failed", e)
+  }
 }
 
 const fetchPrebuiltWordset = async (lang: string): Promise<WordSets | null> => {
@@ -209,9 +199,9 @@ const fetchPrebuiltWordset = async (lang: string): Promise<WordSets | null> => {
   }
 }
 
-const normalizeLang = (lang: string | undefined): string => {
+export const normalizeLang = (lang: string | undefined): string => {
   const lower = (lang || WORDSET_LANG || "es").toLowerCase()
-  if (lower === "ja") return "en" // fall back to english dataset for Japanese UI
+  if (lower === "ja") return "en"
   if (lower === "en" || lower === "es") return lower
   return "es"
 }
@@ -227,8 +217,8 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
         writeCache(datasetLang, prebuilt).catch(() => undefined)
         return prebuilt
       }
-      const canUseWorker = false // temporarily disable worker to avoid port issues
-      const fresh = canUseWorker ? await buildWordsInWorker() : await buildWordsInMain(_deps)
+      // Worker path removed
+      const fresh = await buildWordsInMain(_deps)
       writeCache(datasetLang, fresh).catch(() => undefined)
       return fresh
     })()
