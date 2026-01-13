@@ -74,6 +74,26 @@ bun start
 - Numbers: generated procedurally in-app; no external dataset.
 - Dates: generated procedurally in-app; no external dataset.
 
+## Data Architecture
+
+![Data Flow Diagram](docs/diagrams/data-flow.png)
+
+### Word Data Pipeline
+1. **Source**: Raw data comes from `kanaDictionary.json` (basic kana) and `jmdict-spa-3.6.1.json` (vocabulary).
+2. **Build Process**: 
+   - Primary: Static Generation via `/api/wordset`. The `buildWordsInMain` function merges dictionary definitions with character groups.
+   - Fallback: Client-side generation ensures functionality even if the API fails.
+3. **Caching Strategy**:
+   - Browser: Data is cached in **IndexedDB** (`kana-words` db, `wordSets` store).
+   - Validation: Cache versioning (`v1-prod-{lang}`) prevents stale data usage.
+   - Lifecycle: App checks IndexedDB -> Fetches API -> Falls back to local generation -> Updates Cache.
+
+### Kanji System
+- **Static Storage**: Core N5-N1 data is pre-compiled into `src/lib/kanji-data.ts` for instant load.
+- **Enrichment**:
+  - Scripts (`scripts/build-kanjiset.ts`) fetch missing data from external APIs (Jisho) and scrape supplemental info.
+  - Translation merging scripts (`scripts/merge-n1-translations.ts`) allow collaborative translation updates.
+
 ## Deployment
 The app is deployed on Vercel. To deploy:
 ```bash
