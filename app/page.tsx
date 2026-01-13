@@ -39,7 +39,7 @@ export default function HomePage() {
               </h1>
               <div className="h-1 w-16 sm:w-20 bg-primary" />
             </div>
-            <div className="flex-shrink-0 flex flex-wrap items-center gap-2">
+            <div className="flex-shrink-0 flex flex-wrap items-center gap-2 justify-between">
               <ThemeSwitcher />
               <LanguageSwitcher />
             </div>

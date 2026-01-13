@@ -81,14 +81,12 @@ export type TranslationKey =
   | "kanjiHardHint"
   | "datesTitle"
   | "datesSubtitle"
-  | "daysOnly"
   | "monthsOnly"
   | "fullDates"
   | "dayOfMonth"
   | "month"
   | "date"
   | "writeFullDate"
-  | "writeDayReading"
   | "writeMonthReading"
   | "typeHiraganaOrRomaji"
   | "nextDate"
@@ -111,6 +109,34 @@ export type TranslationKey =
   | "custom"
   | "apply"
   | "roundsLeft"
+  | "weekDays"
+  | "writeWeekDay"
+  | "showName"
+  | "showNumber"
+  | "day.sunday"
+  | "day.monday"
+  | "day.tuesday"
+  | "day.wednesday"
+  | "day.thursday"
+  | "day.friday"
+  | "day.saturday"
+  | "month.january"
+  | "month.february"
+  | "month.march"
+  | "month.april"
+  | "month.may"
+  | "month.june"
+  | "month.july"
+  | "month.august"
+  | "month.september"
+  | "month.october"
+  | "month.november"
+  | "month.december"
+  | "switchToWords"
+  | "switchToCharacters"
+  | "modeWords"
+  | "modeCharacters"
+
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -213,17 +239,43 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     kanjiHardHint: "Reading only",
     datesTitle: "Dates Challenge",
     datesSubtitle: "Write dates in Japanese",
-    daysOnly: "Days",
+
     monthsOnly: "Months",
     fullDates: "Full Dates",
     dayOfMonth: "Day of month",
     month: "Month",
     date: "Full date",
     writeFullDate: "Write the full date reading",
-    writeDayReading: "Write the day reading in hiragana",
     writeMonthReading: "Write the month reading in hiragana",
     typeHiraganaOrRomaji: "Type hiragana or romaji...",
     nextDate: "Next Date",
+    weekDays: "Days",
+    writeWeekDay: "Write the day reading",
+    showName: "Show Name",
+    showNumber: "Show Number",
+    "day.sunday": "Sunday",
+    "day.monday": "Monday",
+    "day.tuesday": "Tuesday",
+    "day.wednesday": "Wednesday",
+    "day.thursday": "Thursday",
+    "day.friday": "Friday",
+    "day.saturday": "Saturday",
+    "month.january": "January",
+    "month.february": "February",
+    "month.march": "March",
+    "month.april": "April",
+    "month.may": "May",
+    "month.june": "June",
+    "month.july": "July",
+    "month.august": "August",
+    "month.september": "September",
+    "month.october": "October",
+    "month.november": "November",
+    "month.december": "December",
+    switchToWords: "Switch to Words",
+    switchToCharacters: "Switch to Characters",
+    modeWords: "Words",
+    modeCharacters: "Random Characters",
   },
   es: {
     chipLabel: "Práctica de Kana",
@@ -325,17 +377,43 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     kanjiHardHint: "Solo lectura",
     datesTitle: "Desafío de Fechas",
     datesSubtitle: "Escribe fechas en japonés",
-    daysOnly: "Días",
+
     monthsOnly: "Meses",
     fullDates: "Fechas",
     dayOfMonth: "Día del mes",
     month: "Mes",
     date: "Fecha completa",
     writeFullDate: "Escribe la lectura completa de la fecha",
-    writeDayReading: "Escribe la lectura del día en hiragana",
     writeMonthReading: "Escribe la lectura del mes en hiragana",
     typeHiraganaOrRomaji: "Escribe hiragana o romaji...",
     nextDate: "Siguiente Fecha",
+    weekDays: "Días",
+    writeWeekDay: "Escribe la lectura del día",
+    showName: "Mostrar Nombre",
+    showNumber: "Mostrar Número",
+    "day.sunday": "Domingo",
+    "day.monday": "Lunes",
+    "day.tuesday": "Martes",
+    "day.wednesday": "Miércoles",
+    "day.thursday": "Jueves",
+    "day.friday": "Viernes",
+    "day.saturday": "Sábado",
+    "month.january": "Enero",
+    "month.february": "Febrero",
+    "month.march": "Marzo",
+    "month.april": "Abril",
+    "month.may": "Mayo",
+    "month.june": "Junio",
+    "month.july": "Julio",
+    "month.august": "Agosto",
+    "month.september": "Septiembre",
+    "month.october": "Octubre",
+    "month.november": "Noviembre",
+    "month.december": "Diciembre",
+    switchToWords: "Cambiar a Palabras",
+    switchToCharacters: "Cambiar a Caracteres",
+    modeWords: "Palabras",
+    modeCharacters: "Caracteres Aleatorios",
   },
   ja: {
     chipLabel: "かな練習",
@@ -437,16 +515,41 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     kanjiHardHint: "読みのみ",
     datesTitle: "日付チャレンジ",
     datesSubtitle: "日付を日本語で書いてください",
-    daysOnly: "日",
     monthsOnly: "月",
     fullDates: "日付",
     dayOfMonth: "日",
     month: "月",
     date: "日付",
     writeFullDate: "日付の読み方を書いてください",
-    writeDayReading: "日の読み方をひらがなで書いてください",
     writeMonthReading: "月の読み方をひらがなで書いてください",
     typeHiraganaOrRomaji: "ひらがなかローマ字を入力...",
     nextDate: "次の日付",
+    weekDays: "曜日",
+    writeWeekDay: "曜日の読み方を書いてください",
+    showName: "名前を表示",
+    showNumber: "数字を表示",
+    "day.sunday": "日曜日",
+    "day.monday": "月曜日",
+    "day.tuesday": "火曜日",
+    "day.wednesday": "水曜日",
+    "day.thursday": "木曜日",
+    "day.friday": "金曜日",
+    "day.saturday": "土曜日",
+    "month.january": "1月",
+    "month.february": "2月",
+    "month.march": "3月",
+    "month.april": "4月",
+    "month.may": "5月",
+    "month.june": "6月",
+    "month.july": "7月",
+    "month.august": "8月",
+    "month.september": "9月",
+    "month.october": "10月",
+    "month.november": "11月",
+    "month.december": "12月",
+    switchToWords: "単語モードへ",
+    switchToCharacters: "文字モードへ",
+    modeWords: "単語",
+    modeCharacters: "ランダム文字",
   },
 }

@@ -30,7 +30,7 @@ export default function DatesPage() {
         t,
     } = useGamePage()
 
-    const [mode, setMode] = useState<DateMode>("days")
+    const [mode, setMode] = useState<DateMode>("week_days")
     const [key, setKey] = useState(0)
 
     const handleModeChange = (newMode: DateMode) => {

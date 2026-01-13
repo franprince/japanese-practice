@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { Check, X, ArrowRight, SkipForward, Calendar, CalendarDays } from "lucide-react"
+import { Check, X, ArrowRight, SkipForward, Calendar, CalendarDays, Hash, Type } from "lucide-react"
 import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese-dates"
 import { useI18n } from "@/lib/i18n"
 
@@ -20,6 +20,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
   const [isCorrect, setIsCorrect] = useState(false)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
+  const [showNumbers, setShowNumbers] = useState(false)
   const enterOnResultRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const { t } = useI18n()
@@ -27,15 +28,15 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
   const generateNewQuestion = useCallback(() => {
     if (disableNext) return
     enterOnResultRef.current = false
-    setQuestion(generateDateQuestion(mode))
+    setQuestion(generateDateQuestion(mode, t, showNumbers))
     setUserInput("")
     setShowResult(false)
     setIsCorrect(false)
-  }, [mode, disableNext])
+  }, [mode, disableNext, showNumbers, t])
 
   useEffect(() => {
     generateNewQuestion()
-  }, [generateNewQuestion])
+  }, [generateNewQuestion, showNumbers])
 
   useEffect(() => {
     if (!showResult && inputRef.current) {
@@ -50,7 +51,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
     const normalizedAnswer = question.answer.toLowerCase()
     const normalizedRomaji = question.romaji.toLowerCase().replace(/\s+/g, "")
 
-    // Accept both hiragana and romaji answers
+
     const correct = userAnswer === normalizedAnswer || userAnswer === normalizedRomaji
 
     setIsCorrect(correct)
@@ -103,10 +104,8 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
 
   const getModeIcon = () => {
     switch (mode) {
-      case "days":
+      case "week_days":
         return <CalendarDays className="w-5 h-5 text-primary" />
-      case "months":
-        return <Calendar className="w-5 h-5 text-primary" />
       case "full":
         return <Calendar className="w-5 h-5 text-primary" />
     }
@@ -114,8 +113,8 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
 
   const getModeLabel = () => {
     switch (mode) {
-      case "days":
-        return t("dayOfMonth")
+      case "week_days":
+        return t("weekDays")
       case "months":
         return t("month")
       case "full":
@@ -130,10 +129,10 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
 
   const handleKeyUp = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && showResult && !disableNext) {
-        if (!enterOnResultRef.current) return
-        e.preventDefault()
-        enterOnResultRef.current = false
-        generateNewQuestion()
+      if (!enterOnResultRef.current) return
+      e.preventDefault()
+      enterOnResultRef.current = false
+      generateNewQuestion()
     }
   }
 
@@ -144,21 +143,36 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         ${showResult ? (isCorrect ? "border-green-500/50 shadow-lg shadow-green-500/10" : "border-red-500/50 shadow-lg shadow-red-500/10") : "border-border"}
       `}
     >
-      {/* Mode indicator */}
+
       <div className="flex items-center justify-center gap-2 mb-4 text-muted-foreground text-sm">
         {getModeIcon()}
         <span>{getModeLabel()}</span>
       </div>
 
-      {/* Question display */}
+
+      {(mode === "months" || mode === "week_days") && (
+        <div className="absolute top-4 right-4 md:top-6 md:right-6">
+          <button
+            onClick={() => setShowNumbers(!showNumbers)}
+            className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            title={showNumbers ? t("showName") || "Show Name" : t("showNumber") || "Show Number"}
+          >
+            {showNumbers ? <Type className="w-5 h-5" /> : <Hash className="w-5 h-5" />}
+          </button>
+        </div>
+      )}
+
+
       <div className="text-center mb-6">
-        <div className="text-6xl md:text-7xl font-bold text-foreground mb-2 font-mono">{question.display}</div>
+        <div className="text-6xl md:text-7xl font-bold text-foreground mb-2 font-mono">
+          {mode === "months" && showNumbers ? question.displayNumber : question.display}
+        </div>
         {mode === "full" && <p className="text-sm text-muted-foreground">{t("writeFullDate")}</p>}
-        {mode === "days" && <p className="text-sm text-muted-foreground">{t("writeDayReading")}</p>}
         {mode === "months" && <p className="text-sm text-muted-foreground">{t("writeMonthReading")}</p>}
+        {mode === "week_days" && <p className="text-sm text-muted-foreground">{t("writeWeekDay")}</p>}
       </div>
 
-      {/* Input */}
+
       <div className="mb-4">
         <input
           ref={inputRef}
@@ -178,7 +192,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         />
       </div>
 
-      {/* Result panel */}
+
       {showResult && (
         <div
           className={`
@@ -201,7 +215,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         </div>
       )}
 
-      {/* Actions */}
+
       <div className="flex gap-3">
         {showResult ? (
           <button

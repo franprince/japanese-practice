@@ -1,10 +1,11 @@
 /// <reference lib="webworker" />
 
-import { kanaDictionary } from "../../data/kanaDictionary"
+import kanaDictionaryData from "../../data/kanaDictionary.json"
+import type { KanaDictionary, KanaGroup } from "../../src/types/kana"
 
-type KanaGroup = {
-  characters: Record<string, string[]>
-}
+const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary
+
+
 
 type CharacterGroup = {
   id: string
@@ -48,15 +49,15 @@ const hiraToKata = (text: string) =>
 
 const buildKanaRomajiMap = (): Record<string, string> => {
   const map: Record<string, string> = {}
-  ;(Object.values(kanaDictionary) as Record<string, KanaGroup>[]).forEach(groups => {
-    Object.values(groups).forEach((group: KanaGroup) => {
-      Object.entries(group.characters).forEach(([kana, romajiList]) => {
-        if (!map[kana]) {
-          map[kana] = Array.isArray(romajiList) && romajiList.length > 0 ? romajiList[0] ?? "" : ""
-        }
+    ; (Object.values(kanaDictionary) as Record<string, KanaGroup>[]).forEach(groups => {
+      Object.values(groups).forEach((group: KanaGroup) => {
+        Object.entries(group.characters).forEach(([kana, romajiList]) => {
+          if (!map[kana]) {
+            map[kana] = Array.isArray(romajiList) && romajiList.length > 0 ? romajiList[0] ?? "" : ""
+          }
+        })
       })
     })
-  })
   return map
 }
 
@@ -137,8 +138,8 @@ const buildWords = async (): Promise<{ hiraganaWords: JapaneseWord[]; katakanaWo
   const rawJmdict = await import("../../data/jmdict-spa-3.6.1.json")
   const jmdictWords: JapaneseWord[] = Array.isArray((rawJmdict as any)?.default?.words ?? (rawJmdict as any)?.words)
     ? (((rawJmdict as any)?.default?.words ?? (rawJmdict as any)?.words) as any[])
-        .map(entry => mapEntryToWord(entry, characterGroups))
-        .filter((w): w is JapaneseWord => w !== null)
+      .map(entry => mapEntryToWord(entry, characterGroups))
+      .filter((w): w is JapaneseWord => w !== null)
     : []
 
   const jmdictLookupByKana: Record<string, Pick<JapaneseWord, "meaning" | "kanji">> = jmdictWords.reduce(

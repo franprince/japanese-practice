@@ -5,12 +5,19 @@ import * as japaneseWords from '@/lib/japanese-words'
 // Mock dependencies BEFORE loading the component
 const mockGetRandomWord = mock(japaneseWords.getRandomWord)
 
+const mockCharacterGroups = [
+    { id: 'h1', type: 'hiragana' as const, label: 'H1', labelJp: 'あ', characters: ['あ'] },
+    { id: 'k1', type: 'katakana' as const, label: 'K1', labelJp: 'ア', characters: ['ア'] },
+]
+
+mock.module('@/lib/data/kana-dictionary-loader', () => ({
+    getCharacterGroups: mock(() => Promise.resolve(mockCharacterGroups)),
+    getKanaRomajiMap: mock(() => Promise.resolve({})),
+}))
+
 mock.module('@/lib/japanese-words', () => ({
     getRandomWord: mockGetRandomWord,
-    characterGroups: [
-        { id: 'h1', type: 'hiragana', label: 'H1' },
-        { id: 'k1', type: 'katakana', label: 'K1' },
-    ],
+    characterGroups: mockCharacterGroups,
 }))
 
 const mockResetSession = mock(() => { })
@@ -106,6 +113,11 @@ describe('WordsPage', () => {
 
     test('handles score update from game card', async () => {
         render(<WordsPage />)
+
+        // Wait for GameCard to render after groups load
+        await waitFor(() => {
+            expect(screen.getByTestId('game-card')).toBeInTheDocument()
+        })
 
         const triggerBtn = screen.getByTestId('trigger-score')
         fireEvent.click(triggerBtn)

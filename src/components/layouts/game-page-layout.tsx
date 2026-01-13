@@ -27,11 +27,11 @@ export function GamePageLayout({
 
             <div className="container max-w-3xl mx-auto px-4 py-6 md:py-10 relative">
                 <header className="mb-6">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2 mb-4">
                         <Button asChild variant="ghost" size="sm" className="shrink-0 cursor-pointer -ml-3">
                             <Link href="/">← Home</Link>
                         </Button>
-                        <LanguageSwitcher />
+                        <LanguageSwitcher className="ml-auto" />
                     </div>
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-balance bg-linear-to-r from-foreground via-foreground to-primary bg-clip-text">

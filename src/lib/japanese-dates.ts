@@ -1,9 +1,4 @@
-// Japanese date data with readings and romaji
-// Days of the month have special/irregular readings
 
-export type DateDifficulty = "easy" | "medium" | "hard"
-
-// Days of the month (1-31) with their readings
 export const daysOfMonth: Record<number, { reading: string; romaji: string }> = {
   1: { reading: "ついたち", romaji: "tsuitachi" },
   2: { reading: "ふつか", romaji: "futsuka" },
@@ -38,7 +33,7 @@ export const daysOfMonth: Record<number, { reading: string; romaji: string }> = 
   31: { reading: "さんじゅういちにち", romaji: "sanjuuichinichi" },
 }
 
-// Months (1-12) with their readings
+
 export const months: Record<number, { reading: string; romaji: string; kanji: string }> = {
   1: { reading: "いちがつ", romaji: "ichigatsu", kanji: "一月" },
   2: { reading: "にがつ", romaji: "nigatsu", kanji: "二月" },
@@ -54,16 +49,31 @@ export const months: Record<number, { reading: string; romaji: string; kanji: st
   12: { reading: "じゅうにがつ", romaji: "juunigatsu", kanji: "十二月" },
 }
 
-export type DateMode = "days" | "months" | "full"
+import type { TranslationKey } from "./translations"
 
-export interface DateQuestion {
-  display: string // What to show (e.g., "March 15" or "15")
-  answer: string // Expected hiragana answer
-  romaji: string // Romaji version for hints
-  kanji?: string // Kanji version if applicable
+
+export const daysOfWeek: Record<number, { reading: string; romaji: string; kanji: string; labelKey: TranslationKey }> = {
+  0: { reading: "にちようび", romaji: "nichiyoubi", kanji: "日曜日", labelKey: "day.sunday" },
+  1: { reading: "げつようび", romaji: "getsuyoubi", kanji: "月曜日", labelKey: "day.monday" },
+  2: { reading: "かようび", romaji: "kayoubi", kanji: "火曜日", labelKey: "day.tuesday" },
+  3: { reading: "すいようび", romaji: "suiyoubi", kanji: "水曜日", labelKey: "day.wednesday" },
+  4: { reading: "もくようび", romaji: "mokuyoubi", kanji: "木曜日", labelKey: "day.thursday" },
+  5: { reading: "きんようび", romaji: "kinyoubi", kanji: "金曜日", labelKey: "day.friday" },
+  6: { reading: "どようび", romaji: "doyoubi", kanji: "土曜日", labelKey: "day.saturday" },
 }
 
-// Generate a random day question
+export type DateMode = "months" | "full" | "week_days"
+
+export interface DateQuestion {
+  display: string
+  displayName: string
+  displayNumber: string
+  answer: string
+  romaji: string
+  kanji?: string
+}
+
+
 export function generateDayQuestion(): DateQuestion {
   const day = Math.floor(Math.random() * 31) + 1
   const dayData = daysOfMonth[day]
@@ -72,27 +82,53 @@ export function generateDayQuestion(): DateQuestion {
   }
   return {
     display: `${day}`,
+    displayName: `${day}`,
+    displayNumber: `${day}`,
     answer: dayData.reading,
     romaji: dayData.romaji,
   }
 }
 
-// Generate a random month question
-export function generateMonthQuestion(): DateQuestion {
+
+export function generateMonthQuestion(t?: (key: TranslationKey) => string): DateQuestion {
   const month = Math.floor(Math.random() * 12) + 1
   const monthData = months[month]
   if (!monthData) {
     throw new Error(`Invalid month generated: ${month}`)
   }
+
+  let display = `${month}`
+  if (t) {
+    const monthKeys: TranslationKey[] = [
+      "month.january", "month.february", "month.march", "month.april",
+      "month.may", "month.june", "month.july", "month.august",
+      "month.september", "month.october", "month.november", "month.december"
+    ]
+    const monthIndex = month - 1
+    if (monthKeys[monthIndex]) {
+      display = t(monthKeys[monthIndex])
+    }
+  } else {
+
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"]
+    const monthIndex = month - 1
+    if (monthNames[monthIndex]) {
+      display = monthNames[monthIndex]
+    }
+  }
+
   return {
-    display: `${month}`,
+    display,
+    displayName: display,
+    displayNumber: `${month}`,
     answer: monthData.reading,
     romaji: monthData.romaji,
     kanji: monthData.kanji,
   }
 }
 
-// Generate a full date question (month + day)
+
 export function generateFullDateQuestion(): DateQuestion {
   const month = Math.floor(Math.random() * 12) + 1
   const day = Math.floor(Math.random() * 31) + 1
@@ -104,19 +140,45 @@ export function generateFullDateQuestion(): DateQuestion {
 
   return {
     display: `${month}/${day}`,
+    displayName: `${month}/${day}`,
+    displayNumber: `${month}/${day}`,
     answer: `${monthData.reading}${dayData.reading}`,
     romaji: `${monthData.romaji} ${dayData.romaji}`,
     kanji: `${monthData.kanji}${day}日`,
   }
 }
 
-export function generateDateQuestion(mode: DateMode): DateQuestion {
+
+export function generateWeekDayQuestion(t?: (key: TranslationKey) => string): DateQuestion {
+  const dayIndex = Math.floor(Math.random() * 7)
+  const dayData = daysOfWeek[dayIndex]
+
+  if (!dayData) {
+    throw new Error(`Invalid week day generated: ${dayIndex}`)
+  }
+
+  return {
+    display: t ? t(dayData.labelKey) : dayData.romaji,
+    displayName: t ? t(dayData.labelKey) : dayData.romaji,
+    displayNumber: `${dayIndex + 1}`,
+    answer: dayData.reading,
+    romaji: dayData.romaji,
+    kanji: dayData.kanji,
+  }
+}
+
+
+export function generateWeekDaysQuestion(t?: (key: TranslationKey) => string): DateQuestion {
+  return generateWeekDayQuestion(t)
+}
+
+export function generateDateQuestion(mode: DateMode, t?: (key: TranslationKey) => string, useNumbers: boolean = false): DateQuestion {
   switch (mode) {
-    case "days":
-      return generateDayQuestion()
     case "months":
-      return generateMonthQuestion()
+      return generateMonthQuestion(t)
     case "full":
       return generateFullDateQuestion()
+    case "week_days":
+      return useNumbers ? generateDayQuestion() : generateWeekDaysQuestion(t)
   }
 }

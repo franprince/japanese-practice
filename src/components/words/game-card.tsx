@@ -8,9 +8,14 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { getRandomWord, type JapaneseWord, type WordFilter } from "@/lib/japanese-words"
+import { getRandomWord, getRandomCharacter, type JapaneseWord, type WordFilter } from "@/lib/japanese-words"
+import { validateAnswer } from "@/lib/japanese-input"
 import { useI18n } from "@/lib/i18n"
-import { Check, X, Flame, SkipForward, Zap } from "lucide-react"
+import { Check, X, Flame, SkipForward, Zap, Type, Shuffle } from "lucide-react"
+
+// ... (existing code)
+
+
 
 import type { GameMode } from "@/types/game"
 
@@ -21,6 +26,8 @@ interface GameCardProps {
   suppressFocus?: boolean
   onRequestCloseSettings?: () => void
   disableNext?: boolean
+  isCharacterMode?: boolean
+  onToggleCharacterMode?: () => void
 }
 
 export function GameCard({
@@ -30,6 +37,8 @@ export function GameCard({
   suppressFocus = false,
   onRequestCloseSettings,
   disableNext = false,
+  isCharacterMode = false,
+  onToggleCharacterMode,
 }: GameCardProps) {
   const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
   const [userInput, setUserInput] = useState("")
@@ -46,7 +55,14 @@ export function GameCard({
 
   const loadNewWord = useCallback(async () => {
     setIsLoading(true)
-    const word = await getRandomWord(mode, filter, lang) // Pass filter and lang
+    let word: JapaneseWord | null
+
+    if (isCharacterMode) {
+      word = await getRandomCharacter(mode, filter)
+    } else {
+      word = await getRandomWord(mode, filter, lang)
+    }
+
     if (word) {
       setCurrentWord(word)
       setDisplayRomaji(word.romaji)
@@ -62,7 +78,7 @@ export function GameCard({
     setTimeout(() => {
       if (!suppressFocus) inputRef.current?.focus()
     }, 100)
-  }, [mode, filter, suppressFocus, lang])
+  }, [mode, filter, suppressFocus, lang, isCharacterMode])
 
   useEffect(() => {
     loadNewWord()
@@ -78,20 +94,13 @@ export function GameCard({
   const checkAnswer = () => {
     if (!currentWord || !userInput.trim()) return
 
-    const normalizedUser = userInput.toLowerCase().trim()
-    const normalizedAnswer = currentWord.romaji.toLowerCase().trim()
+    // Use centralized validation logic that handles particles and romanization variants
+    const isCorrect = validateAnswer(userInput, currentWord)
 
-    let isCorrect = normalizedUser === normalizedAnswer
-    let shownAnswer = normalizedAnswer
+    // If correct but not exact match, you might want to show the canonical answer
+    // For now we just show the canonical answer if correct.
+    const shownAnswer = currentWord.romaji.toLowerCase().trim()
 
-    // Accept "wa" when the word ends with the particle は (e.g., こんにちは -> konnichiwa)
-    if (!isCorrect && currentWord.kana.endsWith("は") && normalizedAnswer.endsWith("ha")) {
-      const alt = normalizedAnswer.slice(0, -2) + "wa"
-      if (normalizedUser === alt) {
-        isCorrect = true
-        shownAnswer = alt
-      }
-    }
     setDisplayRomaji(shownAnswer)
     setFeedback(isCorrect ? "correct" : "incorrect")
     setTotalAttempts((prev) => prev + 1)
@@ -200,13 +209,33 @@ export function GameCard({
 
       <Card
         className={cn(
-          "transition-all duration-300 border-2 backdrop-blur-sm",
+          "transition-all duration-300 border-2 backdrop-blur-sm relative", // Added relative
           feedback === "correct" && "border-success bg-success/10 shadow-[0_0_30px_-5px_var(--success)]",
           feedback === "incorrect" && "border-destructive bg-destructive/10 shadow-[0_0_30px_-5px_var(--destructive)]",
           !feedback && "border-border/50 bg-card/80",
         )}
       >
         <CardContent className="pt-10 pb-8 px-6 md:px-8">
+          {onToggleCharacterMode && (
+            <div className="absolute top-4 right-4 md:top-6 md:right-6">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onToggleCharacterMode}
+                className="h-8 w-8 rounded-full hover:bg-secondary/80 text-muted-foreground hover:text-foreground transition-colors"
+                title={isCharacterMode ? t("switchToWords") : t("switchToCharacters")}
+              >
+                {isCharacterMode ? <Type className="w-5 h-5" /> : <Shuffle className="w-5 h-5" />}
+              </Button>
+            </div>
+          )}
+
+          {/* Mode Indicator */}
+          <div className="flex items-center justify-center gap-2 mb-6 text-muted-foreground text-sm font-medium">
+            {isCharacterMode ? <Shuffle className="w-4 h-4" /> : <Type className="w-4 h-4" />}
+            <span>{isCharacterMode ? t("modeCharacters") : t("modeWords")}</span>
+          </div>
+
           {/* Japanese Character Display */}
           <div className="text-center mb-10">
             <div
