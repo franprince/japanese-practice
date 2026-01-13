@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/utils"
 import { useI18n } from "@/lib/i18n"
-import { characterGroups, type WordFilter } from "@/lib/japanese-words"
+import { type WordFilter, type CharacterGroup } from "@/lib/japanese-words"
+import { getCharacterGroups } from "@/lib/data/kana-dictionary-loader"
 
 interface WordsSettingsPopoverProps {
   filter: WordFilter
@@ -21,6 +22,13 @@ export function WordsSettingsPopover({
   open,
   onOpenChange,
 }: WordsSettingsPopoverProps) {
+  const [characterGroups, setCharacterGroups] = useState<CharacterGroup[]>([])
+
+  // Load character groups on mount
+  useEffect(() => {
+    getCharacterGroups().then(setCharacterGroups)
+  }, [])
+
   useEffect(() => {
     if (open) {
       const prev = document.body.style.overflow
@@ -66,7 +74,7 @@ export function WordsSettingsPopover({
       katakanaBase: kataAll.filter((g) => !g.id.includes("_a")).sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
       katakanaAlt: kataAll.filter((g) => g.id.includes("_a")).sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
     }
-  }, [])
+  }, [characterGroups])
 
   const allHiragana = [...hiraganaBase, ...hiraganaAlt]
   const allKatakana = [...katakanaBase, ...katakanaAlt]
@@ -177,7 +185,7 @@ export function WordsSettingsPopover({
           {/* Character groups */}
           <div className="space-y-3 pt-2 border-t border-border/50">
             <p className="text-xs text-muted-foreground">{t("charactersDescription")}</p>
-            
+
             {draftFilter.selectedGroups.length === 0 && (
               <div className="text-xs text-amber-500 bg-amber-500/10 border border-amber-500/40 rounded-md px-3 py-2">
                 {t("selectGroupsHint")}

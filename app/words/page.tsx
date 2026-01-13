@@ -1,11 +1,12 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo, useState, useEffect } from "react"
 import { GameCard } from "@/components/words/game-card"
 import { ModeSelector } from "@/components/words/mode-selector"
 import { StatsDisplay } from "@/components/game/stats-display"
 import { RemainingBadge } from "@/components/game/remaining-badge"
-import { characterGroups, type WordFilter } from "@/lib/japanese-words"
+import { type WordFilter, type CharacterGroup } from "@/lib/japanese-words"
+import { getCharacterGroups } from "@/lib/data/kana-dictionary-loader"
 import type { GameMode } from "@/types/game"
 import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { WordsSettingsPopover } from "@/components/words/words-settings-popover"
@@ -33,17 +34,29 @@ export default function WordsPage() {
         t,
     } = useGamePage()
 
-    const defaultFilter = useMemo<WordFilter>(
-        () => ({
-            selectedGroups: characterGroups.map((group) => group.id),
-            minLength: 1,
-            maxLength: 10,
-        }),
-        [],
-    )
+    const [characterGroups, setCharacterGroups] = useState<CharacterGroup[]>([])
+    const [isLoadingGroups, setIsLoadingGroups] = useState(true)
+
+    // Preload character groups on mount
+    useEffect(() => {
+        getCharacterGroups().then(groups => {
+            setCharacterGroups(groups)
+            setIsLoadingGroups(false)
+            // Initialize filter with all groups once loaded
+            setFilter({
+                selectedGroups: groups.map(g => g.id),
+                minLength: 3,
+                maxLength: 6,
+            })
+        })
+    }, [])
 
     const [mode, setMode] = useState<GameMode>("hiragana")
-    const [filter, setFilter] = useState<WordFilter>(defaultFilter)
+    const [filter, setFilter] = useState<WordFilter>({
+        selectedGroups: [], // Will be populated after groups load
+        minLength: 3,
+        maxLength: 6,
+    })
     const [customSettingsOpen, setCustomSettingsOpen] = useState(false)
     const [isCharacterMode, setIsCharacterMode] = useState(false)
 
@@ -130,16 +143,18 @@ export default function WordsPage() {
                 </div>
             )}
 
-            <GameCard
-                key={sessionId}
-                mode={mode}
-                filter={filter}
-                onScoreUpdate={handleScoreUpdateWithUi}
-                onRequestCloseSettings={() => setCustomSettingsOpen(false)}
-                disableNext={sessionComplete && playMode === "session"}
-                isCharacterMode={isCharacterMode}
-                onToggleCharacterMode={() => setIsCharacterMode(prev => !prev)}
-            />
+            {!isLoadingGroups && (
+                <GameCard
+                    key={sessionId}
+                    mode={mode}
+                    filter={filter}
+                    onScoreUpdate={handleScoreUpdateWithUi}
+                    onRequestCloseSettings={() => setCustomSettingsOpen(false)}
+                    disableNext={sessionComplete && playMode === "session"}
+                    isCharacterMode={isCharacterMode}
+                    onToggleCharacterMode={() => setIsCharacterMode(prev => !prev)}
+                />
+            )}
         </GamePageLayout>
     )
 }

@@ -58,7 +58,7 @@ export function GameCard({
     let word: JapaneseWord | null
 
     if (isCharacterMode) {
-      word = getRandomCharacter(mode, filter)
+      word = await getRandomCharacter(mode, filter)
     } else {
       word = await getRandomWord(mode, filter, lang)
     }
