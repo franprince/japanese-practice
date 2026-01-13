@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils"
 import { useLanguage } from "@/lib/language-context"
 import type { Language } from "@/lib/translations"
 
-const languages: { code: Language; label: string; flag: string }[] = [
-  { code: "en", label: "EN", flag: "🇺🇸" },
-  { code: "ja", label: "JA", flag: "🇯🇵" },
-  { code: "es", label: "ES", flag: "🇪🇸" },
+const languages: { code: Language; label: string }[] = [
+  { code: "en", label: "EN" },
+  { code: "ja", label: "JA" },
+  { code: "es", label: "ES" },
 ]
 
 interface LanguageSwitcherProps {
@@ -24,18 +24,17 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
         className,
       )}
     >
-      {languages.map(({ code, label, flag }) => (
+      {languages.map(({ code, label }) => (
         <button
           key={code}
           onClick={() => setLanguage(code)}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
+            "px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
             language === code
               ? "bg-primary text-primary-foreground shadow-lg"
               : "text-muted-foreground hover:text-foreground hover:bg-secondary/80",
           )}
         >
-          <span>{flag}</span>
           <span>{label}</span>
         </button>
       ))}
