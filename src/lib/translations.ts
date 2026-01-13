@@ -132,6 +132,10 @@ export type TranslationKey =
   | "month.october"
   | "month.november"
   | "month.december"
+  | "switchToWords"
+  | "switchToCharacters"
+  | "modeWords"
+  | "modeCharacters"
 
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
@@ -268,6 +272,10 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "month.october": "October",
     "month.november": "November",
     "month.december": "December",
+    switchToWords: "Switch to Words",
+    switchToCharacters: "Switch to Characters",
+    modeWords: "Words",
+    modeCharacters: "Random Characters",
   },
   es: {
     chipLabel: "Práctica de Kana",
@@ -402,6 +410,10 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "month.october": "Octubre",
     "month.november": "Noviembre",
     "month.december": "Diciembre",
+    switchToWords: "Cambiar a Palabras",
+    switchToCharacters: "Cambiar a Caracteres",
+    modeWords: "Palabras",
+    modeCharacters: "Caracteres Aleatorios",
   },
   ja: {
     chipLabel: "かな練習",
@@ -535,5 +547,9 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     "month.october": "10月",
     "month.november": "11月",
     "month.december": "12月",
+    switchToWords: "単語モードへ",
+    switchToCharacters: "文字モードへ",
+    modeWords: "単語",
+    modeCharacters: "ランダム文字",
   },
 }

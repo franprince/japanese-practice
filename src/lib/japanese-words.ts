@@ -43,15 +43,15 @@ const buildCharacterGroups = (): CharacterGroup[] =>
 
 const buildKanaRomajiMap = (): Record<string, string> => {
   const map: Record<string, string> = {}
-  ;(Object.values(kanaDictionary) as Record<string, KanaGroup>[]).forEach(groups => {
-    Object.values(groups).forEach((group: KanaGroup) => {
-      Object.entries(group.characters).forEach(([kana, romajiList]) => {
-        if (!map[kana]) {
-          map[kana] = Array.isArray(romajiList) && romajiList.length > 0 ? romajiList[0] ?? "" : ""
-        }
+    ; (Object.values(kanaDictionary) as Record<string, KanaGroup>[]).forEach(groups => {
+      Object.values(groups).forEach((group: KanaGroup) => {
+        Object.entries(group.characters).forEach(([kana, romajiList]) => {
+          if (!map[kana]) {
+            map[kana] = Array.isArray(romajiList) && romajiList.length > 0 ? romajiList[0] ?? "" : ""
+          }
+        })
       })
     })
-  })
   return map
 }
 
@@ -175,4 +175,63 @@ export function getGroupsByType(type: "hiragana" | "katakana" | "both"): Charact
     return characterGroups.filter((g) => g.type === "katakana")
   }
   return characterGroups
+}
+export function getRandomCharacter(
+  type: GameMode,
+  filter?: WordFilter,
+): JapaneseWord | null {
+  // Determine the target type for this specific character generation
+  let targetType: "hiragana" | "katakana" = "hiragana"
+  if (type === "both") {
+    targetType = Math.random() > 0.5 ? "hiragana" : "katakana"
+  } else if (type === "katakana") {
+    targetType = "katakana"
+  } else {
+    targetType = "hiragana"
+  }
+
+  // Get all available characters based on mode and filter
+  let groups = characterGroups.filter((g) => g.type === targetType)
+
+  // Filter by selected groups
+  if (filter) {
+    if (filter.selectedGroups.length === 0) return null
+    groups = groups.filter((g) => filter.selectedGroups.includes(g.id))
+  }
+
+  if (groups.length === 0) return null
+
+  // Determine random length based on filter or default to 1
+  const minLen = Math.max(1, filter?.minLength ?? 1)
+  const maxLen = Math.max(minLen, filter?.maxLength ?? 1)
+  const length = Math.floor(Math.random() * (maxLen - minLen + 1)) + minLen
+
+  let kana = ""
+  let romaji = ""
+  let usedGroups: string[] = []
+
+  // To avoid infinite loops if groups are somehow empty after filtering (checked above), 
+  // we do a simple loop.
+  for (let i = 0; i < length; i++) {
+    // Pick a random group
+    const randomGroup = groups[Math.floor(Math.random() * groups.length)]
+    if (!randomGroup) break
+
+    // Pick a random character from the group
+    const char = randomGroup.characters[Math.floor(Math.random() * randomGroup.characters.length)]
+    if (!char) break // Should not happen
+
+    kana += char
+    romaji += kanaToRomaji(char)
+    if (!usedGroups.includes(randomGroup.id)) {
+      usedGroups.push(randomGroup.id)
+    }
+  }
+
+  return {
+    kana,
+    romaji,
+    type: targetType,
+    groups: usedGroups,
+  }
 }

@@ -45,6 +45,7 @@ export default function WordsPage() {
     const [mode, setMode] = useState<GameMode>("hiragana")
     const [filter, setFilter] = useState<WordFilter>(defaultFilter)
     const [customSettingsOpen, setCustomSettingsOpen] = useState(false)
+    const [isCharacterMode, setIsCharacterMode] = useState(false)
 
     const handleScoreUpdateWithUi = useCallback(
         (newScore: number, newStreak: number, correct: boolean) => {
@@ -136,6 +137,8 @@ export default function WordsPage() {
                 onScoreUpdate={handleScoreUpdateWithUi}
                 onRequestCloseSettings={() => setCustomSettingsOpen(false)}
                 disableNext={sessionComplete && playMode === "session"}
+                isCharacterMode={isCharacterMode}
+                onToggleCharacterMode={() => setIsCharacterMode(prev => !prev)}
             />
         </GamePageLayout>
     )
