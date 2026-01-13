@@ -113,14 +113,34 @@ describe('GameCard', () => {
     })
 
     test('skips word', async () => {
+        // First word is 'あ', second word is 'い'
+        mockGetRandomWord
+            .mockResolvedValueOnce({
+                kana: 'あ',
+                romaji: 'a',
+                type: 'hiragana',
+                groups: []
+            })
+            .mockResolvedValueOnce({
+                kana: 'い',
+                romaji: 'i',
+                type: 'hiragana',
+                groups: []
+            })
+
         render(<GameCard {...defaultProps} />)
         await waitFor(() => screen.getByText('あ'))
 
         const skipButton = screen.getByRole('button', { name: 'skip' })
         fireEvent.click(skipButton)
 
+        // Wait for the SECOND word to appear. This ensures the component has finished updating state.
+        await waitFor(() => {
+            expect(screen.getByText('い')).toBeInTheDocument()
+        })
+
         expect(mockOnScoreUpdate).toHaveBeenCalledWith(expect.any(Number), 0, false)
-        expect(mockGetRandomWord).toHaveBeenCalledTimes(2) // Initial + Skip
+        expect(mockGetRandomWord).toHaveBeenCalledTimes(2)
     })
 
     test('shows no words available state', async () => {
