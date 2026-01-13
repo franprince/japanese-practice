@@ -1,36 +1,40 @@
 import { describe, test, expect } from 'bun:test'
-import { getRandomCharacter, characterGroups } from './japanese-words'
+import { getRandomCharacter } from './japanese-words'
+import { getCharacterGroups } from './data/kana-dictionary-loader'
 
 describe('getRandomCharacter', () => {
-    test('returns a character of the specified type', () => {
+    test('returns a character of the specified type', async () => {
+        const characterGroups = await getCharacterGroups()
         const targetGroup = characterGroups.find(g => g.type === 'hiragana')?.id
         if (!targetGroup) throw new Error('No hiragana group found')
 
-        const char = getRandomCharacter('hiragana', { selectedGroups: [targetGroup], minLength: 1, maxLength: 5 })
+        const char = await getRandomCharacter('hiragana', { selectedGroups: [targetGroup], minLength: 1, maxLength: 5 })
         expect(char).not.toBeNull()
         expect(char?.type).toBe('hiragana')
     })
 
-    test('returns null if no groups match', () => {
-        const char = getRandomCharacter('hiragana', { selectedGroups: [], minLength: 1, maxLength: 5 })
+    test('returns null if no groups match', async () => {
+        const char = await getRandomCharacter('hiragana', { selectedGroups: [], minLength: 1, maxLength: 5 })
         expect(char).toBeNull()
     })
 
-    test('filters by selected groups', () => {
+    test('filters by selected groups', async () => {
         // Find a specific group ID
+        const characterGroups = await getCharacterGroups()
         const targetGroup = characterGroups.find(g => g.type === 'hiragana')?.id
         if (!targetGroup) throw new Error('No hiragana group found')
 
-        const char = getRandomCharacter('hiragana', { selectedGroups: [targetGroup], minLength: 1, maxLength: 5 })
+        const char = await getRandomCharacter('hiragana', { selectedGroups: [targetGroup], minLength: 1, maxLength: 5 })
         expect(char).not.toBeNull()
         expect(char?.groups).toContain(targetGroup)
     })
 
-    test('generates string of correct length', () => {
+    test('generates string of correct length', async () => {
+        const characterGroups = await getCharacterGroups()
         const targetGroup = characterGroups.find(g => g.type === 'hiragana')?.id
         if (!targetGroup) throw new Error()
 
-        const char = getRandomCharacter('hiragana', {
+        const char = await getRandomCharacter('hiragana', {
             selectedGroups: [targetGroup],
             minLength: 3,
             maxLength: 3
