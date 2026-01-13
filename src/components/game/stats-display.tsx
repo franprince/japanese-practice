@@ -11,7 +11,7 @@ export function StatsDisplay({ score, streak, bestStreak }: StatsDisplayProps) {
   const { t } = useI18n()
 
   return (
-    <div className="flex items-center justify-center gap-8 md:gap-12 w-full max-w-lg mx-auto py-4">
+    <div className="flex items-center justify-center gap-8 md:gap-12 w-full max-w-lg mx-auto py-4" data-testid="stats-display">
       <div className="flex flex-col items-center gap-1">
         <Trophy className="w-5 h-5 text-primary" />
         <p className="text-2xl font-bold tabular-nums">{score}</p>
