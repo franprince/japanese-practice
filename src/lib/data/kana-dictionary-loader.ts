@@ -28,7 +28,7 @@ export async function loadKanaDictionary(): Promise<KanaDictionary> {
 
     loadingPromise = (async () => {
         try {
-            const kanaDictionaryData = await import("../../../data/kanaDictionary.json")
+            const kanaDictionaryData = await import("./kanaDictionary.json")
             kanaDictionaryCache = kanaDictionaryData.default as unknown as KanaDictionary
             return kanaDictionaryCache
         } catch (error) {

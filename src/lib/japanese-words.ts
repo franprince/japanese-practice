@@ -1,4 +1,4 @@
-import { blacklist } from "../../data/blacklist";
+import { blacklist } from "../../src/lib/data/blacklist";
 import { loadWordSets } from "./words-loader";
 import type { GameMode } from "@/types/game";
 import {

@@ -1,7 +1,5 @@
 // ... (imports remain)
 import type { JapaneseWord } from "./japanese-words"
-import { loadKanaDictionary } from "./data/kana-dictionary-loader"
-import type { KanaGroup } from "@/types/kana"
 
 export type LoaderDeps = {
   characterGroups: Array<{
@@ -32,117 +30,7 @@ const STORE_NAME = "wordSets"
 
 // Removed worker code
 
-export const mapEntryToWord = (
-  entry: any,
-  deps: LoaderDeps,
-): JapaneseWord | null => {
-  // ... (implementation same as before)
-  const { kanaToRomaji, hasHiragana, hasKatakana, characterGroups } = deps
 
-  const kanaText = entry?.kana?.[0]?.text as string | undefined
-  if (!kanaText) return null
-
-  const meaning = Array.isArray(entry?.sense?.[0]?.gloss)
-    ? entry.sense[0].gloss.map((g: any) => g?.text).filter(Boolean).join(", ")
-    : (entry?.sense?.[0]?.gloss?.[0]?.text as string | undefined)
-  const kanji = entry?.kanji?.[0]?.text as string | undefined
-
-  const type: "hiragana" | "katakana" | null = hasKatakana(kanaText)
-    ? "katakana"
-    : hasHiragana(kanaText)
-      ? "hiragana"
-      : null
-
-  if (!type) return null
-
-  const groups = characterGroups
-    .filter(g => g.type === type && g.characters.some(ch => kanaText.includes(ch)))
-    .map(g => g.id)
-
-  return {
-    kana: kanaText,
-    romaji: kanaToRomaji(kanaText),
-    type,
-    meaning,
-    groups,
-    kanji,
-  }
-}
-
-const buildWordsInMain = async (deps: LoaderDeps): Promise<WordSets> => {
-  // ... (implementation same as before)
-  // Load dictionary asynchronously
-  const kanaDictionary = await loadKanaDictionary()
-
-  const rawJmdict = await import("../../data/jmdict-spa-3.6.1.json")
-
-  // Cast to any to handle the JSON structure safely
-  const rawData: any = rawJmdict
-  const wordsList: any[] = Array.isArray(rawData?.default?.words)
-    ? rawData.default.words
-    : (Array.isArray(rawData?.words) ? rawData.words : [])
-
-  const jmdictWords: JapaneseWord[] = wordsList
-    .map(entry => mapEntryToWord(entry, deps))
-    .filter((w): w is JapaneseWord => w !== null)
-
-  const jmdictLookupByKana: Record<string, Pick<JapaneseWord, "meaning" | "kanji">> = jmdictWords.reduce(
-    (acc, word) => {
-      if (!acc[word.kana]) {
-        acc[word.kana] = { meaning: word.meaning, kanji: word.kanji }
-      }
-      return acc
-    },
-    {} as Record<string, Pick<JapaneseWord, "meaning" | "kanji">>,
-  )
-
-  const dictionaryCharWords: JapaneseWord[] = (
-    Object.entries(kanaDictionary) as [JapaneseWord["type"], Record<string, KanaGroup>][]
-  ).flatMap(([typeKey, groups]) => {
-    return Object.entries(groups).flatMap(([groupId, groupValue]) => {
-      const characters: Record<string, string[]> = groupValue?.characters ?? {}
-      return Object.entries(characters).map(([kana, romajiList]) => {
-        const lookup = jmdictLookupByKana[kana] || {}
-        const matchedGroups =
-          deps.characterGroups
-            .filter(g => g.type === typeKey && g.characters.some(ch => kana.includes(ch)))
-            .map(g => g.id) || []
-
-        return {
-          kana,
-          romaji: Array.isArray(romajiList) && romajiList.length > 0 ? romajiList[0] ?? "" : "",
-          type: typeKey as JapaneseWord["type"],
-          meaning: lookup.meaning,
-          kanji: lookup.kanji,
-          groups: matchedGroups.length ? matchedGroups : [groupId],
-        } satisfies JapaneseWord
-      })
-    })
-  })
-
-  const jmdictWordsWithGroups: JapaneseWord[] = jmdictWords.map(word => {
-    const groups =
-      deps.characterGroups
-        .filter(g => g.type === word.type && g.characters.some(ch => word.kana.includes(ch)))
-        .map(g => g.id) || []
-    return { ...word, groups }
-  })
-
-  const seen = new Map<string, boolean>()
-  const mergedWords: JapaneseWord[] = []
-  for (const word of [...dictionaryCharWords, ...jmdictWordsWithGroups]) {
-    const key = `${word.kana}|${word.type}`
-    if (!seen.has(key)) {
-      seen.set(key, true)
-      mergedWords.push(word)
-    }
-  }
-
-  return {
-    katakanaWords: mergedWords.filter(w => w.type === "katakana"),
-    hiraganaWords: mergedWords.filter(w => w.type === "hiragana"),
-  }
-}
 
 const openDb = (): Promise<IDBDatabase> =>
   new Promise((resolve, reject) => {
@@ -225,10 +113,7 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
         writeCache(datasetLang, prebuilt).catch(() => undefined)
         return prebuilt
       }
-      // Worker path removed
-      const fresh = await buildWordsInMain(_deps)
-      writeCache(datasetLang, fresh).catch(() => undefined)
-      return fresh
+      throw new Error(`Failed to load wordset for ${datasetLang}`)
     })()
   }
   return cachedPromises[datasetLang]
