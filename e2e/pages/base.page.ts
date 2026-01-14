@@ -13,4 +13,15 @@ export class BasePage {
     async waitForPageLoad() {
         await this.page.waitForLoadState('networkidle')
     }
+
+    async screenshot(name: string) {
+        // Capture screenshot as buffer only
+        const buffer = await this.page.screenshot({ fullPage: true })
+
+        // Attach buffer to test report
+        await base.info().attach(name, {
+            body: buffer,
+            contentType: 'image/png'
+        })
+    }
 }
