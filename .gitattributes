@@ -1,2 +1,4 @@
 data/jmdict-spa-3.6.1.json filter=lfs diff=lfs merge=lfs -text
+data/jmdict-spa-3.6.2.json filter=lfs diff=lfs merge=lfs -text
+data/jmdict-eng-3.6.1.json filter=lfs diff=lfs merge=lfs -text
 data/jmdict-eng-3.6.2.json filter=lfs diff=lfs merge=lfs -text

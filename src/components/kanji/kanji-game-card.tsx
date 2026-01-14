@@ -129,9 +129,8 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
         {/* Result feedback */}
         {isRevealed && (
           <div
-            className={`mt-4 p-4 rounded-xl border ${
-              isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"
-            }`}
+            className={`mt-4 p-4 rounded-xl border ${isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"
+              }`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
@@ -168,7 +167,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
       </div>
 
       {/* Options */}
-      <div className="grid grid-cols-1 gap-3">
+      <div id="kanji-options" className="grid grid-cols-1 gap-3">
         {options.map((option) => (
           <KanjiOptionCard
             key={option.char}
