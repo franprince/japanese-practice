@@ -66,7 +66,7 @@ export function NumberPad({
         <span>{t("shuffleNumbers") ?? "Shuffle keys"}</span>
       </label>
 
-      <div className="grid grid-cols-5 gap-2">
+      <div id="number-pad" className="grid grid-cols-5 gap-2">
         {renderedKeys.map(({ char, value }) => (
           <Button
             key={char}
