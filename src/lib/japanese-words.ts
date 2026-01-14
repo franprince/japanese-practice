@@ -155,6 +155,7 @@ export async function getRandomCharacter(
   filter?: WordFilter,
 ): Promise<JapaneseWord | null> {
   const loadedCharacterGroups = await getCharacterGroups()
+  await getKanaRomajiMap() // Ensure romaji map is loaded for kanaToRomaji conversion
 
   let targetType: "hiragana" | "katakana" = "hiragana"
   if (type === "both") {

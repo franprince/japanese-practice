@@ -121,7 +121,7 @@ export function GameCard({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       if (feedback) {
-        loadNewWord()
+        if (!disableNext) loadNewWord()
       } else {
         checkAnswer()
       }
@@ -131,7 +131,8 @@ export function GameCard({
   const skipWord = () => {
     setStreak(0)
     onScoreUpdate(score, 0, false)
-    loadNewWord()
+    setFeedback("incorrect")
+    if (currentWord) setDisplayRomaji(currentWord.romaji)
   }
 
   const accuracyPercent =
