@@ -8,10 +8,9 @@ export interface KanjiEntry {
   jlpt?: string | null
 }
 
-const datasetUrl = "/api/kanjiset"
 const DB_NAME = "kana-words"
 const STORE_NAME = "kanjiData"
-const CACHE_KEY = "kanjiset-v1"
+const CACHE_PREFIX = "kanji-level-"
 const CACHE_EXPIRY_DAYS = 7
 
 const shuffle = <T,>(arr: T[]) => {
@@ -30,7 +29,8 @@ interface CachedKanjiData {
   timestamp: number
 }
 
-let kanjiCache: Promise<KanjiEntry[]> | null = null
+// In-memory cache per level
+const memoryCache: Record<string, Promise<KanjiEntry[]>> = {}
 
 // IndexedDB helpers
 const openDb = (): Promise<IDBDatabase> =>
@@ -39,10 +39,9 @@ const openDb = (): Promise<IDBDatabase> =>
       reject(new Error("IndexedDB not available"))
       return
     }
-    const req = indexedDB.open(DB_NAME, 2) // Version 2 to ensure upgrade runs
-    req.onupgradeneeded = (event) => {
+    const req = indexedDB.open(DB_NAME, 2)
+    req.onupgradeneeded = () => {
       const db = req.result
-      // Only create the store if it doesn't exist
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME)
       }
@@ -51,14 +50,14 @@ const openDb = (): Promise<IDBDatabase> =>
     req.onerror = () => reject(req.error)
   })
 
-const readCache = async (): Promise<KanjiEntry[] | null> => {
+const readCache = async (level: string): Promise<KanjiEntry[] | null> => {
   if (typeof indexedDB === "undefined") return null
   try {
     const db = await openDb()
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readonly")
       const store = tx.objectStore(STORE_NAME)
-      const req = store.get(CACHE_KEY)
+      const req = store.get(CACHE_PREFIX + level)
       req.onsuccess = () => {
         const cached = req.result as CachedKanjiData | undefined
         if (!cached) {
@@ -66,7 +65,6 @@ const readCache = async (): Promise<KanjiEntry[] | null> => {
           return
         }
 
-        // Check if cache is expired
         const now = Date.now()
         const expiryMs = CACHE_EXPIRY_DAYS * 24 * 60 * 60 * 1000
         if (now - cached.timestamp > expiryMs) {
@@ -79,12 +77,12 @@ const readCache = async (): Promise<KanjiEntry[] | null> => {
       req.onerror = () => reject(req.error)
     })
   } catch (e) {
-    console.error("Kanji cache read failed", e)
+    console.error(`Kanji cache read failed for level ${level}`, e)
     return null
   }
 }
 
-const writeCache = async (data: KanjiEntry[]) => {
+const writeCache = async (level: string, data: KanjiEntry[]) => {
   if (typeof indexedDB === "undefined") return
   try {
     const db = await openDb()
@@ -95,12 +93,12 @@ const writeCache = async (data: KanjiEntry[]) => {
         data,
         timestamp: Date.now()
       }
-      const req = store.put(cachedData, CACHE_KEY)
+      const req = store.put(cachedData, CACHE_PREFIX + level)
       req.onsuccess = () => resolve()
       req.onerror = () => reject(req.error)
     })
   } catch (e) {
-    console.error("Kanji cache write failed", e)
+    console.error(`Kanji cache write failed for level ${level}`, e)
   }
 }
 
@@ -110,7 +108,7 @@ async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      const response = await fetch(url, { cache: "no-store" })
+      const response = await fetch(url)
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`)
       }
@@ -118,7 +116,6 @@ async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
     } catch (error) {
       lastError = error as Error
       if (attempt < maxRetries - 1) {
-        // Exponential backoff: 1s, 2s, 4s
         const delay = Math.pow(2, attempt) * 1000
         await new Promise(resolve => setTimeout(resolve, delay))
       }
@@ -128,35 +125,39 @@ async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
   throw lastError || new Error("Failed to fetch kanji data")
 }
 
-export async function loadKanjiSet(): Promise<KanjiEntry[]> {
-  if (kanjiCache) return kanjiCache
+async function loadLevel(level: string): Promise<KanjiEntry[]> {
+  // Check memory cache
+  if (memoryCache[level]) return memoryCache[level]
 
-  kanjiCache = (async () => {
-    // Try cache first
-    const cached = await readCache().catch(() => null)
-    if (cached) {
-      return cached
-    }
+  memoryCache[level] = (async () => {
+    // Try IndexedDB cache first
+    const cached = await readCache(level).catch(() => null)
+    if (cached) return cached
 
-    // Fetch from API with retry logic
+    // Fetch from static file
     try {
-      const res = await fetchWithRetry(datasetUrl)
+      const res = await fetchWithRetry(`/kanji-${level}.json`)
       const data = await res.json() as KanjiEntry[]
 
-      // Cache the result
-      writeCache(data).catch(err => {
-        console.error("Failed to cache kanji data:", err)
-      })
+      // Cache result
+      writeCache(level, data).catch(console.error)
 
       return data
     } catch (err) {
-      kanjiCache = null
-      throw new Error(`Failed to load kanji dataset: ${err}`)
+      delete memoryCache[level] // Clear failed promise
+      throw err
     }
   })()
 
-  return kanjiCache
+  return memoryCache[level]
 }
+
+export async function loadKanjiByLevels(levels: string[]): Promise<KanjiEntry[]> {
+  const promises = levels.map(level => loadLevel(level))
+  const results = await Promise.all(promises)
+  return results.flat()
+}
+
 
 export function getRandomKanji(list: KanjiEntry[], exclude?: KanjiEntry) {
   if (!list.length) throw new Error("Kanji list is empty")
