@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { KanjiOptionCard } from "./kanji-option-card"
-import { getRandomKanji, getRandomOptions, loadKanjiSet, type KanjiEntry, type KanjiDifficulty } from "@/lib/kanji-data"
+import { getRandomKanji, getRandomOptions, loadKanjiByLevels, type KanjiEntry, type KanjiDifficulty } from "@/lib/kanji-data"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Check, Info, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
@@ -24,23 +24,29 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
   const [streak, setStreak] = useState(0)
 
   useEffect(() => {
-    loadKanjiSet()
-      .then(list => list.filter(k => k.reading))
+    let levels: string[] = []
+    switch (difficulty) {
+      case "easy":
+        levels = ["n5"]
+        break
+      case "medium":
+        levels = ["n5", "n4", "n3"]
+        break
+      case "hard":
+        levels = ["n5", "n4", "n3", "n2", "n1"]
+        break
+    }
+
+    loadKanjiByLevels(levels)
+      .then(list => list.filter(k => k.reading)) // Ensure we only use kanji with readings
       .then(list => {
-        // Difficulty-based JLPT filtering
-        const allowedJlpt =
-          difficulty === "easy"
-            ? new Set(["jlpt-n5"])
-            : difficulty === "medium"
-              ? new Set(["jlpt-n5", "jlpt-n4", "jlpt-n3"])
-              : new Set(["jlpt-n5", "jlpt-n4", "jlpt-n3", "jlpt-n2", "jlpt-n1"])
-        return list.filter(k => {
-          if (!k.jlpt) return false
-          return allowedJlpt.has(k.jlpt.toLowerCase())
-        })
+        if (!list.length) throw new Error("No kanji found")
+        setKanjiSet(list)
       })
-      .then(setKanjiSet)
-      .catch(() => setKanjiSet([]))
+      .catch((err) => {
+        console.error("Failed to load kanji:", err)
+        setKanjiSet([])
+      })
   }, [difficulty])
 
   const loadNewKanji = useCallback(
