@@ -238,7 +238,7 @@ export function GameCard({
 
           {/* Japanese Character Display */}
           <div className="text-center mb-10">
-            <div
+            <div id="word-question"
               className={cn("font-medium mb-4 tracking-widest transition-all whitespace-nowrap", getFontSize(currentWord.kana.length))}
             >
               {currentWord.kana}

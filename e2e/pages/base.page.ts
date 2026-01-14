@@ -15,14 +15,10 @@ export class BasePage {
     }
 
     async screenshot(name: string) {
-        // Sanitize name to be safe for filenames
-        const safeName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase()
-        const screenshotPath = `test-results/screenshots/${safeName}.png`
+        // Capture screenshot as buffer only
+        const buffer = await this.page.screenshot({ fullPage: true })
 
-        // Capture screenshot to both disk and buffer
-        const buffer = await this.page.screenshot({ path: screenshotPath, fullPage: true })
-
-        // Attach buffer to test report (fixes broken image links)
+        // Attach buffer to test report
         await base.info().attach(name, {
             body: buffer,
             contentType: 'image/png'
