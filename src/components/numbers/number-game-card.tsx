@@ -43,7 +43,9 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
 
   useEffect(() => {
     generateNewNumber()
-  }, [generateNewNumber])
+    setScore(0)
+    setStreak(0)
+  }, [generateNewNumber]) // generateNewNumber depends on difficulty
 
   const handleKeyPress = (key: string) => {
     if (showResult || disableNext) return
@@ -114,6 +116,8 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
   useEffect(() => {
     if (mode === "kanjiToArabic") {
       setShuffleNumbers(false)
+    } else {
+      setShuffleNumbers(true)
     }
   }, [mode])
 
@@ -131,21 +135,29 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
     return toRomaji(correctAnswerKanji)
   }, [correctAnswerKanji])
 
+  const getFontSize = (text: string) => {
+    const len = text.length
+    if (len <= 2) return "text-6xl md:text-8xl"
+    if (len <= 4) return "text-5xl md:text-7xl"
+    if (len <= 6) return "text-4xl md:text-6xl"
+    if (len <= 9) return "text-3xl md:text-5xl"
+    return "text-2xl md:text-4xl"
+  }
+
   return (
     <div className="space-y-4">
       {/* Question display - always at top */}
       <Card
-        className={`p-6 md:p-8 border-2 transition-all duration-300 ${
-          showResult
-            ? isCorrect
-              ? "border-success bg-success/5 shadow-[0_0_30px_rgba(34,197,94,0.15)]"
-              : "border-destructive bg-destructive/5 shadow-[0_0_30px_rgba(239,68,68,0.15)]"
-            : "border-border bg-card/50 backdrop-blur-sm"
-        }`}
+        className={`p-6 md:p-8 border-2 transition-all duration-300 ${showResult
+          ? isCorrect
+            ? "border-success bg-success/5 shadow-[0_0_30px_rgba(34,197,94,0.15)]"
+            : "border-destructive bg-destructive/5 shadow-[0_0_30px_rgba(239,68,68,0.15)]"
+          : "border-border bg-card/50 backdrop-blur-sm"
+          }`}
       >
         <div className="text-center mb-4">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{promptLabel}</p>
-          <div className="text-6xl md:text-8xl font-bold text-foreground py-4 font-mono">
+          <div className={`font-bold text-foreground py-4 font-mono whitespace-nowrap transition-all ${getFontSize(questionText)}`}>
             {questionText}
           </div>
         </div>
@@ -162,9 +174,8 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
         {/* Result display */}
         {showResult && (
           <div
-            className={`p-4 rounded-xl border ${
-              isCorrect ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"
-            }`}
+            className={`p-4 rounded-xl border ${isCorrect ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"
+              }`}
           >
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
@@ -208,7 +219,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
               disabled={showResult || disableNext}
               shuffleNumbers={shuffleNumbers}
               onShuffleChange={setShuffleNumbers}
-              keys={mode === "arabicToKanji" ? undefined : Array.from(numberPadKeysArabic)}
+              keys={mode === "arabicToKanji" ? undefined : numberPadKeysArabic}
               disableShuffle={mode === "kanjiToArabic"}
             />
             <div className="flex justify-center">

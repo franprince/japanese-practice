@@ -108,7 +108,6 @@ export default function NumbersPage() {
 
             <div className="mt-6 mb-6">
                 <NumberGameCard
-                    key={`${difficulty}-${numbersMode}-${sessionId}`}
                     difficulty={difficulty}
                     mode={numbersMode}
                     onScoreUpdate={handleScoreUpdate}
