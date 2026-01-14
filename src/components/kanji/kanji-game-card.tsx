@@ -152,21 +152,19 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
               )}
             </div>
             <div className="text-sm text-muted-foreground flex flex-col gap-1">
-              {showMeaning && (
-                <span className="inline-flex items-center gap-2">
-                  {meaning ?? t("meaning")}
-                  {usedEnglishMeaning && (
-                    <span
-                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/80 border border-border/50 rounded-full px-2 py-[2px]"
-                      title="Meaning shown in English (missing Spanish translation)"
-                    >
-                      <Info className="w-3 h-3" />
-                      <span>EN</span>
-                    </span>
-                  )}
-                </span>
-              )}
-              {showReading && <span className="uppercase tracking-wide">{currentKanji.reading ?? t("reading")}</span>}
+              <span className="inline-flex items-center gap-2">
+                {meaning ?? t("meaning")}
+                {usedEnglishMeaning && (
+                  <span
+                    className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/80 border border-border/50 rounded-full px-2 py-[2px]"
+                    title="Meaning shown in English (missing Spanish translation)"
+                  >
+                    <Info className="w-3 h-3" />
+                    <span>EN</span>
+                  </span>
+                )}
+              </span>
+              <span className="uppercase tracking-wide">{currentKanji.reading ?? t("reading")}</span>
             </div>
           </div>
         )}

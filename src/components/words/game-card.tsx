@@ -187,7 +187,8 @@ export function GameCard({
     if (length <= 4) return "text-6xl md:text-7xl"
     if (length <= 6) return "text-5xl md:text-6xl"
     if (length <= 8) return "text-4xl md:text-5xl"
-    return "text-3xl md:text-4xl"
+    if (length <= 12) return "text-3xl md:text-4xl"
+    return "text-2xl md:text-3xl"
   }
 
   return (
