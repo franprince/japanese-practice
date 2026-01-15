@@ -109,8 +109,8 @@ export function WordsSettingsPopover({
     <div className="relative inline-block">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40"
-        onPointerDown={(e) => e.preventDefault()}
+        className="fixed inset-0 z-40 bg-black/20"
+        onClick={() => onOpenChange(false)}
       />
 
       {/* Popover */}
