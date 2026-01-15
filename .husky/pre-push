@@ -1,2 +1,9 @@
-bun test src
-bun run wordset:build
+#!/bin/sh
+
+# Skip wordset build in CI (semantic-release environment)
+if [ -z "$CI" ]; then
+  bun test src
+  bun run wordset:build
+else
+  bun test src
+fi
