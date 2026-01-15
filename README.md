@@ -1,42 +1,174 @@
-# Kana Words
+# Japanese Practice (日本語練習)
 
-Practice hiragana and katakana via romaji input with streaks, filters, and multilingual UI.
+A comprehensive web application for practicing Japanese language skills including hiragana, katakana, kanji, numbers, and dates with an intuitive, multilingual interface.
 
-## Features
-- Modes: Hiragana, Katakana, Both
-- Filtering: character groups, word length
-- Dynamic dictionary loading with IndexedDB cache (worker-based)
-- i18n: English, Spanish, Japanese
-- Sokuon rule support (small っ / ッ doubles the consonant)
-- Persistent preferences (language, mode, filters)
-- Shadcn-styled UI with keyboard-friendly flow
+## 🎮 Game Modes
 
-## Tech Stack
-- Next.js (App Router) + React
-- Bun runtime + bunx
-- TypeScript, Tailwind CSS, shadcn/ui
-- IndexedDB + Web Workers for word loading
+### Words Game
+Practice reading and writing Japanese words in hiragana and katakana:
+- **Dictionary Mode**: Learn real Japanese vocabulary with translations
+- **Character Mode**: Practice random character combinations
+- **Custom Settings**: Filter by character groups, word length (3-6 default), and kana type
+- **Particle Support**: Handles は as "wa" particle
+- **Sokuon Rules**: Correctly processes small っ/ッ (doubles consonants)
 
-## Getting Started
-Install dependencies:
+### Kanji Game
+Master Japanese kanji characters:
+- **JLPT Levels**: Practice N5 through N1 kanji
+- **Difficulty Modes**: Adaptive difficulty based on your level
+- **Readings & Meanings**: Learn both readings and English/Spanish meanings
+- **IndexedDB Caching**: Fast loading with intelligent caching
+
+### Numbers Game
+Learn Japanese number pronunciation:
+- **Interactive Keypad**: Shuffle option for varied practice
+- **Multiple Ranges**: Practice different number sets
+- **Audio Support**: Hear correct pronunciations
+
+### Dates Game
+Practice Japanese date expressions:
+- **Days, Months, Years**: Comprehensive date practice
+- **Hybrid Week Days Mode**: Mixed practice scenarios
+- **Real-world Context**: Learn practical date usage
+
+## ✨ Features
+
+- **🌍 Multilingual**: Full i18n support (English, Spanish, Japanese)
+- **🎯 Session & Infinite Modes**: Practice with goals or endlessly
+- **📊 Progress Tracking**: Track your streaks and performance
+- **🎨 Modern UI**: Beautiful interface with shadcn/ui components
+- **🌓 Theme Support**: Light and dark mode
+- **📱 Responsive**: Optimized for mobile and desktop
+- **⚡ Performance**: IndexedDB caching, Web Workers, ETag optimization
+- **🔄 Smart Caching**: Efficient data loading and versioning
+- **📈 Analytics**: Integrated Vercel Analytics and Speed Insights
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router) + React 19
+- **Runtime**: Bun
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS 4 + shadcn/ui
+- **Data**: IndexedDB + Web Workers
+- **Testing**: Bun Test + Playwright + React Testing Library
+- **CI/CD**: GitHub Actions + Semantic Release
+- **Deployment**: Vercel
+
+## 🚀 Getting Started
+
+### Prerequisites
+- [Bun](https://bun.sh/) installed on your system
+
+### Installation
+
 ```bash
+# Install dependencies
 bun install
 ```
 
-Run dev server:
+### Development
+
 ```bash
+# Run dev server
 bun dev
 ```
 
-Build for production:
-```bash
-bun run build
-```
+Visit [http://localhost:3000](http://localhost:3000)
 
-Start production build:
+### Production
+
 ```bash
+# Build for production
+bun run build
+
+# Start production server
 bun start
 ```
+
+## 🧪 Testing
+
+This project uses a comprehensive testing strategy with both unit and E2E tests.
+
+### Unit Tests
+
+```bash
+# Run all unit tests
+bun test
+
+# Run unit tests in watch mode
+bun test --watch
+
+# Run specific test file
+bun test src/lib/game-registry.test.ts
+```
+
+**Framework**: Bun Test + React Testing Library + happy-dom
+
+**Guidelines**:
+- Focus on user interactions, not implementation details
+- Use React Testing Library queries (`getByRole`, `getByText`, etc.)
+- Test behavior, not internals
+- No conditionals in tests
+
+See [TESTING.md](TESTING.md) for detailed testing guidelines.
+
+### E2E Tests
+
+```bash
+# Run all E2E tests
+bun run test:e2e
+
+# Run E2E tests with UI
+bun run test:e2e:ui
+
+# Run E2E tests in headed mode
+bun run test:e2e:headed
+
+# Debug E2E tests
+bun run test:e2e:debug
+```
+
+**Framework**: Playwright
+
+**Coverage**:
+- ✅ Words Game (comprehensive UI and interaction tests)
+- ✅ Numbers Game
+- ✅ Dates Game
+- 📸 Visual documentation with screenshots
+
+E2E tests verify critical user flows including game interactions, settings changes, mode switching, and feedback mechanisms.
+
+### Pre-commit Hooks
+
+The project uses Husky for Git hooks:
+- **Pre-push**: Runs unit tests and builds wordset to ensure code quality
+
+## 🔄 CI/CD
+
+### Automated Releases
+
+This project uses [semantic-release](https://github.com/semantic-release/semantic-release) for automated versioning and changelog generation.
+
+**Commit Convention**: [Conventional Commits](https://www.conventionalcommits.org/)
+
+```bash
+# Examples
+feat: add new game mode
+fix: correct romaji conversion
+docs: update README
+```
+
+**Release Process**:
+1. Push commits following conventional format
+2. GitHub Actions runs tests and builds
+3. Semantic-release analyzes commits
+4. Automatically generates version, CHANGELOG, and GitHub release
+
+### GitHub Actions
+
+- **CI**: Runs on every push and PR
+- **Release**: Automated releases on main branch
+- **Tests**: Unit and E2E tests in CI pipeline
 
 ## Data & Licensing
 - Uses `data/jmdict-spa-3.6.1.json` from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified) (tracked via Git LFS).
@@ -94,8 +226,92 @@ bun start
   - Scripts (`scripts/build-kanjiset.ts`) fetch missing data from external APIs (Jisho) and scrape supplemental info.
   - Translation merging scripts (`scripts/merge-n1-translations.ts`) allow collaborative translation updates.
 
-## Deployment
-The app is deployed on Vercel. To deploy:
+## 🚀 Deployment
+
+The application is deployed on [Vercel](https://vercel.com).
+
+### Deploy to Vercel
+
 ```bash
+# Deploy to production
 vercel --prod
 ```
+
+**Features**:
+- ✅ Automatic deployments from main branch
+- ✅ Preview deployments for PRs
+- ✅ Edge network for global performance
+- ✅ Analytics and Speed Insights integrated
+
+### Environment Variables
+
+Create a `.env.local` file for local development (see `.env.local` in the project for required variables).
+
+## 📚 Scripts
+
+```bash
+# Development
+bun dev                    # Start dev server
+
+# Building
+bun run build             # Build for production
+bun start                 # Start production server
+
+# Testing
+bun test                  # Run unit tests
+bun run test:unit         # Run unit tests (explicit)
+bun run test:e2e          # Run E2E tests
+bun run test:e2e:ui       # Run E2E tests with UI
+bun run test:e2e:debug    # Debug E2E tests
+
+# Data Generation
+bun run wordset:build     # Build word datasets
+bun run kanji:build       # Build kanji dataset
+
+# Code Quality
+bun run lint              # Run ESLint
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. **Commits**: Use [Conventional Commits](https://www.conventionalcommits.org/)
+   - `feat:` for new features
+   - `fix:` for bug fixes
+   - `docs:` for documentation
+   - `test:` for tests
+   - `refactor:` for refactoring
+
+2. **Testing**: 
+   - Write tests for new features
+   - Ensure all tests pass before pushing
+   - Follow React Testing Library best practices
+
+3. **Code Quality**:
+   - Use TypeScript strict mode
+   - Avoid `any` types
+   - Follow the Boy Scout Rule: leave code cleaner than you found it
+
+4. **Git Hooks**: Pre-push hooks will run tests automatically
+
+## 📄 License
+
+This project uses data from:
+- [JMdict/EDICT](https://www.edrdg.org/jmdict/j_jmdict.html) - Japanese-Multilingual Dictionary
+- [KANJIDIC](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) - Kanji Dictionary
+
+Both are provided by the [Electronic Dictionary Research and Development Group](https://www.edrdg.org/) under their [license](https://www.edrdg.org/edrdg/licence.html).
+
+## 🙏 Acknowledgments
+
+- Dictionary data from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- Icons from [Lucide](https://lucide.dev/)
+
+---
+
+**Current Version**: 1.1.0
+
+For detailed changes, see [CHANGELOG.md](CHANGELOG.md)
+
