@@ -219,7 +219,13 @@ export async function getRandomCharacter(
     if (!char) continue
 
     kana += char
-    romaji += kanaToRomaji(char)
+    const charRomaji = kanaToRomaji(char)
+
+    if (char === "い" && charRomaji !== "i") {
+      console.warn(`[Suspicious Romaji] Char: ${char}, Mapped: '${charRomaji}', Map(i): '${getKanaRomajiMapInternal()["い"]}'`)
+    }
+
+    romaji += charRomaji
     if (!usedGroups.includes(randomGroup.id)) {
       usedGroups.push(randomGroup.id)
     }
