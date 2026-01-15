@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/franprince/japanese-practice/compare/v1.0.0...v1.1.0) (2026-01-15)
+
+
+### Features
+
+* close custom menu on click outside ([f0b02f2](https://github.com/franprince/japanese-practice/commit/f0b02f21a86add044bf67a16bd101b7267117a35))
+
 # 1.0.0 (2026-01-15)
 
 
