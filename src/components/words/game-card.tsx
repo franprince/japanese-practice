@@ -54,6 +54,7 @@ export function GameCard({
   const { t, lang } = useI18n()
 
   const loadNewWord = useCallback(async () => {
+    if (disableNext) return
     setIsLoading(true)
     let word: JapaneseWord | null
 
@@ -78,7 +79,7 @@ export function GameCard({
     setTimeout(() => {
       if (!suppressFocus) inputRef.current?.focus()
     }, 100)
-  }, [mode, filter, suppressFocus, lang, isCharacterMode])
+  }, [mode, filter, suppressFocus, lang, isCharacterMode, disableNext])
 
   useEffect(() => {
     loadNewWord()
