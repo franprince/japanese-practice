@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/franprince/japanese-practice/compare/v1.1.0...v1.2.0) (2026-01-16)
+
+
+### Features
+
+* add error detection ([ca2d184](https://github.com/franprince/japanese-practice/commit/ca2d184b4fc9bd365de021ee9afb4b7b796a33f7))
+
 # [1.1.0](https://github.com/franprince/japanese-practice/compare/v1.0.0...v1.1.0) (2026-01-15)
 
 
