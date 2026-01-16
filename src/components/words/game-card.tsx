@@ -29,6 +29,8 @@ interface GameCardProps {
   disableNext?: boolean
   isCharacterMode?: boolean
   onToggleCharacterMode?: () => void
+  /** Callback when incorrect characters change (for session summary) */
+  onIncorrectCharsChange?: (chars: Map<string, { count: number; romaji: string }>) => void
 }
 
 export function GameCard({
@@ -40,6 +42,7 @@ export function GameCard({
   disableNext = false,
   isCharacterMode = false,
   onToggleCharacterMode,
+  onIncorrectCharsChange,
 }: GameCardProps) {
   const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
   const [userInput, setUserInput] = useState("")
@@ -52,6 +55,8 @@ export function GameCard({
   const [isLoading, setIsLoading] = useState(true)
   const [displayRomaji, setDisplayRomaji] = useState("")
   const [errorDetails, setErrorDetails] = useState<ErrorDetectionResult | null>(null)
+  // Track incorrect characters throughout the session (kana -> {count, romaji})
+  const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
   const inputRef = useRef<HTMLInputElement>(null)
   const { t, lang } = useI18n()
 
@@ -95,6 +100,11 @@ export function GameCard({
     }
   }, [suppressFocus])
 
+  // Notify parent when incorrect chars change
+  useEffect(() => {
+    onIncorrectCharsChange?.(incorrectChars)
+  }, [incorrectChars, onIncorrectCharsChange])
+
   const checkAnswer = () => {
     if (!currentWord || !userInput.trim()) return
 
@@ -118,9 +128,24 @@ export function GameCard({
       onScoreUpdate(newScore, newStreak, true)
       setErrorDetails(null)
     } else {
-      // Get detailed error information
+      // Get detailed error information and accumulate incorrect chars
       detectErrors(currentWord.kana, userInput).then((result) => {
         setErrorDetails(result)
+        // Accumulate incorrect characters with romaji
+        setIncorrectChars((prev) => {
+          const newMap = new Map(prev)
+          for (const char of result.characters) {
+            if (!char.isCorrect) {
+              const existing = newMap.get(char.kana)
+              const romaji = char.expectedRomaji[0] || ""
+              newMap.set(char.kana, {
+                count: (existing?.count || 0) + 1,
+                romaji: existing?.romaji || romaji,
+              })
+            }
+          }
+          return newMap
+        })
       })
       setStreak(0)
       onScoreUpdate(score, 0, false)
@@ -395,6 +420,27 @@ export function GameCard({
         <p className="text-center text-xs text-muted-foreground mt-6 tabular-nums">
           {t("accuracy")}: {accuracyPercent}%
         </p>
+      )}
+
+      {/* Session incorrect characters summary */}
+      {incorrectChars.size > 0 && (
+        <div className="mt-4 text-center">
+          <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">
+            {t("incorrectChars") || "Characters to practice"}
+          </p>
+          <div className="flex flex-wrap justify-center gap-1">
+            {Array.from(incorrectChars.entries())
+              .sort(([, a], [, b]) => b.count - a.count) // Sort by occurrence count descending
+              .map(([kana, { count, romaji }]) => (
+                <div
+                  key={kana}
+                  className="flex items-center gap-1 px-2 py-1 rounded-md text-sm font-mono bg-destructive/10 text-destructive border border-destructive/20"
+                >
+                  <span className="text-lg">{kana}</span>
+                </div>
+              ))}
+          </div>
+        </div>
       )}
     </div>
   )
