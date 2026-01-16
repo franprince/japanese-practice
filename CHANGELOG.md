@@ -1,3 +1,13 @@
+# [1.3.0](https://github.com/franprince/japanese-practice/compare/v1.2.0...v1.3.0) (2026-01-16)
+
+
+### Features
+
+* add i18n for incorrect characters table ([e49410a](https://github.com/franprince/japanese-practice/commit/e49410a515ff34d1999791d0f9644d1467537af1))
+* display top 3 incorrect chars in session summary ([1c2f381](https://github.com/franprince/japanese-practice/commit/1c2f381cf1d5bf5397e59a856927e30c60a7e05a))
+* track incorrect characters with romaji in session ([33273f3](https://github.com/franprince/japanese-practice/commit/33273f34fc8fd2fb4615bea4413cae4c7eb04442))
+* wire incorrect chars to session summary ([44324f3](https://github.com/franprince/japanese-practice/commit/44324f3db7de101b00c03402956b21ccab17ab5d))
+
 # [1.2.0](https://github.com/franprince/japanese-practice/compare/v1.1.0...v1.2.0) (2026-01-16)
 
 
