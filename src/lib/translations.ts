@@ -136,6 +136,9 @@ export type TranslationKey =
   | "switchToCharacters"
   | "modeWords"
   | "modeCharacters"
+  | "incorrectChars"
+  | "tableCharacter"
+  | "tableErrors"
 
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
@@ -276,6 +279,9 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     switchToCharacters: "Switch to Characters",
     modeWords: "Words",
     modeCharacters: "Random Characters",
+    incorrectChars: "Most frequent errors",
+    tableCharacter: "Character",
+    tableErrors: "Errors",
   },
   es: {
     chipLabel: "Práctica de Kana",
@@ -414,6 +420,9 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     switchToCharacters: "Cambiar a Caracteres",
     modeWords: "Palabras",
     modeCharacters: "Caracteres Aleatorios",
+    incorrectChars: "Errores más frecuentes",
+    tableCharacter: "Caracter",
+    tableErrors: "Errores",
   },
   ja: {
     chipLabel: "かな練習",
@@ -551,5 +560,8 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     switchToCharacters: "文字モードへ",
     modeWords: "単語",
     modeCharacters: "ランダム文字",
+    incorrectChars: "よく間違える文字",
+    tableCharacter: "文字",
+    tableErrors: "エラー",
   },
 }
