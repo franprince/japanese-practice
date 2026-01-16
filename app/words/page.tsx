@@ -36,6 +36,7 @@ export default function WordsPage() {
 
     const [characterGroups, setCharacterGroups] = useState<CharacterGroup[]>([])
     const [isLoadingGroups, setIsLoadingGroups] = useState(true)
+    const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
 
     // Preload character groups on mount
     useEffect(() => {
@@ -97,6 +98,11 @@ export default function WordsPage() {
         setFilter(next)
     }
 
+    const handleResetSession = useCallback(() => {
+        resetSession()
+        setIncorrectChars(new Map()) // Clear incorrect chars on session reset
+    }, [resetSession])
+
     return (
         <GamePageLayout
             title={t("wordsLabel")}
@@ -105,11 +111,11 @@ export default function WordsPage() {
                 <>
                     <GameSettingsPopover
                         playMode={playMode}
-                        onSelectMode={resetSession}
+                        onSelectMode={handleResetSession}
                         targetCount={targetCount}
                         onSelectCount={(count) => {
                             setTargetCount(count)
-                            resetSession()
+                            handleResetSession()
                         }}
                         remainingQuestions={0}
                     />
@@ -137,8 +143,12 @@ export default function WordsPage() {
                 <div className="mb-6">
                     <SessionSummaryCard
                         {...sessionSummaryProps}
-                        onRestart={() => resetSession()}
+                        onRestart={() => handleResetSession()}
                         onSwitchToInfinite={() => resetSession("infinite")}
+                        incorrectChars={incorrectChars}
+                        incorrectCharsLabel={t("incorrectChars")}
+                        tableCharacterLabel={t("tableCharacter")}
+                        tableErrorsLabel={t("tableErrors")}
                     />
                 </div>
             )}
@@ -153,6 +163,7 @@ export default function WordsPage() {
                     disableNext={sessionComplete && playMode === "session"}
                     isCharacterMode={isCharacterMode}
                     onToggleCharacterMode={() => setIsCharacterMode(prev => !prev)}
+                    onIncorrectCharsChange={setIncorrectChars}
                 />
             )}
         </GamePageLayout>
