@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { getRandomWord, getRandomCharacter, type JapaneseWord, type WordFilter } from "@/lib/japanese-words"
 import { validateAnswer } from "@/lib/japanese-input"
+import { detectErrors, type ErrorDetectionResult } from "@/lib/error-detection"
 import { useI18n } from "@/lib/i18n"
 import { Check, X, Flame, SkipForward, Zap, Type, Shuffle } from "lucide-react"
 
@@ -50,6 +51,7 @@ export function GameCard({
   const [noWordsAvailable, setNoWordsAvailable] = useState(false) // Handle empty results
   const [isLoading, setIsLoading] = useState(true)
   const [displayRomaji, setDisplayRomaji] = useState("")
+  const [errorDetails, setErrorDetails] = useState<ErrorDetectionResult | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const { t, lang } = useI18n()
 
@@ -76,6 +78,7 @@ export function GameCard({
     setIsLoading(false)
     setUserInput("")
     setFeedback(null)
+    setErrorDetails(null)
     setTimeout(() => {
       if (!suppressFocus) inputRef.current?.focus()
     }, 100)
@@ -113,7 +116,12 @@ export function GameCard({
       setStreak(newStreak)
       setCorrectAttempts((prev) => prev + 1)
       onScoreUpdate(newScore, newStreak, true)
+      setErrorDetails(null)
     } else {
+      // Get detailed error information
+      detectErrors(currentWord.kana, userInput).then((result) => {
+        setErrorDetails(result)
+      })
       setStreak(0)
       onScoreUpdate(score, 0, false)
     }
@@ -288,6 +296,42 @@ export function GameCard({
                   <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("correctAnswer")}</p>
                   <p className="text-xl font-mono font-semibold text-primary">{displayRomaji || currentWord.romaji}</p>
                 </div>
+                {/* Character-level error feedback */}
+                {feedback === "incorrect" && errorDetails && errorDetails.characters.length > 0 && (
+                  <div className="pt-3 border-t border-border/30">
+                    <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">{t("yourAnswer") || "Your Answer"}</p>
+                    <div className="flex flex-wrap justify-center gap-1">
+                      {errorDetails.characters.map((char, idx) => (
+                        <div
+                          key={idx}
+                          className={cn(
+                            "flex flex-col items-center px-2 py-1 rounded-md text-sm font-mono",
+                            char.isCorrect
+                              ? "bg-success/20 text-success border border-success/30"
+                              : "bg-destructive/20 text-destructive border border-destructive/30"
+                          )}
+                        >
+                          <span className="text-lg">{char.kana}</span>
+                          <span className="text-xs opacity-80">
+                            {char.userInput || "—"}
+                            {!char.isCorrect && char.expectedRomaji[0] && (
+                              <span className="text-muted-foreground"> → {char.expectedRomaji[0]}</span>
+                            )}
+                          </span>
+                        </div>
+                      ))}
+                      {/* Show extra unmatched input as error */}
+                      {errorDetails.extraInput && (
+                        <div
+                          className="flex flex-col items-center px-2 py-1 rounded-md text-sm font-mono bg-destructive/20 text-destructive border border-destructive/30"
+                        >
+                          <span className="text-lg">?</span>
+                          <span className="text-xs opacity-80">{errorDetails.extraInput}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
                 {currentWord.meaning && (
                   <div className="pt-2 border-t border-border/30">
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("meaning")}</p>
