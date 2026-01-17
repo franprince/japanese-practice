@@ -130,7 +130,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
       >
         <div className="text-center mb-4">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{promptLabel}</p>
-          <div className={`font-bold text-foreground py-4 font-mono whitespace-nowrap transition-all ${getResponsiveFontSize(questionText)}`}>
+          <div lang={mode === "kanjiToArabic" ? "ja" : undefined} className={`font-bold text-foreground py-4 font-mono whitespace-nowrap transition-all ${getResponsiveFontSize(questionText)}`}>
             {questionText}
           </div>
         </div>
@@ -154,7 +154,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t("correctAnswer")}:</span>
                 <div className="text-right">
-                  <p className="text-xl font-bold text-foreground leading-tight">{correctAnswerDisplay}</p>
+                  <p lang={mode === "arabicToKanji" ? "ja" : undefined} className="text-xl font-bold text-foreground leading-tight">{correctAnswerDisplay}</p>
                   <p className="text-xs text-muted-foreground/80 leading-tight">{correctAnswerRomaji}</p>
                 </div>
               </div>
