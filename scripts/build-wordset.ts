@@ -125,7 +125,7 @@ const mapEntryToWord = (entry: any): JapaneseWord | null => {
   if (!type) return null
 
   const groups = characterGroups
-    .filter(g => g.type === type && g.characters.some(ch => kanaText.includes(ch)))
+    .filter(g => g.characters.some(ch => kanaText.includes(ch)))
     .map(g => g.id)
 
   return {
@@ -182,7 +182,7 @@ const buildWordSet = async () => {
 
   const jmdictWordsWithGroups: JapaneseWord[] = jmdictWords.map(word => {
     const groups = characterGroups
-      .filter(g => g.type === word.type && g.characters.some(ch => word.kana.includes(ch)))
+      .filter(g => g.characters.some(ch => word.kana.includes(ch)))
       .map(g => g.id)
     return { ...word, groups }
   })
@@ -203,55 +203,50 @@ const buildWordSet = async () => {
   const hiraSet = new Set(hiraganaWords.map(w => w.kana))
   const bothForms = katakanaWords.filter(w => hiraSet.has(kataToHira(w.kana)))
 
+  // Determine version and filename logic
+  const publicDir = path.join(process.cwd(), "public")
+  await fs.promises.mkdir(publicDir, { recursive: true })
+
+  const baseFilename = `wordset-${WORDSET_LANG}.json`
+  const basePath = path.join(publicDir, baseFilename)
+
+  let nextVersion = 1
+  let existingData: any = null
+
+  try {
+    const existingContent = await fs.promises.readFile(basePath, "utf8")
+    existingData = JSON.parse(existingContent)
+    const existingVersion = typeof existingData.version === "number" ? existingData.version : 0
+    nextVersion = Math.max(existingVersion + 1, 1)
+  } catch {
+    // No existing base file; start at v1
+    nextVersion = 1
+  }
+
+  // Build payload with version
   const payload = {
+    version: nextVersion,
     hiraganaWords,
     katakanaWords,
     bothForms,
   }
 
-  // Determine version and filename logic
-  const publicDir = path.join(process.cwd(), "public")
-  await fs.promises.mkdir(publicDir, { recursive: true })
-
-  // Find latest existing version for this language
-  const existingFiles = await fs.promises.readdir(publicDir)
-  const versionRegex = new RegExp(`^wordset-${WORDSET_LANG}-v(\\d+)\\.json$`)
-
-  let latestVersion = 0
-  let latestFile = ""
-
-  for (const file of existingFiles) {
-    const match = file.match(versionRegex)
-    if (match) {
-      const ver = parseInt(match[1]!, 10)
-      if (ver > latestVersion) {
-        latestVersion = ver
-        latestFile = file
-      }
-    }
-  }
-
-  // Generate new payload string
-  const payloadStr = JSON.stringify(payload)
-
-  // Check if we have an existing file and if content matches
-  if (latestFile) {
-    const existingPath = path.join(publicDir, latestFile)
-    const existingContent = await fs.promises.readFile(existingPath, "utf8")
-
-    if (payloadStr === existingContent) {
-      console.log(`No changes detected for ${WORDSET_LANG} (keeping ${latestFile})`)
+  // Compare with existing (ignore version)
+  if (existingData) {
+    const { version: _, ...existingRest } = existingData
+    const { version: __, ...newRest } = payload
+    if (JSON.stringify(existingRest) === JSON.stringify(newRest)) {
+      console.log(`No changes detected for ${WORDSET_LANG} (keeping ${baseFilename})`)
       return
     }
   }
 
-  // If different or no file exists, bump version
-  const newVersion = latestVersion + 1
-  const newFilename = `wordset-${WORDSET_LANG}-v${newVersion}.json`
-  const newPath = path.join(publicDir, newFilename)
+  const payloadStr = JSON.stringify(payload)
 
-  await fs.promises.writeFile(newPath, payloadStr)
-  console.log(`Wordset updated: ${newFilename}`)
+  // Write base filename (version embedded in JSON)
+  const newPath = basePath
+  await fs.promises.writeFile(newPath, payloadStr, "utf8")
+  console.log(`Wrote wordset: ${baseFilename} (v${nextVersion})`)
 }
 
 buildWordSet().catch(err => {
