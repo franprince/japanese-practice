@@ -1,28 +1,20 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect, useRef, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
-import { getRandomWord, getRandomCharacter, type JapaneseWord, type WordFilter } from "@/lib/japanese-words"
-import { validateAnswer } from "@/lib/japanese-input"
-import { detectErrors, type ErrorDetectionResult } from "@/lib/error-detection"
+import type { WordFilter } from "@/lib/japanese-words"
 import { useI18n } from "@/lib/i18n"
-import { Check, X, Flame, SkipForward, Zap, Type, Shuffle } from "lucide-react"
-
-// ... (existing code)
-
-
-
+import { Flame, SkipForward, Zap, Type, Shuffle } from "lucide-react"
 import type { GameMode } from "@/types/game"
+import { useWordGame } from "@/hooks/use-word-game"
+import { GameFeedbackSection, FeedbackIcon } from "./game-feedback-section"
 
 interface GameCardProps {
   mode: GameMode
-  filter: WordFilter // Added filter prop
+  filter: WordFilter
   onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   suppressFocus?: boolean
   onRequestCloseSettings?: () => void
@@ -44,134 +36,49 @@ export function GameCard({
   onToggleCharacterMode,
   onIncorrectCharsChange,
 }: GameCardProps) {
-  const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
-  const [userInput, setUserInput] = useState("")
-  const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null)
-  const [score, setScore] = useState(0)
-  const [streak, setStreak] = useState(0)
-  const [totalAttempts, setTotalAttempts] = useState(0)
-  const [correctAttempts, setCorrectAttempts] = useState(0)
-  const [noWordsAvailable, setNoWordsAvailable] = useState(false) // Handle empty results
-  const [isLoading, setIsLoading] = useState(true)
-  const [displayRomaji, setDisplayRomaji] = useState("")
-  const [errorDetails, setErrorDetails] = useState<ErrorDetectionResult | null>(null)
-  // Track incorrect characters throughout the session (kana -> {count, romaji})
-  const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
-  const inputRef = useRef<HTMLInputElement>(null)
   const { t, lang } = useI18n()
 
-  const loadNewWord = useCallback(async () => {
-    if (disableNext) return
-    setIsLoading(true)
-    let word: JapaneseWord | null
+  const {
+    currentWord,
+    userInput,
+    setUserInput,
+    feedback,
+    score,
+    streak,
+    totalAttempts,
+    noWordsAvailable,
+    isLoading,
+    displayRomaji,
+    errorDetails,
+    incorrectChars,
+    inputRef,
+    accuracyPercent,
+    checkAnswer,
+    skipWord,
+    handleKeyDown,
+    loadNewWord,
+  } = useWordGame({
+    mode,
+    filter,
+    isCharacterMode,
+    disableNext,
+    suppressFocus,
+    lang,
+    onScoreUpdate,
+    onIncorrectCharsChange,
+  })
 
-    if (isCharacterMode) {
-      word = await getRandomCharacter(mode, filter)
-    } else {
-      word = await getRandomWord(mode, filter, lang)
-    }
-
-    if (word) {
-      setCurrentWord(word)
-      setDisplayRomaji(word.romaji)
-      setNoWordsAvailable(false)
-    } else {
-      setCurrentWord(null)
-      setDisplayRomaji("")
-      setNoWordsAvailable(true)
-    }
-    setIsLoading(false)
-    setUserInput("")
-    setFeedback(null)
-    setErrorDetails(null)
-    setTimeout(() => {
-      if (!suppressFocus) inputRef.current?.focus()
-    }, 100)
-  }, [mode, filter, suppressFocus, lang, isCharacterMode, disableNext])
-
-  useEffect(() => {
-    loadNewWord()
-  }, [loadNewWord])
-
-  useEffect(() => {
-    if (!suppressFocus) {
-      // when settings close, restore focus
-      setTimeout(() => inputRef.current?.focus(), 50)
-    }
-  }, [suppressFocus])
-
-  // Notify parent when incorrect chars change
-  useEffect(() => {
-    onIncorrectCharsChange?.(incorrectChars)
-  }, [incorrectChars, onIncorrectCharsChange])
-
-  const checkAnswer = () => {
-    if (!currentWord || !userInput.trim()) return
-
-    // Use centralized validation logic that handles particles and romanization variants
-    const isCorrect = validateAnswer(userInput, currentWord)
-
-    // If correct but not exact match, you might want to show the canonical answer
-    // For now we just show the canonical answer if correct.
-    const shownAnswer = currentWord.romaji.toLowerCase().trim()
-
-    setDisplayRomaji(shownAnswer)
-    setFeedback(isCorrect ? "correct" : "incorrect")
-    setTotalAttempts((prev) => prev + 1)
-
-    if (isCorrect) {
-      const newScore = score + (1 + Math.floor(streak / 5))
-      const newStreak = streak + 1
-      setScore(newScore)
-      setStreak(newStreak)
-      setCorrectAttempts((prev) => prev + 1)
-      onScoreUpdate(newScore, newStreak, true)
-      setErrorDetails(null)
-    } else {
-      // Get detailed error information and accumulate incorrect chars
-      detectErrors(currentWord.kana, userInput).then((result) => {
-        setErrorDetails(result)
-        // Accumulate incorrect characters with romaji
-        setIncorrectChars((prev) => {
-          const newMap = new Map(prev)
-          for (const char of result.characters) {
-            if (!char.isCorrect) {
-              const existing = newMap.get(char.kana)
-              const romaji = char.expectedRomaji[0] || ""
-              newMap.set(char.kana, {
-                count: (existing?.count || 0) + 1,
-                romaji: existing?.romaji || romaji,
-              })
-            }
-          }
-          return newMap
-        })
-      })
-      setStreak(0)
-      onScoreUpdate(score, 0, false)
-    }
+  // Helper function for font sizing
+  const getFontSize = (length: number) => {
+    if (length <= 2) return "text-7xl md:text-8xl"
+    if (length <= 4) return "text-6xl md:text-7xl"
+    if (length <= 6) return "text-5xl md:text-6xl"
+    if (length <= 8) return "text-4xl md:text-5xl"
+    if (length <= 12) return "text-3xl md:text-4xl"
+    return "text-2xl md:text-3xl"
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      if (feedback) {
-        if (!disableNext) loadNewWord()
-      } else {
-        checkAnswer()
-      }
-    }
-  }
-
-  const skipWord = () => {
-    setStreak(0)
-    onScoreUpdate(score, 0, false)
-    setFeedback("incorrect")
-    if (currentWord) setDisplayRomaji(currentWord.romaji)
-  }
-
-  const accuracyPercent =
-    totalAttempts > 0 ? Math.min(100, Math.max(0, Math.round((correctAttempts / totalAttempts) * 100))) : 0
-
+  // Loading state
   if (isLoading) {
     return (
       <div className="w-full max-w-xl mx-auto">
@@ -184,6 +91,7 @@ export function GameCard({
     )
   }
 
+  // No words available state
   if (noWordsAvailable) {
     return (
       <div className="w-full max-w-xl mx-auto">
@@ -216,17 +124,9 @@ export function GameCard({
 
   if (!currentWord) return null
 
-  const getFontSize = (length: number) => {
-    if (length <= 2) return "text-7xl md:text-8xl"
-    if (length <= 4) return "text-6xl md:text-7xl"
-    if (length <= 6) return "text-5xl md:text-6xl"
-    if (length <= 8) return "text-4xl md:text-5xl"
-    if (length <= 12) return "text-3xl md:text-4xl"
-    return "text-2xl md:text-3xl"
-  }
-
   return (
     <div className="w-full max-w-xl mx-auto">
+      {/* Score and Streak Display */}
       <div className="flex items-center justify-between mb-6 px-1">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
@@ -243,15 +143,17 @@ export function GameCard({
         </Badge>
       </div>
 
+      {/* Main Game Card */}
       <Card
         className={cn(
-          "transition-all duration-300 border-2 backdrop-blur-sm relative", // Added relative
+          "transition-all duration-300 border-2 backdrop-blur-sm relative",
           feedback === "correct" && "border-success bg-success/10 shadow-[0_0_30px_-5px_var(--success)]",
           feedback === "incorrect" && "border-destructive bg-destructive/10 shadow-[0_0_30px_-5px_var(--destructive)]",
-          !feedback && "border-border/50 bg-card/80",
+          !feedback && "border-border/50 bg-card/80"
         )}
       >
         <CardContent className="pt-10 pb-8 px-6 md:px-8">
+          {/* Character Mode Toggle */}
           {onToggleCharacterMode && (
             <div className="absolute top-4 right-4 md:top-6 md:right-6">
               <Button
@@ -274,7 +176,8 @@ export function GameCard({
 
           {/* Japanese Character Display */}
           <div className="text-center mb-10">
-            <div id="word-question"
+            <div
+              id="word-question"
               className={cn("font-medium mb-4 tracking-widest transition-all whitespace-nowrap", getFontSize(currentWord.kana.length))}
             >
               {currentWord.kana}
@@ -295,7 +198,7 @@ export function GameCard({
                   "text-center text-lg h-14 font-mono bg-background/50 border-2 transition-all",
                   feedback === "correct" && "border-success",
                   feedback === "incorrect" && "border-destructive",
-                  !feedback && "border-border/50 focus:border-primary",
+                  !feedback && "border-border/50 focus:border-primary"
                 )}
                 readOnly={feedback !== null}
                 autoComplete="off"
@@ -303,83 +206,19 @@ export function GameCard({
                 autoCapitalize="off"
                 spellCheck={false}
               />
-              {feedback && (
-                <div
-                  className={cn(
-                    "absolute right-4 top-1/2 -translate-y-1/2",
-                    feedback === "correct" ? "text-success" : "text-destructive",
-                  )}
-                >
-                  {feedback === "correct" ? <Check className="w-5 h-5" /> : <X className="w-5 h-5" />}
-                </div>
-              )}
+              <FeedbackIcon feedback={feedback} />
             </div>
 
-            {feedback && (
-              <div className="text-center p-4 bg-secondary/50 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200 border border-border/50 space-y-2">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("correctAnswer")}</p>
-                  <p className="text-xl font-mono font-semibold text-primary">{displayRomaji || currentWord.romaji}</p>
-                </div>
-                {/* Character-level error feedback */}
-                {feedback === "incorrect" && errorDetails && errorDetails.characters.length > 0 && (
-                  <div className="pt-3 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">{t("yourAnswer") || "Your Answer"}</p>
-                    <div className="flex flex-wrap justify-center gap-1">
-                      {errorDetails.characters.map((char, idx) => (
-                        <div
-                          key={idx}
-                          className={cn(
-                            "flex flex-col items-center px-2 py-1 rounded-md text-sm font-mono",
-                            char.isCorrect
-                              ? "bg-success/20 text-success border border-success/30"
-                              : "bg-destructive/20 text-destructive border border-destructive/30"
-                          )}
-                        >
-                          <span className="text-lg">{char.kana}</span>
-                          <span className="text-xs opacity-80">
-                            {char.userInput || "—"}
-                            {!char.isCorrect && char.expectedRomaji[0] && (
-                              <span className="text-muted-foreground"> → {char.expectedRomaji[0]}</span>
-                            )}
-                          </span>
-                        </div>
-                      ))}
-                      {/* Show extra unmatched input as error */}
-                      {errorDetails.extraInput && (
-                        <div
-                          className="flex flex-col items-center px-2 py-1 rounded-md text-sm font-mono bg-destructive/20 text-destructive border border-destructive/30"
-                        >
-                          <span className="text-lg">?</span>
-                          <span className="text-xs opacity-80">{errorDetails.extraInput}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {currentWord.meaning && (
-                  <div className="pt-2 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("meaning")}</p>
-                    <p className="text-base text-foreground/90">{currentWord.meaning}</p>
-                  </div>
-                )}
-                {currentWord.kanji && (
-                  <div className="pt-2 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("word")}</p>
-                    <p className="text-lg font-medium text-foreground">{currentWord.kanji}</p>
-                    <a
-                      href={`https://jisho.org/search/${encodeURIComponent(currentWord.kanji)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-1 inline-block text-xs text-primary hover:underline"
-                    >
-                      {t("showMeaning")}
-                    </a>
-                  </div>
-                )}
-              </div>
-            )}
+            {/* Feedback Section */}
+            <GameFeedbackSection
+              feedback={feedback}
+              displayRomaji={displayRomaji}
+              currentWord={currentWord}
+              errorDetails={errorDetails}
+              t={t}
+            />
 
+            {/* Action Buttons */}
             <div className="flex gap-3 pt-2">
               {!feedback ? (
                 <>
@@ -415,14 +254,14 @@ export function GameCard({
         </CardContent>
       </Card>
 
-      {/* Accuracy */}
+      {/* Accuracy Display */}
       {totalAttempts > 0 && (
         <p className="text-center text-xs text-muted-foreground mt-6 tabular-nums">
           {t("accuracy")}: {accuracyPercent}%
         </p>
       )}
 
-      {/* Session incorrect characters summary */}
+      {/* Session Incorrect Characters Summary */}
       {incorrectChars.size > 0 && (
         <div className="mt-4 text-center">
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">
@@ -430,13 +269,14 @@ export function GameCard({
           </p>
           <div className="flex flex-wrap justify-center gap-1">
             {Array.from(incorrectChars.entries())
-              .sort(([, a], [, b]) => b.count - a.count) // Sort by occurrence count descending
+              .sort(([, a], [, b]) => b.count - a.count)
               .map(([kana, { count, romaji }]) => (
                 <div
                   key={kana}
                   className="flex items-center gap-1 px-2 py-1 rounded-md text-sm font-mono bg-destructive/10 text-destructive border border-destructive/20"
                 >
                   <span className="text-lg">{kana}</span>
+                  <span className="text-xs opacity-60">({romaji}) ×{count}</span>
                 </div>
               ))}
           </div>
