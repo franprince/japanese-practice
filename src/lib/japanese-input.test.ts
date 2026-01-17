@@ -41,47 +41,47 @@ describe("Japanese Input Validation", () => {
             groups: []
         })
 
-        it("accepts exact matches", () => {
+        it("accepts exact matches", async () => {
             const word = mockWord("すし", "sushi")
-            expect(validateAnswer("sushi", word)).toBe(true)
-            expect(validateAnswer(" SUSHI ", word)).toBe(true)
+            expect(await validateAnswer("sushi", word)).toBe(true)
+            expect(await validateAnswer(" SUSHI ", word)).toBe(true)
         })
 
-        it("accepts alternative romanizations", () => {
+        it("accepts alternative romanizations", async () => {
             const word = mockWord("ふじ", "fuji")
-            expect(validateAnswer("fuzi", word)).toBe(true)
-            expect(validateAnswer("huzi", word)).toBe(true)
+            expect(await validateAnswer("fuzi", word)).toBe(true)
+            expect(await validateAnswer("huzi", word)).toBe(true)
 
             const word2 = mockWord("ちず", "chizu")
-            expect(validateAnswer("tizu", word2)).toBe(true)
+            expect(await validateAnswer("tizu", word2)).toBe(true)
         })
 
-        it("accepts wa for ha particle", () => {
+        it("accepts wa for ha particle", async () => {
             const word = mockWord("こんにちは", "konnichiha")
-            expect(validateAnswer("konnichiwa", word)).toBe(true)
-            expect(validateAnswer("konnichiha", word)).toBe(true)
+            expect(await validateAnswer("konnichiwa", word)).toBe(true)
+            expect(await validateAnswer("konnichiha", word)).toBe(true)
         })
 
-        it("accepts e for he particle", () => {
+        it("accepts e for he particle", async () => {
             // "he" is rarely used alone as "he" sound in words unless it's a particle "to/towards"
             // Example: どこへ (dokohe -> dokoe)
             const word = mockWord("どこへ", "dokohe")
-            expect(validateAnswer("dokoe", word)).toBe(true)
-            expect(validateAnswer("dokohe", word)).toBe(true)
+            expect(await validateAnswer("dokoe", word)).toBe(true)
+            expect(await validateAnswer("dokohe", word)).toBe(true)
         })
 
-        it("accepts o for wo particle", () => {
+        it("accepts o for wo particle", async () => {
             // "wo" is pronounced "o" in modern Japanese
             // Example: みずを (mizuwo -> mizuo)
             const word = mockWord("みずを", "mizuwo")
-            expect(validateAnswer("mizuo", word)).toBe(true)
-            expect(validateAnswer("mizuwo", word)).toBe(true)
+            expect(await validateAnswer("mizuo", word)).toBe(true)
+            expect(await validateAnswer("mizuwo", word)).toBe(true)
         })
 
-        it("rejects incorrect answers", () => {
+        it("rejects incorrect answers", async () => {
             const word = mockWord("すし", "sushi")
-            expect(validateAnswer("sashimi", word)).toBe(false)
-            expect(validateAnswer("sus", word)).toBe(false)
+            expect(await validateAnswer("sashimi", word)).toBe(false)
+            expect(await validateAnswer("sus", word)).toBe(false)
         })
     })
 })
