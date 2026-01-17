@@ -1,3 +1,24 @@
+# [2.0.0](https://github.com/franprince/japanese-practice/compare/v1.6.0...v2.0.0) (2026-01-17)
+
+
+### Bug Fixes
+
+* add onRequestOpenSettings handler for better UX ([ce2ac54](https://github.com/franprince/japanese-practice/commit/ce2ac54d8f4bc260c1464a2e766d17679e15a06a))
+* improve character selection accuracy in random mode ([598c421](https://github.com/franprince/japanese-practice/commit/598c42165aae48234b1b1a33eca8d0cfe3dc6f2a))
+
+
+### Features
+
+* add new wordsets ([bae6389](https://github.com/franprince/japanese-practice/commit/bae6389b6b8dda17b8e77a81d0341d217163c711))
+* embed version in wordset JSON and simplify file naming ([7def370](https://github.com/franprince/japanese-practice/commit/7def370c49f145d7a325266257ba57cb0af34866))
+* implement version-based cache invalidation for wordsets ([6fa5cfe](https://github.com/franprince/japanese-practice/commit/6fa5cfef8b37c7238ab70bdd73c3b121876a5943))
+* update wordset API to use embedded version for ETags ([b43230f](https://github.com/franprince/japanese-practice/commit/b43230fa6d0f827994e8af79d14989a88e9e7394))
+
+
+### BREAKING CHANGES
+
+* Wordset file naming convention changed from wordset-{lang}-v{n}.json to wordset-{lang}.json
+
 # [1.6.0](https://github.com/franprince/japanese-practice/compare/v1.5.0...v1.6.0) (2026-01-17)
 
 
