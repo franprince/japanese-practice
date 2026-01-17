@@ -39,3 +39,6 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .next
 .env*.local
 playwright-report/
+
+# old versioned wordset files (replaced by base filename pattern)
+public/wordset-*-v*.json
