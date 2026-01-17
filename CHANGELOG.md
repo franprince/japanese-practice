@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/franprince/japanese-practice/compare/v1.5.0...v1.6.0) (2026-01-17)
+
+
+### Features
+
+* add lang='ja' tags to all game components for proper font rendering ([4206eca](https://github.com/franprince/japanese-practice/commit/4206ecac87af8411846c0f214e1124e75f068ac7))
+
 # [1.5.0](https://github.com/franprince/japanese-practice/compare/v1.4.0...v1.5.0) (2026-01-17)
 
 
