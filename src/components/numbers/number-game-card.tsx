@@ -15,6 +15,9 @@ import {
   type Difficulty,
 } from "@/lib/japanese-numbers"
 import { useI18n } from "@/lib/i18n"
+import { getResponsiveFontSize } from "@/lib/utils/font-sizing"
+import { useGameScore } from "@/hooks/use-game-score"
+import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
 
 interface NumberGameCardProps {
   difficulty: Difficulty
@@ -29,8 +32,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
   const [userAnswer, setUserAnswer] = useState("")
   const [showResult, setShowResult] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
-  const [score, setScore] = useState(0)
-  const [streak, setStreak] = useState(0)
+  const { score, streak, updateScore } = useGameScore(onScoreUpdate)
   const [shuffleNumbers, setShuffleNumbers] = useState(true)
 
   const generateNewNumber = useCallback(() => {
@@ -43,8 +45,6 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
 
   useEffect(() => {
     generateNewNumber()
-    setScore(0)
-    setStreak(0)
   }, [generateNewNumber]) // generateNewNumber depends on difficulty
 
   const handleKeyPress = (key: string) => {
@@ -70,14 +70,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
 
     setIsCorrect(correct)
     setShowResult(true)
-
-    const newStreak = correct ? streak + 1 : 0
-    const streakBonus = correct && newStreak > 0 && newStreak % 5 === 0 ? 5 : 0
-    const newScore = correct ? score + 1 + streakBonus : score
-
-    setScore(newScore)
-    setStreak(newStreak)
-    onScoreUpdate(newScore, newStreak, correct)
+    updateScore(correct, 1)
   }
 
   const handleNext = () => {
@@ -86,31 +79,18 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
   }
 
   const handleSkip = () => {
-    setStreak(0)
-    onScoreUpdate(score, 0, false)
+    updateScore(false)
     generateNewNumber()
   }
 
-  // Keyboard support
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (disableNext) return
-      if (e.key === "Enter") {
-        if (showResult) {
-          handleNext()
-        } else if (userAnswer) {
-          handleSubmit()
-        }
-      } else if (e.key === "Backspace" && !showResult) {
-        handleDelete()
-      } else if (e.key === "Escape" && !showResult) {
-        handleClear()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [disableNext, showResult, userAnswer])
+  useKeyboardNavigation(
+    {
+      onEnter: showResult ? handleNext : (userAnswer ? handleSubmit : undefined),
+      onBackspace: !showResult ? handleDelete : undefined,
+      onEscape: !showResult ? handleClear : undefined,
+    },
+    !disableNext
+  )
 
   // Always keep shuffle off in Kanji → Arabic mode
   useEffect(() => {
@@ -135,14 +115,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
     return toRomaji(correctAnswerKanji)
   }, [correctAnswerKanji])
 
-  const getFontSize = (text: string) => {
-    const len = text.length
-    if (len <= 2) return "text-6xl md:text-8xl"
-    if (len <= 4) return "text-5xl md:text-7xl"
-    if (len <= 6) return "text-4xl md:text-6xl"
-    if (len <= 9) return "text-3xl md:text-5xl"
-    return "text-2xl md:text-4xl"
-  }
+
 
   return (
     <div className="space-y-4">
@@ -157,7 +130,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
       >
         <div className="text-center mb-4">
           <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{promptLabel}</p>
-          <div className={`font-bold text-foreground py-4 font-mono whitespace-nowrap transition-all ${getFontSize(questionText)}`}>
+          <div className={`font-bold text-foreground py-4 font-mono whitespace-nowrap transition-all ${getResponsiveFontSize(questionText)}`}>
             {questionText}
           </div>
         </div>

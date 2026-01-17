@@ -141,15 +141,6 @@ export async function getRandomWord(
   const choice = words[Math.floor(Math.random() * words.length)]
   return choice ?? null
 }
-
-export function getGroupsByType(type: "hiragana" | "katakana" | "both"): CharacterGroup[] {
-  if (type === "hiragana") {
-    return characterGroups.filter((g) => g.type === "hiragana")
-  } else if (type === "katakana") {
-    return characterGroups.filter((g) => g.type === "katakana")
-  }
-  return characterGroups
-}
 export async function getRandomCharacter(
   type: GameMode,
   filter?: WordFilter,

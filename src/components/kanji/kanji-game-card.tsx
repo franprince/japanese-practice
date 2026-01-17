@@ -6,6 +6,8 @@ import { getRandomKanji, getRandomOptions, loadKanjiByLevels, type KanjiEntry, t
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Check, Info, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
+import { useGameScore } from "@/hooks/use-game-score"
+import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
 
 interface KanjiGameCardProps {
   difficulty: KanjiDifficulty
@@ -20,8 +22,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
   const [options, setOptions] = useState<KanjiEntry[]>([])
   const [selectedOption, setSelectedOption] = useState<KanjiEntry | null>(null)
   const [isRevealed, setIsRevealed] = useState(false)
-  const [score, setScore] = useState(0)
-  const [streak, setStreak] = useState(0)
+  const { score, streak, updateScore } = useGameScore(onScoreUpdate)
 
   useEffect(() => {
     let levels: string[] = []
@@ -75,20 +76,9 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
       const isCorrect = choice.char === currentKanji.char
       setSelectedOption(choice)
       setIsRevealed(true)
-
-      if (isCorrect) {
-        const streakBonus = Math.floor(streak / 5) * 5
-        const newScore = score + 10 + streakBonus
-        const newStreak = streak + 1
-        setScore(newScore)
-        setStreak(newStreak)
-        onScoreUpdate(newScore, newStreak, true)
-      } else {
-        setStreak(0)
-        onScoreUpdate(score, 0, false)
-      }
+      updateScore(isCorrect)
     },
-    [selectedOption, currentKanji, score, streak, onScoreUpdate],
+    [selectedOption, currentKanji, updateScore],
   )
 
   const handleOptionClick = (option: KanjiEntry) => {
@@ -101,16 +91,12 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
     loadNewKanji(currentKanji)
   }, [loadNewKanji, currentKanji, disableNext])
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && isRevealed && !disableNext) {
-        handleNext()
-      }
-    }
-
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [isRevealed, handleNext, disableNext])
+  useKeyboardNavigation(
+    {
+      onEnter: isRevealed && !disableNext ? handleNext : undefined,
+    },
+    true
+  )
 
   if (!currentKanji) return null
 

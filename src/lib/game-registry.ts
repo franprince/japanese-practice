@@ -54,17 +54,3 @@ export const GAMES: GameDefinition[] = [
         descriptionKey: 'games.dates.description',
     },
 ]
-
-/**
- * Get a game definition by its ID
- */
-export function getGameById(id: string): GameDefinition | undefined {
-    return GAMES.find(game => game.id === id)
-}
-
-/**
- * Get a game definition by its href path
- */
-export function getGameByPath(path: string): GameDefinition | undefined {
-    return GAMES.find(game => game.href === path)
-}
