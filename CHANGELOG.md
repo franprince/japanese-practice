@@ -1,3 +1,13 @@
+# [1.4.0](https://github.com/franprince/japanese-practice/compare/v1.3.0...v1.4.0) (2026-01-17)
+
+
+### Features
+
+* add lang='ja' to Japanese text in game components ([56bd292](https://github.com/franprince/japanese-practice/commit/56bd29227543ea14e0e06743f40a08e340a7361d))
+* add lang='ja' to Japanese text in UI components ([99b932c](https://github.com/franprince/japanese-practice/commit/99b932c666be0d0c6d6f55a829d1e6e94f6243e6))
+* add lang='ja' to Japanese text on home page ([a6a61d1](https://github.com/franprince/japanese-practice/commit/a6a61d10b27154ed89029ee698bda87ea5cfd717))
+* sync HTML lang attribute with app language ([8dfd354](https://github.com/franprince/japanese-practice/commit/8dfd3546a8e45ffa81ffc6918581736d53367f2c))
+
 # [1.3.0](https://github.com/franprince/japanese-practice/compare/v1.2.0...v1.3.0) (2026-01-16)
 
 
