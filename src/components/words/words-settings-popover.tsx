@@ -195,7 +195,7 @@ export function WordsSettingsPopover({
             {/* Hiragana Base */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium">ひらがな ({selectedHiraganaCount}/{allHiragana.length})</span>
+                <span className="text-xs font-medium"><span lang="ja">ひらがな</span> ({selectedHiraganaCount}/{allHiragana.length})</span>
                 <button
                   onClick={() => selectAllGroups("hiragana")}
                   className="text-xs text-primary hover:underline"
@@ -216,7 +216,7 @@ export function WordsSettingsPopover({
                         : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                     )}
                   >
-                    {group.characters[0]}
+                    <span lang="ja">{group.characters[0]}</span>
                   </button>
                 ))}
               </div>
@@ -245,7 +245,7 @@ export function WordsSettingsPopover({
             {/* Katakana Base */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium">カタカナ ({selectedKatakanaCount}/{allKatakana.length})</span>
+                <span className="text-xs font-medium"><span lang="ja">カタカナ</span> ({selectedKatakanaCount}/{allKatakana.length})</span>
                 <button
                   onClick={() => selectAllGroups("katakana")}
                   className="text-xs text-primary hover:underline"
@@ -266,7 +266,7 @@ export function WordsSettingsPopover({
                         : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                     )}
                   >
-                    {group.characters[0]}
+                    <span lang="ja">{group.characters[0]}</span>
                   </button>
                 ))}
               </div>

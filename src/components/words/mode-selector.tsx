@@ -41,7 +41,7 @@ export function ModeSelector({ mode, onModeChange, onCustomClick }: ModeSelector
           )}
         >
           <span className="sm:hidden">{label}</span>
-          <span className="hidden sm:inline mr-1">{japanese}</span>
+          <span lang="ja" className="hidden sm:inline mr-1">{japanese}</span>
           <span className="hidden sm:inline text-[10px] md:text-xs opacity-70">{label}</span>
         </button>
       ))}
