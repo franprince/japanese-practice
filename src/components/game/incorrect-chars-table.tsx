@@ -38,7 +38,7 @@ export function IncorrectCharsTable({
                         return (
                             <tr key={kana} className="border-t border-border/20">
                                 <td className="py-2 text-left pl-4 font-mono text-lg text-destructive">
-                                    {kana} {romaji && <span className="text-sm opacity-70">({romaji})</span>}
+                                    <span lang="ja">{kana}</span> {romaji && <span className="text-sm opacity-70">({romaji})</span>}
                                 </td>
                                 <td className="py-2 text-right pr-4 tabular-nums text-muted-foreground">×{count}</td>
                             </tr>

@@ -44,7 +44,7 @@ export function GameFeedbackSection({
                                         : "bg-destructive/20 text-destructive border border-destructive/30"
                                 )}
                             >
-                                <span className="text-lg">{char.kana}</span>
+                                <span lang="ja" className="text-lg">{char.kana}</span>
                                 <span className="text-xs opacity-80">
                                     {char.userInput || "—"}
                                     {!char.isCorrect && char.expectedRomaji[0] && (
@@ -78,7 +78,7 @@ export function GameFeedbackSection({
             {currentWord.kanji && (
                 <div className="pt-2 border-t border-border/30">
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("word")}</p>
-                    <p className="text-lg font-medium text-foreground">{currentWord.kanji}</p>
+                    <p lang="ja" className="text-lg font-medium text-foreground">{currentWord.kanji}</p>
                     <a
                         href={`https://jisho.org/search/${encodeURIComponent(currentWord.kanji)}`}
                         target="_blank"
