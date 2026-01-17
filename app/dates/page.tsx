@@ -9,9 +9,11 @@ import type { DateMode } from "@/lib/japanese-dates"
 import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
-import { useGamePage } from "@/hooks/use-game-page"
+import { useSessionProgress } from "@/hooks/use-session-progress"
+import { useI18n } from "@/lib/i18n"
 
 export default function DatesPage() {
+    const { t } = useI18n()
     const {
         score,
         streak,
@@ -25,10 +27,24 @@ export default function DatesPage() {
         handleScoreUpdate,
         resetSession,
         setTargetCount,
-        remainingLabel,
-        sessionSummaryProps,
-        t,
-    } = useGamePage()
+        remainingQuestions,
+    } = useSessionProgress()
+
+    const remainingLabel = playMode === "session"
+        ? t("roundsLeft").replace("{count}", String(Math.max(remainingQuestions ?? 0, 0)))
+        : null
+
+    const sessionSummaryProps = {
+        title: t("sessionCompleteTitle"),
+        targetLabel: t("sessionTargetLabel"),
+        correctLabel: t("sessionCorrectLabel"),
+        accuracyLabel: t("sessionAccuracyLabel"),
+        targetCount,
+        correctCount,
+        accuracy,
+        restartLabel: t("sessionRestart"),
+        switchLabel: t("sessionSwitchToInfinite"),
+    }
 
     const [mode, setMode] = useState<DateMode>("week_days")
     const [key, setKey] = useState(0)

@@ -211,7 +211,9 @@ docs: update README
 
 ### Wordset Delivery (v2)
 
-Rendered diagram: `docs/diagrams/data-flow.png` (source: `docs/diagrams/data-flow.mmd`).
+![Data Flow Diagram](docs/diagrams/data-flow.png)
+
+Source: `docs/diagrams/data-flow.mmd` (exported to PNG for convenience).
 
 ### Word Data Pipeline
 1. **Sources**: `kanaDictionary.json` (kana groups) and `jmdict-spa-3.6.1.json` / `jmdict-eng-3.6.2.json` (vocabulary).

@@ -1,12 +1,15 @@
 import { useCallback, useMemo, useState } from "react"
+import type { TranslationKey } from "@/lib/translations"
 
 export type PlayMode = "infinite" | "session"
 
 type SessionProgressOptions = {
     defaultTargetCount?: number
+    /** Translator function (i18n) for building UI labels */
+    t?: (key: TranslationKey) => string
 }
 
-export function useSessionProgress({ defaultTargetCount = 10 }: SessionProgressOptions = {}) {
+export function useSessionProgress({ defaultTargetCount = 10, t }: SessionProgressOptions = {}) {
     const [score, setScore] = useState(0)
     const [streak, setStreak] = useState(0)
     const [bestStreak, setBestStreak] = useState(0)
@@ -62,6 +65,27 @@ export function useSessionProgress({ defaultTargetCount = 10 }: SessionProgressO
         [playMode, targetCount, answeredCount],
     )
 
+    const translate = useCallback(
+        (key: TranslationKey) => (t ? t(key) : key),
+        [t],
+    )
+
+    const remainingLabel = playMode === "session"
+        ? translate("roundsLeft").replace("{count}", String(Math.max(remainingQuestions ?? 0, 0)))
+        : null
+
+    const sessionSummaryProps = {
+        title: translate("sessionCompleteTitle"),
+        targetLabel: translate("sessionTargetLabel"),
+        correctLabel: translate("sessionCorrectLabel"),
+        accuracyLabel: translate("sessionAccuracyLabel"),
+        targetCount,
+        correctCount,
+        accuracy,
+        restartLabel: translate("sessionRestart"),
+        switchLabel: translate("sessionSwitchToInfinite"),
+    }
+
     return {
         score,
         streak,
@@ -74,6 +98,8 @@ export function useSessionProgress({ defaultTargetCount = 10 }: SessionProgressO
         sessionComplete,
         accuracy,
         remainingQuestions,
+        remainingLabel,
+        sessionSummaryProps,
         handleScoreUpdate,
         resetSession,
         setTargetCount,
