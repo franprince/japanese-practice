@@ -105,7 +105,7 @@ export function SettingsPanel({ mode, filter, onFilterChange }: SettingsPanelPro
                   : "bg-secondary/50 text-muted-foreground border-border/50 hover:bg-secondary hover:text-foreground",
               )}
             >
-              <span className="mr-2">{group.labelJp}</span>
+              <span lang="ja" className="mr-2">{group.labelJp}</span>
               <span className="opacity-70">{group.label}</span>
             </button>
           ))}
@@ -152,7 +152,7 @@ export function SettingsPanel({ mode, filter, onFilterChange }: SettingsPanelPro
               <div className="space-y-4">
                 {mode === "both" && (
                   <h3 className="text-sm font-semibold text-foreground border-b border-border/50 pb-2">
-                    Hiragana ひらがな
+                    Hiragana <span lang="ja">ひらがな</span>
                   </h3>
                 )}
                 <GroupSection title={t("allHiragana")} groups={hiraganaBase} />
@@ -166,7 +166,7 @@ export function SettingsPanel({ mode, filter, onFilterChange }: SettingsPanelPro
               <div className="space-y-4">
                 {mode === "both" && (
                   <h3 className="text-sm font-semibold text-foreground border-b border-border/50 pb-2 mt-6">
-                    Katakana カタカナ
+                    Katakana <span lang="ja">カタカナ</span>
                   </h3>
                 )}
                 <GroupSection title={t("allKatakana")} groups={katakanaBase} />

@@ -35,7 +35,7 @@ export default function HomePage() {
           <div className="flex flex-col-reverse md:flex-row md:items-start md:justify-between mb-6 gap-4 md:gap-6">
             <div className="flex-1">
               <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light text-white mb-2 sm:mb-3 tracking-tight">
-                日本語 練習
+                <span lang="ja">日本語 練習</span>
               </h1>
               <div className="h-1 w-16 sm:w-20 bg-primary" />
             </div>
@@ -66,17 +66,17 @@ export default function HomePage() {
         <footer className="mt-20 pt-12 pb-8 border-t border-white/10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
             <div>
-              <div className="text-4xl mb-4">学</div>
+              <div lang="ja" className="text-4xl mb-4">学</div>
               <h3 className="font-light text-white/80 mb-2 text-lg">{t("pillar.learning.title")}</h3>
               <p className="text-sm text-white/50 leading-relaxed">{t("pillar.learning.body")}</p>
             </div>
             <div>
-              <div className="text-4xl mb-4">心</div>
+              <div lang="ja" className="text-4xl mb-4">心</div>
               <h3 className="font-light text-white/80 mb-2 text-lg">{t("pillar.mindfulness.title")}</h3>
               <p className="text-sm text-white/50 leading-relaxed">{t("pillar.mindfulness.body")}</p>
             </div>
             <div>
-              <div className="text-4xl mb-4">道</div>
+              <div lang="ja" className="text-4xl mb-4">道</div>
               <h3 className="font-light text-white/80 mb-2 text-lg">{t("pillar.path.title")}</h3>
               <p className="text-sm text-white/50 leading-relaxed">{t("pillar.path.body")}</p>
             </div>

@@ -139,7 +139,7 @@ export function GameCard({
           </div>
         </div>
         <Badge variant="secondary" className="text-xs font-medium tracking-wide">
-          {currentWord.type === "hiragana" ? "ひらがな" : "カタカナ"}
+          <span lang="ja">{currentWord.type === "hiragana" ? "ひらがな" : "カタカナ"}</span>
         </Badge>
       </div>
 
@@ -178,6 +178,7 @@ export function GameCard({
           <div className="text-center mb-10">
             <div
               id="word-question"
+              lang="ja"
               className={cn("font-medium mb-4 tracking-widest transition-all whitespace-nowrap", getFontSize(currentWord.kana.length))}
             >
               {currentWord.kana}
@@ -275,7 +276,7 @@ export function GameCard({
                   key={kana}
                   className="flex items-center gap-1 px-2 py-1 rounded-md text-sm font-mono bg-destructive/10 text-destructive border border-destructive/20"
                 >
-                  <span className="text-lg">{kana}</span>
+                  <span lang="ja" className="text-lg">{kana}</span>
                   <span className="text-xs opacity-60">({romaji}) ×{count}</span>
                 </div>
               ))}
