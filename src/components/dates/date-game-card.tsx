@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback, useRef } from "react"
 import { Check, X, ArrowRight, SkipForward, Calendar, CalendarDays, Hash, Type } from "lucide-react"
 import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese-dates"
 import { useI18n } from "@/lib/i18n"
+import { useGameScore } from "@/hooks/use-game-score"
 
 interface DateGameCardProps {
   mode: DateMode
@@ -18,12 +19,11 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
   const [userInput, setUserInput] = useState("")
   const [showResult, setShowResult] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
-  const [score, setScore] = useState(0)
-  const [streak, setStreak] = useState(0)
   const [showNumbers, setShowNumbers] = useState(false)
   const enterOnResultRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const { t } = useI18n()
+  const { score, streak, updateScore } = useGameScore(onScoreUpdate)
 
   const generateNewQuestion = useCallback(() => {
     if (disableNext) return
@@ -56,23 +56,11 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
 
     setIsCorrect(correct)
     setShowResult(true)
-
-    if (correct) {
-      const newStreak = streak + 1
-      const bonus = Math.floor(newStreak / 5) * 5
-      const newScore = score + 10 + bonus
-      setScore(newScore)
-      setStreak(newStreak)
-      onScoreUpdate(newScore, newStreak, true)
-    } else {
-      setStreak(0)
-      onScoreUpdate(score, 0, false)
-    }
+    updateScore(correct)
   }
 
   const handleSkip = () => {
-    setStreak(0)
-    onScoreUpdate(score, 0, false)
+    updateScore(false)
     generateNewQuestion()
   }
 
