@@ -1,8 +1,9 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Trophy, Medal, ThumbsUp, Frown } from "lucide-react"
 import { useConfetti } from "@/hooks/use-confetti"
+import { useAccuracyIcon } from "@/hooks/use-accuracy-icon"
+import { IncorrectCharsTable } from "./incorrect-chars-table"
 
 interface SessionSummaryCardProps {
   title: string
@@ -26,8 +27,6 @@ interface SessionSummaryCardProps {
   tableErrorsLabel?: string
 }
 
-// Confetti component logic moved to hook
-
 export function SessionSummaryCard({
   title,
   targetLabel,
@@ -45,42 +44,8 @@ export function SessionSummaryCard({
   tableCharacterLabel = "Character",
   tableErrorsLabel = "Errors",
 }: SessionSummaryCardProps) {
-
-  let Icon = ThumbsUp
-  let colorClass = "text-primary"
-  let bgClass = "bg-primary/10 border-primary/20"
-  let animationClass = "animate-in fade-in zoom-in duration-500"
-
   const confetti = useConfetti()
-
-  if (accuracy >= 90) {
-    Icon = Trophy
-    colorClass = "text-yellow-500"
-    bgClass = "bg-yellow-500/10 border-yellow-500/30"
-    animationClass = "animate-in zoom-in-50 spin-in-3 duration-700"
-  } else if (accuracy >= 80) {
-    Icon = Medal
-    colorClass = "text-green-500"
-    bgClass = "bg-green-500/10 border-green-500/30"
-    animationClass = "animate-in slide-in-from-bottom-4 duration-500"
-  } else if (accuracy < 50) {
-    Icon = Frown
-    colorClass = "text-destructive"
-    bgClass = "bg-destructive/10 border-destructive/30"
-    animationClass = "animate-in shake duration-500"
-  }
-
-  // Sort incorrect chars by occurrence count (highest first), show top 3
-  // Handle both old format (number) and new format ({ count, romaji })
-  const sortedIncorrectChars = incorrectChars
-    ? Array.from(incorrectChars.entries())
-      .sort(([, a], [, b]) => {
-        const countA = typeof a === 'object' ? a.count : (typeof a === 'number' ? a : 0)
-        const countB = typeof b === 'object' ? b.count : (typeof b === 'number' ? b : 0)
-        return countB - countA
-      })
-      .slice(0, 3)
-    : []
+  const { Icon, colorClass, bgClass, animationClass } = useAccuracyIcon(accuracy)
 
   return (
     <div className={`rounded-2xl border p-8 shadow-lg space-y-6 text-center transition-all relative overflow-hidden ${bgClass} ${animationClass}`}>
@@ -102,33 +67,15 @@ export function SessionSummaryCard({
       </div>
 
       {/* Incorrect characters table */}
-      {sortedIncorrectChars.length > 0 && (
+      {incorrectChars && incorrectChars.size > 0 && (
         <div className="relative z-10 pt-4 border-t border-border/30">
           <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">{incorrectCharsLabel}</p>
-          <div className="max-h-40 overflow-y-auto mx-auto max-w-xs">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-muted-foreground uppercase">
-                  <th className="py-1 text-left pl-4">{tableCharacterLabel}</th>
-                  <th className="py-1 text-right pr-4">{tableErrorsLabel}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedIncorrectChars.map(([kana, data]) => {
-                  const count = typeof data === 'object' ? data.count : (typeof data === 'number' ? data : 1)
-                  const romaji = typeof data === 'object' ? data.romaji : ''
-                  return (
-                    <tr key={kana} className="border-t border-border/20">
-                      <td className="py-2 text-left pl-4 font-mono text-lg text-destructive">
-                        {kana} {romaji && <span className="text-sm opacity-70">({romaji})</span>}
-                      </td>
-                      <td className="py-2 text-right pr-4 tabular-nums text-muted-foreground">×{count}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <IncorrectCharsTable
+            incorrectChars={incorrectChars}
+            tableCharacterLabel={tableCharacterLabel}
+            tableErrorsLabel={tableErrorsLabel}
+            maxItems={3}
+          />
         </div>
       )}
 
