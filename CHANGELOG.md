@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/franprince/japanese-practice/compare/v2.0.0...v2.0.1) (2026-01-17)
+
+
+### Bug Fixes
+
+* mix hiragana and katakana in both character mode ([fe33581](https://github.com/franprince/japanese-practice/commit/fe335816dbee0b318f112f33a6b5f2a861fd2b20))
+
 # [2.0.0](https://github.com/franprince/japanese-practice/compare/v1.6.0...v2.0.0) (2026-01-17)
 
 
