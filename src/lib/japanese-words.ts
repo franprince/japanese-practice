@@ -155,19 +155,23 @@ export async function getRandomCharacter(
         : "hiragana"
 
   // Determine target type from selected groups or mode
-  let targetType: "hiragana" | "katakana"
-  if (filter?.selectedGroups && filter.selectedGroups.length > 0) {
-    const types = filter.selectedGroups
-      .map(id => loadedCharacterGroups.find(g => g.id === id)?.type)
-      .filter(Boolean)
-    const hasH = types.includes("hiragana")
-    const hasK = types.includes("katakana")
+  const selectedTypes = (filter?.selectedGroups ?? [])
+    .map(id => loadedCharacterGroups.find(g => g.id === id)?.type)
+    .filter((t): t is "hiragana" | "katakana" => Boolean(t))
+  const hasH = selectedTypes.includes("hiragana")
+  const hasK = selectedTypes.includes("katakana")
+
+  // If both types are available and mode is "both", allow mixed selection per prompt
+  const allowMixed = type === "both" && (filter?.selectedGroups?.length ? hasH && hasK : true)
+
+  let targetType: "hiragana" | "katakana" = modeToType(type)
+  if (!allowMixed && filter?.selectedGroups && filter.selectedGroups.length > 0) {
     targetType = hasK && !hasH ? "katakana" : hasH && !hasK ? "hiragana" : modeToType(type)
-  } else {
-    targetType = modeToType(type)
   }
 
-  let groups = loadedCharacterGroups.filter((g) => g.type === targetType)
+  let groups = allowMixed
+    ? loadedCharacterGroups
+    : loadedCharacterGroups.filter((g) => g.type === targetType)
 
   // Apply group filter
   if (filter?.selectedGroups !== undefined) {
@@ -211,6 +215,7 @@ export async function getRandomCharacter(
   let kana = ""
   let romaji = ""
   const usedGroups: string[] = []
+  let wordType: "hiragana" | "katakana" | undefined
 
   for (let i = 0; i < length; i++) {
     const randomGroup = groups[Math.floor(Math.random() * groups.length)]
@@ -221,6 +226,10 @@ export async function getRandomCharacter(
 
     kana += char
     const charRomaji = kanaToRomaji(char)
+
+    if (!wordType) {
+      wordType = randomGroup.type as "hiragana" | "katakana"
+    }
 
     if (char === "い" && charRomaji !== "i") {
       console.warn(`[Suspicious Romaji] Char: ${char}, Mapped: '${charRomaji}', Map(i): '${getKanaRomajiMapInternal()["い"]}'`)
@@ -237,7 +246,7 @@ export async function getRandomCharacter(
   return {
     kana,
     romaji,
-    type: targetType,
+    type: wordType ?? targetType,
     groups: usedGroups,
   }
 }
