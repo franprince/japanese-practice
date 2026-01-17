@@ -211,42 +211,7 @@ docs: update README
 
 ### Wordset Delivery (v2)
 
-```mermaid
-graph TD
-    subgraph Sources
-        KD[kanaDictionary.json]
-        JD[jmdict-spa.json]
-    end
-
-    subgraph Build["Wordset Build"]
-        BWM[build-wordset.ts]
-        API["/api/wordset (ETag)"]
-    end
-
-    subgraph Client["Client Browser"]
-        IDB[(IndexedDB\\nkana-words)]
-        App[Application State]
-        Logic[Loader Logic]
-    end
-
-    KD & JD --> BWM
-    BWM -->|Embed version + write wordset-<lang>.json| API
-    API -->|ETag from version| Logic
-    Logic -->|1. Check| IDB
-    IDB -- "Hit" --> Logic
-    Logic -- "Hit/Miss (Update)" --> IDB
-    Logic -->|Load| App
-
-    classDef database fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
-    classDef component fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
-    classDef source fill:#fff3e0,stroke:#e65100,stroke-width:2px;
-
-    class IDB database;
-    class App,Logic,BWM,API component;
-    class KD,JD source;
-```
-
-Rendered image: `docs/diagrams/data-flow.png` (source in `docs/diagrams/data-flow.mmd`).
+Rendered diagram: `docs/diagrams/data-flow.png` (source: `docs/diagrams/data-flow.mmd`).
 
 ### Word Data Pipeline
 1. **Sources**: `kanaDictionary.json` (kana groups) and `jmdict-spa-3.6.1.json` / `jmdict-eng-3.6.2.json` (vocabulary).
