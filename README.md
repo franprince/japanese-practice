@@ -179,6 +179,7 @@ docs: update README
 - Source: JMdict simplified (see above).
 - Build: filtered and normalized into `data/jmdict-spa-3.6.1.json` with language fields `meaning_en` and `meaning_es`, plus kana/romaji for practice.
 - Storage: shipped via Git LFS; loaded lazily in the browser and cached in IndexedDB.
+- **Distribution:** Wordsets ship as `public/wordset-<lang>.json` (no version suffix in filename). Each file embeds a numeric `version`, which the API surfaces via ETag for cache invalidation.
 
 ### Kanji
 - Source: KANJIDIC (via jmdict-simplified repo).
@@ -208,17 +209,52 @@ docs: update README
 
 ## Data Architecture
 
-![Data Flow Diagram](docs/diagrams/data-flow.png)
+### Wordset Delivery (v2)
+
+```mermaid
+graph TD
+    subgraph Sources
+        KD[kanaDictionary.json]
+        JD[jmdict-spa.json]
+    end
+
+    subgraph Build["Wordset Build"]
+        BWM[build-wordset.ts]
+        API["/api/wordset (ETag)"]
+    end
+
+    subgraph Client["Client Browser"]
+        IDB[(IndexedDB\\nkana-words)]
+        App[Application State]
+        Logic[Loader Logic]
+    end
+
+    KD & JD --> BWM
+    BWM -->|Embed version + write wordset-<lang>.json| API
+    API -->|ETag from version| Logic
+    Logic -->|1. Check| IDB
+    IDB -- "Hit" --> Logic
+    Logic -- "Hit/Miss (Update)" --> IDB
+    Logic -->|Load| App
+
+    classDef database fill:#e1f5fe,stroke:#01579b,stroke-width:2px;
+    classDef component fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;
+    classDef source fill:#fff3e0,stroke:#e65100,stroke-width:2px;
+
+    class IDB database;
+    class App,Logic,BWM,API component;
+    class KD,JD source;
+```
+
+Rendered image: `docs/diagrams/data-flow.png` (source in `docs/diagrams/data-flow.mmd`).
 
 ### Word Data Pipeline
-1. **Source**: Raw data comes from `kanaDictionary.json` (basic kana) and `jmdict-spa-3.6.1.json` (vocabulary).
-2. **Build Process**: 
-   - Primary: Static Generation via `/api/wordset`. The `buildWordsInMain` function merges dictionary definitions with character groups.
-   - Fallback: Client-side generation ensures functionality even if the API fails.
-3. **Caching Strategy**:
-   - Browser: Data is cached in **IndexedDB** (`kana-words` db, `wordSets` store).
-   - Validation: Cache versioning (`v1-prod-{lang}`) prevents stale data usage.
-   - Lifecycle: App checks IndexedDB -> Fetches API -> Falls back to local generation -> Updates Cache.
+1. **Sources**: `kanaDictionary.json` (kana groups) and `jmdict-spa-3.6.1.json` / `jmdict-eng-3.6.2.json` (vocabulary).
+2. **Build Process**: `scripts/build-wordset.ts` merges sources, filters blacklist, embeds `version`, and writes `public/wordset-<lang>.json` (ES and EN variants).
+3. **API Delivery**: `/api/wordset?lang=<lang>` reads the embedded `version`, sets `ETag`, and serves JSON. Clients validate with `If-None-Match` for lightweight 304 responses.
+4. **Caching**:
+   - Browser: IndexedDB (`kana-words` db, `wordSets` store) stores the latest wordset per language.
+   - Lifecycle: Check IndexedDB → Fetch API (ETag) → Fallback to local generation if needed → Update cache.
 
 ### Kanji System
 - **Static Storage**: Core N5-N1 data is pre-compiled into `src/lib/kanji-data.ts` for instant load.
@@ -311,7 +347,7 @@ Both are provided by the [Electronic Dictionary Research and Development Group](
 
 ---
 
-**Current Version**: 1.1.0
+**Current Version**: 2.0.0
 
 For detailed changes, see [CHANGELOG.md](CHANGELOG.md)
 
