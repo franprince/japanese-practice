@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { NumberGameCard } from "@/components/numbers/number-game-card"
 import { DifficultySelector } from "@/components/numbers/difficulty-selector"
 import { StatsDisplay } from "@/components/game/stats-display"
@@ -9,9 +9,11 @@ import type { Difficulty } from "@/lib/japanese-numbers"
 import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
-import { useGamePage } from "@/hooks/use-game-page"
+import { useSessionProgress } from "@/hooks/use-session-progress"
+import { useI18n } from "@/lib/i18n"
 
 export default function NumbersPage() {
+    const { t } = useI18n()
     const {
         score,
         streak,
@@ -26,19 +28,11 @@ export default function NumbersPage() {
         setTargetCount,
         remainingLabel,
         sessionSummaryProps,
-        t,
-    } = useGamePage()
+    } = useSessionProgress({ t })
 
     const [difficulty, setDifficulty] = useState<Difficulty>("easy")
     const [sessionId, setSessionId] = useState(() => Math.random().toString(36).slice(2))
     const [numbersMode, setNumbersMode] = useState<"arabicToKanji" | "kanjiToArabic">("arabicToKanji")
-
-    const handleScoreUpdate = useMemo(
-        () => (newScore: number, newStreak: number, correct: boolean) => {
-            handleSessionScoreUpdate(newScore, newStreak, correct)
-        },
-        [handleSessionScoreUpdate],
-    )
 
     const handleDifficultyChange = (newDifficulty: Difficulty) => {
         setDifficulty(newDifficulty)
@@ -110,7 +104,7 @@ export default function NumbersPage() {
                 <NumberGameCard
                     difficulty={difficulty}
                     mode={numbersMode}
-                    onScoreUpdate={handleScoreUpdate}
+                    onScoreUpdate={handleSessionScoreUpdate}
                     disableNext={sessionComplete && playMode === "session"}
                 />
             </div>

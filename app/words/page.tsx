@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
 import { GameCard } from "@/components/words/game-card"
 import { ModeSelector } from "@/components/words/mode-selector"
 import { StatsDisplay } from "@/components/game/stats-display"
@@ -12,9 +12,11 @@ import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { WordsSettingsPopover } from "@/components/words/words-settings-popover"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
-import { useGamePage } from "@/hooks/use-game-page"
+import { useSessionProgress } from "@/hooks/use-session-progress"
+import { useI18n } from "@/lib/i18n"
 
 export default function WordsPage() {
+    const { t } = useI18n()
     const {
         score,
         streak,
@@ -31,8 +33,7 @@ export default function WordsPage() {
         setBestStreak,
         remainingLabel,
         sessionSummaryProps,
-        t,
-    } = useGamePage()
+    } = useSessionProgress({ t })
 
     const [characterGroups, setCharacterGroups] = useState<CharacterGroup[]>([])
     const [isLoadingGroups, setIsLoadingGroups] = useState(true)
