@@ -15,15 +15,15 @@ export type LoaderDeps = {
 }
 
 export type WordSets = {
+  version: number
   hiraganaWords: JapaneseWord[]
   katakanaWords: JapaneseWord[]
   bothForms?: JapaneseWord[]
 }
 
 const WORDSET_LANG = "es".toLowerCase()
-const CACHE_VERSION = "v1"
 const CACHE_NAMESPACE = "prod"
-const getCacheKey = (lang: string) => `${CACHE_VERSION}-${CACHE_NAMESPACE}-${lang}`
+const getCacheKey = (lang: string) => `${CACHE_NAMESPACE}-${lang}`
 const cachedPromises: Record<string, Promise<WordSets>> = {}
 const DB_NAME = "kana-words"
 const STORE_NAME = "wordSets"
@@ -106,14 +106,22 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
   const datasetLang = normalizeLang(lang)
   if (!cachedPromises[datasetLang]) {
     cachedPromises[datasetLang] = (async () => {
+      // Fetch remote wordset
+      const remote = await fetchPrebuiltWordset(datasetLang)
+      if (!remote) throw new Error(`Failed to load wordset for ${datasetLang}`)
+
+      // Check cache
       const cached = await readCache(datasetLang).catch(() => null)
-      if (cached) return cached
-      const prebuilt = await fetchPrebuiltWordset(datasetLang)
-      if (prebuilt) {
-        writeCache(datasetLang, prebuilt).catch(() => undefined)
-        return prebuilt
+
+      // Compare versions - use remote if cache is missing, outdated, or has no version
+      if (!cached || !cached.version || cached.version < remote.version) {
+        // Cache is outdated or missing, use remote and update cache
+        writeCache(datasetLang, remote).catch(() => undefined)
+        return remote
       }
-      throw new Error(`Failed to load wordset for ${datasetLang}`)
+
+      // Use cached version (same or newer)
+      return cached
     })()
   }
   return cachedPromises[datasetLang]

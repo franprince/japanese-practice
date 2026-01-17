@@ -19,6 +19,7 @@ interface GameCardProps {
   onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   suppressFocus?: boolean
   onRequestCloseSettings?: () => void
+  onRequestOpenSettings?: () => void
   disableNext?: boolean
   isCharacterMode?: boolean
   onToggleCharacterMode?: () => void
@@ -32,6 +33,7 @@ export function GameCard({
   onScoreUpdate,
   suppressFocus = false,
   onRequestCloseSettings,
+  onRequestOpenSettings,
   disableNext = false,
   isCharacterMode = false,
   onToggleCharacterMode,
@@ -98,14 +100,7 @@ export function GameCard({
               variant="secondary"
               size="sm"
               className="cursor-pointer"
-              onClick={() => {
-                const el = document.getElementById("settings-panel")
-                if (el) {
-                  el.scrollIntoView({ behavior: "smooth", block: "start" })
-                } else {
-                  onRequestCloseSettings?.()
-                }
-              }}
+              onClick={() => onRequestOpenSettings?.()}
             >
               {t("settings")}
             </Button>

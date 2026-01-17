@@ -148,13 +148,23 @@ export async function getRandomCharacter(
   const loadedCharacterGroups = await getCharacterGroups()
   await getKanaRomajiMap() // Ensure romaji map is loaded for kanaToRomaji conversion
 
-  let targetType: "hiragana" | "katakana" = "hiragana"
-  if (type === "both") {
-    targetType = Math.random() > 0.5 ? "hiragana" : "katakana"
-  } else if (type === "katakana") {
-    targetType = "katakana"
+  // Helper to convert mode to type
+  const modeToType = (mode: GameMode): "hiragana" | "katakana" =>
+    mode === "katakana" ? "katakana"
+      : mode === "both" ? (Math.random() > 0.5 ? "hiragana" : "katakana")
+        : "hiragana"
+
+  // Determine target type from selected groups or mode
+  let targetType: "hiragana" | "katakana"
+  if (filter?.selectedGroups && filter.selectedGroups.length > 0) {
+    const types = filter.selectedGroups
+      .map(id => loadedCharacterGroups.find(g => g.id === id)?.type)
+      .filter(Boolean)
+    const hasH = types.includes("hiragana")
+    const hasK = types.includes("katakana")
+    targetType = hasK && !hasH ? "katakana" : hasH && !hasK ? "hiragana" : modeToType(type)
   } else {
-    targetType = "hiragana"
+    targetType = modeToType(type)
   }
 
   let groups = loadedCharacterGroups.filter((g) => g.type === targetType)
@@ -178,7 +188,7 @@ export async function getRandomCharacter(
 
     // Only apply weighting when more than 50% of groups are selected
     if (selectionRatio > 0.5) {
-      const specialGroupPattern = /h_(group1[6-9]|group2[0-6])_a$|k_(group1[8-9]|group[2-3][0-9])_a$/
+      const specialGroupPattern = /^h(1[6-9]|2[0-6])_a$|^k(1[8-9]|[2-3][0-9])_a$/
 
       // Filter out some special groups (keep ~40% of them)
       groups = groups.filter(g => {

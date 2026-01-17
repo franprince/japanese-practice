@@ -111,7 +111,7 @@ export default function WordsPage() {
                 <>
                     <GameSettingsPopover
                         playMode={playMode}
-                        onSelectMode={handleResetSession}
+                        onSelectMode={resetSession}
                         targetCount={targetCount}
                         onSelectCount={(count) => {
                             setTargetCount(count)
@@ -160,6 +160,7 @@ export default function WordsPage() {
                     filter={filter}
                     onScoreUpdate={handleScoreUpdateWithUi}
                     onRequestCloseSettings={() => setCustomSettingsOpen(false)}
+                    onRequestOpenSettings={() => setCustomSettingsOpen(true)}
                     disableNext={sessionComplete && playMode === "session"}
                     isCharacterMode={isCharacterMode}
                     onToggleCharacterMode={() => setIsCharacterMode(prev => !prev)}
