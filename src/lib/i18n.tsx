@@ -28,6 +28,13 @@ export function I18nProvider({ children, initialLang = "es" }: { children: React
     if (stored) setLangState(stored)
   }, [])
 
+  // Update HTML lang attribute when language changes
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = lang
+    }
+  }, [lang])
+
   const setLang = (next: Language) => {
     setLangState(next)
     if (typeof window !== "undefined") {
