@@ -11,6 +11,7 @@ import { Flame, SkipForward, Zap, Type, Shuffle } from "lucide-react"
 import type { GameMode } from "@/types/game"
 import { useWordGame } from "@/hooks/use-word-game"
 import { GameFeedbackSection, FeedbackIcon } from "./game-feedback-section"
+import { getResponsiveFontSize } from "@/lib/utils/font-sizing"
 
 interface GameCardProps {
   mode: GameMode
@@ -68,15 +69,7 @@ export function GameCard({
     onIncorrectCharsChange,
   })
 
-  // Helper function for font sizing
-  const getFontSize = (length: number) => {
-    if (length <= 2) return "text-7xl md:text-8xl"
-    if (length <= 4) return "text-6xl md:text-7xl"
-    if (length <= 6) return "text-5xl md:text-6xl"
-    if (length <= 8) return "text-4xl md:text-5xl"
-    if (length <= 12) return "text-3xl md:text-4xl"
-    return "text-2xl md:text-3xl"
-  }
+
 
   // Loading state
   if (isLoading) {
@@ -179,7 +172,7 @@ export function GameCard({
             <div
               id="word-question"
               lang="ja"
-              className={cn("font-medium mb-4 tracking-widest transition-all whitespace-nowrap", getFontSize(currentWord.kana.length))}
+              className={cn("font-medium mb-4 tracking-widest transition-all whitespace-nowrap", getResponsiveFontSize(currentWord.kana))}
             >
               {currentWord.kana}
             </div>
