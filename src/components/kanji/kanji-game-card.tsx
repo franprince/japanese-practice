@@ -116,7 +116,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
 
         <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{promptLabel}</p>
 
-        <div className="text-7xl md:text-9xl font-bold mb-4 relative">{currentKanji.char}</div>
+        <div lang="ja" className="text-7xl md:text-9xl font-bold mb-4 relative">{currentKanji.char}</div>
 
         {/* Result feedback */}
         {isRevealed && (
@@ -150,7 +150,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
                   </span>
                 )}
               </span>
-              <span className="uppercase tracking-wide">{currentKanji.reading ?? t("reading")}</span>
+              <span className="uppercase tracking-wide">{currentKanji.reading ? <span lang="ja">{currentKanji.reading}</span> : t("reading")}</span>
             </div>
           </div>
         )}

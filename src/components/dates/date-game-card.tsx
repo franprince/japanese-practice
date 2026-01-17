@@ -196,9 +196,9 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
           </div>
           <div className="text-center space-y-1">
             <p className="text-sm text-muted-foreground">{t("correctAnswer")}:</p>
-            <p className="text-xl font-medium">{question.answer}</p>
+            <p lang="ja" className="text-xl font-medium">{question.answer}</p>
             <p className="text-sm text-muted-foreground">({question.romaji})</p>
-            {question.kanji && <p className="text-lg text-primary mt-2">{question.kanji}</p>}
+            {question.kanji && <p lang="ja" className="text-lg text-primary mt-2">{question.kanji}</p>}
           </div>
         </div>
       )}

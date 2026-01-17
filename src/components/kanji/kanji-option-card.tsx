@@ -51,7 +51,7 @@ export function KanjiOptionCard({
     >
       <div className="flex flex-col gap-1">
         {/* Reading as the main label (no kanji character in options) */}
-        <span className="text-xl font-medium">{kanji.reading}</span>
+        <span lang="ja" className="text-xl font-medium">{kanji.reading}</span>
 
         {/* Meaning / reading depending on difficulty */}
         <div className="flex flex-col text-xs text-muted-foreground/80 mt-1 leading-tight gap-0.5">
