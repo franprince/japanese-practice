@@ -1,3 +1,12 @@
+# [1.5.0](https://github.com/franprince/japanese-practice/compare/v1.4.0...v1.5.0) (2026-01-17)
+
+
+### Features
+
+* add reusable utility functions ([5c703f1](https://github.com/franprince/japanese-practice/commit/5c703f1986b3190c11a69af9149e0663a157d90a))
+* add useGameScore hook for centralized scoring ([f84d643](https://github.com/franprince/japanese-practice/commit/f84d6432001736cc4bc995c6cd78ab0c92f0181d))
+* add useKeyboardNavigation hook ([d252ff4](https://github.com/franprince/japanese-practice/commit/d252ff4ba9fd5e969c53a132a577f5bbf41486f7))
+
 # [1.4.0](https://github.com/franprince/japanese-practice/compare/v1.3.0...v1.4.0) (2026-01-17)
 
 
