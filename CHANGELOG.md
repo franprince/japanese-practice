@@ -1,3 +1,11 @@
+## [2.1.1](https://github.com/franprince/japanese-practice/compare/v2.1.0...v2.1.1) (2026-01-18)
+
+
+### Bug Fixes
+
+* **home:** improve light theme compatibility and semantics ([fbda166](https://github.com/franprince/japanese-practice/commit/fbda1661dbef45dc3369f79bdc111ac72a30e3eb))
+* **layout:** remove excessive footer margin ([e5b6f50](https://github.com/franprince/japanese-practice/commit/e5b6f507c2ea435f9416a3da9a958393ec7866af))
+
 # [2.1.0](https://github.com/franprince/japanese-practice/compare/v2.0.2...v2.1.0) (2026-01-18)
 
 
