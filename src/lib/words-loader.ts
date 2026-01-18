@@ -83,9 +83,22 @@ const writeCache = async (lang: string, data: WordSets) => {
   }
 }
 
-const fetchPrebuiltWordset = async (lang: string): Promise<WordSets | null> => {
+const fetchPrebuiltWordset = async (lang: string, currentVersion?: number): Promise<WordSets | "not-modified" | null> => {
   try {
-    const res = await fetch(`/api/wordset?lang=${lang}`, { cache: "no-store" })
+    const headers: Record<string, string> = {}
+    if (currentVersion !== undefined) {
+      headers["If-None-Match"] = `"${currentVersion}"`
+    }
+
+    const res = await fetch(`/api/wordset?lang=${lang}`, {
+      cache: "no-store",
+      headers
+    })
+
+    if (res.status === 304) {
+      return "not-modified"
+    }
+
     if (!res.ok) return null
     const json = (await res.json()) as WordSets
     if (!json?.hiraganaWords || !json?.katakanaWords) return null
@@ -106,22 +119,42 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
   const datasetLang = normalizeLang(lang)
   if (!cachedPromises[datasetLang]) {
     cachedPromises[datasetLang] = (async () => {
-      // Fetch remote wordset
-      const remote = await fetchPrebuiltWordset(datasetLang)
-      if (!remote) throw new Error(`Failed to load wordset for ${datasetLang}`)
+      // 1. Check cache first
+      let cached: WordSets | null = null
+      try {
+        cached = await readCache(datasetLang)
+      } catch (e) {
+        console.warn("Failed to read cache", e)
+      }
 
-      // Check cache
-      const cached = await readCache(datasetLang).catch(() => null)
+      // 2. Conditional fetch using cached version
+      const remote = await fetchPrebuiltWordset(datasetLang, cached?.version)
 
-      // Compare versions - use remote if cache is missing, outdated, or has no version
-      if (!cached || !cached.version || cached.version < remote.version) {
-        // Cache is outdated or missing, use remote and update cache
+      // 3. Handle response
+      if (remote === "not-modified") {
+        if (cached) return cached
+        // Should not happen unless cache was deleted between read and fetch, retry without version
+        const fallback = await fetchPrebuiltWordset(datasetLang)
+        if (typeof fallback === "object" && fallback) {
+          writeCache(datasetLang, fallback).catch(() => undefined)
+          return fallback
+        }
+        throw new Error(`Failed to load wordset for ${datasetLang} (304 without cache)`)
+      }
+
+      if (remote) {
+        // New version downloaded
         writeCache(datasetLang, remote).catch(() => undefined)
         return remote
       }
 
-      // Use cached version (same or newer)
-      return cached
+      // 4. Network error - fallback to cache if available
+      if (cached) {
+        console.warn("Network failed, using cached wordset")
+        return cached
+      }
+
+      throw new Error(`Failed to load wordset for ${datasetLang}`)
     })()
   }
   return cachedPromises[datasetLang]
