@@ -96,7 +96,7 @@ const buildKanjiSet = async () => {
     await fs.promises.readFile(path.join(baseDir, "data", "most_used_kanjis.json"), "utf8"),
   )
 
-  const dataDir = path.join(baseDir, "data")
+  const dataDir = path.join(baseDir, "public")
   const { outputPath, versionUsed } = await resolveOutputPath(dataDir)
 
   // If a previous dataset exists (any version), reuse its English meanings to avoid re-requesting

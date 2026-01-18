@@ -190,7 +190,7 @@ docs: update README
   3. Loads JMdict English/Spanish dictionaries for meanings
   4. Fetches missing data from [Jisho API](https://jisho.org/api/v1/search/words) with throttling
   5. Uses Playwright to scrape Jisho pages as final fallback for stubborn entries
-  6. Outputs versioned `data/kanjiset-vN.json` with all enriched data
+  6. Outputs versioned `public/kanjiset-vN.json` with all enriched data
 - **Fields**: `char`, `reading`, `meaning_en`, `meaning_es`, `jlpt`, `rank` (frequency rank)
 - **Delivery**: Split by JLPT level into `public/kanji-n1.json` through `public/kanji-n5.json` for lazy loading
 - **Storage**: Loaded lazily per JLPT level and cached in IndexedDB with 7-day expiry
