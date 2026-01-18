@@ -219,8 +219,6 @@ docs: update README
 
 ![Data Flow Diagram](docs/diagrams/data-flow.png)
 
-Source: `docs/diagrams/data-flow.mmd` (exported to PNG for convenience).
-
 ### Word Data Pipeline
 1. **Sources**: `kanaDictionary.json` (kana groups) and `jmdict-spa-3.6.1.json` / `jmdict-eng-3.6.2.json` (vocabulary).
 2. **Build Process**: `scripts/build-wordset.ts` merges sources, filters blacklist, embeds `version`, and writes `public/wordset-<lang>.json` (ES and EN variants).
