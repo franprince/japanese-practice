@@ -22,7 +22,6 @@ export function normalizeRomaji(text: string): string {
         // Digraphs
         "sha": "sha", "shu": "shu", "sho": "sho",
         "cha": "cha", "chu": "chu", "cho": "cho",
-        "jya": "ja", "jyu": "ju", "jyo": "jo",
         "sya": "sha", "syu": "shu", "syo": "sho",
         "tya": "cha", "tyu": "chu", "tyo": "cho",
         "zya": "ja", "zyu": "ju", "zyo": "jo",
