@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
-export type Theme = "default" | "sakura" | "ocean" | "forest" | "sunset"
+export type Theme = "default" | "sakura" | "ocean" | "forest" | "sunset" | "daylight" | "lavender" | "mint"
 
 interface ThemeContextType {
   theme: Theme
@@ -16,7 +16,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem("theme") as Theme
-    if (saved && ["default", "sakura", "ocean", "forest", "sunset"].includes(saved)) {
+    if (saved && ["default", "sakura", "ocean", "forest", "sunset", "daylight", "lavender", "mint"].includes(saved)) {
       setTheme(saved)
     }
   }, [])
