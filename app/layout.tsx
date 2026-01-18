@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             {children}
           </I18nProvider>
         </ThemeProvider>
-        <footer className="border-t border-border/40 bg-card/60 backdrop-blur py-8 mt-12">
+        <footer className="border-t border-border/40 bg-card/60 backdrop-blur py-8">
           <div className="mx-auto max-w-5xl px-4 text-xs text-muted-foreground leading-relaxed space-y-1.5">
             <p className="text-sm font-medium text-foreground">Developed by Fran 🇦🇷 • <a href="mailto:hey@franprince.dev" className="hover:underline hover:text-primary transition-colors">hey@franprince.dev</a></p>
             <p className="text-sm text-muted-foreground">Inspired by kana.pro</p>
