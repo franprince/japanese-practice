@@ -1,3 +1,11 @@
+## [2.1.2](https://github.com/franprince/japanese-practice/compare/v2.1.1...v2.1.2) (2026-01-18)
+
+
+### Bug Fixes
+
+* **kanji:** output kanji datasets to public directory ([9f427ea](https://github.com/franprince/japanese-practice/commit/9f427ea54a1bf1d90113cc5175fc26392949a88f))
+* **scripts:** prioritize previous kanji dataset during build ([5367e77](https://github.com/franprince/japanese-practice/commit/5367e7794abd61a97cc34d99e0d9da12872d3664))
+
 ## [2.1.1](https://github.com/franprince/japanese-practice/compare/v2.1.0...v2.1.1) (2026-01-18)
 
 
