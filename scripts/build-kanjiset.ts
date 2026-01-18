@@ -96,14 +96,8 @@ const buildKanjiSet = async () => {
     await fs.promises.readFile(path.join(baseDir, "data", "most_used_kanjis.json"), "utf8"),
   )
 
-  const dataDir = path.join(baseDir, "data")
+  const dataDir = path.join(baseDir, "public")
   const { outputPath, versionUsed } = await resolveOutputPath(dataDir)
-
-  const engDict = await readJson(path.join(baseDir, "data", "jmdict-eng-3.6.2.json"))
-  const spaDict = await readJson(path.join(baseDir, "data", "jmdict-spa-3.6.1.json"))
-
-  const engLookup = buildGlossLookup(engDict)
-  const spaLookup = buildGlossLookup(spaDict)
 
   // If a previous dataset exists (any version), reuse its English meanings to avoid re-requesting
   const previousMeaningLookup: Record<string, string | null> = {}
@@ -130,6 +124,14 @@ const buildKanjiSet = async () => {
   } catch (err) {
     console.warn("Failed to read previous kanjiset file(s), continuing without reuse", err)
   }
+
+  const engDict = await readJson(path.join(baseDir, "data", "jmdict-eng-3.6.2.json"))
+  const spaDict = await readJson(path.join(baseDir, "data", "jmdict-spa-3.6.1.json"))
+
+  const engLookup = buildGlossLookup(engDict)
+  const spaLookup = buildGlossLookup(spaDict)
+
+
 
   // Fallback to Jisho API for missing English meanings
   const missingJishoChars = mostUsed
@@ -211,20 +213,20 @@ const buildKanjiSet = async () => {
 
   const fallbackModules: FallbackModule[] = [
     {
-      name: "base-dicts",
-      apply: (entry) => ({
-        ...entry,
-        meaning_en: entry.meaning_en ?? engLookup[entry.char] ?? null,
-        meaning_es: entry.meaning_es ?? spaLookup[entry.char] ?? null,
-      }),
-    },
-    {
       name: "previous-dataset",
       apply: (entry) => ({
         ...entry,
         meaning_en: entry.meaning_en ?? previousMeaningLookup[entry.char] ?? null,
         reading: entry.reading ?? previousReadingLookup[entry.char] ?? null,
         jlpt: entry.jlpt ?? previousJlptLookup[entry.char] ?? null,
+      }),
+    },
+    {
+      name: "base-dicts",
+      apply: (entry) => ({
+        ...entry,
+        meaning_en: entry.meaning_en ?? engLookup[entry.char] ?? null,
+        meaning_es: entry.meaning_es ?? spaLookup[entry.char] ?? null,
       }),
     },
     {
@@ -311,7 +313,7 @@ const buildKanjiSet = async () => {
           return entry
         } finally {
           if (browser) {
-            await browser.close().catch(() => {})
+            await browser.close().catch(() => { })
           }
         }
       },
@@ -346,9 +348,9 @@ const buildKanjiSet = async () => {
   )
   console.log(
     `Fallbacks → jisho updates: ${fallbackStats.jisho} | playwright run: ${fallbackStats.playwrightRun} | ` +
-      `playwright skipped (has meaning): ${fallbackStats.playwrightSkipHasMeaning} | ` +
-      `playwright skipped (not installed): ${fallbackStats.playwrightSkipNoPlaywright} | ` +
-      `playwright failures: ${fallbackStats.playwrightFailures}`,
+    `playwright skipped (has meaning): ${fallbackStats.playwrightSkipHasMeaning} | ` +
+    `playwright skipped (not installed): ${fallbackStats.playwrightSkipNoPlaywright} | ` +
+    `playwright failures: ${fallbackStats.playwrightFailures}`,
   )
   if (jishoErrors.length) {
     console.log(`Jisho missing/failed (${jishoErrors.length}):`, jishoErrors.slice(0, 50).join(", "))

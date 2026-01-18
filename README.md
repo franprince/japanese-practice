@@ -185,12 +185,12 @@ docs: update README
 - **Frequency Source**: [kanji-frequency](https://github.com/scriptin/kanji-frequency) by scriptin - provides frequency-ranked kanji based on newspaper corpus analysis.
 - **Metadata Source**: KANJIDIC (via jmdict-simplified repo) + Jisho API for readings, meanings, and JLPT levels.
 - **Build Process**: `scripts/build-kanjiset.ts` creates the complete dataset:
-  1. Loads `data/most_used_kanjis.json` (frequency-ranked list from kanji-frequency)
-  2. Cross-references with JMdict English/Spanish dictionaries for meanings
-  3. Falls back to previous dataset cache for known entries
+  1. Checks previous dataset cache to reuse known entries (meanings, readings, JLPT)
+  2. Loads `data/most_used_kanjis.json` (frequency-ranked list from kanji-frequency)
+  3. Loads JMdict English/Spanish dictionaries for meanings
   4. Fetches missing data from [Jisho API](https://jisho.org/api/v1/search/words) with throttling
   5. Uses Playwright to scrape Jisho pages as final fallback for stubborn entries
-  6. Outputs versioned `data/kanjiset-vN.json` with all enriched data
+  6. Outputs versioned `public/kanjiset-vN.json` with all enriched data
 - **Fields**: `char`, `reading`, `meaning_en`, `meaning_es`, `jlpt`, `rank` (frequency rank)
 - **Delivery**: Split by JLPT level into `public/kanji-n1.json` through `public/kanji-n5.json` for lazy loading
 - **Storage**: Loaded lazily per JLPT level and cached in IndexedDB with 7-day expiry
