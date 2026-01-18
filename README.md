@@ -182,26 +182,32 @@ docs: update README
 - **Distribution:** Wordsets ship as `public/wordset-<lang>.json` (no version suffix in filename). Each file embeds a numeric `version`, which the API surfaces via ETag for cache invalidation.
 
 ### Kanji
-- Source: KANJIDIC (via jmdict-simplified repo).
-- Build: filtered by JLPT levels (N5–N1) with readings and meanings; stored inline in `src/lib/kanji-data.ts`.
-- Fields: `char`, `reading`, `meaning_en`, `meaning_es` (Spanish may be missing for some entries and will fall back to English), `jlpt`.
-- Maintenance scripts (Bun):
-  - Build dataset fallback pipeline (Jisho API + Playwright scrape):  
+- **Frequency Source**: [kanji-frequency](https://github.com/scriptin/kanji-frequency) by scriptin - provides frequency-ranked kanji based on newspaper corpus analysis.
+- **Metadata Source**: KANJIDIC (via jmdict-simplified repo) + Jisho API for readings, meanings, and JLPT levels.
+- **Build Process**: `scripts/build-kanjiset.ts` creates the complete dataset:
+  1. Loads `data/most_used_kanjis.json` (frequency-ranked list from kanji-frequency)
+  2. Cross-references with JMdict English/Spanish dictionaries for meanings
+  3. Falls back to previous dataset cache for known entries
+  4. Fetches missing data from [Jisho API](https://jisho.org/api/v1/search/words) with throttling
+  5. Uses Playwright to scrape Jisho pages as final fallback for stubborn entries
+  6. Outputs versioned `data/kanjiset-vN.json` with all enriched data
+- **Fields**: `char`, `reading`, `meaning_en`, `meaning_es`, `jlpt`, `rank` (frequency rank)
+- **Delivery**: Split by JLPT level into `public/kanji-n1.json` through `public/kanji-n5.json` for lazy loading
+- **Storage**: Loaded lazily per JLPT level and cached in IndexedDB with 7-day expiry
+
+**Maintenance scripts (Bun)**:
+  - Build dataset with fallback pipeline (Jisho API + Playwright scrape):  
     ```bash
     bunx tsx scripts/build-kanjiset.ts
     ```
   - Report JLPT entries missing Spanish (configurable):  
     ```bash
-    # defaults: --input data/kanjiset-v7.json --output data/kanjiset-missing-es.json --jlpt jlpt-n1
     bunx tsx scripts/report-n1-missing-es.ts --input data/kanjiset-v7.json --jlpt jlpt-n1 --output data/kanjiset-n1-missing-es.json
     ```
-    - Interactive mode: if `--input`/`--output` are omitted, it will list detected `kanjiset-v*.json` files (latest default), prompt to choose, and auto-rename output to avoid overwrites.
   - Merge translated entries into a dataset (ID-based merge):  
     ```bash
-    # defaults: --input data/kanjiset-v7.json --translations data/kanjiset-n1-missing-es.json --output data/kanjiset-v7-merged.json
     bunx tsx scripts/merge-n1-translations.ts --input data/kanjiset-v7.json --translations data/kanjiset-n1-missing-es.json --output data/kanjiset-v7-merged.json
     ```
-    - Interactive mode: if args are omitted, it will list detected datasets and translation JSONs, pick the latest by default, and write to a non-overwriting `*-merged.json` (auto-suffixed if needed).
 
 ### Numbers & Dates
 - Numbers: generated procedurally in-app; no external dataset.
@@ -223,11 +229,18 @@ Source: `docs/diagrams/data-flow.mmd` (exported to PNG for convenience).
    - Browser: IndexedDB (`kana-words` db, `wordSets` store) stores the latest wordset per language.
    - Lifecycle: Check IndexedDB → Fetch API (ETag) → Fallback to local generation if needed → Update cache.
 
-### Kanji System
-- **Static Storage**: Core N5-N1 data is pre-compiled into `src/lib/kanji-data.ts` for instant load.
+### Kanji Data Pipeline
+
+![Kanji Data Flow Diagram](docs/diagrams/kanji-data-flow.png)
+
+Source: `docs/diagrams/kanji-data-flow.mmd` (exported to PNG for convenience).
+
+**Pipeline Details**:
+- **Static Storage**: Core N5-N1 data is pre-compiled into `public/kanji-n*.json` for lazy loading by JLPT level.
 - **Enrichment**:
   - Scripts (`scripts/build-kanjiset.ts`) fetch missing data from external APIs (Jisho) and scrape supplemental info.
   - Translation merging scripts (`scripts/merge-n1-translations.ts`) allow collaborative translation updates.
+- **Caching**: Browser caches kanji data in IndexedDB with 7-day expiry per JLPT level.
 
 ## 🚀 Deployment
 
@@ -309,6 +322,7 @@ Both are provided by the [Electronic Dictionary Research and Development Group](
 ## 🙏 Acknowledgments
 
 - Dictionary data from [jmdict-simplified](https://github.com/scriptin/jmdict-simplified)
+- Kanji frequency data from [kanji-frequency](https://github.com/scriptin/kanji-frequency)
 - UI components from [shadcn/ui](https://ui.shadcn.com/)
 - Icons from [Lucide](https://lucide.dev/)
 
