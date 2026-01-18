@@ -1,3 +1,12 @@
+# [2.1.0](https://github.com/franprince/japanese-practice/compare/v2.0.2...v2.1.0) (2026-01-18)
+
+
+### Features
+
+* **game-card:** add glassmorphism design for light themes ([4e418da](https://github.com/franprince/japanese-practice/commit/4e418da62c8e89030eafe5393dae89a9f3b4c6c9))
+* **theme-switcher:** group themes by dark/light with icons ([387dea7](https://github.com/franprince/japanese-practice/commit/387dea7713056f687fa0433112ec966169092bc7))
+* **theme:** add daylight, lavender, and mint light themes ([7f52d1d](https://github.com/franprince/japanese-practice/commit/7f52d1dce6da5f539900481e93195b36113ffd78))
+
 ## [2.0.2](https://github.com/franprince/japanese-practice/compare/v2.0.1...v2.0.2) (2026-01-18)
 
 
