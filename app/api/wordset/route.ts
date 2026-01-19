@@ -39,7 +39,11 @@ export async function GET(request: Request) {
   const etag = `"${version}"`
 
   // Check ETag
-  if (request.headers.get("if-none-match") === etag) {
+  const ifNoneMatch = request.headers.get("if-none-match")
+  console.log(`[API] Wordset ETag Check - Current: ${etag}, Client: ${ifNoneMatch}`)
+
+  if (ifNoneMatch === etag) {
+    console.log("[API] Returning 304 Not Modified")
     return new NextResponse(null, { status: 304 })
   }
 

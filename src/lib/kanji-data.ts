@@ -8,8 +8,8 @@ export interface KanjiEntry {
   jlpt?: string | null
 }
 
-const DB_NAME = "kana-words"
-const STORE_NAME = "kanjiData"
+import { openDb, STORE_KANJI } from "./db"
+
 const CACHE_PREFIX = "kanji-level-"
 const CACHE_EXPIRY_DAYS = 7
 
@@ -32,31 +32,13 @@ interface CachedKanjiData {
 // In-memory cache per level
 const memoryCache: Record<string, Promise<KanjiEntry[]>> = {}
 
-// IndexedDB helpers
-const openDb = (): Promise<IDBDatabase> =>
-  new Promise((resolve, reject) => {
-    if (typeof indexedDB === "undefined") {
-      reject(new Error("IndexedDB not available"))
-      return
-    }
-    const req = indexedDB.open(DB_NAME, 2)
-    req.onupgradeneeded = () => {
-      const db = req.result
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME)
-      }
-    }
-    req.onsuccess = () => resolve(req.result)
-    req.onerror = () => reject(req.error)
-  })
-
 const readCache = async (level: string): Promise<KanjiEntry[] | null> => {
   if (typeof indexedDB === "undefined") return null
   try {
     const db = await openDb()
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, "readonly")
-      const store = tx.objectStore(STORE_NAME)
+      const tx = db.transaction(STORE_KANJI, "readonly")
+      const store = tx.objectStore(STORE_KANJI)
       const req = store.get(CACHE_PREFIX + level)
       req.onsuccess = () => {
         const cached = req.result as CachedKanjiData | undefined
@@ -87,8 +69,8 @@ const writeCache = async (level: string, data: KanjiEntry[]) => {
   try {
     const db = await openDb()
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, "readwrite")
-      const store = tx.objectStore(STORE_NAME)
+      const tx = db.transaction(STORE_KANJI, "readwrite")
+      const store = tx.objectStore(STORE_KANJI)
       const cachedData: CachedKanjiData = {
         data,
         timestamp: Date.now()
