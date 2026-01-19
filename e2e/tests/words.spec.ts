@@ -185,4 +185,65 @@ test.describe('Words Game', () => {
         await toggleButton.click()
         await expect(modalTitle).toBeHidden()
     })
+
+  test('should not fetch full wordset on mobile until user confirms', async ({ wordsPage, page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('kana-words-lang', 'en')
+      localStorage.removeItem('wordset-confirmed-en')
+    })
+    await page.setViewportSize({ width: 375, height: 812 })
+
+    const requests: { method: string; url: string }[] = []
+    const payload = {
+      version: 1,
+      hiraganaWords: [],
+      katakanaWords: [],
+      bothForms: [],
+    }
+    const payloadStr = JSON.stringify(payload)
+
+    await page.route('**/api/wordset?lang=en', async (route, request) => {
+      const method = request.method()
+      requests.push({ method, url: request.url() })
+      if (method === 'HEAD') {
+        await route.fulfill({
+          status: 200,
+          headers: {
+            'content-length': String(payloadStr.length),
+          },
+        })
+        return
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        headers: {
+          'content-length': String(payloadStr.length),
+        },
+        body: payloadStr,
+      })
+    })
+
+    await wordsPage.goto()
+    await page.waitForLoadState('networkidle')
+    await page.waitForTimeout(500)
+
+    const toggleButton = page.locator('button[title="Switch to Words"]')
+    await expect(toggleButton).toBeVisible()
+
+    // No GET should have happened before confirmation
+    expect(requests.filter((r) => r.method === 'GET').length).toBe(0)
+
+    await toggleButton.click()
+    await expect(page.locator('text=Download word set')).toBeVisible()
+
+    await page.locator('button:has-text("Download")').click()
+
+    await expect(page.locator('text=Download word set')).toBeHidden()
+
+    // After confirm, one GET fetch should occur
+    await page.waitForTimeout(200)
+    expect(requests.filter((r) => r.method === 'GET').length).toBe(1)
+  })
 })
