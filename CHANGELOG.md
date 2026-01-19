@@ -1,3 +1,11 @@
+## [2.1.3](https://github.com/franprince/japanese-practice/compare/v2.1.2...v2.1.3) (2026-01-19)
+
+
+### Bug Fixes
+
+* **cache:** centralize indexeddb management to prevent schema race conditions ([c07b11e](https://github.com/franprince/japanese-practice/commit/c07b11e839d2e5d7ca5a983505ac231d49e52728))
+* **cache:** check IndexedDB before network fetch for wordsets ([a57e42d](https://github.com/franprince/japanese-practice/commit/a57e42dc2d4e220d2451bf7b2d460af20eb56335))
+
 ## [2.1.2](https://github.com/franprince/japanese-practice/compare/v2.1.1...v2.1.2) (2026-01-18)
 
 
