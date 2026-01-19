@@ -139,6 +139,10 @@ export type TranslationKey =
   | "incorrectChars"
   | "tableCharacter"
   | "tableErrors"
+  | "mobileWordModeConfirm"
+  | "mobileWordModeTitle"
+  | "mobileWordModeCancel"
+  | "mobileWordModeContinue"
 
 
 export const translations: Record<Language, Record<TranslationKey, string>> = {
@@ -282,6 +286,10 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     incorrectChars: "Most frequent errors",
     tableCharacter: "Character",
     tableErrors: "Errors",
+    mobileWordModeConfirm: "Word mode downloads around {size}. Continue?",
+    mobileWordModeTitle: "Download word set",
+    mobileWordModeCancel: "Not now",
+    mobileWordModeContinue: "Download",
   },
   es: {
     chipLabel: "Práctica de Kana",
@@ -423,6 +431,10 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     incorrectChars: "Errores más frecuentes",
     tableCharacter: "Caracter",
     tableErrors: "Errores",
+    mobileWordModeConfirm: "El modo palabras descarga alrededor de {size}. ¿Continuar?",
+    mobileWordModeTitle: "Descargar set de palabras",
+    mobileWordModeCancel: "Ahora no",
+    mobileWordModeContinue: "Descargar",
   },
   ja: {
     chipLabel: "かな練習",
@@ -563,5 +575,9 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     incorrectChars: "よく間違える文字",
     tableCharacter: "文字",
     tableErrors: "エラー",
+    mobileWordModeConfirm: "単語モードは約 {size} をダウンロードします。続行しますか？",
+    mobileWordModeTitle: "単語セットをダウンロード",
+    mobileWordModeCancel: "今はしない",
+    mobileWordModeContinue: "ダウンロード",
   },
 }

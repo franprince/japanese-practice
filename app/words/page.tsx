@@ -14,9 +14,11 @@ import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
 import { useSessionProgress } from "@/hooks/use-session-progress"
 import { useI18n } from "@/lib/i18n"
+import { useMobileWordset } from "@/hooks/use-mobile-wordset"
+import { MobileWordsetModal } from "@/components/words/mobile-wordset-modal"
 
 export default function WordsPage() {
-    const { t } = useI18n()
+    const { t, lang } = useI18n()
     const {
         score,
         streak,
@@ -60,7 +62,15 @@ export default function WordsPage() {
         maxLength: 6,
     })
     const [customSettingsOpen, setCustomSettingsOpen] = useState(false)
-    const [isCharacterMode, setIsCharacterMode] = useState(false)
+    const {
+        isCharacterMode,
+        mobileConfirmOpen,
+        downloadProgress,
+        wordsetSizeMB,
+        requestToggleCharacterMode,
+        confirmWordMode,
+        cancelConfirm,
+    } = useMobileWordset(lang)
 
     const handleScoreUpdateWithUi = useCallback(
         (newScore: number, newStreak: number, correct: boolean) => {
@@ -103,6 +113,7 @@ export default function WordsPage() {
         resetSession()
         setIncorrectChars(new Map()) // Clear incorrect chars on session reset
     }, [resetSession])
+
 
     return (
         <GamePageLayout
@@ -164,10 +175,22 @@ export default function WordsPage() {
                     onRequestOpenSettings={() => setCustomSettingsOpen(true)}
                     disableNext={sessionComplete && playMode === "session"}
                     isCharacterMode={isCharacterMode}
-                    onToggleCharacterMode={() => setIsCharacterMode(prev => !prev)}
+                    onToggleCharacterMode={requestToggleCharacterMode}
                     onIncorrectCharsChange={setIncorrectChars}
                 />
             )}
+            <MobileWordsetModal
+                open={mobileConfirmOpen}
+                title={t("mobileWordModeTitle")}
+                message={t("mobileWordModeConfirm").replace("{size}", `${wordsetSizeMB}MB`)}
+                progress={downloadProgress}
+                onCancel={cancelConfirm}
+                onConfirm={confirmWordMode}
+                cancelLabel={t("mobileWordModeCancel")}
+                confirmLabel={t("mobileWordModeContinue")}
+                cancelDisabled={downloadProgress !== null}
+                confirmDisabled={downloadProgress !== null}
+            />
         </GamePageLayout>
     )
 }
