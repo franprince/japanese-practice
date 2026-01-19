@@ -125,4 +125,64 @@ test.describe('Words Game', () => {
         // Capture incorrect screenshot
         await wordsPage.screenshot('words_feedback_incorrect')
     })
+
+    test('should confirm mobile wordset download before switching to words', async ({ wordsPage, page }) => {
+        await page.addInitScript(() => {
+            localStorage.setItem('kana-words-lang', 'en')
+        })
+        await page.setViewportSize({ width: 375, height: 812 })
+
+        const payload = {
+            version: 1,
+            hiraganaWords: [],
+            katakanaWords: [],
+            bothForms: [],
+        }
+        const payloadStr = JSON.stringify(payload)
+
+        await page.route('**/api/wordset?lang=en', async (route, request) => {
+            if (request.method() === 'HEAD') {
+                await route.fulfill({
+                    status: 200,
+                    headers: {
+                        'content-length': String(payloadStr.length),
+                    },
+                })
+                return
+            }
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                headers: {
+                    'content-length': String(payloadStr.length),
+                },
+                body: payloadStr,
+            })
+        })
+
+        await wordsPage.goto()
+        await page.waitForLoadState('networkidle')
+        await page.waitForTimeout(1000)
+
+        const toggleButton = page.locator('button[title="Switch to Words"]')
+        await expect(toggleButton).toBeVisible()
+        await toggleButton.click()
+
+        const modalTitle = page.locator('text=Download word set')
+        await expect(modalTitle).toBeVisible()
+
+        await page.locator('button:has-text("Not now")').click()
+        await expect(modalTitle).toBeHidden()
+
+        await toggleButton.click()
+        await expect(modalTitle).toBeVisible()
+
+        await page.locator('button:has-text("Download")').click()
+        await expect(modalTitle).toBeHidden()
+
+        // Cached: switching back to words should not prompt
+        await toggleButton.click()
+        await expect(modalTitle).toBeHidden()
+    })
 })
