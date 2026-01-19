@@ -1,4 +1,5 @@
 // ... (imports remain)
+import { openDb, STORE_WORDSETS } from "./db"
 import type { JapaneseWord } from "./japanese-words"
 
 export type LoaderDeps = {
@@ -22,41 +23,20 @@ export type WordSets = {
 }
 
 const WORDSET_LANG = "es".toLowerCase()
+
+
 const CACHE_NAMESPACE = "prod"
 const getCacheKey = (lang: string) => `${CACHE_NAMESPACE}-${lang}`
 const cachedPromises: Record<string, Promise<WordSets>> = {}
-const DB_NAME = "kana-words"
-const STORE_NAME = "wordSets"
 
-// Removed worker code
-
-
-
-const openDb = (): Promise<IDBDatabase> =>
-  new Promise((resolve, reject) => {
-    if (typeof indexedDB === "undefined") {
-      reject(new Error("IndexedDB not available"))
-      return
-    }
-    const req = indexedDB.open(DB_NAME, 2) // Version 2 for consistency with kanji-data
-    req.onupgradeneeded = () => {
-      const db = req.result
-      // Only create the store if it doesn't exist
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME)
-      }
-    }
-    req.onsuccess = () => resolve(req.result)
-    req.onerror = () => reject(req.error)
-  })
 
 const readCache = async (lang: string): Promise<WordSets | null> => {
   if (typeof indexedDB === "undefined") return null
   try {
     const db = await openDb()
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, "readonly")
-      const store = tx.objectStore(STORE_NAME)
+      const tx = db.transaction(STORE_WORDSETS, "readonly")
+      const store = tx.objectStore(STORE_WORDSETS)
       const req = store.get(getCacheKey(lang))
       req.onsuccess = () => resolve((req.result as WordSets) ?? null)
       req.onerror = () => reject(req.error)
@@ -72,8 +52,8 @@ const writeCache = async (lang: string, data: WordSets) => {
   try {
     const db = await openDb()
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(STORE_NAME, "readwrite")
-      const store = tx.objectStore(STORE_NAME)
+      const tx = db.transaction(STORE_WORDSETS, "readwrite")
+      const store = tx.objectStore(STORE_WORDSETS)
       const req = store.put(data, getCacheKey(lang))
       req.onsuccess = () => resolve()
       req.onerror = () => reject(req.error)
@@ -123,12 +103,15 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
       let cached: WordSets | null = null
       try {
         cached = await readCache(datasetLang)
+        console.log(`[Loader] Checked cache for ${datasetLang}. Found version:`, cached?.version)
       } catch (e) {
         console.warn("Failed to read cache", e)
       }
 
       // 2. Conditional fetch using cached version
+      console.log(`[Loader] Fetching wordset with If-None-Match: "${cached?.version}"`)
       const remote = await fetchPrebuiltWordset(datasetLang, cached?.version)
+      console.log(`[Loader] Fetch result:`, remote === "not-modified" ? "304 Not Modified" : "New Data/Error")
 
       // 3. Handle response
       if (remote === "not-modified") {
