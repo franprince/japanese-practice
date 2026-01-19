@@ -23,20 +23,36 @@ export type WordSets = {
 
 const WORDSET_LANG = "es".toLowerCase()
 
+const isMobileDevice = () => {
+  if (typeof window === "undefined") return false
+  if (window.matchMedia?.("(max-width: 768px)").matches) return true
+  const ua = navigator.userAgent.toLowerCase()
+  return /android|iphone|ipad|ipod|mobile|tablet/.test(ua)
+}
+
+const isWordsetConfirmed = (lang: string) => {
+  if (typeof window === "undefined") return false
+  try {
+    return localStorage.getItem(`wordset-confirmed-${lang}`) === "1"
+  } catch {
+    return false
+  }
+}
+
 
 const CACHE_NAMESPACE = "prod"
-const getCacheKey = (lang: string) => `${CACHE_NAMESPACE}-${lang}`
+export const getWordsetCacheKey = (lang: string) => `${CACHE_NAMESPACE}-${lang}`
 const cachedPromises: Record<string, Promise<WordSets>> = {}
 
 
-const readCache = async (lang: string): Promise<WordSets | null> => {
+export const readWordsetCache = async (lang: string): Promise<WordSets | null> => {
   if (typeof indexedDB === "undefined") return null
   try {
     const db = await openDb()
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_WORDSETS, "readonly")
       const store = tx.objectStore(STORE_WORDSETS)
-      const req = store.get(getCacheKey(lang))
+      const req = store.get(getWordsetCacheKey(lang))
       req.onsuccess = () => resolve(req.result as WordSets)
       req.onerror = () => reject(req.error)
     })
@@ -52,10 +68,15 @@ const writeCache = async (lang: string, data: WordSets): Promise<void> => {
     const db = await openDb()
     const tx = db.transaction(STORE_WORDSETS, "readwrite")
     const store = tx.objectStore(STORE_WORDSETS)
-    store.put(data, getCacheKey(lang))
+    store.put(data, getWordsetCacheKey(lang))
   } catch (e) {
     console.warn("IndexedDB write failed", e)
   }
+}
+
+export const primeWordsetCache = async (lang: string, data: WordSets): Promise<void> => {
+  cachedPromises[lang] = Promise.resolve(data)
+  await writeCache(lang, data)
 }
 
 const fetchPrebuiltWordset = async (lang: string, currentVersion?: number): Promise<WordSets | "not-modified" | null> => {
@@ -100,7 +121,7 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
       // 1. Check cache first
       let cached: WordSets | null = null
       try {
-        cached = await readCache(datasetLang)
+        cached = await readWordsetCache(datasetLang)
         console.log(`[Loader] Cache probe for ${datasetLang}:`, cached ? `Found v${cached.version}` : "Miss")
       } catch (e) {
         console.warn("Failed to read cache", e)
@@ -146,10 +167,18 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
         return cached
       }
 
+      // 3b. Mobile guard: do not fetch until user confirms
+      if (isMobileDevice() && !isWordsetConfirmed(datasetLang)) {
+        throw new Error(`Wordset fetch blocked until user confirms for ${datasetLang}`)
+      }
+
       // 4. Cold Start
       console.log("[Loader] Cold start: Waiting for network")
       return performFetch()
-    })()
+    })().catch((err) => {
+      delete cachedPromises[datasetLang]
+      throw err
+    })
   }
   return cachedPromises[datasetLang]
 }
