@@ -1,3 +1,20 @@
+# [2.2.0](https://github.com/franprince/japanese-practice/compare/v2.1.3...v2.2.0) (2026-01-19)
+
+
+### Bug Fixes
+
+* gate mobile fetch until confirmed ([db6db54](https://github.com/franprince/japanese-practice/commit/db6db54ddc61e3e3bb454bfd3e775cf1f89810cd))
+* gate mobile wordset fetch until confirmed ([e12212a](https://github.com/franprince/japanese-practice/commit/e12212a81c2618003b58a0784ebc8f5eef247628))
+* improve mobile wordset progress reporting ([dda5bb7](https://github.com/franprince/japanese-practice/commit/dda5bb7fb35d7a708dfc0be6015ce8647e11307e))
+* improve mobile wordset progress reporting ([bc20d15](https://github.com/franprince/japanese-practice/commit/bc20d158496b1bf6eec8f5c8e08569fac7b0480a))
+* improve mobile wordset progress reporting ([b32db56](https://github.com/franprince/japanese-practice/commit/b32db5630d5daf0caf4a983d7c424fd18a8460e3))
+
+
+### Features
+
+* add mobile wordset confirmation flow ([a3015f6](https://github.com/franprince/japanese-practice/commit/a3015f62fa6d7843fe48b368e049119915048091))
+* optimize mobile word filtering ([94c5421](https://github.com/franprince/japanese-practice/commit/94c54214b031af582cbd59917061ca141096869c))
+
 ## [2.1.3](https://github.com/franprince/japanese-practice/compare/v2.1.2...v2.1.3) (2026-01-19)
 
 
