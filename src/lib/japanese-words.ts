@@ -1,5 +1,5 @@
 import { blacklist } from "../../src/lib/data/blacklist";
-import { loadWordSets } from "./words-loader";
+import { loadWordSets, normalizeLang } from "./words-loader";
 import type { GameMode } from "@/types/game";
 import {
   getCharacterGroups,
@@ -30,6 +30,34 @@ const getKanaRomajiMapInternal = (): Record<string, string> => getKanaRomajiMapS
 
 const hasHiragana = (text: string) => /[\u3040-\u309F]/.test(text)
 const hasKatakana = (text: string) => /[\u30A0-\u30FF]/.test(text)
+
+const MOBILE_WORDSET_MAX = 1500
+const filteredWordCache = new Map<string, JapaneseWord[]>()
+
+const isMobileDevice = () => {
+  if (typeof window === "undefined") return false
+  if (window.matchMedia?.("(max-width: 768px)").matches) return true
+  const ua = navigator.userAgent.toLowerCase()
+  return /android|iphone|ipad|ipod|mobile|tablet/.test(ua)
+}
+
+const buildFilterKey = (type: GameMode, filter: WordFilter | undefined, lang: string, isMobile: boolean) => {
+  if (!filter) return `${type}:${lang}:${isMobile ? "mobile" : "desktop"}:none`
+  const sortedGroups = [...filter.selectedGroups].sort()
+  return `${type}:${lang}:${isMobile ? "mobile" : "desktop"}:${filter.minLength}-${filter.maxLength}:${sortedGroups.join("|")}`
+}
+
+const clampWordsetForMobile = (words: JapaneseWord[]) => {
+  if (!isMobileDevice() || words.length <= MOBILE_WORDSET_MAX) return words
+  const shuffled = [...words]
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const current = shuffled[i]!
+    shuffled[i] = shuffled[j]!
+    shuffled[j] = current
+  }
+  return shuffled.slice(0, MOBILE_WORDSET_MAX)
+}
 
 const hiraToKata = (text: string) =>
   text.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60))
@@ -116,25 +144,37 @@ export async function getRandomWord(
     words = combined
   }
 
-  // Global blacklist filter based on meaning
-  words = words.filter(word => !isMeaningBlacklisted(word.meaning))
+  const datasetLang = normalizeLang(lang)
+  const mobile = isMobileDevice()
+  const cacheKey = buildFilterKey(type, filter, datasetLang, mobile)
+  const cached = filteredWordCache.get(cacheKey)
 
-  // Apply filters
-  if (filter) {
-    const { selectedGroups, minLength, maxLength } = filter
+  if (cached) {
+    words = cached
+  } else {
+    // Global blacklist filter based on meaning
+    words = words.filter(word => !isMeaningBlacklisted(word.meaning))
 
-    words = words.filter((word) => {
-      // Length filter
-      const length = word.kana.length
-      if (length < minLength || length > maxLength) return false
+    // Apply filters
+    if (filter) {
+      const { selectedGroups, minLength, maxLength } = filter
 
-      // Group filter - require selections; if none selected, exclude all
-      if (selectedGroups.length === 0) return false
-      const allGroupsAllowed = word.groups.every((g) => selectedGroups.includes(g))
-      if (!allGroupsAllowed) return false
+      words = words.filter((word) => {
+        // Length filter
+        const length = word.kana.length
+        if (length < minLength || length > maxLength) return false
 
-      return true
-    })
+        // Group filter - require selections; if none selected, exclude all
+        if (selectedGroups.length === 0) return false
+        const allGroupsAllowed = word.groups.every((g) => selectedGroups.includes(g))
+        if (!allGroupsAllowed) return false
+
+        return true
+      })
+    }
+
+    words = clampWordsetForMobile(words)
+    filteredWordCache.set(cacheKey, words)
   }
 
   if (words.length === 0) return null
