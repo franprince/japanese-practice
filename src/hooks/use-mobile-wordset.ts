@@ -31,8 +31,10 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
   const [mobileConfirmOpen, setMobileConfirmOpen] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null)
   const [wordsetSizeMB, setWordsetSizeMB] = useState<number>(WORDSET_SIZE_MB_BY_LANG[lang])
+  const [wordsetSizeBytes, setWordsetSizeBytes] = useState<number | null>(null)
   const [confirmedWordLang, setConfirmedWordLang] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [isCheckingCache, setIsCheckingCache] = useState(false)
 
   useEffect(() => {
     const mobile = isMobileDevice()
@@ -45,17 +47,17 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
   useEffect(() => {
     if (!isMobileDevice()) return
     const datasetLang = normalizeLang(lang)
+    setIsCheckingCache(true)
     readWordsetCache(datasetLang)
       .then((cached) => {
         if (cached) {
           setConfirmedWordLang(datasetLang)
-          return
-        }
-        if (!isCharacterMode && confirmedWordLang && confirmedWordLang !== datasetLang) {
+        } else if (!isCharacterMode && confirmedWordLang && confirmedWordLang !== datasetLang) {
           setIsCharacterMode(true)
           setMobileConfirmOpen(true)
         }
       })
+      .finally(() => setIsCheckingCache(false))
       .catch(() => undefined)
   }, [lang, isCharacterMode, confirmedWordLang])
 
@@ -75,6 +77,7 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
         if (!sizeHeader) return
         const bytes = Number(sizeHeader)
         if (!Number.isFinite(bytes) || bytes <= 0) return
+        setWordsetSizeBytes(bytes)
         const mb = Math.round((bytes / 1024 / 1024) * 10) / 10
         setWordsetSizeMB(mb)
       } catch {
@@ -103,6 +106,7 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
     try {
       const res = await fetch(`/api/wordset?lang=${datasetLang}`)
       const contentLength = Number(res.headers.get("content-length") || 0)
+      const totalBytes = contentLength > 0 ? contentLength : (wordsetSizeBytes ?? 0)
       const reader = res.body?.getReader()
 
       if (reader) {
@@ -114,8 +118,13 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
           if (value) {
             chunks.push(value)
             received += value.length
-            if (contentLength > 0) {
-              setDownloadProgress(Math.min(100, Math.round((received / contentLength) * 100)))
+            if (totalBytes > 0) {
+              setDownloadProgress(Math.min(100, Math.round((received / totalBytes) * 100)))
+            } else {
+              setDownloadProgress((prev) => {
+                const next = (prev ?? 0) + 5
+                return Math.min(95, next)
+              })
             }
           }
         }
@@ -134,18 +143,19 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
     } catch {
       // allow fallback loading via normal flow
     }
-    setDownloadProgress(null)
+    setDownloadProgress(100)
     setMobileConfirmOpen(false)
     setConfirmedWordLang(datasetLang)
     setIsCharacterMode(false)
-  }, [lang])
+    setDownloadProgress(null)
+  }, [lang, wordsetSizeBytes])
 
   const cancelConfirm = useCallback(() => {
     if (downloadProgress !== null) return
     setMobileConfirmOpen(false)
   }, [downloadProgress])
 
-  const effectiveCharacterMode = isMobile && confirmedWordLang !== normalizeLang(lang)
+  const effectiveCharacterMode = isMobile && !isCheckingCache && confirmedWordLang !== normalizeLang(lang)
     ? true
     : isCharacterMode
 
