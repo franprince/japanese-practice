@@ -23,6 +23,22 @@ export type WordSets = {
 
 const WORDSET_LANG = "es".toLowerCase()
 
+const isMobileDevice = () => {
+  if (typeof window === "undefined") return false
+  if (window.matchMedia?.("(max-width: 768px)").matches) return true
+  const ua = navigator.userAgent.toLowerCase()
+  return /android|iphone|ipad|ipod|mobile|tablet/.test(ua)
+}
+
+const isWordsetConfirmed = (lang: string) => {
+  if (typeof window === "undefined") return false
+  try {
+    return localStorage.getItem(`wordset-confirmed-${lang}`) === "1"
+  } catch {
+    return false
+  }
+}
+
 
 const CACHE_NAMESPACE = "prod"
 export const getWordsetCacheKey = (lang: string) => `${CACHE_NAMESPACE}-${lang}`
@@ -151,10 +167,18 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
         return cached
       }
 
+      // 3b. Mobile guard: do not fetch until user confirms
+      if (isMobileDevice() && !isWordsetConfirmed(datasetLang)) {
+        throw new Error(`Wordset fetch blocked until user confirms for ${datasetLang}`)
+      }
+
       // 4. Cold Start
       console.log("[Loader] Cold start: Waiting for network")
       return performFetch()
-    })()
+    })().catch((err) => {
+      delete cachedPromises[datasetLang]
+      throw err
+    })
   }
   return cachedPromises[datasetLang]
 }

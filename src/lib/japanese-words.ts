@@ -123,12 +123,23 @@ export async function getRandomWord(
   // Ensure character groups are loaded before we need them
   const loadedCharacterGroups = await getCharacterGroups()
 
-  const { hiraganaWords, katakanaWords, bothForms } = await loadWordSets({
-    characterGroups: loadedCharacterGroups,
-    kanaToRomaji,
-    hasHiragana,
-    hasKatakana,
-  }, lang)
+  let wordSets
+  try {
+    wordSets = await loadWordSets({
+      characterGroups: loadedCharacterGroups,
+      kanaToRomaji,
+      hasHiragana,
+      hasKatakana,
+    }, lang)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : ""
+    if (message.includes("Wordset fetch blocked until user confirms")) {
+      return null
+    }
+    throw err
+  }
+
+  const { hiraganaWords, katakanaWords, bothForms } = wordSets
 
   let words: JapaneseWord[]
 

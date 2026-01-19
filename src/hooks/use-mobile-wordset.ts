@@ -143,6 +143,13 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
     } catch {
       // allow fallback loading via normal flow
     }
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`wordset-confirmed-${datasetLang}`, "1")
+      }
+    } catch {
+      // ignore storage failures
+    }
     setDownloadProgress(100)
     setMobileConfirmOpen(false)
     setConfirmedWordLang(datasetLang)
