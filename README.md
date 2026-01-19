@@ -224,8 +224,10 @@ docs: update README
 2. **Build Process**: `scripts/build-wordset.ts` merges sources, filters blacklist, embeds `version`, and writes `public/wordset-<lang>.json` (ES and EN variants).
 3. **API Delivery**: `/api/wordset?lang=<lang>` reads the embedded `version`, sets `ETag`, and serves JSON. Clients validate with `If-None-Match` for lightweight 304 responses.
 4. **Caching**:
-   - Browser: IndexedDB (`kana-words` db, `wordSets` store) stores the latest wordset per language.
-   - Lifecycle: Check IndexedDB → Fetch API (ETag) → Fallback to local generation if needed → Update cache.
+   - **Architecture**: Centralized management via `src/lib/db.ts` ensures the `kana-words` IndexedDB (v3) initializes correctly with both `kanjiData` and `wordSets` stores, resolving schema race conditions.
+   - **Lifecycle**: Check IndexedDB → Fetch API (If-None-Match) → Reuse Cache (304) or Update (200).
+
+   ![Cache Workflow Diagram](docs/diagrams/cache-workflow.png)
 
 ### Kanji Data Pipeline
 
