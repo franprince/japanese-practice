@@ -40,11 +40,20 @@ export async function GET(request: Request) {
 
   // Check ETag
   const ifNoneMatch = request.headers.get("if-none-match")
-  console.log(`[API] Wordset ETag Check - Current: ${etag}, Client: ${ifNoneMatch}`)
+  // console.log(`[API] Wordset ETag Check - Current: ${etag}, Client: ${ifNoneMatch}`)
 
-  if (ifNoneMatch === etag) {
-    console.log("[API] Returning 304 Not Modified")
-    return new NextResponse(null, { status: 304 })
+  // Robust ETag comparison:
+  // 1. Remove "W/" prefix if present
+  // 2. Remove surrounding quotes if present
+  // 3. Compare trimmed values
+  if (ifNoneMatch) {
+    const cleanClient = ifNoneMatch.replace(/^W\//, "").replace(/"/g, "").trim()
+    const cleanServer = etag.replace(/^W\//, "").replace(/"/g, "").trim()
+
+    if (cleanClient === cleanServer) {
+      // console.log("[API] Returning 304 Not Modified")
+      return new NextResponse(null, { status: 304 })
+    }
   }
 
   const data = JSON.parse(raw!)
