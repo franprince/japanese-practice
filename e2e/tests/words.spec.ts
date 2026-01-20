@@ -4,7 +4,7 @@ import * as path from 'path'
 
 // Load kana dictionary for deterministic answers
 const kanaDict = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../../src/lib/data/kanaDictionary.json'), 'utf-8')
+    fs.readFileSync(path.join(__dirname, '../../src/lib/japanese/shared/kanaDictionary.json'), 'utf-8')
 )
 
 // Build a lookup map for quick character->romaji conversion
