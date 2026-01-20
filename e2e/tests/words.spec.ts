@@ -127,21 +127,20 @@ test.describe('Words Game', () => {
     })
 
     test('should load words game on mobile with confirmation flow', async ({ wordsPage, page }) => {
-        // Force mobile environment
-        await page.setViewportSize({ width: 375, height: 812 })
-        // Mock User Agent to ensure isMobileDevice returns true
-        await page.addInitScript(() => {
-            Object.defineProperty(navigator, 'userAgent', {
-                get: () => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
-            })
-            // Force clear storage to ensure no previous confirmation prevents modal
-            localStorage.clear()
+        // Use desktop viewport but simulate mobile logic via matchMedia override
+        await page.setViewportSize({ width: 1280, height: 800 })
 
-            // Force matchMedia to true for mobile breadth
+        // Mock matchMedia to ensure isMobileDevice returns true
+        await page.addInitScript(() => {
+            // Force English language and clear other storage
+            localStorage.clear()
+            localStorage.setItem('kana-words-lang', 'en')
+
+            // Force matchMedia to true for mobile breadth ONLY
             Object.defineProperty(window, 'matchMedia', {
                 writable: true,
                 value: (query: string) => ({
-                    matches: true,
+                    matches: query.includes('max-width: 768px'), // Only match the mobile query
                     media: query,
                     onchange: null,
                     addListener: () => { },
@@ -155,61 +154,70 @@ test.describe('Words Game', () => {
 
         await wordsPage.goto()
 
-        // Clear IndexedDB reliably and reload to ensure clean state
+        // Clear IndexedDB to simulate a fresh mobile user
         await page.evaluate(async () => {
             const DB_NAME = "kana-words"
-            await new Promise((resolve, reject) => {
+            return new Promise<void>((resolve, reject) => {
                 const req = indexedDB.deleteDatabase(DB_NAME)
-                req.onsuccess = resolve
-                req.onerror = reject
-                req.onblocked = resolve
+                req.onsuccess = () => resolve()
+                req.onerror = () => reject(req.error)
+                req.onblocked = () => resolve()
             })
         })
-        await page.reload()
+
+        // Reload to apply the cleared DB state
+        await wordsPage.goto()
+        await page.waitForLoadState('networkidle')
 
         // 1. Should start in Character Mode (input visible immediately, no download)
         const input = page.locator('input[type="text"]')
         await expect(input).toBeVisible()
 
         // 2. Switch to Words Mode (toggle button)
-        const switchBtn = page.locator('button[title="Switch to words"]')
-        console.log('Checking for switch button...')
+        const switchBtn = page.getByRole('button', { name: /switch to|cambiar a/i })
+        console.log('Waiting for switch button...')
+        await switchBtn.waitFor({ timeout: 5000 })
+
         if (await switchBtn.isVisible()) {
             await switchBtn.click()
             console.log('Clicked switch button')
         } else {
             console.log('Switch button not found, checking if already in words mode...')
             // If we are already in words mode, the button should say "Switch to Characters"
-            const charBtn = page.locator('button[title="Switch to Characters"]')
+            const charBtn = page.locator('button[title*="Switch to"], button[title*="Cambiar a"]')
             if (await charBtn.isVisible()) {
                 console.log('Already in Words Mode (Switch to Characters visible)')
             } else {
                 console.log('NEITHER button found. Dumping page layout...')
-                console.log(await page.content())
             }
         }
 
         // 3. Now should see Download Confirmation Modal
         console.log('Waiting for modal...')
-        const modal = page.getByTestId('mobile-wordset-modal')
+        const modal = page.locator('[data-testid="mobile-wordset-modal"]')
+        await expect(modal).toBeVisible({ timeout: 5000 })
+        console.log('Modal found! Clicking Download...')
+        const downloadBtn = modal.locator('button', { hasText: /Download|Descargar/i })
+        await downloadBtn.click()
+
+        // Verify modal closes
+        await expect(modal).toBeHidden({ timeout: 5000 })
+
+        // 4. Input should reappear
         try {
-            await expect(modal).toBeVisible({ timeout: 5000 })
-            console.log('Modal found! Clicking Download...')
-            const downloadBtn = modal.locator('button', { hasText: 'Download' })
-            await downloadBtn.click()
+            await expect(input).toBeVisible({ timeout: 10000 })
         } catch (e) {
-            console.log('Modal NOT visible. Taking screenshot...')
-            await page.screenshot({ path: 'modal-fail.png' })
-            // Check input visibility as fallback debug
-            const input = page.locator('input[type="text"]')
-            if (await input.isVisible()) {
-                console.log('Input visible - logic skipped modal?')
+            console.log('Input not visible after download. Checking for error state...')
+            const noWords = page.locator('text=/No words|No hay palabras/i')
+            if (await noWords.isVisible()) {
+                console.log('Error: "No words" message is visible!')
+            } else {
+                console.log('Error: Input missing AND "No words" missing. Dumping layout...')
+                const content = await page.content()
+                fs.writeFileSync('page_dump_fail.html', content)
             }
             throw e
         }
-
-        // 4. Input should reappear
-        await expect(input).toBeVisible({ timeout: 10000 })
     })
 
 })
