@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { useTheme } from "@/lib/theme-context"
+import { useTheme } from "@/lib/theme"
 
 export interface UseBaseGameProps {
     onScoreUpdate: (score: number, streak: number, correct: boolean) => void
