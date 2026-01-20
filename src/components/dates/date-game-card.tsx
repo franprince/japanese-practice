@@ -2,12 +2,10 @@
 
 import type React from "react"
 
-import { Check, X, CalendarDays, Calendar, Hash, Type } from "lucide-react"
+import { Check, X, ArrowRight, SkipForward, Calendar, CalendarDays, Hash, Type } from "lucide-react"
 import type { DateMode } from "@/lib/japanese/dates"
 import { useI18n } from "@/lib/i18n"
 import { useDateGame } from "@/hooks/use-date-game"
-import { GameCardContainer, QuestionDisplay, AnswerSection, ResultDisplay, ActionBar } from "@/components/game/primitives"
-import { Input } from "@/components/ui/input"
 
 interface DateGameCardProps {
   mode: DateMode
@@ -55,27 +53,25 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
     }
   }
 
-  const getPromptText = () => {
-    switch (mode) {
-      case "full":
-        return t("writeFullDate")
-      case "months":
-        return t("writeMonthReading")
-      case "week_days":
-        return t("writeWeekDay")
-    }
-  }
-
   const handleInputChange = (value: string) => {
     if (showResult) return
     setUserInput(value)
   }
 
-  const displayValue = (mode === "months" && showNumbers ? question.displayNumber : question.display) || ""
-
   return (
-    <GameCardContainer feedback={showResult ? (isCorrect ? "correct" : "incorrect") : null}>
-      {/* Number/Name toggle for months and week_days */}
+    <div
+      className={`
+        relative rounded-2xl border-2 bg-card p-6 md:p-8 transition-all duration-300
+        ${showResult ? (isCorrect ? "border-green-500/50 shadow-lg shadow-green-500/10" : "border-red-500/50 shadow-lg shadow-red-500/10") : "border-border"}
+      `}
+    >
+
+      <div className="flex items-center justify-center gap-2 mb-4 text-muted-foreground text-sm">
+        {getModeIcon()}
+        <span>{getModeLabel()}</span>
+      </div>
+
+
       {(mode === "months" || mode === "week_days") && (
         <div className="absolute top-4 right-4 md:top-6 md:right-6">
           <button
@@ -88,16 +84,22 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         </div>
       )}
 
-      <QuestionDisplay
-        value={displayValue}
-        prompt={getModeLabel()}
-        icon={getModeIcon()}
-      />
 
-      <p className="text-sm text-muted-foreground text-center mb-6">{getPromptText()}</p>
+      <div className="text-center mb-6">
+        <div
+          lang={mode === "months" && showNumbers ? undefined : "ja"}
+          className="text-6xl md:text-7xl font-bold text-foreground mb-2 font-mono"
+        >
+          {mode === "months" && showNumbers ? question.displayNumber : question.display}
+        </div>
+        {mode === "full" && <p className="text-sm text-muted-foreground">{t("writeFullDate")}</p>}
+        {mode === "months" && <p className="text-sm text-muted-foreground">{t("writeMonthReading")}</p>}
+        {mode === "week_days" && <p className="text-sm text-muted-foreground">{t("writeWeekDay")}</p>}
+      </div>
 
-      <AnswerSection>
-        <Input
+
+      <div className="mb-4">
+        <input
           ref={inputRef}
           type="text"
           value={userInput}
@@ -107,33 +109,70 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
           readOnly={showResult}
           aria-disabled={showResult}
           placeholder={t("typeHiraganaOrRomaji")}
-          className="text-center text-lg"
+          className={`
+            w-full px-4 py-3 text-lg text-center rounded-xl border-2 bg-background
+            placeholder:text-muted-foreground/50 focus:outline-none transition-all
+            ${showResult ? "border-border opacity-60" : "border-border focus:border-primary"}
+          `}
         />
+      </div>
 
-        {showResult && (
-          <ResultDisplay
-            isCorrect={isCorrect}
-            expectedAnswer={question.answer}
-            userAnswer={userInput}
-            romaji={question.romaji}
-            additionalInfo={
-              question.kanji ? <p lang="ja" className="text-lg text-primary">{question.kanji}</p> : undefined
-            }
-            t={t}
-          />
+
+      {showResult && (
+        <div
+          className={`
+            mb-4 p-4 rounded-xl border
+            ${isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"}
+          `}
+        >
+          <div className="flex items-center justify-center gap-2 mb-2">
+            {isCorrect ? <Check className="w-5 h-5 text-green-500" /> : <X className="w-5 h-5 text-red-500" />}
+            <span className={`font-medium ${isCorrect ? "text-green-500" : "text-red-500"}`}>
+              {isCorrect ? t("correct") : t("incorrect")}
+            </span>
+          </div>
+          <div className="text-center space-y-1">
+            <p className="text-sm text-muted-foreground">{t("correctAnswer")}:</p>
+            <p lang="ja" className="text-xl font-medium">{question.answer}</p>
+            <p className="text-sm text-muted-foreground">({question.romaji})</p>
+            {question.kanji && <p lang="ja" className="text-lg text-primary mt-2">{question.kanji}</p>}
+          </div>
+        </div>
+      )}
+
+
+      <div className="flex gap-3">
+        {showResult ? (
+          <button
+            onClick={() => {
+              if (!disableNext) generateNewQuestion()
+            }}
+            disabled={disableNext}
+            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {t("nextDate")}
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={handleSkip}
+              className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-secondary text-secondary-foreground font-medium hover:bg-secondary/80 transition-colors"
+            >
+              <SkipForward className="w-4 h-4" />
+              <span className="hidden sm:inline">{t("skip")}</span>
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={!userInput.trim()}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {t("check")}
+              <Check className="w-4 h-4" />
+            </button>
+          </>
         )}
-      </AnswerSection>
-
-      <ActionBar
-        showResult={showResult}
-        onSubmit={handleSubmit}
-        onNext={generateNewQuestion}
-        onSkip={handleSkip}
-        submitDisabled={!userInput.trim()}
-        nextDisabled={disableNext}
-        nextLabel={t("nextDate")}
-        t={t}
-      />
-    </GameCardContainer>
+      </div>
+    </div>
   )
 }

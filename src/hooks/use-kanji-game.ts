@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { getRandomKanji, getRandomOptions, loadKanjiByLevels, type KanjiEntry, type KanjiDifficulty } from "@/lib/japanese/kanji"
-import { useGameScore } from "./use-game-score"
+import { useBaseGame } from "./use-base-game"
 import { useKeyboardNavigation } from "./use-keyboard-navigation"
 
 export interface UseKanjiGameProps {
@@ -33,8 +33,16 @@ export function useKanjiGame({
     const [currentKanji, setCurrentKanji] = useState<KanjiEntry | null>(null)
     const [options, setOptions] = useState<KanjiEntry[]>([])
     const [selectedOption, setSelectedOption] = useState<KanjiEntry | null>(null)
-    const [isRevealed, setIsRevealed] = useState(false)
-    const { updateScore } = useGameScore(onScoreUpdate)
+
+    // Use unified base game logic
+    const {
+        feedback,
+        setFeedback,
+        submitAnswer
+    } = useBaseGame({ onScoreUpdate })
+
+    const isRevealed = feedback !== null
+    const isCorrect = feedback === "correct"
 
     useEffect(() => {
         let levels: string[] = []
@@ -69,9 +77,9 @@ export function useKanjiGame({
             setCurrentKanji(newKanji)
             setOptions(getRandomOptions(kanjiSet, newKanji, 3))
             setSelectedOption(null)
-            setIsRevealed(false)
+            setFeedback(null)
         },
-        [kanjiSet],
+        [kanjiSet, setFeedback],
     )
 
     useEffect(() => {
@@ -85,12 +93,11 @@ export function useKanjiGame({
             const choice = option ?? selectedOption
             if (!choice || !currentKanji) return
 
-            const isCorrect = choice.char === currentKanji.char
+            const correct = choice.char === currentKanji.char
             setSelectedOption(choice)
-            setIsRevealed(true)
-            updateScore(isCorrect)
+            submitAnswer(correct)
         },
-        [selectedOption, currentKanji, updateScore],
+        [selectedOption, currentKanji, submitAnswer],
     )
 
     const handleOptionClick = useCallback((option: KanjiEntry) => {
@@ -109,8 +116,6 @@ export function useKanjiGame({
         },
         true
     )
-
-    const isCorrect = selectedOption?.char === currentKanji?.char
 
     return {
         // State

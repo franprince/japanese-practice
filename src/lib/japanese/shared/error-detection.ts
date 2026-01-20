@@ -100,70 +100,19 @@ export async function getValidRomaji(kana: string): Promise<string[]> {
 }
 
 /**
- * Checks if a two-character sequence is a digraph (combination kana)
- */
-function isDigraph(twoChars: string): boolean {
-    const smallY = ["ゃ", "ゅ", "ょ", "ャ", "ュ", "ョ"]
-    const secondChar = twoChars[1]
-    return twoChars.length === 2 && secondChar !== undefined && smallY.includes(secondChar)
-}
-
-/**
  * Tokenizes a kana string into individual characters/digraphs
- * Handles compound characters like きゃ, しゅ, ちょ
- * Combines sokuon (っ/ッ) with following character as single token
+ * Handles compound characters like きゃ, しゅ, ちょ and sokuon combinations
  */
 export function tokenizeKana(kana: string): string[] {
-    const tokens: string[] = []
-    let i = 0
-
-    while (i < kana.length) {
-        const char = kana[i]
-
-        // Handle sokuon (small tsu) - combine with following character(s)
-        if (char === "っ" || char === "ッ") {
-            if (i + 1 < kana.length) {
-                // Check if next chars form a digraph
-                if (i + 2 < kana.length) {
-                    const nextDigraph = kana.slice(i + 1, i + 3)
-                    if (isDigraph(nextDigraph)) {
-                        tokens.push(char + nextDigraph) // e.g., っきゃ
-                        i += 3
-                        continue
-                    }
-                }
-                // Combine with single next character
-                const nextChar = kana[i + 1]
-                if (nextChar !== undefined) {
-                    tokens.push(char + nextChar) // e.g., っき
-                    i += 2
-                    continue
-                }
-            }
-            // Sokuon at end of string (unusual but handle it)
-            tokens.push(char)
-            i += 1
-            continue
-        }
-
-        // Check for digraph (2-character combo like きゃ, きゅ, きょ)
-        if (i + 1 < kana.length) {
-            const digraph = kana.slice(i, i + 2)
-            if (isDigraph(digraph)) {
-                tokens.push(digraph)
-                i += 2
-                continue
-            }
-        }
-
-        // Single character
-        if (char !== undefined) {
-            tokens.push(char)
-        }
-        i += 1
-    }
-
-    return tokens
+    // Matches:
+    // 1. Sokuon + Char + optional Small (e.g. っきゃ)
+    // 2. Sokuon + Char (e.g. っき)
+    // 3. Char + optional Small (e.g. きゃ)
+    // 4. Sokuon alone (degenerate case)
+    // 5. Char alone
+    // The regex order matters (longest match first)
+    const tokenRegex = /[っッ][^っッ][ャュョゃゅょ]?|[^っッ][ャュョゃゅょ]?|[っッ]/g
+    return kana.match(tokenRegex) || []
 }
 
 /**

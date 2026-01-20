@@ -1,5 +1,5 @@
 
-export const daysOfMonth: Record<number, { reading: string; romaji: string }> = {
+const irregularDays: Record<number, { reading: string, romaji: string }> = {
   1: { reading: "ついたち", romaji: "tsuitachi" },
   2: { reading: "ふつか", romaji: "futsuka" },
   3: { reading: "みっか", romaji: "mikka" },
@@ -10,47 +10,78 @@ export const daysOfMonth: Record<number, { reading: string; romaji: string }> = 
   8: { reading: "ようか", romaji: "youka" },
   9: { reading: "ここのか", romaji: "kokonoka" },
   10: { reading: "とおか", romaji: "tooka" },
-  11: { reading: "じゅういちにち", romaji: "juuichinichi" },
-  12: { reading: "じゅうににち", romaji: "juuninichi" },
-  13: { reading: "じゅうさんにち", romaji: "juusannichi" },
   14: { reading: "じゅうよっか", romaji: "juuyokka" },
-  15: { reading: "じゅうごにち", romaji: "juugonichi" },
-  16: { reading: "じゅうろくにち", romaji: "juurokunichi" },
-  17: { reading: "じゅうしちにち", romaji: "juushichinichi" },
-  18: { reading: "じゅうはちにち", romaji: "juuhachinichi" },
-  19: { reading: "じゅうくにち", romaji: "juukunichi" },
   20: { reading: "はつか", romaji: "hatsuka" },
-  21: { reading: "にじゅういちにち", romaji: "nijuuichinichi" },
-  22: { reading: "にじゅうににち", romaji: "nijuuninichi" },
-  23: { reading: "にじゅうさんにち", romaji: "nijuusannichi" },
   24: { reading: "にじゅうよっか", romaji: "nijuuyokka" },
-  25: { reading: "にじゅうごにち", romaji: "nijuugonichi" },
-  26: { reading: "にじゅうろくにち", romaji: "nijuurokunichi" },
-  27: { reading: "にじゅうしちにち", romaji: "nijuushichinichi" },
-  28: { reading: "にじゅうはちにち", romaji: "nijuuhachinichi" },
-  29: { reading: "にじゅうくにち", romaji: "nijuukunichi" },
-  30: { reading: "さんじゅうにち", romaji: "sanjuunichi" },
-  31: { reading: "さんじゅういちにち", romaji: "sanjuuichinichi" },
 }
 
+function getDayData(day: number) {
+  if (irregularDays[day]) return irregularDays[day]
 
-export const months: Record<number, { reading: string; romaji: string; kanji: string }> = {
-  1: { reading: "いちがつ", romaji: "ichigatsu", kanji: "一月" },
-  2: { reading: "にがつ", romaji: "nigatsu", kanji: "二月" },
-  3: { reading: "さんがつ", romaji: "sangatsu", kanji: "三月" },
-  4: { reading: "しがつ", romaji: "shigatsu", kanji: "四月" },
-  5: { reading: "ごがつ", romaji: "gogatsu", kanji: "五月" },
-  6: { reading: "ろくがつ", romaji: "rokugatsu", kanji: "六月" },
-  7: { reading: "しちがつ", romaji: "shichigatsu", kanji: "七月" },
-  8: { reading: "はちがつ", romaji: "hachigatsu", kanji: "八月" },
-  9: { reading: "くがつ", romaji: "kugatsu", kanji: "九月" },
-  10: { reading: "じゅうがつ", romaji: "juugatsu", kanji: "十月" },
-  11: { reading: "じゅういちがつ", romaji: "juuichigatsu", kanji: "十一月" },
-  12: { reading: "じゅうにがつ", romaji: "juunigatsu", kanji: "十二月" },
+  const numReadings = ["", "いち", "に", "さん", "よん", "ご", "ろく", "しち", "はち", "きゅう", "じゅう"]
+  const romajiNums = ["", "ichi", "ni", "san", "yon", "go", "roku", "shichi", "hachi", "kyuu", "juu"]
+
+  let reading = ""
+  let romaji = ""
+
+  if (day >= 10) {
+    if (day === 10) { // covered by irregular but logic works
+      reading = "じゅう"
+      romaji = "juu"
+    } else if (day < 20) {
+      reading = "じゅう" + numReadings[day - 10]
+      romaji = "juu" + romajiNums[day - 10]
+    } else {
+      const tens = Math.floor(day / 10)
+      const ones = day % 10
+      reading = (tens === 2 ? "にじゅう" : "さんじゅう") + (ones > 0 ? numReadings[ones] : "")
+      romaji = (tens === 2 ? "nijuu" : "sanjuu") + (ones > 0 ? romajiNums[ones] : "")
+    }
+  } else {
+    reading = numReadings[day] || ""
+    romaji = romajiNums[day] || ""
+  }
+
+  return { reading: reading + "にち", romaji: romaji + "nichi" }
 }
 
-import type { TranslationKey } from "@/lib/i18n"
+export const daysOfMonth: Record<number, { reading: string; romaji: string }> = new Proxy({}, {
+  get: (_, prop) => {
+    const day = typeof prop === 'string' ? parseInt(prop, 10) : Number(prop)
+    if (isNaN(day) || day < 1 || day > 31) return undefined
+    return getDayData(day)
+  }
+})
 
+const irregularMonths: Record<number, { reading: string, romaji: string }> = {
+  4: { reading: "しがつ", romaji: "shigatsu" },
+  7: { reading: "しちがつ", romaji: "shichigatsu" },
+  9: { reading: "くがつ", romaji: "kugatsu" },
+}
+
+function getMonthData(month: number) {
+  if (irregularMonths[month]) return { ...irregularMonths[month], kanji: ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"][month] + "月" }
+
+  const numReadings = ["", "いち", "に", "さん", "よん", "ご", "ろく", "しち", "はち", "きゅう", "じゅう", "じゅういち", "じゅうに"]
+  const romajiNums = ["", "ichi", "ni", "san", "yon", "go", "roku", "shichi", "hachi", "kyuu", "juu", "juuichi", "juuni"]
+  const kanjiNums = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二"]
+
+  return {
+    reading: numReadings[month] + "がつ",
+    romaji: romajiNums[month] + "gatsu",
+    kanji: kanjiNums[month] + "月"
+  }
+}
+
+export const months: Record<number, { reading: string; romaji: string; kanji: string }> = new Proxy({}, {
+  get: (_, prop) => {
+    const month = typeof prop === 'string' ? parseInt(prop, 10) : Number(prop)
+    if (isNaN(month) || month < 1 || month > 12) return undefined
+    return getMonthData(month)
+  }
+})
+
+import type { TranslationKey } from "@/lib/i18n/translations"
 
 export const daysOfWeek: Record<number, { reading: string; romaji: string; kanji: string; labelKey: TranslationKey }> = {
   0: { reading: "にちようび", romaji: "nichiyoubi", kanji: "日曜日", labelKey: "day.sunday" },
@@ -62,11 +93,17 @@ export const daysOfWeek: Record<number, { reading: string; romaji: string; kanji
   6: { reading: "どようび", romaji: "doyoubi", kanji: "土曜日", labelKey: "day.saturday" },
 }
 
-// Import types from centralized location for use in this file
-import type { DateMode, DateQuestion } from "@/types/japanese"
+export type DateMode = "months" | "full" | "week_days"
 
-// Re-export types from centralized location
-export type { DateMode, DateQuestion } from "@/types/japanese"
+export interface DateQuestion {
+  display: string
+  displayName: string
+  displayNumber: string
+  answer: string
+  romaji: string
+  kanji?: string
+}
+
 
 export function generateDayQuestion(): DateQuestion {
   const day = Math.floor(Math.random() * 31) + 1

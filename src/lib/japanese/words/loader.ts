@@ -7,16 +7,15 @@ import type { LoaderDeps, WordSets } from "@/types/api"
 // Re-export types from centralized location
 export type { LoaderDeps, WordSets } from "@/types/api"
 
-const WORDSET_LANG = "es".toLowerCase()
-
-const isMobileDevice = () => {
+// Mobile data protection helpers
+export const isMobileDevice = () => {
   if (typeof window === "undefined") return false
   if (window.matchMedia?.("(max-width: 768px)").matches) return true
   const ua = navigator.userAgent.toLowerCase()
   return /android|iphone|ipad|ipod|mobile|tablet/.test(ua)
 }
 
-const isWordsetConfirmed = (lang: string) => {
+export const isWordsetConfirmed = (lang: string) => {
   if (typeof window === "undefined") return false
   try {
     return localStorage.getItem(`wordset-confirmed-${lang}`) === "1"
@@ -24,6 +23,12 @@ const isWordsetConfirmed = (lang: string) => {
     return false
   }
 }
+
+export const confirmWordset = (lang: string) => {
+  if (typeof window === "undefined") return
+  localStorage.setItem(`wordset-confirmed-${lang}`, "1")
+}
+
 
 
 const CACHE_NAMESPACE = "prod"
@@ -94,7 +99,7 @@ const fetchPrebuiltWordset = async (lang: string, currentVersion?: number): Prom
 };
 
 export const normalizeLang = (lang: string | undefined): string => {
-  const lower = (lang || WORDSET_LANG || "es").toLowerCase()
+  const lower = (lang || "es").toLowerCase()
   if (lower === "ja") return "en"
   if (lower === "en" || lower === "es") return lower
   return "es"
@@ -155,8 +160,11 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
 
       // 3b. Mobile guard: do not fetch until user confirms
       if (isMobileDevice() && !isWordsetConfirmed(datasetLang)) {
-        throw new Error(`Wordset fetch blocked until user confirms for ${datasetLang}`)
+        const error = new Error(`Wordset fetch blocked until user confirms`)
+          ; (error as any).code = "MOBILE_AUTH_REQUIRED"
+        throw error
       }
+
 
       // 4. Cold Start
       console.log("[Loader] Cold start: Waiting for network")

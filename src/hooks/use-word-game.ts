@@ -1,10 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from "react"
+"use client"
+
+import { useState, useEffect, useRef, useCallback, useTransition } from "react"
 import type { JapaneseWord, WordFilter } from "@/lib/japanese/words"
 import { getRandomWord, getRandomCharacter } from "@/lib/japanese/words"
-import { validateAnswer } from "@/lib/japanese/shared"
-import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared"
+import { confirmWordset, normalizeLang } from "@/lib/japanese/words/loader"
+import { validateAnswer } from "@/lib/japanese/shared/input"
+import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared/error-detection"
 import type { GameMode } from "@/types/game"
-import type { Language } from "@/lib/i18n"
+import type { Language } from "@/lib/i18n/translations"
+import { useBaseGame } from "./use-base-game"
 
 export interface UseWordGameProps {
     mode: GameMode
@@ -57,9 +61,6 @@ export function useWordGame({
     // State
     const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
     const [userInput, setUserInput] = useState("")
-    const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null)
-    const [score, setScore] = useState(0)
-    const [streak, setStreak] = useState(0)
     const [totalAttempts, setTotalAttempts] = useState(0)
     const [correctAttempts, setCorrectAttempts] = useState(0)
     const [noWordsAvailable, setNoWordsAvailable] = useState(false)
@@ -69,6 +70,19 @@ export function useWordGame({
     const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
     const inputRef = useRef<HTMLInputElement>(null)
 
+    // Use transition for non-urgent updates
+    const [isPending, startTransition] = useTransition()
+
+    // Use unified base game logic
+    const {
+        score,
+        streak,
+        feedback,
+        setFeedback,
+        submitAnswer,
+        skipQuestion
+    } = useBaseGame({ onScoreUpdate })
+
     // Computed values
     const accuracyPercent = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 100
 
@@ -76,31 +90,42 @@ export function useWordGame({
     const loadNewWord = useCallback(async () => {
         if (disableNext) return
         setIsLoading(true)
-        let word: JapaneseWord | null
+        let word: JapaneseWord | null = null
 
-        if (isCharacterMode) {
-            word = await getRandomCharacter(mode, filter)
-        } else {
-            word = await getRandomWord(mode, filter, lang)
+        try {
+            if (isCharacterMode) {
+                word = await getRandomCharacter(mode, filter)
+            } else {
+                word = await getRandomWord(mode, filter, lang)
+            }
+
+            if (word) {
+                setCurrentWord(word)
+                setDisplayRomaji(word.romaji)
+                setNoWordsAvailable(false)
+            } else {
+                setCurrentWord(null)
+                setDisplayRomaji("")
+                setNoWordsAvailable(true)
+            }
+        } catch (error: any) {
+            console.error("Failed to load word:", error)
+        } finally {
+            setIsLoading(false)
         }
 
         if (word) {
-            setCurrentWord(word)
-            setDisplayRomaji(word.romaji)
-            setNoWordsAvailable(false)
-        } else {
-            setCurrentWord(null)
-            setDisplayRomaji("")
-            setNoWordsAvailable(true)
+            setUserInput("")
+            setFeedback(null)
+            setErrorDetails(null)
+            // Use requestAnimationFrame for better timing sync with browser paint
+            requestAnimationFrame(() => {
+                if (!suppressFocus) inputRef.current?.focus()
+            })
         }
-        setIsLoading(false)
-        setUserInput("")
-        setFeedback(null)
-        setErrorDetails(null)
-        setTimeout(() => {
-            if (!suppressFocus) inputRef.current?.focus()
-        }, 100)
-    }, [mode, filter, suppressFocus, lang, isCharacterMode, disableNext])
+    }, [mode, filter, suppressFocus, lang, isCharacterMode, disableNext, setFeedback])
+
+
 
     // Check answer
     const checkAnswer = useCallback(() => {
@@ -110,49 +135,50 @@ export function useWordGame({
         const shownAnswer = currentWord.romaji.toLowerCase().trim()
 
         setDisplayRomaji(shownAnswer)
-        setFeedback(isCorrect ? "correct" : "incorrect")
         setTotalAttempts((prev) => prev + 1)
 
         if (isCorrect) {
-            const newScore = score + (1 + Math.floor(streak / 5))
-            const newStreak = streak + 1
-            setScore(newScore)
-            setStreak(newStreak)
             setCorrectAttempts((prev) => prev + 1)
-            onScoreUpdate(newScore, newStreak, true)
             setErrorDetails(null)
+            submitAnswer(true, 1) // Base points 1 for words
         } else {
-            // Get detailed error information and accumulate incorrect chars
-            detectErrors(currentWord.kana, userInput).then((result) => {
-                setErrorDetails(result)
-                // Accumulate incorrect characters with romaji
-                setIncorrectChars((prev) => {
-                    const newMap = new Map(prev)
-                    for (const char of result.characters) {
-                        if (!char.isCorrect) {
-                            const existing = newMap.get(char.kana)
-                            const romaji = char.expectedRomaji[0] || ""
-                            newMap.set(char.kana, {
-                                count: (existing?.count || 0) + 1,
-                                romaji: existing?.romaji || romaji,
-                            })
-                        }
-                    }
-                    return newMap
+            // Submit answer immediately for fast feedback
+            submitAnswer(false)
+
+            // Defer error detection to avoid blocking the main thread
+            // Use requestIdleCallback for better INP performance
+            const idleCallback = window.requestIdleCallback || ((cb) => setTimeout(cb, 1))
+            idleCallback(() => {
+                detectErrors(currentWord.kana, userInput).then((result) => {
+                    // Wrap non-urgent state updates in transition
+                    startTransition(() => {
+                        setErrorDetails(result)
+                        // Accumulate incorrect characters with romaji
+                        setIncorrectChars((prev) => {
+                            const newMap = new Map(prev)
+                            for (const char of result.characters) {
+                                if (!char.isCorrect) {
+                                    const existing = newMap.get(char.kana)
+                                    const romaji = char.expectedRomaji[0] || ""
+                                    newMap.set(char.kana, {
+                                        count: (existing?.count || 0) + 1,
+                                        romaji: existing?.romaji || romaji,
+                                    })
+                                }
+                            }
+                            return newMap
+                        })
+                    })
                 })
             })
-            setStreak(0)
-            onScoreUpdate(score, 0, false)
         }
-    }, [currentWord, userInput, score, streak, onScoreUpdate])
+    }, [currentWord, userInput, submitAnswer, startTransition])
 
     // Skip word
     const skipWord = useCallback(() => {
-        setStreak(0)
-        onScoreUpdate(score, 0, false)
-        setFeedback("incorrect")
+        skipQuestion()
         if (currentWord) setDisplayRomaji(currentWord.romaji)
-    }, [currentWord, score, onScoreUpdate])
+    }, [currentWord, skipQuestion])
 
     // Handle key down
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
@@ -173,7 +199,7 @@ export function useWordGame({
     // Restore focus when suppressFocus changes
     useEffect(() => {
         if (!suppressFocus) {
-            setTimeout(() => inputRef.current?.focus(), 50)
+            requestAnimationFrame(() => inputRef.current?.focus())
         }
     }, [suppressFocus])
 
