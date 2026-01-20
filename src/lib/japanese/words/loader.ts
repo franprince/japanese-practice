@@ -1,5 +1,5 @@
-import { openDb, STORE_WORDSETS } from "./db"
-import type { JapaneseWord } from "./japanese-words"
+import { openDb, STORE_WORDSETS } from "@/lib/core/db"
+import type { JapaneseWord } from "@/types/japanese"
 
 // Import types from centralized location for use in this file
 import type { LoaderDeps, WordSets } from "@/types/api"

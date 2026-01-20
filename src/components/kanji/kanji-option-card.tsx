@@ -2,10 +2,10 @@
 
 import { Info } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { kanaToRomaji } from "@/lib/japanese-words"
-import type { KanjiEntry, KanjiDifficulty } from "@/lib/kanji-data"
-import type { Language } from "@/lib/translations"
+import { cn } from "@/lib/core"
+import { kanaToRomaji } from "@/lib/japanese/words"
+import type { KanjiEntry, KanjiDifficulty } from "@/lib/japanese/kanji"
+import type { Language } from "@/lib/i18n"
 
 interface KanjiOptionCardProps {
   kanji: KanjiEntry

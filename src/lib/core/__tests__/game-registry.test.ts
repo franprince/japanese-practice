@@ -6,7 +6,7 @@
  * For full component testing, consider using Playwright for E2E tests.
  */
 import { describe, test, expect } from 'bun:test'
-import { GAMES } from '@/lib/game-registry'
+import { GAMES } from '@/lib/core'
 
 describe('Game Registry', () => {
     test('should have all 4 games defined', () => {

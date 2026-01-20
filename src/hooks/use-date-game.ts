@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese-dates"
+import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese/dates"
 import { useGameScore } from "./use-game-score"
-import type { TranslationKey } from "@/lib/translations"
+import type { TranslationKey } from "@/lib/i18n"
 
 export interface UseDateGameProps {
     mode: DateMode

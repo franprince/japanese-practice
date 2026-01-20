@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react"
-import type { JapaneseWord, WordFilter } from "@/lib/japanese-words"
-import { getRandomWord, getRandomCharacter } from "@/lib/japanese-words"
-import { validateAnswer } from "@/lib/japanese-input"
-import { detectErrors, type ErrorDetectionResult } from "@/lib/error-detection"
+import type { JapaneseWord, WordFilter } from "@/lib/japanese/words"
+import { getRandomWord, getRandomCharacter } from "@/lib/japanese/words"
+import { validateAnswer } from "@/lib/japanese/shared"
+import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared"
 import type { GameMode } from "@/types/game"
-import type { Language } from "@/lib/translations"
+import type { Language } from "@/lib/i18n"
 
 export interface UseWordGameProps {
     mode: GameMode

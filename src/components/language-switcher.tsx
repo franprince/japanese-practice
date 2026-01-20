@@ -1,8 +1,8 @@
 "use client"
 
-import { cn } from "@/lib/utils"
-import { useLanguage } from "@/lib/language-context"
-import type { Language } from "@/lib/translations"
+import { cn } from "@/lib/core"
+import { useLanguage } from "@/lib/i18n"
+import type { Language } from "@/lib/i18n"
 
 const languages: { code: Language; label: string }[] = [
   { code: "en", label: "EN" },

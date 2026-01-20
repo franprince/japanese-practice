@@ -1,7 +1,7 @@
 "use client"
 
 import { useI18n } from "@/lib/i18n"
-import type { KanjiDifficulty } from "@/lib/kanji-data"
+import type { KanjiDifficulty } from "@/lib/japanese/kanji"
 
 interface KanjiDifficultySelectorProps {
   difficulty: KanjiDifficulty

@@ -1,8 +1,8 @@
-import { normalizeRomaji } from "./japanese-input"
+import { normalizeRomaji } from "./input"
 import {
     getKanaRomajiMap,
     loadKanaDictionary,
-} from "./data/kana-dictionary-loader"
+} from "./kana-dictionary-loader"
 import type { KanaDictionary, KanaGroup } from "@/types/kana"
 
 // Import types from centralized location for use in this file

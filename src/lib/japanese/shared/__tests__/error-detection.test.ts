@@ -1,11 +1,6 @@
 import { describe, it, expect, beforeAll } from "bun:test"
-import {
-    detectErrors,
-    tokenizeKana,
-    getValidRomaji,
-    type ErrorDetectionResult,
-} from "../error-detection"
-import { loadKanaDictionary } from "../data/kana-dictionary-loader"
+import { tokenizeKana, getValidRomaji, detectErrors } from "../error-detection"
+import { loadKanaDictionary } from "../kana-dictionary-loader"
 
 // Ensure dictionary is loaded before tests
 beforeAll(async () => {

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react"
-import type { TranslationKey } from "@/lib/translations"
+import type { TranslationKey } from "@/lib/i18n"
 
 export type PlayMode = "infinite" | "session"
 
