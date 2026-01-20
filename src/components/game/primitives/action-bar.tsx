@@ -42,7 +42,7 @@ export function ActionBar({
                     className="w-full bg-primary hover:bg-primary/90"
                     disabled={nextDisabled}
                 >
-                    {nextLabel || t("next")}
+                    {nextLabel || t("common.next")}
                     <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
             </div>
