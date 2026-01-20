@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese-dates"
-import { useGameScore } from "./use-game-score"
+import { useBaseGame } from "./use-base-game"
 import type { TranslationKey } from "@/lib/translations"
 
 export interface UseDateGameProps {
@@ -41,21 +41,28 @@ export function useDateGame({
 }: UseDateGameProps): UseDateGameReturn {
     const [question, setQuestion] = useState<DateQuestion | null>(null)
     const [userInput, setUserInput] = useState("")
-    const [showResult, setShowResult] = useState(false)
-    const [isCorrect, setIsCorrect] = useState(false)
     const [showNumbers, setShowNumbers] = useState(false)
     const enterOnResultRef = useRef(false)
     const inputRef = useRef<HTMLInputElement>(null)
-    const { updateScore } = useGameScore(onScoreUpdate)
+
+    // Use unified base game logic
+    const {
+        feedback,
+        setFeedback,
+        submitAnswer,
+        skipQuestion
+    } = useBaseGame({ onScoreUpdate })
+
+    const showResult = feedback !== null
+    const isCorrect = feedback === "correct"
 
     const generateNewQuestion = useCallback(() => {
         if (disableNext) return
         enterOnResultRef.current = false
         setQuestion(generateDateQuestion(mode, t, showNumbers))
         setUserInput("")
-        setShowResult(false)
-        setIsCorrect(false)
-    }, [mode, disableNext, showNumbers, t])
+        setFeedback(null)
+    }, [mode, disableNext, showNumbers, t, setFeedback])
 
     useEffect(() => {
         generateNewQuestion()
@@ -76,15 +83,13 @@ export function useDateGame({
 
         const correct = userAnswer === normalizedAnswer || userAnswer === normalizedRomaji
 
-        setIsCorrect(correct)
-        setShowResult(true)
-        updateScore(correct)
-    }, [question, userInput, updateScore])
+        submitAnswer(correct)
+    }, [question, userInput, submitAnswer])
 
     const handleSkip = useCallback(() => {
-        updateScore(false)
+        skipQuestion()
         generateNewQuestion()
-    }, [updateScore, generateNewQuestion])
+    }, [skipQuestion, generateNewQuestion])
 
     const handleDelete = useCallback(() => {
         setUserInput(userInput.slice(0, -1))
