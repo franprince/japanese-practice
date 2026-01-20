@@ -140,5 +140,9 @@
     "mobileWordModeConfirm": "El modo palabras descarga alrededor de {size}. ¿Continuar?",
     "mobileWordModeTitle": "Descargar set de palabras",
     "mobileWordModeCancel": "Ahora no",
-    "mobileWordModeContinue": "Descargar"
+    "mobileWordModeContinue": "Descargar",
+    "words.downloadTitle": "Descargar set de palabras",
+    "words.downloadMessage": "El set de palabras es grande",
+    "common.download": "Descargar",
+    "common.cancel": "Cancelar"
 }

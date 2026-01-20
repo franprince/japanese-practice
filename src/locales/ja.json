@@ -140,5 +140,9 @@
     "mobileWordModeConfirm": "単語モードは約 {size} をダウンロードします。続行しますか？",
     "mobileWordModeTitle": "単語セットをダウンロード",
     "mobileWordModeCancel": "今はしない",
-    "mobileWordModeContinue": "ダウンロード"
+    "mobileWordModeContinue": "ダウンロード",
+    "words.downloadTitle": "単語セットをダウンロード",
+    "words.downloadMessage": "単語セットはサイズが大きいです",
+    "common.download": "ダウンロード",
+    "common.cancel": "キャンセル"
 }
