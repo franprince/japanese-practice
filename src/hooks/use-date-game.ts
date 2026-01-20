@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese-dates"
+import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese/dates"
 import { useBaseGame } from "./use-base-game"
 import type { TranslationKey } from "@/lib/translations"
 
