@@ -7,11 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/core"
 import type { WordFilter } from "@/lib/japanese/words"
 import { useI18n } from "@/lib/i18n"
-import { Flame, SkipForward, Zap, Type, Shuffle } from "lucide-react"
+import { Flame, Zap, Type, Shuffle } from "lucide-react"
 import type { GameMode } from "@/types/game"
 import { useWordGame } from "@/hooks/use-word-game"
 import { GameFeedbackSection, FeedbackIcon } from "./game-feedback-section"
-import { getResponsiveFontSize } from "@/lib/core"
+import { GameCardContainer, QuestionDisplay, AnswerSection, ActionBar } from "@/components/game/primitives"
 
 interface GameCardProps {
   mode: GameMode
@@ -134,116 +134,84 @@ export function GameCard({
       </div>
 
       {/* Main Game Card */}
-      <Card
-        className={cn(
-          "transition-all duration-300 border-2 backdrop-blur-sm relative",
-          feedback === "correct" && "border-success bg-success/10 shadow-[0_0_30px_-5px_var(--success)]",
-          feedback === "incorrect" && "border-destructive bg-destructive/10 shadow-[0_0_30px_-5px_var(--destructive)]",
-          !feedback && "border-border/50 bg-card/80"
-        )}
+      <GameCardContainer
+        feedback={feedback}
+        className="backdrop-blur-sm"
       >
-        <CardContent className="pt-10 pb-8 px-6 md:px-8">
-          {/* Character Mode Toggle */}
-          {onToggleCharacterMode && (
-            <div className="absolute top-4 right-4 md:top-6 md:right-6">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onToggleCharacterMode}
-                className="h-8 w-8 rounded-full hover:bg-secondary/80 text-muted-foreground hover:text-foreground transition-colors"
-                title={isCharacterMode ? t("switchToWords") : t("switchToCharacters")}
-              >
-                {isCharacterMode ? <Type className="w-5 h-5" /> : <Shuffle className="w-5 h-5" />}
-              </Button>
-            </div>
-          )}
-
-          {/* Mode Indicator */}
-          <div className="flex items-center justify-center gap-2 mb-6 text-muted-foreground text-sm font-medium">
-            {isCharacterMode ? <Shuffle className="w-4 h-4" /> : <Type className="w-4 h-4" />}
-            <span>{isCharacterMode ? t("modeCharacters") : t("modeWords")}</span>
-          </div>
-
-          {/* Japanese Character Display */}
-          <div className="text-center mb-10">
-            <div
-              id="word-question"
-              lang="ja"
-              className={cn("font-medium mb-4 tracking-widest transition-all whitespace-nowrap", getResponsiveFontSize(currentWord.kana))}
+        {/* Character Mode Toggle */}
+        {onToggleCharacterMode && (
+          <div className="absolute top-4 right-4 md:top-6 md:right-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleCharacterMode}
+              className="h-8 w-8 rounded-full hover:bg-secondary/80 text-muted-foreground hover:text-foreground transition-colors"
+              title={isCharacterMode ? t("switchToWords") : t("switchToCharacters")}
             >
-              {currentWord.kana}
-            </div>
+              {isCharacterMode ? <Type className="w-5 h-5" /> : <Shuffle className="w-5 h-5" />}
+            </Button>
           </div>
+        )}
 
-          {/* Input Section */}
-          <div className="space-y-5">
-            <div className="relative">
-              <Input
-                ref={inputRef}
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={t("placeholder")}
-                className={cn(
-                  "text-center text-lg h-14 font-mono bg-background/50 border-2 transition-all",
-                  feedback === "correct" && "border-success",
-                  feedback === "incorrect" && "border-destructive",
-                  !feedback && "border-border/50 focus:border-primary"
-                )}
-                readOnly={feedback !== null}
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-              />
-              <FeedbackIcon feedback={feedback} />
-            </div>
+        {/* Mode Indicator */}
+        <div className="flex items-center justify-center gap-2 mb-6 text-muted-foreground text-sm font-medium">
+          {isCharacterMode ? <Shuffle className="w-4 h-4" /> : <Type className="w-4 h-4" />}
+          <span>{isCharacterMode ? t("modeCharacters") : t("modeWords")}</span>
+        </div>
 
-            {/* Feedback Section */}
-            <GameFeedbackSection
-              feedback={feedback}
-              displayRomaji={displayRomaji}
-              currentWord={currentWord}
-              errorDetails={errorDetails}
-              t={t}
-            />
+        {/* Japanese Character Display */}
+        <QuestionDisplay
+          value={currentWord.kana}
+          lang="ja"
+        />
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-2">
-              {!feedback ? (
-                <>
-                  <Button
-                    variant="outline"
-                    onClick={skipWord}
-                    className="flex-1 bg-transparent border-border/50 hover:bg-secondary/50 hover:border-border cursor-pointer"
-                  >
-                    <SkipForward className="w-4 h-4 mr-2" />
-                    {t("skip")}
-                  </Button>
-                  <Button
-                    onClick={checkAnswer}
-                    className="flex-1 bg-primary hover:bg-primary/90 cursor-pointer"
-                    disabled={!userInput.trim()}
-                  >
-                    {t("check")}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={() => {
-                    if (!disableNext) loadNewWord()
-                  }}
-                  className="w-full bg-primary hover:bg-primary/90 cursor-pointer"
-                  disabled={disableNext}
-                >
-                  {t("nextWord")}
-                </Button>
+        {/* Input Section */}
+        <AnswerSection>
+          <div className="relative">
+            <Input
+              ref={inputRef}
+              type="text"
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={t("placeholder")}
+              className={cn(
+                "text-center text-lg h-14 font-mono bg-background/50 border-2 transition-all",
+                feedback === "correct" && "border-success",
+                feedback === "incorrect" && "border-destructive",
+                !feedback && "border-border/50 focus:border-primary"
               )}
-            </div>
+              readOnly={feedback !== null}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+            />
+            <FeedbackIcon feedback={feedback} />
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Feedback Section */}
+          <GameFeedbackSection
+            feedback={feedback}
+            displayRomaji={displayRomaji}
+            currentWord={currentWord}
+            errorDetails={errorDetails}
+            t={t}
+          />
+
+          {/* Action Buttons */}
+          <ActionBar
+            showResult={feedback !== null}
+            onSubmit={checkAnswer}
+            onNext={loadNewWord}
+            onSkip={skipWord}
+            submitDisabled={!userInput.trim()}
+            nextDisabled={disableNext}
+            nextLabel={t("nextWord")}
+            t={t}
+          />
+        </AnswerSection>
+      </GameCardContainer>
 
       {/* Accuracy Display */}
       {totalAttempts > 0 && (
