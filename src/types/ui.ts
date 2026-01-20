@@ -1,6 +1,14 @@
 /**
- * Shared component type definitions for game pages
+ * Shared UI and component type definitions
  */
+
+// Re-export Language and TranslationKey from translations (source of truth)
+export type { Language, TranslationKey } from "../lib/translations"
+
+/**
+ * Available themes
+ */
+export type Theme = "default" | "sakura" | "ocean" | "forest" | "sunset" | "daylight" | "lavender" | "mint"
 
 /**
  * Base props that all game card components should implement
