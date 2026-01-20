@@ -7,9 +7,9 @@ import { ArrowRight, SkipForward } from "lucide-react"
 import {
   numberPadKeysArabic,
   type Difficulty,
-} from "@/lib/japanese/numbers"
+} from "@/lib/japanese-numbers"
 import { useI18n } from "@/lib/i18n"
-import { getResponsiveFontSize } from "@/lib/core"
+import { getResponsiveFontSize } from "@/lib/utils/font-sizing"
 import { useNumberGame } from "@/hooks/use-number-game"
 
 interface NumberGameCardProps {
@@ -61,7 +61,12 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
         {/* User answer display */}
         <div className="min-h-16 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
           {userAnswer ? (
-            <span className="text-3xl md:text-4xl font-bold text-foreground">{userAnswer}</span>
+            <span
+              lang={mode === "arabicToKanji" ? "ja" : undefined}
+              className="text-3xl md:text-4xl font-bold text-foreground"
+            >
+              {userAnswer}
+            </span>
           ) : (
             <span className="text-muted-foreground text-lg">{t("useKeypadBelow")}</span>
           )}

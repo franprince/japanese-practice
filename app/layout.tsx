@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { I18nProvider } from "@/lib/i18n"
-import { ThemeProvider } from "@/lib/theme"
+import { ThemeProvider } from "@/lib/theme-context"
+import { PerformanceMonitor } from "@/components/performance-monitor"
 
 import "./globals.css";
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <I18nProvider>
             <Analytics />
             <SpeedInsights />
+            <PerformanceMonitor />
             {children}
           </I18nProvider>
         </ThemeProvider>

@@ -8,8 +8,8 @@ import {
     difficultyRanges,
     japaneseNumbers,
     type Difficulty,
-} from "@/lib/japanese/numbers"
-import { useGameScore } from "./use-game-score"
+} from "@/lib/japanese-numbers"
+import { useBaseGame } from "./use-base-game"
 import { useKeyboardNavigation } from "./use-keyboard-navigation"
 
 export interface UseNumberGameProps {
@@ -49,18 +49,26 @@ export function useNumberGame({
 }: UseNumberGameProps): UseNumberGameReturn {
     const [currentNumber, setCurrentNumber] = useState<number>(1)
     const [userAnswer, setUserAnswer] = useState("")
-    const [showResult, setShowResult] = useState(false)
-    const [isCorrect, setIsCorrect] = useState(false)
-    const { updateScore } = useGameScore(onScoreUpdate)
     const [shuffleNumbers, setShuffleNumbers] = useState(true)
+
+    // Use unified base game logic
+    const {
+        feedback,
+        setFeedback,
+        submitAnswer,
+        skipQuestion
+    } = useBaseGame({ onScoreUpdate })
+
+    const showResult = feedback !== null
+    const isCorrect = feedback === "correct"
 
     const generateNewNumber = useCallback(() => {
         const range = difficultyRanges[difficulty]
         const newNumber = generateRandomNumber(range.min, range.max)
         setCurrentNumber(newNumber)
         setUserAnswer("")
-        setShowResult(false)
-    }, [difficulty])
+        setFeedback(null)
+    }, [difficulty, setFeedback])
 
     useEffect(() => {
         generateNewNumber()
@@ -87,10 +95,8 @@ export function useNumberGame({
         const userValue = mode === "arabicToKanji" ? japaneseToArabic(userAnswer) : Number(userAnswer)
         const correct = userValue === currentNumber
 
-        setIsCorrect(correct)
-        setShowResult(true)
-        updateScore(correct, 1)
-    }, [showResult, userAnswer, disableNext, mode, currentNumber, updateScore])
+        submitAnswer(correct)
+    }, [showResult, userAnswer, disableNext, mode, currentNumber, submitAnswer])
 
     const handleNext = useCallback(() => {
         if (disableNext) return
@@ -98,9 +104,9 @@ export function useNumberGame({
     }, [disableNext, generateNewNumber])
 
     const handleSkip = useCallback(() => {
-        updateScore(false)
+        skipQuestion()
         generateNewNumber()
-    }, [updateScore, generateNewNumber])
+    }, [skipQuestion, generateNewNumber])
 
     useKeyboardNavigation(
         {

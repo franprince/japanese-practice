@@ -1,7 +1,7 @@
 "use client"
 
 import { KanjiOptionCard } from "./kanji-option-card"
-import type { KanjiDifficulty } from "@/lib/japanese/kanji"
+import type { KanjiDifficulty } from "@/lib/kanji-data"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Check, Info, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"

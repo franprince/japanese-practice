@@ -120,9 +120,12 @@ export async function getRandomWord(
       hasKatakana,
     }, lang)
   } catch (err) {
-    const message = err instanceof Error ? err.message : ""
-    if (message.includes("Wordset fetch blocked until user confirms")) {
-      return null
+    const error = err as any
+    // Propagate mobile auth error so UI can handle it
+    if (error?.code === "MOBILE_AUTH_REQUIRED" || error?.message?.includes("Wordset fetch blocked")) {
+      // Ensure code is set if we caught by message
+      if (!error.code) error.code = "MOBILE_AUTH_REQUIRED"
+      throw error
     }
     throw err
   }

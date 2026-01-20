@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { Check, X, ArrowRight, SkipForward, Calendar, CalendarDays, Hash, Type } from "lucide-react"
-import type { DateMode } from "@/lib/japanese/dates"
+import type { DateMode } from "@/lib/japanese-dates"
 import { useI18n } from "@/lib/i18n"
 import { useDateGame } from "@/hooks/use-date-game"
 
@@ -86,7 +86,10 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
 
 
       <div className="text-center mb-6">
-        <div className="text-6xl md:text-7xl font-bold text-foreground mb-2 font-mono">
+        <div
+          lang={mode === "months" && showNumbers ? undefined : "ja"}
+          className="text-6xl md:text-7xl font-bold text-foreground mb-2 font-mono"
+        >
           {mode === "months" && showNumbers ? question.displayNumber : question.display}
         </div>
         {mode === "full" && <p className="text-sm text-muted-foreground">{t("writeFullDate")}</p>}
