@@ -1,7 +1,7 @@
 
 import { describe, expect, it } from "bun:test"
-import { validateAnswer, normalizeRomaji } from "./japanese-input"
-import type { JapaneseWord } from "./japanese-words"
+import { normalizeRomaji, validateAnswer } from "../input"
+import type { JapaneseWord } from "@/types/japanese"
 
 describe("Japanese Input Validation", () => {
     describe("normalizeRomaji", () => {

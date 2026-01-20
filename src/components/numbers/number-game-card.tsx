@@ -7,9 +7,9 @@ import { ArrowRight, SkipForward } from "lucide-react"
 import {
   numberPadKeysArabic,
   type Difficulty,
-} from "@/lib/japanese-numbers"
+} from "@/lib/japanese/numbers"
 import { useI18n } from "@/lib/i18n"
-import { getResponsiveFontSize } from "@/lib/utils/font-sizing"
+import { getResponsiveFontSize } from "@/lib/core"
 import { useNumberGame } from "@/hooks/use-number-game"
 
 interface NumberGameCardProps {

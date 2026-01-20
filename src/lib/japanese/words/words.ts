@@ -1,5 +1,5 @@
-import { blacklist } from "../../src/lib/data/blacklist";
-import { loadWordSets, normalizeLang } from "./words-loader";
+import { blacklist } from "../shared/blacklist";
+import { loadWordSets, normalizeLang } from "./loader";
 import type { GameMode } from "@/types/game";
 import {
   getCharacterGroups,
@@ -7,7 +7,7 @@ import {
   getCharacterGroupsSync,
   getKanaRomajiMapSync,
   type CharacterGroup as LoaderCharacterGroup
-} from "./data/kana-dictionary-loader";
+} from "../shared/kana-dictionary-loader";
 
 // Import types from centralized location for use in this file
 import type { JapaneseWord, WordFilter, CharacterGroup } from "@/types/japanese"

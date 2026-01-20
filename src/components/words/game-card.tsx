@@ -4,14 +4,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-import type { WordFilter } from "@/lib/japanese-words"
+import { cn } from "@/lib/core"
+import type { WordFilter } from "@/lib/japanese/words"
 import { useI18n } from "@/lib/i18n"
 import { Flame, SkipForward, Zap, Type, Shuffle } from "lucide-react"
 import type { GameMode } from "@/types/game"
 import { useWordGame } from "@/hooks/use-word-game"
 import { GameFeedbackSection, FeedbackIcon } from "./game-feedback-section"
-import { getResponsiveFontSize } from "@/lib/utils/font-sizing"
+import { getResponsiveFontSize } from "@/lib/core"
 
 interface GameCardProps {
   mode: GameMode

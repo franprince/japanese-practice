@@ -1,8 +1,8 @@
 import { useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
-import { characterGroups, type WordFilter } from "@/lib/japanese-words"
+import { cn } from "@/lib/core"
+import { characterGroups, type WordFilter } from "@/lib/japanese/words"
 import { RotateCcw } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 

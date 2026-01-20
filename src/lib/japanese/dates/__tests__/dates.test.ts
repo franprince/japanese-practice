@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { generateWeekDayQuestion, generateWeekDaysQuestion, generateMonthQuestion, daysOfWeek } from './japanese-dates'
+import { generateWeekDayQuestion, generateWeekDaysQuestion, generateMonthQuestion, daysOfWeek } from "../dates"
 
 describe('japanese-dates', () => {
     describe('generateWeekDayQuestion', () => {

@@ -1,5 +1,5 @@
 
-import type { JapaneseWord } from "./japanese-words"
+import type { JapaneseWord } from "@/types/japanese"
 
 /**
  * Normalizes romanization variations to a standard form (Hepburn-ish) for comparison.

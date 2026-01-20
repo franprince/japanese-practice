@@ -4,7 +4,7 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { GameSelectorCard } from "@/components/game-selector-card"
 import { useI18n } from "@/lib/i18n"
-import { GAMES } from "@/lib/game-registry"
+import { GAMES } from "@/lib/core"
 
 export default function HomePage() {
   const { t } = useI18n()

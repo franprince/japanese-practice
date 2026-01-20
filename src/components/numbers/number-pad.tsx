@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Delete, CornerDownLeft } from "lucide-react"
-import { numberPadKeysArabic, numberPadKeysKanji } from "@/lib/japanese-numbers"
+import { numberPadKeysArabic, numberPadKeysKanji } from "@/lib/japanese/numbers"
 import { useI18n } from "@/lib/i18n"
 
 interface NumberPadProps {

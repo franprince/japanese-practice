@@ -3,7 +3,7 @@
  */
 
 // Re-export Language and TranslationKey from translations (source of truth)
-export type { Language, TranslationKey } from "../lib/translations"
+export type { Language, TranslationKey } from "../lib/i18n"
 
 /**
  * Available themes

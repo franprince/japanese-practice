@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from "react"
 import { RotateCcw, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/core"
 import { useI18n } from "@/lib/i18n"
-import { type WordFilter, type CharacterGroup } from "@/lib/japanese-words"
-import { getCharacterGroups } from "@/lib/data/kana-dictionary-loader"
+import { type WordFilter, type CharacterGroup } from "@/lib/japanese/words"
+import { getCharacterGroups } from "@/lib/japanese/shared"
 
 interface WordsSettingsPopoverProps {
   filter: WordFilter

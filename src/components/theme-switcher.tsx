@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { useTheme } from "@/lib/theme-context"
+import { useTheme } from "@/lib/theme"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import { ChevronDown, Moon, Sun } from "lucide-react"

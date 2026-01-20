@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { Calendar, CalendarDays, CalendarRange } from "lucide-react"
-import type { DateMode } from "@/lib/japanese-dates"
+import type { DateMode } from "@/lib/japanese/dates"
 import { useI18n } from "@/lib/i18n"
 
 interface DateModeSelectorProps {

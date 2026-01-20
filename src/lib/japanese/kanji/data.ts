@@ -1,4 +1,4 @@
-import { openDb, STORE_KANJI } from "./db"
+import { openDb, STORE_KANJI } from "@/lib/core/db"
 
 // Import types from centralized location for use in this file
 import type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"

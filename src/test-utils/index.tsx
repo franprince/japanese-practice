@@ -1,7 +1,7 @@
 import { render, type RenderOptions } from '@testing-library/react'
 import type { ReactElement } from 'react'
 import { I18nProvider } from '@/lib/i18n'
-import { ThemeProvider } from '@/lib/theme-context'
+import { ThemeProvider } from '@/lib/theme'
 
 /**
  * Custom render function that wraps components with necessary providers

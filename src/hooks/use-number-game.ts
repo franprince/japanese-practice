@@ -8,7 +8,7 @@ import {
     difficultyRanges,
     japaneseNumbers,
     type Difficulty,
-} from "@/lib/japanese-numbers"
+} from "@/lib/japanese/numbers"
 import { useGameScore } from "./use-game-score"
 import { useKeyboardNavigation } from "./use-keyboard-navigation"
 

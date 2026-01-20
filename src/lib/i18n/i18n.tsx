@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useMemo, useState, useEffect, type ReactNode } from "react"
-import { translations, type Language, type TranslationKey } from "@/lib/translations"
+import { translations, type Language, type TranslationKey } from "@/lib/i18n"
 
 const LANG_STORAGE_KEY = "kana-words-lang"
 

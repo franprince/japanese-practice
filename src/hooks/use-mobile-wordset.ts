@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
-import type { Language } from "@/lib/translations"
-import { normalizeLang, primeWordsetCache, readWordsetCache } from "@/lib/words-loader"
+import type { Language } from "@/lib/i18n"
+import { normalizeLang, primeWordsetCache, readWordsetCache } from "@/lib/japanese/words"
 
 const isMobileDevice = () => {
   if (typeof window === "undefined") return false
