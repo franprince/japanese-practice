@@ -31,7 +31,7 @@ export function MobileWordsetModal({
     if (!open) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+        <div data-testid="mobile-wordset-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
             <Card className="w-full max-w-sm border-border/50 bg-card/95 backdrop-blur-sm shadow-lg">
                 <CardContent className="p-6 space-y-4">
                     <div className="space-y-2">
