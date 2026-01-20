@@ -2,11 +2,10 @@
 
 import type React from "react"
 
-import { useState, useEffect, useCallback, useRef } from "react"
 import { Check, X, ArrowRight, SkipForward, Calendar, CalendarDays, Hash, Type } from "lucide-react"
-import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese-dates"
+import type { DateMode } from "@/lib/japanese-dates"
 import { useI18n } from "@/lib/i18n"
-import { useGameScore } from "@/hooks/use-game-score"
+import { useDateGame } from "@/hooks/use-date-game"
 
 interface DateGameCardProps {
   mode: DateMode
@@ -15,78 +14,22 @@ interface DateGameCardProps {
 }
 
 export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateGameCardProps) {
-  const [question, setQuestion] = useState<DateQuestion | null>(null)
-  const [userInput, setUserInput] = useState("")
-  const [showResult, setShowResult] = useState(false)
-  const [isCorrect, setIsCorrect] = useState(false)
-  const [showNumbers, setShowNumbers] = useState(false)
-  const enterOnResultRef = useRef(false)
-  const inputRef = useRef<HTMLInputElement>(null)
   const { t } = useI18n()
-  const { score, streak, updateScore } = useGameScore(onScoreUpdate)
-
-  const generateNewQuestion = useCallback(() => {
-    if (disableNext) return
-    enterOnResultRef.current = false
-    setQuestion(generateDateQuestion(mode, t, showNumbers))
-    setUserInput("")
-    setShowResult(false)
-    setIsCorrect(false)
-  }, [mode, disableNext, showNumbers, t])
-
-  useEffect(() => {
-    generateNewQuestion()
-  }, [generateNewQuestion, showNumbers])
-
-  useEffect(() => {
-    if (!showResult && inputRef.current) {
-      inputRef.current.focus()
-    }
-  }, [showResult, question])
-
-  const handleSubmit = () => {
-    if (!question) return
-
-    const userAnswer = userInput.trim().toLowerCase()
-    const normalizedAnswer = question.answer.toLowerCase()
-    const normalizedRomaji = question.romaji.toLowerCase().replace(/\s+/g, "")
-
-
-    const correct = userAnswer === normalizedAnswer || userAnswer === normalizedRomaji
-
-    setIsCorrect(correct)
-    setShowResult(true)
-    updateScore(correct)
-  }
-
-  const handleSkip = () => {
-    updateScore(false)
-    generateNewQuestion()
-  }
-
-  const handleDelete = () => {
-    setUserInput(userInput.slice(0, -1))
-  }
-
-  const handleClear = () => {
-    setUserInput("")
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      if (showResult && !disableNext) {
-        e.preventDefault()
-        enterOnResultRef.current = true
-      } else if (!showResult) {
-        handleSubmit()
-      }
-    } else if (e.key === "Backspace" && !showResult) {
-      e.preventDefault()
-      handleDelete()
-    } else if (e.key === "Escape" && !showResult) {
-      handleClear()
-    }
-  }
+  const {
+    question,
+    userInput,
+    setUserInput,
+    showResult,
+    isCorrect,
+    showNumbers,
+    setShowNumbers,
+    inputRef,
+    handleSubmit,
+    handleSkip,
+    handleKeyDown,
+    handleKeyUp,
+    generateNewQuestion,
+  } = useDateGame({ mode, onScoreUpdate, disableNext, t })
 
   if (!question) return null
 
@@ -113,15 +56,6 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
   const handleInputChange = (value: string) => {
     if (showResult) return
     setUserInput(value)
-  }
-
-  const handleKeyUp = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && showResult && !disableNext) {
-      if (!enterOnResultRef.current) return
-      e.preventDefault()
-      enterOnResultRef.current = false
-      generateNewQuestion()
-    }
   }
 
   return (
