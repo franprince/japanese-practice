@@ -69,6 +69,7 @@ test.describe('Words Game', () => {
     })
 
     test('should capture correct answer feedback', async ({ wordsPage, page }) => {
+        await page.setViewportSize({ width: 1280, height: 720 })
         await wordsPage.goto()
         await page.waitForLoadState('networkidle')
         await page.waitForTimeout(2000)
@@ -76,8 +77,8 @@ test.describe('Words Game', () => {
         const input = page.locator('input[type="text"]')
         const checkBtn = page.locator('button:has-text("Check"), button:has-text("Verificar"), button:has-text("Comprobar")')
 
-        // Get the displayed kana using the word-question ID
-        const displayedKana = await page.locator('#word-question').textContent()
+        // Get the displayed kana using the question-display test ID
+        const displayedKana = await page.locator('[data-testid="question-display"]').textContent()
 
         if (!displayedKana) {
             throw new Error('Could not find displayed kana')

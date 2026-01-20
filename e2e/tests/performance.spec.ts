@@ -3,6 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Performance (INP Proxy)', () => {
 
     test('desktop input latency should be under 400ms', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 720 })
         await page.goto('/words')
         await page.waitForLoadState('networkidle')
 
@@ -52,6 +53,7 @@ test.describe('Performance (INP Proxy)', () => {
     })
 
     test('check answer interaction latency should be under 400ms', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 720 })
         await page.goto('/words')
         await page.waitForLoadState('networkidle')
 
@@ -82,6 +84,7 @@ test.describe('Performance (INP Proxy)', () => {
     })
 
     test('next word interaction latency should be under 400ms', async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 720 })
         await page.goto('/words')
         await page.waitForLoadState('networkidle')
 
@@ -89,7 +92,7 @@ test.describe('Performance (INP Proxy)', () => {
         await expect(input).toBeVisible()
 
         // Get initial word
-        const initialWord = await page.locator('#word-question').textContent()
+        const initialWord = await page.locator('[data-testid="question-display"]').textContent()
 
         // Type a correct answer (just skip for simplicity)
         await input.fill('test')
@@ -106,7 +109,7 @@ test.describe('Performance (INP Proxy)', () => {
 
         // Wait for new word to load and input to be focused
         await page.waitForFunction((prevWord) => {
-            const wordEl = document.querySelector('#word-question')
+            const wordEl = document.querySelector('[data-testid="question-display"]')
             const inputEl = document.querySelector('input[type="text"]') as HTMLInputElement
             return wordEl?.textContent !== prevWord && inputEl?.value === '' && document.activeElement === inputEl
         }, initialWord, { timeout: 5000 })

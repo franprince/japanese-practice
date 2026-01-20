@@ -29,6 +29,7 @@ export function QuestionDisplay({ value, prompt, lang, icon, className }: Questi
 
             {/* Question text with responsive sizing */}
             <div
+                data-testid="question-display"
                 lang={lang}
                 className={cn(
                     "font-bold text-foreground transition-all whitespace-nowrap",
