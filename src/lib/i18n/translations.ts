@@ -40,6 +40,7 @@ export type TranslationKey =
   | "placeholder"
   | "skip"
   | "check"
+  | "next"
   | "nextWord"
   | "score"
   | "streak"
@@ -205,6 +206,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     placeholder: "Type romaji...",
     skip: "Skip",
     check: "Check",
+    next: "Next",
     nextWord: "Next Word",
     score: "Score",
     streak: "Streak",
@@ -350,6 +352,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     placeholder: "Escribe el rōmaji...",
     skip: "Saltar",
     check: "Comprobar",
+    next: "Siguiente",
     nextWord: "Siguiente palabra",
     score: "Puntaje",
     streak: "Racha",
@@ -495,6 +498,7 @@ export const translations: Record<Language, Record<TranslationKey, string>> = {
     placeholder: "ローマ字を入力...",
     skip: "スキップ",
     check: "チェック",
+    next: "次へ",
     nextWord: "次の単語",
     score: "スコア",
     streak: "連続",
