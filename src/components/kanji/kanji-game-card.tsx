@@ -2,10 +2,10 @@
 
 import { KanjiOptionCard } from "./kanji-option-card"
 import type { KanjiDifficulty } from "@/lib/japanese/kanji"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, Check, Info, X } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { useKanjiGame } from "@/hooks/use-kanji-game"
+import { GameCardContainer, QuestionDisplay, AnswerSection, ActionBar } from "@/components/game/primitives"
+import { Info } from "lucide-react"
 
 interface KanjiGameCardProps {
   difficulty: KanjiDifficulty
@@ -30,27 +30,28 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
   const meaning = lang === "es" ? currentKanji.meaning_es ?? currentKanji.meaning_en : currentKanji.meaning_en ?? currentKanji.meaning_es
   const usedEnglishMeaning = lang === "es" && !currentKanji.meaning_es && !!currentKanji.meaning_en
   const levelLabel = currentKanji.jlpt ? currentKanji.jlpt.toUpperCase().replace("JLPT-", "JLPT ") : null
-  const promptLabel = t("kanji")
 
   return (
     <div className="space-y-6">
       {/* Kanji Display */}
-      <div className="bg-card border border-border/50 rounded-2xl p-6 md:p-8 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <GameCardContainer feedback={isRevealed ? (isCorrect ? "correct" : "incorrect") : null}>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none rounded-2xl" />
 
-        <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{promptLabel}</p>
-
-        <div lang="ja" className="text-7xl md:text-9xl font-bold mb-4 relative">{currentKanji.char}</div>
+        <QuestionDisplay
+          value={currentKanji.char}
+          prompt={t("kanji")}
+          lang="ja"
+          className="relative"
+        />
 
         {/* Result feedback */}
         {isRevealed && (
           <div
-            className={`mt-4 p-4 rounded-xl border ${isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"
+            className={`p-4 rounded-xl border ${isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"
               }`}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                {isCorrect ? <Check className="w-5 h-5 text-green-500" /> : <X className="w-5 h-5 text-red-500" />}
                 <span className={isCorrect ? "text-green-500" : "text-red-500"}>
                   {isCorrect ? t("correct") : t("incorrect")}
                 </span>
@@ -78,34 +79,37 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
             </div>
           </div>
         )}
-      </div>
+      </GameCardContainer>
 
       {/* Options */}
-      <div id="kanji-options" className="grid grid-cols-1 gap-3">
-        {options.map((option) => (
-          <KanjiOptionCard
-            key={option.char}
-            kanji={option}
-            difficulty={difficulty}
-            language={lang}
-            isSelected={selectedOption?.char === option.char}
-            isCorrect={isRevealed ? option.char === currentKanji.char : null}
-            isRevealed={isRevealed}
-            onClick={() => handleOptionClick(option)}
-            disabled={isRevealed}
-          />
-        ))}
-      </div>
+      <AnswerSection>
+        <div id="kanji-options" className="grid grid-cols-1 gap-3">
+          {options.map((option) => (
+            <KanjiOptionCard
+              key={option.char}
+              kanji={option}
+              difficulty={difficulty}
+              language={lang}
+              isSelected={selectedOption?.char === option.char}
+              isCorrect={isRevealed ? option.char === currentKanji.char : null}
+              isRevealed={isRevealed}
+              onClick={() => handleOptionClick(option)}
+              disabled={isRevealed}
+            />
+          ))}
+        </div>
+      </AnswerSection>
 
       {/* Action Button */}
-      <div className="flex justify-center">
-        {isRevealed && (
-          <Button onClick={handleNext} size="lg" className="gap-2" disabled={disableNext}>
-            {t("nextKanji")}
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-        )}
-      </div>
+      {isRevealed && (
+        <ActionBar
+          showResult={isRevealed}
+          onNext={handleNext}
+          nextDisabled={disableNext}
+          nextLabel={t("nextKanji")}
+          t={t}
+        />
+      )}
     </div>
   )
 }
