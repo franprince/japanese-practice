@@ -61,7 +61,12 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
         {/* User answer display */}
         <div className="min-h-16 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
           {userAnswer ? (
-            <span className="text-3xl md:text-4xl font-bold text-foreground">{userAnswer}</span>
+            <span
+              lang={mode === "arabicToKanji" ? "ja" : undefined}
+              className="text-3xl md:text-4xl font-bold text-foreground"
+            >
+              {userAnswer}
+            </span>
           ) : (
             <span className="text-muted-foreground text-lg">{t("useKeypadBelow")}</span>
           )}

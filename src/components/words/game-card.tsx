@@ -86,6 +86,8 @@ export function GameCard({
     )
   }
 
+
+
   // No words available state
   if (noWordsAvailable) {
     return (

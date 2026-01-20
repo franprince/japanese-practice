@@ -21,7 +21,27 @@ export type WordSets = {
   bothForms?: JapaneseWord[]
 }
 
-const WORDSET_LANG = "es".toLowerCase()
+// Mobile data protection helpers
+export const isMobileDevice = () => {
+  if (typeof window === "undefined") return false
+  if (window.matchMedia?.("(max-width: 768px)").matches) return true
+  const ua = navigator.userAgent.toLowerCase()
+  return /android|iphone|ipad|ipod|mobile|tablet/.test(ua)
+}
+
+export const isWordsetConfirmed = (lang: string) => {
+  if (typeof window === "undefined") return false
+  try {
+    return localStorage.getItem(`wordset-confirmed-${lang}`) === "1"
+  } catch {
+    return false
+  }
+}
+
+export const confirmWordset = (lang: string) => {
+  if (typeof window === "undefined") return
+  localStorage.setItem(`wordset-confirmed-${lang}`, "1")
+}
 
 
 
@@ -93,7 +113,7 @@ const fetchPrebuiltWordset = async (lang: string, currentVersion?: number): Prom
 };
 
 export const normalizeLang = (lang: string | undefined): string => {
-  const lower = (lang || WORDSET_LANG || "es").toLowerCase()
+  const lower = (lang || "es").toLowerCase()
   if (lower === "ja") return "en"
   if (lower === "en" || lower === "es") return lower
   return "es"
@@ -150,6 +170,13 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
         // Revalidate in background without awaiting
         performFetch().catch(err => console.error("[Loader] Background revalidation failed:", err))
         return cached
+      }
+
+      // 3b. Mobile guard: do not fetch until user confirms
+      if (isMobileDevice() && !isWordsetConfirmed(datasetLang)) {
+        const error = new Error(`Wordset fetch blocked until user confirms`)
+          ; (error as any).code = "MOBILE_AUTH_REQUIRED"
+        throw error
       }
 
 

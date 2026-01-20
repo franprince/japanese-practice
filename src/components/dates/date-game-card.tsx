@@ -86,7 +86,10 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
 
 
       <div className="text-center mb-6">
-        <div className="text-6xl md:text-7xl font-bold text-foreground mb-2 font-mono">
+        <div
+          lang={mode === "months" && showNumbers ? undefined : "ja"}
+          className="text-6xl md:text-7xl font-bold text-foreground mb-2 font-mono"
+        >
           {mode === "months" && showNumbers ? question.displayNumber : question.display}
         </div>
         {mode === "full" && <p className="text-sm text-muted-foreground">{t("writeFullDate")}</p>}

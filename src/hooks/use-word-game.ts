@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import type { JapaneseWord, WordFilter } from "@/lib/japanese-words"
 import { getRandomWord, getRandomCharacter } from "@/lib/japanese-words"
+import { confirmWordset, normalizeLang } from "@/lib/words-loader"
 import { validateAnswer } from "@/lib/japanese-input"
 import { detectErrors, type ErrorDetectionResult } from "@/lib/error-detection"
 import type { GameMode } from "@/types/game"
@@ -86,31 +87,41 @@ export function useWordGame({
     const loadNewWord = useCallback(async () => {
         if (disableNext) return
         setIsLoading(true)
-        let word: JapaneseWord | null
+        let word: JapaneseWord | null = null
 
-        if (isCharacterMode) {
-            word = await getRandomCharacter(mode, filter)
-        } else {
-            word = await getRandomWord(mode, filter, lang)
+        try {
+            if (isCharacterMode) {
+                word = await getRandomCharacter(mode, filter)
+            } else {
+                word = await getRandomWord(mode, filter, lang)
+            }
+
+            if (word) {
+                setCurrentWord(word)
+                setDisplayRomaji(word.romaji)
+                setNoWordsAvailable(false)
+            } else {
+                setCurrentWord(null)
+                setDisplayRomaji("")
+                setNoWordsAvailable(true)
+            }
+        } catch (error: any) {
+            console.error("Failed to load word:", error)
+        } finally {
+            setIsLoading(false)
         }
 
         if (word) {
-            setCurrentWord(word)
-            setDisplayRomaji(word.romaji)
-            setNoWordsAvailable(false)
-        } else {
-            setCurrentWord(null)
-            setDisplayRomaji("")
-            setNoWordsAvailable(true)
+            setUserInput("")
+            setFeedback(null)
+            setErrorDetails(null)
+            setTimeout(() => {
+                if (!suppressFocus) inputRef.current?.focus()
+            }, 100)
         }
-        setIsLoading(false)
-        setUserInput("")
-        setFeedback(null)
-        setErrorDetails(null)
-        setTimeout(() => {
-            if (!suppressFocus) inputRef.current?.focus()
-        }, 100)
     }, [mode, filter, suppressFocus, lang, isCharacterMode, disableNext, setFeedback])
+
+
 
     // Check answer
     const checkAnswer = useCallback(() => {

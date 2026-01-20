@@ -30,8 +30,10 @@ test.describe('Performance (INP Proxy)', () => {
         await page.goto('/words')
         await page.waitForLoadState('networkidle')
 
+        // Default is Character Mode on mobile, so input should be visible immediately
+        // No download confirmation needed unless we switch to Words mode
         const input = page.locator('input[type="text"]')
-        await expect(input).toBeVisible()
+        await expect(input).toBeVisible({ timeout: 10000 })
 
         // Measure typing latency
         const start = Date.now()
