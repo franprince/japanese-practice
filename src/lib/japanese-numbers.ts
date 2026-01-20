@@ -49,65 +49,55 @@ export const numberPadKeysArabic = [
     { char: "0", value: "0" },
 ] as const
 
+// Mappings for conversion
+const digitMap = ["〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"]
+const unitMap = ["", "十", "百", "千", "万"]
+
 // Function to convert Arabic number to Japanese
 export function arabicToJapanese(num: number): string {
     if (num === 0) return "〇"
     if (num < 0) return ""
 
     let result = ""
-    let remaining = num
+    const s = num.toString()
+    let len = s.length
 
-    // 万 (10000s)
-    if (remaining >= 10000) {
-        const manCount = Math.floor(remaining / 10000)
-        if (manCount > 1) {
-            result += arabicToJapaneseSmall(manCount)
+    for (let i = 0; i < len; i++) {
+        const char = s[i]
+        if (!char) continue
+        const n = parseInt(char)
+        const pos = len - i - 1 // 0-based position from right (0=units, 1=tens, etc)
+
+        // Handling for 10000 (Man) is special in simple cases, but standard multiplier logic:
+        // This simple version handles up to 99999 as requested by difficulty ranges
+
+        if (n === 0) continue
+
+        // Special handling for patterns like 10 -> juu (not ichijuu), 100 -> hyaku
+        // But 10000 is ichiman
+
+        // Simplified Logic for < 100000
+        const unit = unitMap[pos] || ""
+
+        if (pos === 4) { // Man
+            // Always show digit for Man (e.g. 10000 -> ichiman)
+            result += (digitMap[n] || "") + "万"
+            continue
         }
-        result += "万"
-        remaining %= 10000
-    }
 
-    // 千 (1000s)
-    if (remaining >= 1000) {
-        const senCount = Math.floor(remaining / 1000)
-        if (senCount > 1) {
-            result += arabicToJapaneseSmall(senCount)
+        if (n === 1 && pos > 0) {
+            result += unit
+        } else {
+            result += (digitMap[n] || "") + unit
         }
-        result += "千"
-        remaining %= 1000
     }
-
-    // 百 (100s)
-    if (remaining >= 100) {
-        const hyakuCount = Math.floor(remaining / 100)
-        if (hyakuCount > 1) {
-            result += arabicToJapaneseSmall(hyakuCount)
-        }
-        result += "百"
-        remaining %= 100
-    }
-
-    // 十 (10s)
-    if (remaining >= 10) {
-        const juuCount = Math.floor(remaining / 10)
-        if (juuCount > 1) {
-            result += arabicToJapaneseSmall(juuCount)
-        }
-        result += "十"
-        remaining %= 10
-    }
-
-    // Units (1-9)
-    if (remaining > 0) {
-        result += arabicToJapaneseSmall(remaining)
-    }
-
     return result
 }
 
-function arabicToJapaneseSmall(num: number): string {
-    const digits = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"]
-    return digits[num] || ""
+const valueMap: Record<string, number> = {
+    "〇": 0, "零": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5,
+    "六": 6, "七": 7, "八": 8, "九": 9, "十": 10, "百": 100,
+    "千": 1000, "万": 10000
 }
 
 // Function to convert Japanese number string to Arabic
@@ -117,66 +107,25 @@ export function japaneseToArabic(japanese: string): number {
 
     let total = 0
     let current = 0
-    let manPart = 0
 
     for (const char of japanese) {
-        switch (char) {
-            case "一":
-                current = 1
-                break
-            case "二":
-                current = 2
-                break
-            case "三":
-                current = 3
-                break
-            case "四":
-                current = 4
-                break
-            case "五":
-                current = 5
-                break
-            case "六":
-                current = 6
-                break
-            case "七":
-                current = 7
-                break
-            case "八":
-                current = 8
-                break
-            case "九":
-                current = 9
-                break
-            case "十":
-                current = current === 0 ? 10 : current * 10
-                total += current
+        const val = valueMap[char]
+        if (val === undefined) continue
+
+        if (val < 10) {
+            current = val
+        } else {
+            // Multiplier (10, 100, 1000, 10000)
+            if (val === 10000) {
+                total = (total + (current || 1)) * val
                 current = 0
-                break
-            case "百":
-                current = current === 0 ? 100 : current * 100
-                total += current
+            } else {
+                total += (current || 1) * val
                 current = 0
-                break
-            case "千":
-                current = current === 0 ? 1000 : current * 1000
-                total += current
-                current = 0
-                break
-            case "万":
-                current = current === 0 ? 1 : current
-                manPart = (total + current) * 10000
-                total = 0
-                current = 0
-                break
-            case "〇":
-            case "零":
-                if (japanese.length === 1) return 0
-                break
+            }
         }
     }
-
-    return manPart + total + current
+    return total + current
 }
 
 // Generate a random number within a range
