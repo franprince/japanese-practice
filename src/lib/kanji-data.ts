@@ -1,14 +1,10 @@
-export type KanjiDifficulty = "easy" | "medium" | "hard"
-
-export interface KanjiEntry {
-  char: string
-  meaning_en: string | null
-  meaning_es: string | null
-  reading?: string | null
-  jlpt?: string | null
-}
-
 import { openDb, STORE_KANJI } from "./db"
+
+// Import types from centralized location for use in this file
+import type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
+
+// Re-export types from centralized location
+export type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
 
 const CACHE_PREFIX = "kanji-level-"
 const CACHE_EXPIRY_DAYS = 7

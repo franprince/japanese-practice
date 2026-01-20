@@ -1,25 +1,11 @@
 import { openDb, STORE_WORDSETS } from "./db"
 import type { JapaneseWord } from "./japanese-words"
 
-export type LoaderDeps = {
-  characterGroups: Array<{
-    id: string
-    label: string
-    labelJp: string
-    type: "hiragana" | "katakana"
-    characters: string[]
-  }>
-  kanaToRomaji: (text: string) => string
-  hasHiragana: (text: string) => boolean
-  hasKatakana: (text: string) => boolean
-}
+// Import types from centralized location for use in this file
+import type { LoaderDeps, WordSets } from "@/types/api"
 
-export type WordSets = {
-  version: number
-  hiraganaWords: JapaneseWord[]
-  katakanaWords: JapaneseWord[]
-  bothForms?: JapaneseWord[]
-}
+// Re-export types from centralized location
+export type { LoaderDeps, WordSets } from "@/types/api"
 
 const WORDSET_LANG = "es".toLowerCase()
 

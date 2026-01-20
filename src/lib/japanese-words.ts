@@ -9,17 +9,11 @@ import {
   type CharacterGroup as LoaderCharacterGroup
 } from "./data/kana-dictionary-loader";
 
-export interface JapaneseWord {
-  kana: string
-  romaji: string
-  type: "hiragana" | "katakana"
-  meaning?: string
-  groups: string[] // Added groups for filtering
-  kanji?: string
-}
+// Import types from centralized location for use in this file
+import type { JapaneseWord, WordFilter, CharacterGroup } from "@/types/japanese"
 
-// Re-export CharacterGroup type from loader
-export type CharacterGroup = LoaderCharacterGroup
+// Re-export types from centralized location
+export type { JapaneseWord, WordFilter, CharacterGroup } from "@/types/japanese"
 
 // Lazy-loaded data - use getCharacterGroups() and getKanaRomajiMap() for async access
 // For backwards compatibility, export sync versions (will be empty until loaded)
@@ -107,12 +101,6 @@ const isMeaningBlacklisted = (meaning?: string) => {
   if (!meaning) return false
   const lowerMeaning = meaning.toLowerCase()
   return blacklist.some(term => term.trim() && lowerMeaning.includes(term.toLowerCase()))
-}
-
-export interface WordFilter {
-  selectedGroups: string[]
-  minLength: number
-  maxLength: number
 }
 
 export async function getRandomWord(

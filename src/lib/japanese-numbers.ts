@@ -185,7 +185,10 @@ export function generateRandomNumber(min: number, max: number): number {
 }
 
 // Difficulty presets
-export type Difficulty = "easy" | "medium" | "hard" | "expert"
+// Re-export type from centralized location
+export type { NumberDifficulty } from "@/types/japanese"
+// Backward compatibility alias
+export type Difficulty = import("@/types/japanese").NumberDifficulty
 
 export const difficultyRanges: Record<Difficulty, { min: number; max: number; label: string }> = {
     easy: { min: 1, max: 10, label: "1-10" },
