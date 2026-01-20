@@ -27,24 +27,9 @@ export default function KanjiPage() {
         handleScoreUpdate,
         resetSession,
         setTargetCount,
-        remainingQuestions,
-    } = useSessionProgress()
-
-    const remainingLabel = playMode === "session"
-        ? t("roundsLeft").replace("{count}", String(Math.max(remainingQuestions ?? 0, 0)))
-        : null
-
-    const sessionSummaryProps = {
-        title: t("sessionCompleteTitle"),
-        targetLabel: t("sessionTargetLabel"),
-        correctLabel: t("sessionCorrectLabel"),
-        accuracyLabel: t("sessionAccuracyLabel"),
-        targetCount,
-        correctCount,
-        accuracy,
-        restartLabel: t("sessionRestart"),
-        switchLabel: t("sessionSwitchToInfinite"),
-    }
+        remainingLabel,
+        sessionSummaryProps,
+    } = useSessionProgress({ t })
 
     const [difficulty, setDifficulty] = useState<KanjiDifficulty>("easy")
     const [key, setKey] = useState(0)
