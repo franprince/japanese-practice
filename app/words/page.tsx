@@ -14,8 +14,6 @@ import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
 import { useSessionProgress } from "@/hooks/use-session-progress"
 import { useI18n } from "@/lib/i18n"
-import { useMobileWordset } from "@/hooks/use-mobile-wordset"
-import { MobileWordsetModal } from "@/components/words/mobile-wordset-modal"
 
 export default function WordsPage() {
     const { t, lang } = useI18n()
@@ -62,15 +60,11 @@ export default function WordsPage() {
         maxLength: 6,
     })
     const [customSettingsOpen, setCustomSettingsOpen] = useState(false)
-    const {
-        isCharacterMode,
-        mobileConfirmOpen,
-        downloadProgress,
-        wordsetSizeMB,
-        requestToggleCharacterMode,
-        confirmWordMode,
-        cancelConfirm,
-    } = useMobileWordset(lang)
+    const [isCharacterMode, setIsCharacterMode] = useState(false)
+
+    const requestToggleCharacterMode = () => {
+        setIsCharacterMode(prev => !prev)
+    }
 
     const handleScoreUpdateWithUi = useCallback(
         (newScore: number, newStreak: number, correct: boolean) => {
@@ -179,18 +173,6 @@ export default function WordsPage() {
                     onIncorrectCharsChange={setIncorrectChars}
                 />
             )}
-            <MobileWordsetModal
-                open={mobileConfirmOpen}
-                title={t("mobileWordModeTitle")}
-                message={t("mobileWordModeConfirm").replace("{size}", `${wordsetSizeMB}MB`)}
-                progress={downloadProgress}
-                onCancel={cancelConfirm}
-                onConfirm={confirmWordMode}
-                cancelLabel={t("mobileWordModeCancel")}
-                confirmLabel={t("mobileWordModeContinue")}
-                cancelDisabled={downloadProgress !== null}
-                confirmDisabled={downloadProgress !== null}
-            />
         </GamePageLayout>
     )
 }
