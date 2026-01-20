@@ -62,17 +62,11 @@ export const daysOfWeek: Record<number, { reading: string; romaji: string; kanji
   6: { reading: "どようび", romaji: "doyoubi", kanji: "土曜日", labelKey: "day.saturday" },
 }
 
-export type DateMode = "months" | "full" | "week_days"
+// Import types from centralized location for use in this file
+import type { DateMode, DateQuestion } from "@/types/japanese"
 
-export interface DateQuestion {
-  display: string
-  displayName: string
-  displayNumber: string
-  answer: string
-  romaji: string
-  kanji?: string
-}
-
+// Re-export types from centralized location
+export type { DateMode, DateQuestion } from "@/types/japanese"
 
 export function generateDayQuestion(): DateQuestion {
   const day = Math.floor(Math.random() * 31) + 1

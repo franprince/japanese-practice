@@ -1,8 +1,12 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 
-export type Theme = "default" | "sakura" | "ocean" | "forest" | "sunset" | "daylight" | "lavender" | "mint"
+// Import type from centralized location for use in this file
+import type { Theme } from "@/types/ui"
+
+// Re-export type from centralized location
+export type { Theme } from "@/types/ui"
 
 interface ThemeContextType {
   theme: Theme

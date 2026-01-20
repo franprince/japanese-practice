@@ -5,35 +5,11 @@ import {
 } from "./data/kana-dictionary-loader"
 import type { KanaDictionary, KanaGroup } from "@/types/kana"
 
-/**
- * Result for a single kana character/segment
- */
-export interface CharacterResult {
-    /** The kana character(s) (e.g., "ぴゃ", "ぼ") */
-    kana: string
-    /** All valid romaji variations (e.g., ["pya"]) */
-    expectedRomaji: string[]
-    /** What the user actually typed for this segment */
-    userInput: string
-    /** Whether the user input matches any expected romanization */
-    isCorrect: boolean
-}
+// Import types from centralized location for use in this file
+import type { CharacterResult, ErrorDetectionResult } from "@/types/japanese"
 
-/**
- * Complete result of error detection
- */
-export interface ErrorDetectionResult {
-    /** True if all characters are correct */
-    isFullyCorrect: boolean
-    /** Per-character results */
-    characters: CharacterResult[]
-    /** Number of correctly typed characters */
-    correctCount: number
-    /** Number of incorrectly typed characters */
-    incorrectCount: number
-    /** Any extra characters the user typed that weren't matched to kana */
-    extraInput: string
-}
+// Re-export types from centralized location
+export type { CharacterResult, ErrorDetectionResult } from "@/types/japanese"
 
 // Cache for all valid romaji mappings (kana -> all valid romaji)
 let allRomajiMapCache: Record<string, string[]> | null = null
