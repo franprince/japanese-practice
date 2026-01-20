@@ -126,18 +126,90 @@ test.describe('Words Game', () => {
         await wordsPage.screenshot('words_feedback_incorrect')
     })
 
-    test('should load words game on mobile without confirmation modal', async ({ wordsPage, page }) => {
+    test('should load words game on mobile with confirmation flow', async ({ wordsPage, page }) => {
+        // Force mobile environment
         await page.setViewportSize({ width: 375, height: 812 })
+        // Mock User Agent to ensure isMobileDevice returns true
+        await page.addInitScript(() => {
+            Object.defineProperty(navigator, 'userAgent', {
+                get: () => 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
+            })
+            // Force clear storage to ensure no previous confirmation prevents modal
+            localStorage.clear()
+
+            // Force matchMedia to true for mobile breadth
+            Object.defineProperty(window, 'matchMedia', {
+                writable: true,
+                value: (query: string) => ({
+                    matches: true,
+                    media: query,
+                    onchange: null,
+                    addListener: () => { },
+                    removeListener: () => { },
+                    addEventListener: () => { },
+                    removeEventListener: () => { },
+                    dispatchEvent: () => false,
+                }),
+            });
+        })
 
         await wordsPage.goto()
-        await page.waitForLoadState('networkidle')
 
-        // Should show game directly (input visible)
+        // Clear IndexedDB reliably and reload to ensure clean state
+        await page.evaluate(async () => {
+            const DB_NAME = "kana-words"
+            await new Promise((resolve, reject) => {
+                const req = indexedDB.deleteDatabase(DB_NAME)
+                req.onsuccess = resolve
+                req.onerror = reject
+                req.onblocked = resolve
+            })
+        })
+        await page.reload()
+
+        // 1. Should start in Character Mode (input visible immediately, no download)
         const input = page.locator('input[type="text"]')
         await expect(input).toBeVisible()
 
-        // Should NOT show modal
-        await expect(page.locator('text=Download word set')).toBeHidden()
+        // 2. Switch to Words Mode (toggle button)
+        const switchBtn = page.locator('button[title="Switch to words"]')
+        console.log('Checking for switch button...')
+        if (await switchBtn.isVisible()) {
+            await switchBtn.click()
+            console.log('Clicked switch button')
+        } else {
+            console.log('Switch button not found, checking if already in words mode...')
+            // If we are already in words mode, the button should say "Switch to Characters"
+            const charBtn = page.locator('button[title="Switch to Characters"]')
+            if (await charBtn.isVisible()) {
+                console.log('Already in Words Mode (Switch to Characters visible)')
+            } else {
+                console.log('NEITHER button found. Dumping page layout...')
+                console.log(await page.content())
+            }
+        }
+
+        // 3. Now should see Download Confirmation Modal
+        console.log('Waiting for modal...')
+        const modal = page.getByTestId('mobile-wordset-modal')
+        try {
+            await expect(modal).toBeVisible({ timeout: 5000 })
+            console.log('Modal found! Clicking Download...')
+            const downloadBtn = modal.locator('button', { hasText: 'Download' })
+            await downloadBtn.click()
+        } catch (e) {
+            console.log('Modal NOT visible. Taking screenshot...')
+            await page.screenshot({ path: 'modal-fail.png' })
+            // Check input visibility as fallback debug
+            const input = page.locator('input[type="text"]')
+            if (await input.isVisible()) {
+                console.log('Input visible - logic skipped modal?')
+            }
+            throw e
+        }
+
+        // 4. Input should reappear
+        await expect(input).toBeVisible({ timeout: 10000 })
     })
 
 })
