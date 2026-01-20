@@ -7,7 +7,7 @@ import { confirmWordset, normalizeLang } from "@/lib/japanese/words/loader"
 import { validateAnswer } from "@/lib/japanese/shared/input"
 import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared/error-detection"
 import type { GameMode } from "@/types/game"
-import type { Language } from "@/lib/translations"
+import type { Language } from "@/lib/i18n/translations"
 import { useBaseGame } from "./use-base-game"
 
 export interface UseWordGameProps {
