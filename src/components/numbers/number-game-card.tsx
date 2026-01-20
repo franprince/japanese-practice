@@ -1,23 +1,16 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { NumberPad } from "@/components/numbers/number-pad"
 import { ArrowRight, SkipForward } from "lucide-react"
 import {
-  generateRandomNumber,
-  arabicToJapanese,
-  japaneseToArabic,
-  difficultyRanges,
-  japaneseNumbers,
   numberPadKeysArabic,
   type Difficulty,
 } from "@/lib/japanese-numbers"
 import { useI18n } from "@/lib/i18n"
 import { getResponsiveFontSize } from "@/lib/utils/font-sizing"
-import { useGameScore } from "@/hooks/use-game-score"
-import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
+import { useNumberGame } from "@/hooks/use-number-game"
 
 interface NumberGameCardProps {
   difficulty: Difficulty
@@ -28,94 +21,24 @@ interface NumberGameCardProps {
 
 export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = false }: NumberGameCardProps) {
   const { t } = useI18n()
-  const [currentNumber, setCurrentNumber] = useState<number>(1)
-  const [userAnswer, setUserAnswer] = useState("")
-  const [showResult, setShowResult] = useState(false)
-  const [isCorrect, setIsCorrect] = useState(false)
-  const { score, streak, updateScore } = useGameScore(onScoreUpdate)
-  const [shuffleNumbers, setShuffleNumbers] = useState(true)
+  const {
+    userAnswer,
+    showResult,
+    isCorrect,
+    shuffleNumbers,
+    setShuffleNumbers,
+    questionText,
+    correctAnswerDisplay,
+    correctAnswerRomaji,
+    handleKeyPress,
+    handleDelete,
+    handleClear,
+    handleSubmit,
+    handleNext,
+    handleSkip,
+  } = useNumberGame({ difficulty, mode, onScoreUpdate, disableNext })
 
-  const generateNewNumber = useCallback(() => {
-    const range = difficultyRanges[difficulty]
-    const newNumber = generateRandomNumber(range.min, range.max)
-    setCurrentNumber(newNumber)
-    setUserAnswer("")
-    setShowResult(false)
-  }, [difficulty])
-
-  useEffect(() => {
-    generateNewNumber()
-  }, [generateNewNumber]) // generateNewNumber depends on difficulty
-
-  const handleKeyPress = (key: string) => {
-    if (showResult || disableNext) return
-    setUserAnswer((prev) => prev + key)
-  }
-
-  const handleDelete = () => {
-    if (showResult || disableNext) return
-    setUserAnswer((prev) => prev.slice(0, -1))
-  }
-
-  const handleClear = () => {
-    if (showResult || disableNext) return
-    setUserAnswer("")
-  }
-
-  const handleSubmit = () => {
-    if (showResult || !userAnswer || disableNext) return
-
-    const userValue = mode === "arabicToKanji" ? japaneseToArabic(userAnswer) : Number(userAnswer)
-    const correct = userValue === currentNumber
-
-    setIsCorrect(correct)
-    setShowResult(true)
-    updateScore(correct, 1)
-  }
-
-  const handleNext = () => {
-    if (disableNext) return
-    generateNewNumber()
-  }
-
-  const handleSkip = () => {
-    updateScore(false)
-    generateNewNumber()
-  }
-
-  useKeyboardNavigation(
-    {
-      onEnter: showResult ? handleNext : (userAnswer ? handleSubmit : undefined),
-      onBackspace: !showResult ? handleDelete : undefined,
-      onEscape: !showResult ? handleClear : undefined,
-    },
-    !disableNext
-  )
-
-  // Always keep shuffle off in Kanji → Arabic mode
-  useEffect(() => {
-    if (mode === "kanjiToArabic") {
-      setShuffleNumbers(false)
-    } else {
-      setShuffleNumbers(true)
-    }
-  }, [mode])
-
-  const correctAnswerKanji = arabicToJapanese(currentNumber)
-  const questionText = mode === "arabicToKanji" ? currentNumber.toLocaleString() : correctAnswerKanji
   const promptLabel = mode === "arabicToKanji" ? t("writeInJapanese") : t("writeInArabic")
-  const correctAnswerDisplay = mode === "arabicToKanji" ? correctAnswerKanji : currentNumber.toLocaleString()
-
-  const correctAnswerRomaji = useMemo(() => {
-    const toRomaji = (jp: string) =>
-      jp
-        .split("")
-        .map((char) => japaneseNumbers[char as keyof typeof japaneseNumbers]?.reading ?? char)
-        .join(" ")
-    return toRomaji(correctAnswerKanji)
-  }, [correctAnswerKanji])
-
-
 
   return (
     <div className="space-y-4">
