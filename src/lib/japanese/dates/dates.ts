@@ -81,7 +81,7 @@ export const months: Record<number, { reading: string; romaji: string; kanji: st
   }
 })
 
-import type { TranslationKey } from "./translations"
+import type { TranslationKey } from "@/lib/i18n/translations"
 
 export const daysOfWeek: Record<number, { reading: string; romaji: string; kanji: string; labelKey: TranslationKey }> = {
   0: { reading: "にちようび", romaji: "nichiyoubi", kanji: "日曜日", labelKey: "day.sunday" },
