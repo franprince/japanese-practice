@@ -126,4 +126,18 @@ test.describe('Words Game', () => {
         await wordsPage.screenshot('words_feedback_incorrect')
     })
 
+    test('should load words game on mobile without confirmation modal', async ({ wordsPage, page }) => {
+        await page.setViewportSize({ width: 375, height: 812 })
+
+        await wordsPage.goto()
+        await page.waitForLoadState('networkidle')
+
+        // Should show game directly (input visible)
+        const input = page.locator('input[type="text"]')
+        await expect(input).toBeVisible()
+
+        // Should NOT show modal
+        await expect(page.locator('text=Download word set')).toBeHidden()
+    })
+
 })
