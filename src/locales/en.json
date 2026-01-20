@@ -144,5 +144,6 @@
     "words.downloadTitle": "Download Word Set",
     "words.downloadMessage": "The word set is large",
     "common.download": "Download",
-    "common.cancel": "Cancel"
+    "common.cancel": "Cancel",
+    "common.next": "Next"
 }

@@ -144,5 +144,6 @@
     "words.downloadTitle": "単語セットをダウンロード",
     "words.downloadMessage": "単語セットはサイズが大きいです",
     "common.download": "ダウンロード",
-    "common.cancel": "キャンセル"
+    "common.cancel": "キャンセル",
+    "common.next": "次へ"
 }
