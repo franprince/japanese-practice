@@ -25,7 +25,6 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
     showResult,
     isCorrect,
     shuffleNumbers,
-    setShuffleNumbers,
     questionText,
     correctAnswerDisplay,
     correctAnswerRomaji,
@@ -101,7 +100,6 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
               onSubmit={handleSubmit}
               disabled={showResult || disableNext}
               shuffleNumbers={shuffleNumbers}
-              onShuffleChange={setShuffleNumbers}
               keys={mode === "arabicToKanji" ? undefined : numberPadKeysArabic}
               disableShuffle={mode === "kanjiToArabic"}
             />
