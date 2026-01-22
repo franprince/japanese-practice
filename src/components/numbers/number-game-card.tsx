@@ -1,6 +1,5 @@
 "use client"
 
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { NumberPad } from "@/components/numbers/number-pad"
 import { ArrowRight, SkipForward } from "lucide-react"
@@ -9,8 +8,8 @@ import {
   type Difficulty,
 } from "@/lib/japanese/numbers"
 import { useI18n } from "@/lib/i18n"
-import { getResponsiveFontSize } from "@/lib/core/font-sizing"
 import { useNumberGame } from "@/hooks/use-number-game"
+import { GameCardContainer, QuestionDisplay, ResultDisplay } from "@/components/game/primitives"
 
 interface NumberGameCardProps {
   difficulty: Difficulty
@@ -40,23 +39,19 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
 
   const promptLabel = mode === "arabicToKanji" ? t("writeInJapanese") : t("writeInArabic")
 
+  // Map feedback state for GameCardContainer
+  const feedback = showResult ? (isCorrect ? "correct" : "incorrect") : null
+
   return (
     <div className="space-y-4">
       {/* Question display - always at top */}
-      <Card
-        className={`p-6 md:p-8 border-2 transition-all duration-300 ${showResult
-          ? isCorrect
-            ? "border-success bg-success/5 shadow-[0_0_30px_rgba(34,197,94,0.15)]"
-            : "border-destructive bg-destructive/5 shadow-[0_0_30px_rgba(239,68,68,0.15)]"
-          : "border-border bg-card/50 backdrop-blur-sm"
-          }`}
-      >
-        <div className="text-center mb-4">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{promptLabel}</p>
-          <div lang={mode === "kanjiToArabic" ? "ja" : undefined} className={`font-bold text-foreground py-4 font-mono whitespace-nowrap transition-all ${getResponsiveFontSize(questionText)}`}>
-            {questionText}
-          </div>
-        </div>
+      <GameCardContainer feedback={feedback} className="backdrop-blur-sm">
+        {/* Question Display */}
+        <QuestionDisplay
+          value={questionText}
+          prompt={promptLabel}
+          lang={mode === "kanjiToArabic" ? "ja" : undefined}
+        />
 
         {/* User answer display */}
         <div className="min-h-16 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
@@ -74,28 +69,15 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
 
         {/* Result display */}
         {showResult && (
-          <div
-            className={`p-4 rounded-xl border ${isCorrect ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30"
-              }`}
-          >
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">{t("correctAnswer")}:</span>
-                <div className="text-right">
-                  <p lang={mode === "arabicToKanji" ? "ja" : undefined} className="text-xl font-bold text-foreground leading-tight">{correctAnswerDisplay}</p>
-                  <p className="text-xs text-muted-foreground/80 leading-tight">{correctAnswerRomaji}</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">{t("yourAnswer")}:</span>
-                <span className={`text-xl font-bold ${isCorrect ? "text-success" : "text-destructive"}`}>
-                  {userAnswer || "—"}
-                </span>
-              </div>
-            </div>
-          </div>
+          <ResultDisplay
+            isCorrect={isCorrect}
+            expectedAnswer={correctAnswerDisplay}
+            userAnswer={userAnswer || "—"}
+            romaji={correctAnswerRomaji}
+            t={t}
+          />
         )}
-      </Card>
+      </GameCardContainer>
 
       {/* Number pad and controls */}
       <div className="space-y-3">
