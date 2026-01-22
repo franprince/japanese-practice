@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { ArrowRight, SkipForward } from "lucide-react"
+import { ArrowRight, Check, SkipForward } from "lucide-react"
 import type { TranslationKey } from "@/lib/i18n"
 
 interface ActionBarProps {
@@ -69,6 +69,7 @@ export function ActionBar({
                     disabled={submitDisabled}
                 >
                     {submitLabel || t("check")}
+                    <Check className="ml-2 h-4 w-4" />
                 </Button>
             )}
         </div>
