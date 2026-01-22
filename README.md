@@ -324,9 +324,5 @@ Both are provided by the [Electronic Dictionary Research and Development Group](
 - UI components from [shadcn/ui](https://ui.shadcn.com/)
 - Icons from [Lucide](https://lucide.dev/)
 
----
-
-**Current Version**: 2.0.0
-
 For detailed changes, see [CHANGELOG.md](CHANGELOG.md)
 
