@@ -1,3 +1,56 @@
+# [3.0.0](https://github.com/franprince/japanese-practice/compare/v2.2.0...v3.0.0) (2026-01-22)
+
+
+### Bug Fixes
+
+* **kanji:** romaji display and language ssr issues ([#44](https://github.com/franprince/japanese-practice/issues/44)) ([df58fca](https://github.com/franprince/japanese-practice/commit/df58fcafe757e79418fd15592104f33d199c4759))
+
+
+### Code Refactoring
+
+* **lib:** reorganize by domain into core, i18n, japanese, theme modules ([#39](https://github.com/franprince/japanese-practice/issues/39)) ([0cfe5f2](https://github.com/franprince/japanese-practice/commit/0cfe5f254d3aca4872417fc11660d2d514f0fe4b))
+
+
+### BREAKING CHANGES
+
+* **lib:** Internal lib structure reorganized
+
+- Created domain-based directory structure:
+  * core/ - Infrastructure (db, utils, game-registry, font-sizing, random)
+  * i18n/ - Internationalization (i18n, translations, language-context)
+  * japanese/ - Japanese domain modules:
+    - words/ (words, loader)
+    - dates/ (dates)
+    - numbers/ (numbers)
+    - kanji/ (data)
+    - shared/ (input, error-detection, kana-dictionary-loader, kanaDictionary.json, blacklist)
+  * theme/ - Theme management (theme-context)
+
+- Added barrel exports (index.ts) for each module
+- Updated ~50+ import statements across:
+  * Components (~20 files)
+  * Hooks (~5 files)
+  * Pages (~5 files)
+  * Lib files (~15 files)
+  * Tests (~5 files)
+  * Build scripts (1 file)
+
+- Renamed files for clarity:
+  * japanese-words.ts → words/words.ts
+  * japanese-dates.ts → dates/dates.ts
+  * japanese-numbers.ts → numbers/numbers.ts
+  * japanese-input.ts → shared/input.ts
+  * kanji-data.ts → kanji/data.ts
+  * words-loader.ts → words/loader.ts
+
+Benefits:
+- Clear module boundaries by domain
+- Improved code discoverability
+- Follows domain-driven design principles
+- Easier to maintain and extend
+
+Tests: 51 unit tests pass, build successful
+
 # [2.2.0](https://github.com/franprince/japanese-practice/compare/v2.1.3...v2.2.0) (2026-01-19)
 
 
