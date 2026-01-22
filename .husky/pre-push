@@ -3,6 +3,8 @@
 # Skip wordset build in CI (semantic-release environment)
 if [ -z "$CI" ]; then
   bun test src
+  bun run test:e2e
+  bun run build
   bun run wordset:build
 else
   bun test src

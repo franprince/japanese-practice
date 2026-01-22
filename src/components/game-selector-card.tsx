@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useTheme } from "@/lib/theme-context"
+import { useTheme } from "@/lib/theme"
 
 interface GameSelectorCardProps {
   title: string

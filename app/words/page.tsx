@@ -5,8 +5,8 @@ import { GameCard } from "@/components/words/game-card"
 import { ModeSelector } from "@/components/words/mode-selector"
 import { StatsDisplay } from "@/components/game/stats-display"
 import { RemainingBadge } from "@/components/game/remaining-badge"
-import { type WordFilter, type CharacterGroup } from "@/lib/japanese-words"
-import { getCharacterGroups } from "@/lib/data/kana-dictionary-loader"
+import { type WordFilter, type CharacterGroup } from "@/lib/japanese/words"
+import { getCharacterGroups } from "@/lib/japanese/shared"
 import type { GameMode } from "@/types/game"
 import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { WordsSettingsPopover } from "@/components/words/words-settings-popover"
@@ -62,6 +62,8 @@ export default function WordsPage() {
         maxLength: 6,
     })
     const [customSettingsOpen, setCustomSettingsOpen] = useState(false)
+
+    // Use the mobile hook for mode and confirmations
     const {
         isCharacterMode,
         mobileConfirmOpen,
@@ -69,7 +71,7 @@ export default function WordsPage() {
         wordsetSizeMB,
         requestToggleCharacterMode,
         confirmWordMode,
-        cancelConfirm,
+        cancelConfirm
     } = useMobileWordset(lang)
 
     const handleScoreUpdateWithUi = useCallback(
@@ -83,6 +85,9 @@ export default function WordsPage() {
     )
 
     const handleModeChange = (nextMode: GameMode) => {
+        // Prevent re-render if mode is same (unless custom, which toggles settings)
+        if (nextMode === mode && nextMode !== "custom") return
+
         // Custom: open popover and avoid resetting the game so the menu stays open
         if (nextMode === "custom") {
             setMode(nextMode)
@@ -179,17 +184,18 @@ export default function WordsPage() {
                     onIncorrectCharsChange={setIncorrectChars}
                 />
             )}
+
             <MobileWordsetModal
                 open={mobileConfirmOpen}
-                title={t("mobileWordModeTitle")}
-                message={t("mobileWordModeConfirm").replace("{size}", `${wordsetSizeMB}MB`)}
+                title={t("words.downloadTitle") || "Download Word Set"}
+                message={`${t("words.downloadMessage") || "The word set is large"} (~${wordsetSizeMB}MB).`}
                 progress={downloadProgress}
                 onCancel={cancelConfirm}
                 onConfirm={confirmWordMode}
-                cancelLabel={t("mobileWordModeCancel")}
-                confirmLabel={t("mobileWordModeContinue")}
-                cancelDisabled={downloadProgress !== null}
+                confirmLabel={t("common.download") || "Download"}
+                cancelLabel={t("common.cancel") || "Cancel"}
                 confirmDisabled={downloadProgress !== null}
+                cancelDisabled={downloadProgress !== null}
             />
         </GamePageLayout>
     )

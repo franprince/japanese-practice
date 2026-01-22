@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Delete, CornerDownLeft } from "lucide-react"
-import { numberPadKeysArabic, numberPadKeysKanji } from "@/lib/japanese-numbers"
+import { numberPadKeysArabic, numberPadKeysKanji } from "@/lib/japanese/numbers"
 import { useI18n } from "@/lib/i18n"
 
 interface NumberPadProps {
@@ -13,7 +13,7 @@ interface NumberPadProps {
   onSubmit: () => void
   disabled?: boolean
   shuffleNumbers: boolean
-  onShuffleChange: (checked: boolean) => void
+  onShuffleChange?: (checked: boolean) => void
   keys?: readonly NumberPadKey[]
   disableShuffle?: boolean
 }
@@ -55,16 +55,18 @@ export function NumberPad({
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <label className="flex items-center gap-2 mb-2 text-sm text-muted-foreground cursor-pointer select-none">
-        <input
-          type="checkbox"
-          className="h-4 w-4 accent-primary cursor-pointer"
-          checked={shuffleNumbers}
-          onChange={(e) => onShuffleChange(e.target.checked)}
-          disabled={disabled || disableShuffle}
-        />
-        <span>{t("shuffleNumbers") ?? "Shuffle keys"}</span>
-      </label>
+      {onShuffleChange && (
+        <label className="flex items-center gap-2 mb-2 text-sm text-muted-foreground cursor-pointer select-none">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-primary cursor-pointer"
+            checked={shuffleNumbers}
+            onChange={(e) => onShuffleChange(e.target.checked)}
+            disabled={disabled || disableShuffle}
+          />
+          <span>{t("shuffleNumbers") ?? "Shuffle keys"}</span>
+        </label>
+      )}
 
       <div id="number-pad" className="grid grid-cols-5 gap-2">
         {renderedKeys.map(({ char, value }) => (

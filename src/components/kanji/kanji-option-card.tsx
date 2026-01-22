@@ -1,11 +1,16 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Info } from "lucide-react"
 
-import { cn } from "@/lib/utils"
-import { kanaToRomaji } from "@/lib/japanese-words"
-import type { KanjiEntry, KanjiDifficulty } from "@/lib/kanji-data"
-import type { Language } from "@/lib/translations"
+import { cn } from "@/lib/core"
+import { kanaToRomaji } from "@/lib/japanese/words"
+import { getKanaRomajiMap } from "@/lib/japanese/shared/kana-dictionary-loader"
+import type { KanjiEntry, KanjiDifficulty } from "@/lib/japanese/kanji"
+import type { Language } from "@/lib/i18n"
+
+// Cache the promise at module level so it's shared across all instances
+let romajiMapPromise: Promise<void> | null = null
 
 interface KanjiOptionCardProps {
   kanji: KanjiEntry
@@ -32,7 +37,21 @@ export function KanjiOptionCard({
   const showReading = difficulty === "easy"
   const meaning = kanji.meaning_es && language === "es" ? kanji.meaning_es : kanji.meaning_en
   const usedEnglishMeaning = language === "es" && !kanji.meaning_es && !!kanji.meaning_en
-  const romajiReading = kanji.reading ? kanaToRomaji(kanji.reading) : "—"
+
+  const [romajiReading, setRomajiReading] = useState(kanji.reading || "—")
+
+  useEffect(() => {
+    if (!kanji.reading) return
+
+    // Ensure map is loaded, then convert
+    if (!romajiMapPromise) {
+      romajiMapPromise = getKanaRomajiMap().then(() => { })
+    }
+
+    romajiMapPromise.then(() => {
+      setRomajiReading(kanaToRomaji(kanji.reading!))
+    })
+  }, [kanji.reading])
 
   return (
     <button
@@ -54,7 +73,7 @@ export function KanjiOptionCard({
         <span lang="ja" className="text-xl font-medium">{kanji.reading}</span>
 
         {/* Meaning / reading depending on difficulty */}
-        <div className="flex flex-col text-xs text-muted-foreground/80 mt-1 leading-tight gap-0.5">
+        <div className="flex flex-col text-xs text-muted-foreground/80 mt-1 leading-tight gap-1.5">
           {showReading && <span className="uppercase tracking-wide">{romajiReading}</span>}
           {showMeaning && (
             <span className="inline-flex items-center gap-2">

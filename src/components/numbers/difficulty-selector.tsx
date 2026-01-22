@@ -1,7 +1,7 @@
 "use client"
 
 import { useI18n } from "@/lib/i18n"
-import { difficultyRanges, type Difficulty } from "@/lib/japanese-numbers"
+import { difficultyRanges, type Difficulty } from "@/lib/japanese/numbers"
 
 interface DifficultySelectorProps {
   difficulty: Difficulty

@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/core"
 import { Check, X } from "lucide-react"
-import type { JapaneseWord } from "@/lib/japanese-words"
-import type { ErrorDetectionResult } from "@/lib/error-detection"
-import type { TranslationKey } from "@/lib/translations"
+import type { JapaneseWord } from "@/lib/japanese/words"
+import type { ErrorDetectionResult } from "@/lib/japanese/shared"
+import type { TranslationKey } from "@/lib/i18n"
 
 export interface GameFeedbackSectionProps {
     feedback: "correct" | "incorrect" | null

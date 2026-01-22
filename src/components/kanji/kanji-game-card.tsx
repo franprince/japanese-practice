@@ -1,13 +1,12 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
 import { KanjiOptionCard } from "./kanji-option-card"
-import { getRandomKanji, getRandomOptions, loadKanjiByLevels, type KanjiEntry, type KanjiDifficulty } from "@/lib/kanji-data"
+import type { KanjiDifficulty } from "@/lib/japanese/kanji"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Check, Info, X } from "lucide-react"
+import { ArrowRight, Info } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
-import { useGameScore } from "@/hooks/use-game-score"
-import { useKeyboardNavigation } from "@/hooks/use-keyboard-navigation"
+import { useKanjiGame } from "@/hooks/use-kanji-game"
+import { ResultDisplay } from "@/components/game/primitives"
 
 interface KanjiGameCardProps {
   difficulty: KanjiDifficulty
@@ -17,96 +16,22 @@ interface KanjiGameCardProps {
 
 export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }: KanjiGameCardProps) {
   const { t, lang } = useI18n()
-  const [kanjiSet, setKanjiSet] = useState<KanjiEntry[]>([])
-  const [currentKanji, setCurrentKanji] = useState<KanjiEntry | null>(null)
-  const [options, setOptions] = useState<KanjiEntry[]>([])
-  const [selectedOption, setSelectedOption] = useState<KanjiEntry | null>(null)
-  const [isRevealed, setIsRevealed] = useState(false)
-  const { score, streak, updateScore } = useGameScore(onScoreUpdate)
-
-  useEffect(() => {
-    let levels: string[] = []
-    switch (difficulty) {
-      case "easy":
-        levels = ["n5"]
-        break
-      case "medium":
-        levels = ["n5", "n4", "n3"]
-        break
-      case "hard":
-        levels = ["n5", "n4", "n3", "n2", "n1"]
-        break
-    }
-
-    loadKanjiByLevels(levels)
-      .then(list => list.filter(k => k.reading)) // Ensure we only use kanji with readings
-      .then(list => {
-        if (!list.length) throw new Error("No kanji found")
-        setKanjiSet(list)
-      })
-      .catch((err) => {
-        console.error("Failed to load kanji:", err)
-        setKanjiSet([])
-      })
-  }, [difficulty])
-
-  const loadNewKanji = useCallback(
-    (exclude?: KanjiEntry | null) => {
-      if (!kanjiSet.length) return
-      const newKanji = getRandomKanji(kanjiSet, exclude ?? undefined)
-      setCurrentKanji(newKanji)
-      setOptions(getRandomOptions(kanjiSet, newKanji, 3))
-      setSelectedOption(null)
-      setIsRevealed(false)
-    },
-    [kanjiSet],
-  )
-
-  useEffect(() => {
-    if (kanjiSet.length) {
-      loadNewKanji()
-    }
-  }, [kanjiSet, loadNewKanji])
-
-  const handleSubmit = useCallback(
-    (option?: KanjiEntry) => {
-      const choice = option ?? selectedOption
-      if (!choice || !currentKanji) return
-
-      const isCorrect = choice.char === currentKanji.char
-      setSelectedOption(choice)
-      setIsRevealed(true)
-      updateScore(isCorrect)
-    },
-    [selectedOption, currentKanji, updateScore],
-  )
-
-  const handleOptionClick = (option: KanjiEntry) => {
-    if (isRevealed) return
-    handleSubmit(option)
-  }
-
-  const handleNext = useCallback(() => {
-    if (disableNext) return
-    loadNewKanji(currentKanji)
-  }, [loadNewKanji, currentKanji, disableNext])
-
-  useKeyboardNavigation(
-    {
-      onEnter: isRevealed && !disableNext ? handleNext : undefined,
-    },
-    true
-  )
+  const {
+    currentKanji,
+    options,
+    selectedOption,
+    isRevealed,
+    isCorrect,
+    handleOptionClick,
+    handleNext,
+  } = useKanjiGame({ difficulty, onScoreUpdate, disableNext })
 
   if (!currentKanji) return null
 
-  const isCorrect = selectedOption?.char === currentKanji.char
   const meaning = lang === "es" ? currentKanji.meaning_es ?? currentKanji.meaning_en : currentKanji.meaning_en ?? currentKanji.meaning_es
   const usedEnglishMeaning = lang === "es" && !currentKanji.meaning_es && !!currentKanji.meaning_en
-  const showMeaning = difficulty === "easy" || difficulty === "medium"
-  const showReading = difficulty === "easy" || difficulty === "hard"
-  const promptLabel = t("kanji")
   const levelLabel = currentKanji.jlpt ? currentKanji.jlpt.toUpperCase().replace("JLPT-", "JLPT ") : null
+  const promptLabel = t("kanji")
 
   return (
     <div className="space-y-6">
@@ -120,38 +45,32 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
 
         {/* Result feedback */}
         {isRevealed && (
-          <div
-            className={`mt-4 p-4 rounded-xl border ${isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"
-              }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                {isCorrect ? <Check className="w-5 h-5 text-green-500" /> : <X className="w-5 h-5 text-red-500" />}
-                <span className={isCorrect ? "text-green-500" : "text-red-500"}>
-                  {isCorrect ? t("correct") : t("incorrect")}
-                </span>
-              </div>
-              {levelLabel && (
-                <span className="text-[10px] px-2 py-1 rounded-full border border-border/50 text-muted-foreground uppercase tracking-wide">
-                  {levelLabel}
-                </span>
-              )}
-            </div>
-            <div className="text-sm text-muted-foreground flex flex-col gap-1">
-              <span className="inline-flex items-center gap-2">
-                {meaning ?? t("meaning")}
-                {usedEnglishMeaning && (
-                  <span
-                    className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/80 border border-border/50 rounded-full px-2 py-[2px]"
-                    title="Meaning shown in English (missing Spanish translation)"
-                  >
-                    <Info className="w-3 h-3" />
-                    <span>EN</span>
-                  </span>
-                )}
-              </span>
-              <span className="uppercase tracking-wide">{currentKanji.reading ? <span lang="ja">{currentKanji.reading}</span> : t("reading")}</span>
-            </div>
+          <div className="mt-4">
+            <ResultDisplay
+              isCorrect={isCorrect}
+              expectedAnswer={meaning ?? t("meaning")}
+              userAnswer={selectedOption ? (lang === "es" ? selectedOption.meaning_es ?? selectedOption.meaning_en : selectedOption.meaning_en ?? selectedOption.meaning_es) ?? "" : ""}
+              romaji={currentKanji.reading ?? t("reading")}
+              t={t}
+              additionalInfo={
+                <div className="flex items-center justify-between">
+                  {usedEnglishMeaning && (
+                    <span
+                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/80 border border-border/50 rounded-full px-2 py-[2px]"
+                      title="Meaning shown in English (missing Spanish translation)"
+                    >
+                      <Info className="w-3 h-3" />
+                      <span>EN</span>
+                    </span>
+                  )}
+                  {levelLabel && (
+                    <span className="text-[10px] px-2 py-1 rounded-full border border-border/50 text-muted-foreground uppercase tracking-wide ml-auto">
+                      {levelLabel}
+                    </span>
+                  )}
+                </div>
+              }
+            />
           </div>
         )}
       </div>
