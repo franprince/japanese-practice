@@ -26,8 +26,6 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
     inputRef,
     handleSubmit,
     handleSkip,
-    handleKeyDown,
-    handleKeyUp,
     generateNewQuestion,
   } = useDateGame({ mode, onScoreUpdate, disableNext, t })
 
@@ -105,8 +103,6 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
           type="text"
           value={userInput}
           onChange={(e) => handleInputChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onKeyUp={handleKeyUp}
           readOnly={showResult}
           aria-disabled={showResult}
           placeholder={t("typeHiraganaOrRomaji")}
