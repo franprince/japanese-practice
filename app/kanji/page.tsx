@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { KanjiGameCard } from "@/components/kanji/kanji-game-card"
 import { KanjiDifficultySelector } from "@/components/kanji/kanji-difficulty-selector"
 import { StatsDisplay } from "@/components/game/stats-display"
@@ -11,6 +11,7 @@ import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
 import { useSessionProgress } from "@/hooks/use-session-progress"
 import { useI18n } from "@/lib/i18n"
+import { preloadKanaDictionary } from "@/lib/japanese/shared/kana-dictionary-loader"
 
 export default function KanjiPage() {
     const { t } = useI18n()
@@ -33,6 +34,11 @@ export default function KanjiPage() {
 
     const [difficulty, setDifficulty] = useState<KanjiDifficulty>("easy")
     const [key, setKey] = useState(0)
+
+    // Preload kana dictionary for romaji conversion in option cards
+    useEffect(() => {
+        preloadKanaDictionary()
+    }, [])
 
     const handleDifficultyChange = (newDifficulty: KanjiDifficulty) => {
         setDifficulty(newDifficulty)
