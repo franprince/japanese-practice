@@ -73,7 +73,7 @@ export function KanjiOptionCard({
         <span lang="ja" className="text-xl font-medium">{kanji.reading}</span>
 
         {/* Meaning / reading depending on difficulty */}
-        <div className="flex flex-col text-xs text-muted-foreground/80 mt-1 leading-tight gap-1">
+        <div className="flex flex-col text-xs text-muted-foreground/80 mt-1 leading-tight gap-1.5">
           {showReading && <span className="uppercase tracking-wide">{romajiReading}</span>}
           {showMeaning && (
             <span className="inline-flex items-center gap-2">
