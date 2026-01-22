@@ -121,8 +121,8 @@ test.describe('Kanji Game', () => {
 
         await page.waitForTimeout(1000)
 
-        // Verify success feedback (use more specific selector to avoid strict mode)
-        const successFeedback = page.locator('.mt-4.p-4.rounded-xl.border.bg-green-500\\/10').first()
+        // Verify success feedback - ResultDisplay uses bg-green-500/10 border-green-500/30
+        const successFeedback = page.locator('.bg-green-500\\/10.border-green-500\\/30').first()
         await expect(successFeedback).toBeVisible()
 
         // Capture screenshot
@@ -172,8 +172,8 @@ test.describe('Kanji Game', () => {
 
         await page.waitForTimeout(1000)
 
-        // Verify error feedback (use more specific selector to avoid strict mode)
-        const errorFeedback = page.locator('.mt-4.p-4.rounded-xl.border.bg-red-500\\/10').first()
+        // Verify error feedback - ResultDisplay uses bg-red-500/10 border-red-500/30
+        const errorFeedback = page.locator('.bg-red-500\\/10.border-red-500\\/30').first()
         await expect(errorFeedback).toBeVisible()
 
         // Capture screenshot

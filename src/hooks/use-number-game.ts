@@ -26,7 +26,6 @@ export interface UseNumberGameReturn {
     showResult: boolean
     isCorrect: boolean
     shuffleNumbers: boolean
-    setShuffleNumbers: (value: boolean) => void
     correctAnswerKanji: string
     correctAnswerRomaji: string
     questionText: string
@@ -49,7 +48,6 @@ export function useNumberGame({
 }: UseNumberGameProps): UseNumberGameReturn {
     const [currentNumber, setCurrentNumber] = useState<number>(1)
     const [userAnswer, setUserAnswer] = useState("")
-    const [shuffleNumbers, setShuffleNumbers] = useState(true)
 
     // Use unified base game logic
     const {
@@ -117,14 +115,8 @@ export function useNumberGame({
         !disableNext
     )
 
-    // Always keep shuffle off in Kanji → Arabic mode
-    useEffect(() => {
-        if (mode === "kanjiToArabic") {
-            setShuffleNumbers(false)
-        } else {
-            setShuffleNumbers(true)
-        }
-    }, [mode])
+    // Derive shuffle from mode (no shuffle in Kanji → Arabic mode)
+    const shuffleNumbers = mode !== "kanjiToArabic"
 
     const correctAnswerKanji = arabicToJapanese(currentNumber)
     const questionText = mode === "arabicToKanji" ? currentNumber.toLocaleString() : correctAnswerKanji
@@ -146,7 +138,6 @@ export function useNumberGame({
         showResult,
         isCorrect,
         shuffleNumbers,
-        setShuffleNumbers,
         correctAnswerKanji,
         correctAnswerRomaji,
         questionText,

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese/dates"
 import { useBaseGame } from "./use-base-game"
+import { useKeyboardNavigation } from "./use-keyboard-navigation"
 import type { TranslationKey } from "@/lib/i18n/translations"
 
 export interface UseDateGameProps {
@@ -26,10 +27,6 @@ export interface UseDateGameReturn {
     // Actions
     handleSubmit: () => void
     handleSkip: () => void
-    handleDelete: () => void
-    handleClear: () => void
-    handleKeyDown: (e: React.KeyboardEvent) => void
-    handleKeyUp: (e: React.KeyboardEvent) => void
     generateNewQuestion: () => void
 }
 
@@ -42,7 +39,6 @@ export function useDateGame({
     const [question, setQuestion] = useState<DateQuestion | null>(null)
     const [userInput, setUserInput] = useState("")
     const [showNumbers, setShowNumbers] = useState(false)
-    const enterOnResultRef = useRef(false)
     const inputRef = useRef<HTMLInputElement>(null)
 
     // Use unified base game logic
@@ -58,7 +54,6 @@ export function useDateGame({
 
     const generateNewQuestion = useCallback(() => {
         if (disableNext) return
-        enterOnResultRef.current = false
         setQuestion(generateDateQuestion(mode, t, showNumbers))
         setUserInput("")
         setFeedback(null)
@@ -99,30 +94,14 @@ export function useDateGame({
         setUserInput("")
     }, [])
 
-    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-        if (e.key === "Enter") {
-            if (showResult && !disableNext) {
-                e.preventDefault()
-                enterOnResultRef.current = true
-            } else if (!showResult) {
-                handleSubmit()
-            }
-        } else if (e.key === "Backspace" && !showResult) {
-            e.preventDefault()
-            handleDelete()
-        } else if (e.key === "Escape" && !showResult) {
-            handleClear()
-        }
-    }, [showResult, disableNext, handleSubmit, handleDelete, handleClear])
-
-    const handleKeyUp = useCallback((e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && showResult && !disableNext) {
-            if (!enterOnResultRef.current) return
-            e.preventDefault()
-            enterOnResultRef.current = false
-            generateNewQuestion()
-        }
-    }, [showResult, disableNext, generateNewQuestion])
+    useKeyboardNavigation(
+        {
+            onEnter: showResult ? (disableNext ? undefined : generateNewQuestion) : handleSubmit,
+            onBackspace: !showResult ? handleDelete : undefined,
+            onEscape: !showResult ? handleClear : undefined,
+        },
+        true
+    )
 
     return {
         // State
@@ -138,10 +117,6 @@ export function useDateGame({
         // Actions
         handleSubmit,
         handleSkip,
-        handleDelete,
-        handleClear,
-        handleKeyDown,
-        handleKeyUp,
         generateNewQuestion,
     }
 }

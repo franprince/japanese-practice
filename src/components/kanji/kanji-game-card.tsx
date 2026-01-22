@@ -3,9 +3,10 @@
 import { KanjiOptionCard } from "./kanji-option-card"
 import type { KanjiDifficulty } from "@/lib/japanese/kanji"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Check, Info, X } from "lucide-react"
+import { ArrowRight, Info } from "lucide-react"
 import { useI18n } from "@/lib/i18n"
 import { useKanjiGame } from "@/hooks/use-kanji-game"
+import { ResultDisplay } from "@/components/game/primitives"
 
 interface KanjiGameCardProps {
   difficulty: KanjiDifficulty
@@ -44,38 +45,32 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
 
         {/* Result feedback */}
         {isRevealed && (
-          <div
-            className={`mt-4 p-4 rounded-xl border ${isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30"
-              }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                {isCorrect ? <Check className="w-5 h-5 text-green-500" /> : <X className="w-5 h-5 text-red-500" />}
-                <span className={isCorrect ? "text-green-500" : "text-red-500"}>
-                  {isCorrect ? t("correct") : t("incorrect")}
-                </span>
-              </div>
-              {levelLabel && (
-                <span className="text-[10px] px-2 py-1 rounded-full border border-border/50 text-muted-foreground uppercase tracking-wide">
-                  {levelLabel}
-                </span>
-              )}
-            </div>
-            <div className="text-sm text-muted-foreground flex flex-col gap-1">
-              <span className="inline-flex items-center gap-2">
-                {meaning ?? t("meaning")}
-                {usedEnglishMeaning && (
-                  <span
-                    className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/80 border border-border/50 rounded-full px-2 py-[2px]"
-                    title="Meaning shown in English (missing Spanish translation)"
-                  >
-                    <Info className="w-3 h-3" />
-                    <span>EN</span>
-                  </span>
-                )}
-              </span>
-              <span className="uppercase tracking-wide">{currentKanji.reading ? <span lang="ja">{currentKanji.reading}</span> : t("reading")}</span>
-            </div>
+          <div className="mt-4">
+            <ResultDisplay
+              isCorrect={isCorrect}
+              expectedAnswer={meaning ?? t("meaning")}
+              userAnswer={selectedOption ? (lang === "es" ? selectedOption.meaning_es ?? selectedOption.meaning_en : selectedOption.meaning_en ?? selectedOption.meaning_es) ?? "" : ""}
+              romaji={currentKanji.reading ?? t("reading")}
+              t={t}
+              additionalInfo={
+                <div className="flex items-center justify-between">
+                  {usedEnglishMeaning && (
+                    <span
+                      className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/80 border border-border/50 rounded-full px-2 py-[2px]"
+                      title="Meaning shown in English (missing Spanish translation)"
+                    >
+                      <Info className="w-3 h-3" />
+                      <span>EN</span>
+                    </span>
+                  )}
+                  {levelLabel && (
+                    <span className="text-[10px] px-2 py-1 rounded-full border border-border/50 text-muted-foreground uppercase tracking-wide ml-auto">
+                      {levelLabel}
+                    </span>
+                  )}
+                </div>
+              }
+            />
           </div>
         )}
       </div>
