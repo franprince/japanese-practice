@@ -41,6 +41,7 @@ export default function KanjiPage() {
     }, [])
 
     const handleDifficultyChange = (newDifficulty: KanjiDifficulty) => {
+        if (newDifficulty === difficulty) return // Don't reset if same difficulty
         setDifficulty(newDifficulty)
         setKey((prev) => prev + 1)
         resetSession()
