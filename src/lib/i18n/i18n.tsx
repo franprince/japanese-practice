@@ -35,17 +35,16 @@ const loadTranslations = async (lang: Language): Promise<Record<string, string>>
 }
 
 export function I18nProvider({ children, initialLang = "es" }: { children: ReactNode; initialLang?: Language }) {
-  const [lang, setLangState] = useState<Language>(initialLang)
+  // Read from storage immediately to avoid hydration mismatch
+  const getInitialLang = (): Language => {
+    if (typeof window === "undefined") return initialLang
+    const stored = getStoredLang()
+    return stored || initialLang
+  }
+
+  const [lang, setLangState] = useState<Language>(getInitialLang)
   const [translationsMap, setTranslationsMap] = useState<Record<string, string>>(en) // Default to English initially
   const [isLoading, setIsLoading] = useState(false)
-
-  // Initial load from storage
-  useEffect(() => {
-    const stored = getStoredLang()
-    if (stored && stored !== lang) {
-      setLangState(stored)
-    }
-  }, [])
 
   // Load translations when lang changes
   useEffect(() => {
