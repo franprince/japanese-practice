@@ -71,7 +71,7 @@ export function useWordGame({
     const inputRef = useRef<HTMLInputElement>(null)
 
     // Use transition for non-urgent updates
-    const [isPending, startTransition] = useTransition()
+    const [, startTransition] = useTransition()
 
     // Use unified base game logic
     const {
