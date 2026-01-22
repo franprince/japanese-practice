@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/core"
 import { useLanguage } from "@/lib/i18n"
 import type { Language } from "@/lib/i18n"
@@ -16,6 +17,33 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { language, setLanguage } = useLanguage()
+  const [mounted, setMounted] = useState(false)
+
+  // Only render after client hydration to avoid mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    // Render placeholder during SSR/hydration
+    return (
+      <div
+        className={cn(
+          "inline-flex items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50",
+          className,
+        )}
+      >
+        {languages.map(({ code, label }) => (
+          <div
+            key={code}
+            className="px-3 py-1.5 rounded-full text-sm font-medium text-muted-foreground"
+          >
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div
@@ -28,7 +56,6 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
         <button
           key={code}
           onClick={() => setLanguage(code)}
-          suppressHydrationWarning
           className={cn(
             "px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
             language === code
