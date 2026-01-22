@@ -28,6 +28,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
         <button
           key={code}
           onClick={() => setLanguage(code)}
+          suppressHydrationWarning
           className={cn(
             "px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
             language === code
