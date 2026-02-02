@@ -83,28 +83,5 @@ describe("Japanese Input Validation", () => {
             expect(await validateAnswer("sashimi", word)).toBe(false)
             expect(await validateAnswer("sus", word)).toBe(false)
         })
-        it("accepts macron inputs (ā,ī,ū,ē,ō)", async () => {
-            const word = mockWord("コーヒー", "koohii") // Expected Answer has standard double vowel
-            expect(await validateAnswer("koohii", word)).toBe(true)
-            expect(await validateAnswer("kōhī", word)).toBe(true)
-            expect(await validateAnswer("kōhi", word)).toBe(false) // missing long i
-
-            const word2 = mockWord("ありがとう", "arigatou") // Answer has 'ou'
-            expect(await validateAnswer("arigatō", word2)).toBe(true) // Should map ō -> (oo|ou) -> match ou
-            expect(await validateAnswer("arigatou", word2)).toBe(true)
-
-            const word3 = mockWord("せんせい", "sensei") // 'ei' (not long vowel usually, but sometimes ē)
-            // 'sensei' is usually 'sensei', but 'sēnsei' or 'sensē'? 
-            // ē -> ee. 'sensee'.
-            // validateAnswer checks exact match or Hepburn match. 
-            // If answer is 'sensei', Hepburn might be 'sensei'.
-            // If input is 'sensē' -> 'sensee'.
-            // 'sensee' != 'sensei'. So this should FAIL unless answer allows it.
-            // Standard romanization for '先生' is 'sensei'. 
-            // But pronunciation is 'sensee'.
-            // Our map produces 'sensei'. So 'sensē' -> 'sensee' -> mismatch. Correct.
-            const word4 = mockWord("おねえさん", "oneesan") // double vowel 'ee'
-            expect(await validateAnswer("onēsan", word4)).toBe(true) // ē -> ee -> match
-        })
     })
 })

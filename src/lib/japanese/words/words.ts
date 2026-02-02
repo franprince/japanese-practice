@@ -56,8 +56,6 @@ const clampWordsetForMobile = (words: JapaneseWord[]) => {
 const hiraToKata = (text: string) =>
   text.replace(/[\u3041-\u3096]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60))
 
-const isVowel = (char: string) => /[aeiouāīūēō]/i.test(char)
-
 export const kanaToRomaji = (text: string) => {
   const kanaRomajiMap = getKanaRomajiMapInternal()
   let romaji = ""
@@ -65,32 +63,6 @@ export const kanaToRomaji = (text: string) => {
   const normalized = text || ""
   while (i < normalized.length) {
     const char = normalized[i]
-
-    // Handle chouonpu (ー) by extending previous vowel via macron
-    if (char === "ー") {
-      if (romaji.length > 0) {
-        const lastChar = romaji[romaji.length - 1]
-        // If it's a vowel (including macrons), ensure it's macronized
-        if (lastChar && isVowel(lastChar)) {
-          // Replace last char with macron version
-          const macronMap: Record<string, string> = {
-            a: "ā", i: "ī", u: "ū", e: "ē", o: "ō",
-            A: "Ā", I: "Ī", U: "Ū", E: "Ē", O: "Ō",
-            // Helper for already-macronized chars (idempotent)
-            "ā": "ā", "ī": "ī", "ū": "ū", "ē": "ē", "ō": "ō",
-            "Ā": "Ā", "Ī": "Ī", "Ū": "Ū", "Ē": "Ē", "Ō": "Ō"
-          }
-          romaji = romaji.slice(0, -1) + (macronMap[lastChar] || lastChar)
-        } else {
-          // Fallback if no preceding vowel
-          romaji += "-"
-        }
-      } else {
-        romaji += "-"
-      }
-      i += 1
-      continue
-    }
 
     // Handle sokuon (small tsu) by doubling the next consonant sound
     if (char === "っ" || char === "ッ") {
@@ -291,44 +263,25 @@ export async function getRandomCharacter(
     const randomGroup = groups[Math.floor(Math.random() * groups.length)]
     if (!randomGroup) break
 
-    let char = randomGroup.characters[Math.floor(Math.random() * randomGroup.characters.length)]
+    const char = randomGroup.characters[Math.floor(Math.random() * randomGroup.characters.length)]
     if (!char) continue
 
-    // Prevent consecutive chouonpu
-    if (char === "ー" && kana.endsWith("ー")) {
-      continue
-    }
-
-    // Randomly inject chouonpu (ー) for Katakana (except at start)
-    // 15% chance if we are in Katakana mode or current word is developing as Katakana
-    // and we have a preceding char.
-    // ALSO: prevent consecutive chouonpu (don't inject if last char was 'ー')
-    // WHITELIST: Only allow if preceding char ends in a vowel sound (not 'n' or 'xtu')
-    const lastKanaChar = kana.slice(-1)
-    if (i > 0 && lastKanaChar !== "ー" && (wordType === "katakana" || (!wordType && randomGroup.type === "katakana"))) {
-      // Check if last char is suitable for elongation (ends in vowel)
-      const lastRomaji = kanaToRomaji(lastKanaChar)
-      const endsInVowel = /[aeiouāīūēō]$/i.test(lastRomaji)
-
-      if (endsInVowel && Math.random() < 0.15) {
-        // Replace current char with 'ー'
-        char = "ー"
-      }
-    }
-
     kana += char
+    const charRomaji = kanaToRomaji(char)
 
     if (!wordType) {
       wordType = randomGroup.type as "hiragana" | "katakana"
     }
 
+    if (char === "い" && charRomaji !== "i") {
+      console.warn(`[Suspicious Romaji] Char: ${char}, Mapped: '${charRomaji}', Map(i): '${getKanaRomajiMapInternal()["い"]}'`)
+    }
+
+    romaji += charRomaji
     if (!usedGroups.includes(randomGroup.id)) {
       usedGroups.push(randomGroup.id)
     }
   }
-
-  // Calculate final romaji from the full kana string to ensure correct context-aware processing (sokuon, chouonpu, etc.)
-  romaji = kanaToRomaji(kana)
 
   if (!kana) return null
 

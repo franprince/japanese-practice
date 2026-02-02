@@ -140,55 +140,5 @@ export function validateAnswer(input: string, word: JapaneseWord): boolean {
         if (normInput === stem + "o") return true
     }
 
-    // 4. Macron Expansion (Input has macrons)
-    // If the input has macrons, try expanding them to standard Hepburn forms
-    // and see if matches the answer.
-    const hasInputMacrons = /[āīūēōĀĪŪĒŌ]/.test(input)
-    if (hasInputMacrons) {
-        // Expand deterministic macrons first
-        let expandedInput = input.toLowerCase().trim()
-            .replace(/[āĀ]/g, "aa")
-            .replace(/[īĪ]/g, "ii")
-            .replace(/[ūŪ]/g, "uu")
-            .replace(/[ēĒ]/g, "ee")
-
-        // Handle ō/Ō ambiguity (can map to "oo" or "ou")
-        // We construct a regex pattern where ō becomes (oo|ou)
-        const patternStr = expandedInput.replace(/[ōŌ]/g, "(oo|ou)")
-
-        // Normalize the answer to compare against
-        // Note: normAnswer uses our normalizeRomaji which handles basic variations
-
-        // Simple case: exact match against one of the variations
-        // We use full match anchor
-        try {
-            const regex = new RegExp(`^${patternStr}$`)
-            if (regex.test(normAnswer)) return true
-        } catch (e) {
-            console.error("Invalid regex from macron input", e)
-        }
-    }
-
-    // 5. Answer Macron Expansion (Answer has macrons, Input has double vowels)
-    // If the answer has macrons (e.g. "kōhī"), expanding them should match user input ("koohii").
-    const hasAnswerMacrons = /[āīūēōĀĪŪĒŌ]/.test(normAnswer)
-    if (hasAnswerMacrons) {
-        let expandedAnswer = normAnswer.toLowerCase().trim()
-            .replace(/[āĀ]/g, "aa")
-            .replace(/[īĪ]/g, "ii")
-            .replace(/[ūŪ]/g, "uu")
-            .replace(/[ēĒ]/g, "ee")
-            .replace(/[ōŌ]/g, "oo") // Standardize ō -> oo for mismatch check (ou is tougher but chouonpu usually oo)
-
-        // Check if expanded answer matches normalized input
-        if (expandedAnswer === normInput) return true
-
-        // Also check ō -> ou case if needed? 
-        // If answer is "arigatō", expanded is "arigatoo". Input "arigatou". mismatch.
-        // If we want to support that, we'd need to try both or use regex match against input.
-        // But input is simple string.
-        // Let's rely on standard chouonpu ō -> oo first as that's the main use case for 'ー'.
-    }
-
     return false
 }
