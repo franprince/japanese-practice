@@ -53,6 +53,7 @@ const kanaToRomaji = (text: string) => {
   let romaji = ""
   let i = 0
   const normalized = text || ""
+
   while (i < normalized.length) {
     const char = normalized[i]
 
@@ -74,6 +75,28 @@ const kanaToRomaji = (text: string) => {
       continue
     }
 
+    // Handle Katakana Chouonpu (ー)
+    if (char === "ー") {
+      if (romaji.length > 0) {
+        const lastChar = romaji[romaji.length - 1]
+        // Extend the previous vowel
+        switch (lastChar) {
+          case 'a': romaji = romaji.slice(0, -1) + 'ā'; break;
+          case 'i': romaji = romaji.slice(0, -1) + 'ī'; break;
+          case 'u': romaji = romaji.slice(0, -1) + 'ū'; break;
+          case 'e': romaji = romaji.slice(0, -1) + 'ē'; break;
+          case 'o': romaji = romaji.slice(0, -1) + 'ō'; break;
+          // Handle existing macrons
+          case 'ā': case 'ī': case 'ū': case 'ē': case 'ō':
+            break;
+          default:
+            break;
+        }
+      }
+      i += 1
+      continue
+    }
+
     const tri = normalized.slice(i, i + 2)
     if (kanaRomajiMap[tri]) {
       romaji += kanaRomajiMap[tri]
@@ -85,7 +108,15 @@ const kanaToRomaji = (text: string) => {
     romaji += mapped
     i += 1
   }
-  return romaji || text
+
+  // Post-processing for Hiragana Long Vowels to Macrons
+  return romaji
+    .replace(/aa/g, "ā")
+    .replace(/ii/g, "ī")
+    .replace(/uu/g, "ū")
+    .replace(/ee/g, "ē")
+    .replace(/oo/g, "ō")
+    .replace(/ou/g, "ō")
 }
 
 const buildCharacterGroups = () =>
