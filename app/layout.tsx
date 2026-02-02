@@ -5,6 +5,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import { I18nProvider } from "@/lib/i18n"
 import { ThemeProvider } from "@/lib/theme"
 import { PerformanceMonitor } from "@/components/performance-monitor"
+import { CacheInvalidator } from "@/components/cache-invalidator"
+import { Toaster } from "@/components/ui/sonner"
 
 import "./globals.css";
 
@@ -22,7 +24,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Analytics />
             <SpeedInsights />
             <PerformanceMonitor />
+            <CacheInvalidator />
             {children}
+            <Toaster />
           </I18nProvider>
         </ThemeProvider>
         <footer className="border-t border-border/40 bg-card/60 backdrop-blur py-8">
