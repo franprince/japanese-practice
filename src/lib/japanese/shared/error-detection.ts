@@ -1,4 +1,4 @@
-import { normalizeRomaji } from "./input"
+import { normalizeRomaji, toMacronForm } from "./input"
 import {
     getKanaRomajiMap,
     loadKanaDictionary,
@@ -52,47 +52,96 @@ async function getAllRomajiMap(): Promise<Record<string, string[]>> {
 /**
  * Gets all valid romaji representations for a kana character/digraph
  * Handles sokuon combinations like っき → kki
+ * Handles chouonpu extensions like ター → tā, taa
  */
 export async function getValidRomaji(kana: string): Promise<string[]> {
     const map = await getAllRomajiMap()
 
-    // Handle sokuon (っ/ッ) + following character(s)
-    const firstChar = kana[0]
-    if ((firstChar === "っ" || firstChar === "ッ") && kana.length > 1) {
-        const followingKana = kana.slice(1)
-        const followingRomaji = map[followingKana]
+    // Handle chouonpu (ー) at the end
+    let suffix = ""
+    let baseKana = kana
+    if (kana.endsWith("ー") && kana !== "ー") {
+        baseKana = kana.slice(0, -1)
+        suffix = "ー"
+    }
 
-        if (followingRomaji && followingRomaji.length > 0) {
-            // Double the first consonant of each valid romaji
-            return followingRomaji.map(romaji => {
-                const firstConsonant = romaji[0]
-                if (firstConsonant && /[bcdfghjklmnpqrstvwxyz]/i.test(firstConsonant)) {
-                    return firstConsonant + romaji
-                }
-                return romaji
-            })
+    const processBase = async (k: string): Promise<string[]> => {
+        // Handle sokuon (っ/ッ) + following character(s)
+        const firstChar = k[0]
+        if ((firstChar === "っ" || firstChar === "ッ") && k.length > 1) {
+            const followingKana = k.slice(1)
+            // Recursive call to handle nested structures if necessary, but map lookup is usually enough for the tail
+            // Actually, sokuon usually prefixes a valid token.
+            // But if we stripped 'ー', the tail might be valid.
+            const followingRomaji = map[followingKana] || await getValidRomaji(followingKana)
+
+            if (followingRomaji && followingRomaji.length > 0) {
+                return followingRomaji.map(romaji => {
+                    const firstConsonant = romaji[0]
+                    if (firstConsonant && /[bcdfghjklmnpqrstvwxyz]/i.test(firstConsonant)) {
+                        return firstConsonant + romaji
+                    }
+                    return romaji
+                })
+            }
         }
+
+        // Direct map lookup
+        if (map[k]) return map[k]
+
+        // Fallback for compound lookup failure
+        if (k.length === 1 && map[k]) return map[k]
+
+        // Try splitting if regex failed to group known digraph? 
+        // But regex should match token.
+
+        return []
     }
 
-    // Check for digraph first
-    if (kana.length === 2 && map[kana]) {
-        return map[kana]
+    let baseRomajiOptions = await processBase(baseKana)
+
+    // If we have a suffix 'ー', extend the vowels
+    if (suffix === "ー" && baseRomajiOptions.length > 0) {
+        const extendedOptions: string[] = []
+        baseRomajiOptions.forEach(romaji => {
+            const lastChar = romaji.slice(-1)
+            let macron = ""
+            let double = ""
+
+            switch (lastChar) {
+                case 'a': macron = 'ā'; double = 'aa'; break;
+                case 'i': macron = 'ī'; double = 'ii'; break;
+                case 'u': macron = 'ū'; double = 'uu'; break;
+                case 'e': macron = 'ē'; double = 'ee'; break; // or ei? standard chouonpu is usually valid as ē.
+                case 'o': macron = 'ō'; double = 'oo'; break; // or ou? default to oo for katakana chouonpu
+                default: break;
+            }
+
+            if (macron) {
+                const stem = romaji.slice(0, -1)
+                extendedOptions.push(stem + macron)
+                extendedOptions.push(stem + double)
+            } else {
+                // If no vowel, just append hyphen (fallback) or keep as is?
+                // Usually invalid, just ignore
+                extendedOptions.push(romaji)
+            }
+        })
+        return extendedOptions.length > 0 ? extendedOptions : baseRomajiOptions
     }
 
-    // Check single character
-    if (kana.length === 1 && map[kana]) {
-        return map[kana]
-    }
+    if (baseRomajiOptions.length > 0) return baseRomajiOptions
 
     // Handle standalone sokuon (unusual)
     if (kana === "っ" || kana === "ッ") {
         return []
     }
 
-    // If not found, try to build from individual characters
+    // fallback manual construction
     let result = ""
     const singleMap = await getKanaRomajiMap()
     for (const char of kana) {
+        if (char === "ー") continue // Skip isolated chouonpu if manual
         result += singleMap[char] || ""
     }
 
@@ -101,17 +150,15 @@ export async function getValidRomaji(kana: string): Promise<string[]> {
 
 /**
  * Tokenizes a kana string into individual characters/digraphs
- * Handles compound characters like きゃ, しゅ, ちょ and sokuon combinations
+ * Handles compound characters like きゃ, しゅ, ちょ, ティ
+ * Handles sokuon combinations
+ * Handles chouonpu (ー) attached to tokens
  */
 export function tokenizeKana(kana: string): string[] {
     // Matches:
-    // 1. Sokuon + Char + optional Small (e.g. っきゃ)
-    // 2. Sokuon + Char (e.g. っき)
-    // 3. Char + optional Small (e.g. きゃ)
-    // 4. Sokuon alone (degenerate case)
-    // 5. Char alone
-    // The regex order matters (longest match first)
-    const tokenRegex = /[っッ][^っッ][ャュョゃゅょ]?|[^っッ][ャュョゃゅょ]?|[っッ]/g
+    // Sokuon/NotSokuon + optional small kana + optional ー
+    // Includes expanded small kana list for Katakana (ァィゥェォ)
+    const tokenRegex = /[っッ][^っッー][ャュョゃゅょァィゥェォぁぃぅぇぉ]*ー?|[^っッー][ャュョゃゅょァィゥェォぁぃぅぇぉ]*ー?|[っッ]/g
     return kana.match(tokenRegex) || []
 }
 
@@ -263,6 +310,7 @@ async function matchUserInputToTokens(
 
     for (const token of tokens) {
         // getValidRomaji handles all cases including sokuon+char combinations
+        // We use the *first* (macron) form as the canonical alignment target
         const validRomaji = await getValidRomaji(token)
         const primary = validRomaji[0] || ""
         expectedRomajiList.push(primary)
@@ -284,11 +332,6 @@ async function matchUserInputToTokens(
  * @param kanaWord - The expected kana word (e.g., "ぴゃぼでだ")
  * @param userInput - The user's romaji input (e.g., "pyaboteka")
  * @returns Detailed per-character error detection results
- *
- * @example
- * const result = await detectErrors('ぴゃぼでだ', 'pyaboteka')
- * // result.characters[0] = { kana: 'ぴゃ', isCorrect: true, ... }
- * // result.characters[2] = { kana: 'で', isCorrect: false, userInput: 'te', ... }
  */
 export async function detectErrors(
     kanaWord: string,
@@ -316,8 +359,8 @@ export async function detectErrors(
                 expectedRomaji.length > 0 &&
                 expectedRomaji.some(
                     (r) =>
-                        normalizeRomaji(r.toLowerCase()) ===
-                        normalizeRomaji(userSegment.toLowerCase())
+                        toMacronForm(normalizeRomaji(r.toLowerCase())) ===
+                        toMacronForm(normalizeRomaji(userSegment.toLowerCase()))
                 )
 
             return {

@@ -61,6 +61,7 @@ export const kanaToRomaji = (text: string) => {
   let romaji = ""
   let i = 0
   const normalized = text || ""
+
   while (i < normalized.length) {
     const char = normalized[i]
 
@@ -83,18 +84,64 @@ export const kanaToRomaji = (text: string) => {
       continue
     }
 
+    // Handle Katakana Chouonpu (ー)
+    if (char === "ー") {
+      if (romaji.length > 0) {
+        const lastChar = romaji[romaji.length - 1]
+        // Extend the previous vowel
+        switch (lastChar) {
+          case 'a': romaji = romaji.slice(0, -1) + 'ā'; break;
+          case 'i': romaji = romaji.slice(0, -1) + 'ī'; break;
+          case 'u': romaji = romaji.slice(0, -1) + 'ū'; break;
+          case 'e': romaji = romaji.slice(0, -1) + 'ē'; break;
+          case 'o': romaji = romaji.slice(0, -1) + 'ō'; break;
+          // Handle existing macrons (rare but possible if double chouonpu)
+          case 'ā': case 'ī': case 'ū': case 'ē': case 'ō':
+            // Do nothing, already extended
+            break;
+          default:
+            // If previous char wasn't a vowel, maybe we should check the vowel sound of the previous syllable?
+            // Simple heuristic: check the character before the last character if it wasn't a vowel?
+            // Actually, for "car" -> "kaa" -> "kā".
+            // romaji is accumulated. "ka" -> 'a' is last.
+            // If "computer" -> "konpyuutaa".
+            // If "party" -> "paatii".
+            // If we have "bu" -> "b" "u". last is "u". -> "bū".
+            // If we have "n" -> "n". "n" + "ー"? Invalid in Japanese usually.
+            // Just ignore if not vowel.
+            break;
+        }
+      }
+      i += 1
+      continue
+    }
+
+    // Standard matching
     const tri = normalized.slice(i, i + 2)
     if (kanaRomajiMap[tri]) {
       romaji += kanaRomajiMap[tri]
       i += 2
       continue
     }
+
     if (!char) break
     const mapped = kanaRomajiMap[char] || kanaRomajiMap[hiraToKata(char)] || ""
     romaji += mapped
     i += 1
   }
-  return romaji || text
+
+  // Post-processing for Hiragana Long Vowels (Double Vowels) to Macrons
+  // Rules: aa -> ā, ii -> ī, uu -> ū, ee -> ē, oo -> ō, ou -> ō
+  // We apply this buffer-based or regex-based.
+  // Regex is safer on the full string to avoid boundary issues.
+
+  return romaji
+    .replace(/aa/g, "ā")
+    .replace(/ii/g, "ī")
+    .replace(/uu/g, "ū")
+    .replace(/ee/g, "ē")
+    .replace(/oo/g, "ō")
+    .replace(/ou/g, "ō")
 }
 
 const isMeaningBlacklisted = (meaning?: string) => {
