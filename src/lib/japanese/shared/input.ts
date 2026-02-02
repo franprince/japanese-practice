@@ -82,62 +82,65 @@ export function normalizeRomaji(text: string): string {
     return norm
 }
 
+/**
+ * Converts double vowels and 'ou' to macron form for standardized comparison
+ * e.g., "arigatou" -> "arigatō", "suuji" -> "sūji"
+ */
+export function toMacronForm(text: string): string {
+    if (!text) return ""
+    return text.toLowerCase()
+        .replace(/aa/g, "ā")
+        .replace(/ii/g, "ī")
+        .replace(/uu/g, "ū")
+        .replace(/ee/g, "ē")
+        .replace(/oo/g, "ō")
+        .replace(/ou/g, "ō")
+}
+
 export function validateAnswer(input: string, word: JapaneseWord): boolean {
     if (!input || !word) return false
 
-    const normalizedInput = input.toLowerCase().trim()
-    const normalizedAnswer = word.romaji.toLowerCase().trim()
+    const rawInput = input.toLowerCase().trim()
+    const rawAnswer = word.romaji.toLowerCase().trim()
     const kana = word.kana
 
-    // 1. Exact match (standard check)
-    if (normalizedInput === normalizedAnswer) return true
+    // 1. Exact match
+    if (rawInput === rawAnswer) return true
 
-    // 2. Normalize Romanization (handle si/shi, tu/tsu, etc.)
-    const normInput = normalizeRomaji(normalizedInput)
-    const normAnswer = normalizeRomaji(normalizedAnswer)
+    // 2. Normalize Romanization (handle si/shi, etc.)
+    const normInput = normalizeRomaji(rawInput)
+    const normAnswer = normalizeRomaji(rawAnswer)
 
     if (normInput === normAnswer) return true
 
-    // 3. Particle Exceptions (Contextual)
-    // Check if the word *ends* with a particle that has special reading.
-    // Commonly: 
-    // は (ha) -> read as 'wa'
-    // へ (he) -> read as 'e'
-    // を (wo) -> read as 'o'
+    // 3. Macron Normalization (The new robust check)
+    // Convert both valid input styles (double vowel, macron) to a single standard
+    // e.g. Input "suuji" -> "sūji" vs Answer "sūji" -> "sūji"
+    const macronInput = toMacronForm(normInput)
+    const macronAnswer = toMacronForm(normAnswer)
 
+    if (macronInput === macronAnswer) return true
+
+    // 4. Particle Exceptions (Contextual)
     const particleMap: Record<string, string> = {
         "は": "wa",
         "へ": "e",
         "を": "o"
     }
 
-    // We check if the answer ends with the "raw" romanization of the particle 
-    // AND the user typed the "sound" of the particle.
-
-    // Reverse map for checking the romanization tail
-    const romajiTailMap: Record<string, string> = {
-        "wa": "ha",
-        "e": "he",
-        "o": "wo"
+    if (kana.endsWith("は") && macronAnswer.endsWith("ha") && macronInput.endsWith("wa")) {
+        const stem = macronAnswer.slice(0, -2)
+        if (macronInput === stem + "wa") return true
     }
 
-    // Check "wa" (input) vs "ha" (answer) for 'は'
-    if (kana.endsWith("は") && normAnswer.endsWith("ha") && normInput.endsWith("wa")) {
-        const stem = normAnswer.slice(0, -2) // remove 'ha'
-        // Check if input matches stem + 'wa'
-        if (normInput === stem + "wa") return true
+    if (kana.endsWith("へ") && macronAnswer.endsWith("he") && macronInput.endsWith("e")) {
+        const stem = macronAnswer.slice(0, -2)
+        if (macronInput === stem + "e") return true
     }
 
-    // Check "e" (input) vs "he" (answer) for 'へ'
-    if (kana.endsWith("へ") && normAnswer.endsWith("he") && normInput.endsWith("e")) {
-        const stem = normAnswer.slice(0, -2)
-        if (normInput === stem + "e") return true
-    }
-
-    // Check "o" (input) vs "wo" (answer) for 'を'
-    if (kana.endsWith("を") && normAnswer.endsWith("wo") && normInput.endsWith("o")) {
-        const stem = normAnswer.slice(0, -2)
-        if (normInput === stem + "o") return true
+    if (kana.endsWith("を") && macronAnswer.endsWith("wo") && macronInput.endsWith("o")) {
+        const stem = macronAnswer.slice(0, -2)
+        if (macronInput === stem + "o") return true
     }
 
     return false
