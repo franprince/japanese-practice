@@ -281,6 +281,21 @@ describe("detectErrors", () => {
             expect(result.incorrectCount).toBeGreaterThan(0)
         })
 
+        it("tokenizes chouonpu with preceding char: ソー (soo)", async () => {
+            const tokens = tokenizeKana("ソー")
+            expect(tokens).toHaveLength(1)
+            expect(tokens[0]).toBe("ソー")
+
+            const romajis = await getValidRomaji("ソー")
+            expect(romajis).toContain("soo")
+
+            const result = await detectErrors("ソー", "soo")
+            expect(result.isFullyCorrect).toBe(true)
+            expect(result.characters).toHaveLength(1)
+            expect(result.characters[0].kana).toBe("ソー")
+            expect(result.characters[0].expectedRomaji).toContain("soo")
+        })
+
         it("handles extended vowel in middle: タクシー (takushii)", async () => {
             const result = await detectErrors("タクシー", "takushii")
             expect(result.isFullyCorrect).toBe(true)
@@ -289,6 +304,19 @@ describe("detectErrors", () => {
         it("handles multiple chouonpu: コーヒー (koohii)", async () => {
             const result = await detectErrors("コーヒー", "koohii")
             expect(result.isFullyCorrect).toBe(true)
+        })
+
+        it("tokenizes extended Katakana correctly: ヴェ (ve)", async () => {
+            const tokens = tokenizeKana("ヴェ")
+            expect(tokens).toHaveLength(1)
+            expect(tokens[0]).toBe("ヴェ")
+        })
+
+        it("tokenizes mixed extended Katakana: バァビィ (baabii)", async () => {
+            const tokens = tokenizeKana("バァビィ")
+            expect(tokens).toHaveLength(2)
+            expect(tokens[0]).toBe("バァ")
+            expect(tokens[1]).toBe("ビィ")
         })
     })
 })
