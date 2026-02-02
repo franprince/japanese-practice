@@ -267,4 +267,28 @@ describe("detectErrors", () => {
             expect(result.isFullyCorrect).toBe(true)
         })
     })
+
+    describe("chouonpu (ー) handling", () => {
+        it("handles extended vowel at end: コイネー (koinee)", async () => {
+            const result = await detectErrors("コイネー", "koinee")
+            expect(result.isFullyCorrect).toBe(true)
+        })
+
+        it("rejects extended vowel as hyphen: コイネー (koine-)", async () => {
+            const result = await detectErrors("コイネー", "koine-")
+            expect(result.isFullyCorrect).toBe(false)
+            // Should properly identify the hyphen as incorrect input for the chouonpu
+            expect(result.incorrectCount).toBeGreaterThan(0)
+        })
+
+        it("handles extended vowel in middle: タクシー (takushii)", async () => {
+            const result = await detectErrors("タクシー", "takushii")
+            expect(result.isFullyCorrect).toBe(true)
+        })
+
+        it("handles multiple chouonpu: コーヒー (koohii)", async () => {
+            const result = await detectErrors("コーヒー", "koohii")
+            expect(result.isFullyCorrect).toBe(true)
+        })
+    })
 })
