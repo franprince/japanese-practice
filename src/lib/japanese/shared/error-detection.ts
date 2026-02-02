@@ -92,6 +92,22 @@ export async function getValidRomaji(kana: string): Promise<string[]> {
         return []
     }
 
+    // Check for chouonpu extension
+    if (kana.endsWith("ー") && kana.length > 1) {
+        const baseKana = kana.slice(0, -1)
+        const baseRomajiList = await getValidRomaji(baseKana)
+
+        if (baseRomajiList.length > 0) {
+            return baseRomajiList.map(base => {
+                const lastChar = base.slice(-1)
+                if (["a", "i", "u", "e", "o"].includes(lastChar)) {
+                    return base + lastChar
+                }
+                return base + "-"
+            })
+        }
+    }
+
     // If not found, try to build from individual characters
     let result = ""
     const singleMap = await getKanaRomajiMap()
@@ -108,13 +124,12 @@ export async function getValidRomaji(kana: string): Promise<string[]> {
  */
 export function tokenizeKana(kana: string): string[] {
     // Matches:
-    // 1. Sokuon + Char + optional Small (e.g. っきゃ)
-    // 2. Sokuon + Char (e.g. っき)
-    // 3. Char + optional Small (e.g. きゃ)
-    // 4. Sokuon alone (degenerate case)
-    // 5. Char alone
-    // The regex order matters (longest match first)
-    const tokenRegex = /[っッ][^っッ][ャュョゃゅょ]?|[^っッ][ャュョゃゅょ]?|[っッ]/g
+    // 1. Sokuon + Char + optional Small/Vowel + optional Chouonpu
+    // 2. Sokuon + Char + optional Chouonpu
+    // 3. Char + optional Small/Vowel + optional Chouonpu
+    // 4. Sokuon alone
+    const smalls = "[ャュョゃゅょァィゥェォ]"
+    const tokenRegex = new RegExp(`[っッ][^っッ]${smalls}?[ー]?|[^っッ]${smalls}?[ー]?|[っッ]`, "g")
     return kana.match(tokenRegex) || []
 }
 
@@ -255,28 +270,7 @@ function mapAlignmentToTokens(
  * This properly handles structural differences in input
  */
 async function getContextualRomaji(token: string, prevToken?: string): Promise<string[]> {
-    const validRomaji = await getValidRomaji(token)
-
-    // Handle Chouonpu (ー)
-    if (token === "ー" && prevToken) {
-        const prevRomajis = await getValidRomaji(prevToken)
-        if (prevRomajis.length > 0) {
-            // Get the last character of the primary romaji for the previous token
-            // e.g. "ne" -> "e", "shi" -> "i"
-            const firstPrev = prevRomajis[0]
-            const lastChar = firstPrev ? firstPrev.slice(-1) : ""
-            // Check if it's a vowel (simple heuristic). 
-            // Most valid romaji end in vowels or n. 
-            // If n, then 'ー' is weird, but standard is vowel elongation.
-            if (["a", "i", "u", "e", "o"].includes(lastChar)) {
-                // Return vowel as primary, strictly enforcing vowel elongation
-                return [lastChar]
-            }
-        }
-        return ["-"] // Fallback
-    }
-
-    return validRomaji
+    return getValidRomaji(token)
 }
 
 /**

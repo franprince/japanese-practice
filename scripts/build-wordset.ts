@@ -3,7 +3,7 @@ import path from "path"
 import kanaDictionaryData from "../src/lib/japanese/shared/kanaDictionary.json"
 import type { KanaDictionary, KanaGroup } from "../src/types/kana"
 import { blacklist } from "../src/lib/japanese/shared/blacklist"
-import type { JapaneseWord } from "../src/lib/japanese/words/words"
+import { kanaToRomaji, type JapaneseWord } from "../src/lib/japanese/words/words"
 
 const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary
 
@@ -49,44 +49,7 @@ const buildKanaRomajiMap = () => {
 
 const kanaRomajiMap = buildKanaRomajiMap()
 
-const kanaToRomaji = (text: string) => {
-  let romaji = ""
-  let i = 0
-  const normalized = text || ""
-  while (i < normalized.length) {
-    const char = normalized[i]
-
-    // Handle sokuon (small tsu) by doubling the next consonant sound
-    if (char === "っ" || char === "ッ") {
-      const nextTri = normalized.slice(i + 1, i + 3)
-      const nextChar = normalized[i + 1]
-      const nextMapped =
-        (nextTri && kanaRomajiMap[nextTri]) ||
-        (nextChar && (kanaRomajiMap[nextChar] || kanaRomajiMap[hiraToKata(nextChar)])) ||
-        ""
-      if (nextMapped) {
-        const first = nextMapped[0] ?? ""
-        if (/[bcdfghjklmnpqrstvwxyz]/i.test(first)) {
-          romaji += first
-        }
-      }
-      i += 1
-      continue
-    }
-
-    const tri = normalized.slice(i, i + 2)
-    if (kanaRomajiMap[tri]) {
-      romaji += kanaRomajiMap[tri]
-      i += 2
-      continue
-    }
-    if (!char) break
-    const mapped = kanaRomajiMap[char] || kanaRomajiMap[hiraToKata(char)] || ""
-    romaji += mapped
-    i += 1
-  }
-  return romaji || text
-}
+// Local kanaToRomaji removed in favor of imported version
 
 const buildCharacterGroups = () =>
   Object.entries(kanaDictionary).flatMap(([typeKey, groups]) =>
