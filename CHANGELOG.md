@@ -1,3 +1,21 @@
+# [3.1.0](https://github.com/franprince/japanese-practice/compare/v3.0.0...v3.1.0) (2026-02-02)
+
+
+### Bug Fixes
+
+* **i18n:** prevent language flash on page reload ([da7bbf1](https://github.com/franprince/japanese-practice/commit/da7bbf190512d9b6f696234491ab0631080cc0da))
+* **i18n:** suppress hydration warning in language switcher ([da49aff](https://github.com/franprince/japanese-practice/commit/da49affd5bee4fe8e37e21a9aa0ef247cdb784a9))
+* **i18n:** use client-only rendering for language switcher ([7350e58](https://github.com/franprince/japanese-practice/commit/7350e58261f2fcf5161675c6556c00baed58caa4))
+* **kanji:** don't reset question when clicking same difficulty ([d348fed](https://github.com/franprince/japanese-practice/commit/d348fed6135978da4ad0f15bbf052c6daa6590b6))
+* **kanji:** preload kana dictionary for romaji conversion ([89bc1aa](https://github.com/franprince/japanese-practice/commit/89bc1aa5256be65012235514513c8efba4538ff3))
+* **kanji:** use module-level promise cache for romaji conversion ([7125fac](https://github.com/franprince/japanese-practice/commit/7125fac9fc90131c2c96b43bd17eb96217783bea))
+
+
+### Features
+
+* add padding to kanji answer card ([eae3b87](https://github.com/franprince/japanese-practice/commit/eae3b87509b9b5b47b77ffc981a664adb0ce757b))
+* **japanese:** implement strict chouonpu vowel extension logic ([48d93c8](https://github.com/franprince/japanese-practice/commit/48d93c8da5f919ff31f321079f751c33c004bf7a))
+
 # [3.0.0](https://github.com/franprince/japanese-practice/compare/v2.2.0...v3.0.0) (2026-01-22)
 
 

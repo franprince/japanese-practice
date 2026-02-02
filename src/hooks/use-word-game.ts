@@ -127,11 +127,24 @@ export function useWordGame({
 
 
 
-    // Check answer
-    const checkAnswer = useCallback(() => {
+    const checkAnswer = useCallback(async () => {
         if (!currentWord || !userInput.trim()) return
 
-        const isCorrect = validateAnswer(userInput, currentWord)
+        let isCorrect = validateAnswer(userInput, currentWord)
+        let detectionResult: ErrorDetectionResult | null = null
+
+        // If basic validation fails, try detailed detection (supports chouonpu)
+        if (!isCorrect) {
+            try {
+                detectionResult = await detectErrors(currentWord.kana, userInput)
+                if (detectionResult.isFullyCorrect) {
+                    isCorrect = true
+                }
+            } catch (e) {
+                console.error("Validation error:", e)
+            }
+        }
+
         const shownAnswer = currentWord.romaji.toLowerCase().trim()
 
         setDisplayRomaji(shownAnswer)
@@ -145,32 +158,36 @@ export function useWordGame({
             // Submit answer immediately for fast feedback
             submitAnswer(false)
 
-            // Defer error detection to avoid blocking the main thread
-            // Use requestIdleCallback for better INP performance
-            const idleCallback = window.requestIdleCallback || ((cb) => setTimeout(cb, 1))
-            idleCallback(() => {
-                detectErrors(currentWord.kana, userInput).then((result) => {
-                    // Wrap non-urgent state updates in transition
-                    startTransition(() => {
-                        setErrorDetails(result)
-                        // Accumulate incorrect characters with romaji
-                        setIncorrectChars((prev) => {
-                            const newMap = new Map(prev)
-                            for (const char of result.characters) {
-                                if (!char.isCorrect) {
-                                    const existing = newMap.get(char.kana)
-                                    const romaji = char.expectedRomaji[0] || ""
-                                    newMap.set(char.kana, {
-                                        count: (existing?.count || 0) + 1,
-                                        romaji: existing?.romaji || romaji,
-                                    })
-                                }
+            // Helper to update error state
+            const handleDetectionResult = (result: ErrorDetectionResult) => {
+                startTransition(() => {
+                    setErrorDetails(result)
+                    // Accumulate incorrect characters with romaji
+                    setIncorrectChars((prev) => {
+                        const newMap = new Map(prev)
+                        for (const char of result.characters) {
+                            if (!char.isCorrect) {
+                                const existing = newMap.get(char.kana)
+                                const romaji = char.expectedRomaji[0] || ""
+                                newMap.set(char.kana, {
+                                    count: (existing?.count || 0) + 1,
+                                    romaji: existing?.romaji || romaji,
+                                })
                             }
-                            return newMap
-                        })
+                        }
+                        return newMap
                     })
                 })
-            })
+            }
+
+            if (detectionResult) {
+                handleDetectionResult(detectionResult)
+            } else {
+                // Should rare/never happen in failure case if detectErrors was called
+                // But if isCorrect was false initially and we somehow skipped detection? 
+                // (Only if detectErrors threw, in which case we retry here?)
+                detectErrors(currentWord.kana, userInput).then(handleDetectionResult)
+            }
         }
     }, [currentWord, userInput, submitAnswer, startTransition])
 

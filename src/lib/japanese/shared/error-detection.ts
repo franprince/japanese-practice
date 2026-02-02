@@ -14,6 +14,9 @@ export type { CharacterResult, ErrorDetectionResult } from "@/types/japanese"
 // Cache for all valid romaji mappings (kana -> all valid romaji)
 let allRomajiMapCache: Record<string, string[]> | null = null
 
+// Special character to represent gaps in alignment (using null character to avoid conflict with user input like hyphens)
+const GAP_CHAR = "\u0000"
+
 /**
  * Builds a map of kana -> all valid romaji representations (not just the first one)
  */
@@ -225,13 +228,13 @@ function alignStrings(expected: string, actual: string): { expectedAligned: stri
             i--; j--
         } else if (j > 0 && currentVal === leftVal + 1) {
             // Insertion in actual
-            expectedAligned = "-" + expectedAligned
+            expectedAligned = GAP_CHAR + expectedAligned
             actualAligned = actual[j - 1] + actualAligned
             j--
         } else if (i > 0) {
             // Deletion from expected
             expectedAligned = expected[i - 1] + expectedAligned
-            actualAligned = "-" + actualAligned
+            actualAligned = GAP_CHAR + actualAligned
             i--
         }
     }
@@ -269,10 +272,10 @@ function mapAlignmentToTokens(
             const expChar = expectedAligned[alignedPos]
             const actChar = actualAligned[alignedPos]
 
-            if (expChar !== "-") {
+            if (expChar !== GAP_CHAR) {
                 expectedCharsFound++
             }
-            if (actChar !== "-") {
+            if (actChar !== GAP_CHAR) {
                 userSegment += actChar
             }
             alignedPos++
@@ -285,13 +288,42 @@ function mapAlignmentToTokens(
     let extraInput = ""
     while (alignedPos < actualAligned.length) {
         const actChar = actualAligned[alignedPos]
-        if (actChar !== "-") {
+        if (actChar !== GAP_CHAR) {
             extraInput += actChar
         }
         alignedPos++
     }
 
     return { matches, extraInput }
+}
+
+/**
+ * Matches user input segments to kana tokens using edit-distance alignment
+ * This properly handles structural differences in input
+ */
+async function getContextualRomaji(token: string, prevToken?: string): Promise<string[]> {
+    const validRomaji = await getValidRomaji(token)
+
+    // Handle Chouonpu (ー)
+    if (token === "ー" && prevToken) {
+        const prevRomajis = await getValidRomaji(prevToken)
+        if (prevRomajis.length > 0) {
+            // Get the last character of the primary romaji for the previous token
+            // e.g. "ne" -> "e", "shi" -> "i"
+            const firstPrev = prevRomajis[0]
+            const lastChar = firstPrev ? firstPrev.slice(-1) : ""
+            // Check if it's a vowel (simple heuristic). 
+            // Most valid romaji end in vowels or n. 
+            // If n, then 'ー' is weird, but standard is vowel elongation.
+            if (["a", "i", "u", "e", "o"].includes(lastChar)) {
+                // Return vowel as primary, strictly enforcing vowel elongation
+                return [lastChar]
+            }
+        }
+        return ["-"] // Fallback
+    }
+
+    return validRomaji
 }
 
 /**
@@ -351,8 +383,9 @@ export async function detectErrors(
     const { segments: userSegments, extraInput } = await matchUserInputToTokens(tokens, userInput)
 
     const characters: CharacterResult[] = await Promise.all(
+
         tokens.map(async (kana, i) => {
-            const expectedRomaji = await getValidRomaji(kana)
+            const expectedRomaji = await getContextualRomaji(kana, i > 0 ? tokens[i - 1] : undefined)
             const userSegment = userSegments[i] || ""
 
             const isCorrect =
