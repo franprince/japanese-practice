@@ -1,10 +1,4 @@
-/**
- * Basic test example for GamePageLayout component
- * 
- * Note: Due to React 19 + Bun + happy-dom compatibility issues,
- * this is a simplified test that demonstrates the testing setup.
- * For full component testing, consider using Playwright for E2E tests.
- */
+
 import { describe, test, expect } from 'bun:test'
 import { GAMES } from '@/lib/core'
 

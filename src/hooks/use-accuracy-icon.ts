@@ -36,7 +36,7 @@ export function useAccuracyIcon(accuracy: number): AccuracyIconResult {
         }
     }
 
-    // Default: 50-79%
+    
     return {
         Icon: ThumbsUp,
         colorClass: "text-primary",

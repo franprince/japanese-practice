@@ -9,17 +9,17 @@ import {
   type CharacterGroup as LoaderCharacterGroup
 } from "../shared/kana-dictionary-loader";
 
-// Import types from centralized location for use in this file
+
 import type { JapaneseWord, WordFilter, CharacterGroup } from "@/types/japanese"
 
-// Re-export types from centralized location
+
 export type { JapaneseWord, WordFilter, CharacterGroup } from "@/types/japanese"
 
-// Lazy-loaded data - use getCharacterGroups() and getKanaRomajiMap() for async access
-// For backwards compatibility, export sync versions (will be empty until loaded)
+
+
 export const characterGroups: CharacterGroup[] = getCharacterGroupsSync()
 
-// Internal helper to get kana romaji map synchronously
+
 const getKanaRomajiMapInternal = (): Record<string, string> => getKanaRomajiMapSync()
 
 const hasHiragana = (text: string) => /[\u3040-\u309F]/.test(text)
@@ -65,9 +65,9 @@ export const kanaToRomaji = (text: string) => {
   while (i < normalized.length) {
     const char = normalized[i]
 
-    // Handle sokuon (small tsu) by doubling the next consonant sound
+    
     if (char === "っ" || char === "ッ") {
-      // Look ahead to the next kana chunk (prioritize digraph)
+      
       const nextTri = normalized.slice(i + 1, i + 3)
       const nextChar = normalized[i + 1]
       const nextMapped =
@@ -84,31 +84,31 @@ export const kanaToRomaji = (text: string) => {
       continue
     }
 
-    // Handle Katakana Chouonpu (ー)
+    
     if (char === "ー") {
       if (romaji.length > 0) {
         const lastChar = romaji[romaji.length - 1]
-        // Extend the previous vowel
+        
         switch (lastChar) {
           case 'a': romaji = romaji.slice(0, -1) + 'ā'; break;
           case 'i': romaji = romaji.slice(0, -1) + 'ī'; break;
           case 'u': romaji = romaji.slice(0, -1) + 'ū'; break;
           case 'e': romaji = romaji.slice(0, -1) + 'ē'; break;
           case 'o': romaji = romaji.slice(0, -1) + 'ō'; break;
-          // Handle existing macrons (rare but possible if double chouonpu)
+          
           case 'ā': case 'ī': case 'ū': case 'ē': case 'ō':
-            // Do nothing, already extended
+            
             break;
           default:
-            // If previous char wasn't a vowel, maybe we should check the vowel sound of the previous syllable?
-            // Simple heuristic: check the character before the last character if it wasn't a vowel?
-            // Actually, for "car" -> "kaa" -> "kā".
-            // romaji is accumulated. "ka" -> 'a' is last.
-            // If "computer" -> "konpyuutaa".
-            // If "party" -> "paatii".
-            // If we have "bu" -> "b" "u". last is "u". -> "bū".
-            // If we have "n" -> "n". "n" + "ー"? Invalid in Japanese usually.
-            // Just ignore if not vowel.
+            
+            
+            
+            
+            
+            
+            
+            
+            
             break;
         }
       }
@@ -116,7 +116,7 @@ export const kanaToRomaji = (text: string) => {
       continue
     }
 
-    // Standard matching
+    
     const tri = normalized.slice(i, i + 2)
     if (kanaRomajiMap[tri]) {
       romaji += kanaRomajiMap[tri]
@@ -130,10 +130,10 @@ export const kanaToRomaji = (text: string) => {
     i += 1
   }
 
-  // Post-processing for Hiragana Long Vowels (Double Vowels) to Macrons
-  // Rules: aa -> ā, ii -> ī, uu -> ū, ee -> ē, oo -> ō, ou -> ō
-  // We apply this buffer-based or regex-based.
-  // Regex is safer on the full string to avoid boundary issues.
+  
+  
+  
+  
 
   return romaji
     .replace(/aa/g, "ā")
@@ -155,7 +155,7 @@ export async function getRandomWord(
   filter?: WordFilter,
   lang?: "en" | "es" | "ja",
 ): Promise<JapaneseWord | null> {
-  // Ensure character groups are loaded before we need them
+  
   const loadedCharacterGroups = await getCharacterGroups()
 
   let wordSets
@@ -168,9 +168,9 @@ export async function getRandomWord(
     }, lang)
   } catch (err) {
     const error = err as any
-    // Propagate mobile auth error so UI can handle it
+    
     if (error?.code === "MOBILE_AUTH_REQUIRED" || error?.message?.includes("Wordset fetch blocked")) {
-      // Ensure code is set if we caught by message
+      
       if (!error.code) error.code = "MOBILE_AUTH_REQUIRED"
       throw error
     }
@@ -201,19 +201,19 @@ export async function getRandomWord(
   if (cached) {
     words = cached
   } else {
-    // Global blacklist filter based on meaning
+    
     words = words.filter(word => !isMeaningBlacklisted(word.meaning))
 
-    // Apply filters
+    
     if (filter) {
       const { selectedGroups, minLength, maxLength } = filter
 
       words = words.filter((word) => {
-        // Length filter
+        
         const length = word.kana.length
         if (length < minLength || length > maxLength) return false
 
-        // Group filter - require selections; if none selected, exclude all
+        
         if (selectedGroups.length === 0) return false
         const allGroupsAllowed = word.groups.every((g) => selectedGroups.includes(g))
         if (!allGroupsAllowed) return false
@@ -235,22 +235,22 @@ export async function getRandomCharacter(
   filter?: WordFilter,
 ): Promise<JapaneseWord | null> {
   const loadedCharacterGroups = await getCharacterGroups()
-  await getKanaRomajiMap() // Ensure romaji map is loaded for kanaToRomaji conversion
+  await getKanaRomajiMap() 
 
-  // Helper to convert mode to type
+  
   const modeToType = (mode: GameMode): "hiragana" | "katakana" =>
     mode === "katakana" ? "katakana"
       : mode === "both" ? (Math.random() > 0.5 ? "hiragana" : "katakana")
         : "hiragana"
 
-  // Determine target type from selected groups or mode
+  
   const selectedTypes = (filter?.selectedGroups ?? [])
     .map(id => loadedCharacterGroups.find(g => g.id === id)?.type)
     .filter((t): t is "hiragana" | "katakana" => Boolean(t))
   const hasH = selectedTypes.includes("hiragana")
   const hasK = selectedTypes.includes("katakana")
 
-  // If both types are available and mode is "both", allow mixed selection per prompt
+  
   const allowMixed = type === "both" && (filter?.selectedGroups?.length ? hasH && hasK : true)
 
   let targetType: "hiragana" | "katakana" = modeToType(type)
@@ -262,15 +262,15 @@ export async function getRandomCharacter(
     ? loadedCharacterGroups
     : loadedCharacterGroups.filter((g) => g.type === targetType)
 
-  // Apply group filter
+  
   if (filter?.selectedGroups !== undefined) {
     if (filter.selectedGroups.length === 0) return null
     groups = groups.filter((g) => filter.selectedGroups.includes(g.id))
   }
 
-  // Apply weighted filtering for special groups when many groups are selected
-  // Special groups are h_group16_a through h_group26_a (hiragana combos)
-  // and k_group18_a onwards (katakana combos)
+  
+  
+  
   if (filter?.selectedGroups) {
     const totalGroups = loadedCharacterGroups.filter((g) => g.type === targetType).length
     const selectedCount = filter.selectedGroups.filter(id => {
@@ -279,15 +279,15 @@ export async function getRandomCharacter(
     }).length
     const selectionRatio = selectedCount / totalGroups
 
-    // Only apply weighting when more than 50% of groups are selected
+    
     if (selectionRatio > 0.5) {
       const specialGroupPattern = /^h(1[6-9]|2[0-6])_a$|^k(1[8-9]|[2-3][0-9])_a$/
 
-      // Filter out some special groups (keep ~40% of them)
+      
       groups = groups.filter(g => {
         const isSpecialGroup = specialGroupPattern.test(g.id)
         if (isSpecialGroup) {
-          // Keep only 40% of special groups
+          
           return Math.random() < 0.4
         }
         return true

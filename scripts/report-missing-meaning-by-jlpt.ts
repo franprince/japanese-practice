@@ -78,7 +78,7 @@ const main = async () => {
       ? jlpt
       : await promptSelect("Select JLPT level to scan:", jlptLevels, defaultJlptIdx >= 0 ? defaultJlptIdx : jlptLevels.length - 1)
 
-  // Interactive dataset selection
+  
   const dataDir = path.join(process.cwd(), "data")
   const versions = readVersions(dataDir)
   const defaultIdx = versions.length > 0 ? versions.length - 1 : 0
@@ -89,7 +89,7 @@ const main = async () => {
       : "kanjiset.json")
   const input = path.resolve(dataDir, chosenFile)
 
-  // Output path with no overwrite
+  
   const defaultOutput = path.join(process.cwd(), "data", "kanjiset-missing-es.json")
   const output = ensureUniquePath(outputArg ? path.resolve(outputArg) : defaultOutput)
 

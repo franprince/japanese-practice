@@ -14,7 +14,7 @@ export interface UseDateGameProps {
 }
 
 export interface UseDateGameReturn {
-    // State
+    
     question: DateQuestion | null
     userInput: string
     setUserInput: (value: string) => void
@@ -24,7 +24,7 @@ export interface UseDateGameReturn {
     setShowNumbers: (value: boolean) => void
     inputRef: React.RefObject<HTMLInputElement | null>
 
-    // Actions
+    
     handleSubmit: () => void
     handleSkip: () => void
     generateNewQuestion: () => void
@@ -41,7 +41,7 @@ export function useDateGame({
     const [showNumbers, setShowNumbers] = useState(false)
     const inputRef = useRef<HTMLInputElement>(null)
 
-    // Use unified base game logic
+    
     const {
         feedback,
         setFeedback,
@@ -104,7 +104,7 @@ export function useDateGame({
     )
 
     return {
-        // State
+        
         question,
         userInput,
         setUserInput,
@@ -114,7 +114,7 @@ export function useDateGame({
         setShowNumbers,
         inputRef,
 
-        // Actions
+        
         handleSubmit,
         handleSkip,
         generateNewQuestion,

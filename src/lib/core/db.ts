@@ -13,12 +13,12 @@ export const openDb = (): Promise<IDBDatabase> =>
         req.onupgradeneeded = () => {
             const db = req.result
 
-            // Create kanji store if missing
+            
             if (!db.objectStoreNames.contains(STORE_KANJI)) {
                 db.createObjectStore(STORE_KANJI)
             }
 
-            // Create wordsets store if missing
+            
             if (!db.objectStoreNames.contains(STORE_WORDSETS)) {
                 db.createObjectStore(STORE_WORDSETS)
             }

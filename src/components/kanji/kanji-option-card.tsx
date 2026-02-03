@@ -9,7 +9,7 @@ import { getKanaRomajiMap } from "@/lib/japanese/shared/kana-dictionary-loader"
 import type { KanjiEntry, KanjiDifficulty } from "@/lib/japanese/kanji"
 import type { Language } from "@/lib/i18n"
 
-// Cache the promise at module level so it's shared across all instances
+
 let romajiMapPromise: Promise<void> | null = null
 
 interface KanjiOptionCardProps {
@@ -43,7 +43,7 @@ export function KanjiOptionCard({
   useEffect(() => {
     if (!kanji.reading) return
 
-    // Ensure map is loaded, then convert
+    
     if (!romajiMapPromise) {
       romajiMapPromise = getKanaRomajiMap().then(() => { })
     }
@@ -69,10 +69,10 @@ export function KanjiOptionCard({
       )}
     >
       <div className="flex flex-col gap-1">
-        {/* Reading as the main label (no kanji character in options) */}
+        {}
         <span lang="ja" className="text-xl font-medium">{kanji.reading}</span>
 
-        {/* Meaning / reading depending on difficulty */}
+        {}
         <div className="flex flex-col text-xs text-muted-foreground/80 mt-1 leading-tight gap-1.5">
           {showReading && <span className="uppercase tracking-wide">{romajiReading}</span>}
           {showMeaning && (

@@ -38,21 +38,21 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
 
   const promptLabel = mode === "arabicToKanji" ? t("writeInJapanese") : t("writeInArabic")
 
-  // Map feedback state for GameCardContainer
+  
   const feedback = showResult ? (isCorrect ? "correct" : "incorrect") : null
 
   return (
     <div className="space-y-4">
-      {/* Question display - always at top */}
+      {}
       <GameCardContainer feedback={feedback} className="backdrop-blur-sm">
-        {/* Question Display */}
+        {}
         <QuestionDisplay
           value={questionText}
           prompt={promptLabel}
           lang={mode === "kanjiToArabic" ? "ja" : undefined}
         />
 
-        {/* User answer display */}
+        {}
         <div className="min-h-16 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
           {userAnswer ? (
             <span
@@ -66,7 +66,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
           )}
         </div>
 
-        {/* Result display */}
+        {}
         {showResult && (
           <ResultDisplay
             isCorrect={isCorrect}
@@ -78,7 +78,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
         )}
       </GameCardContainer>
 
-      {/* Number pad and controls */}
+      {}
       <div className="space-y-3">
         {showResult ? (
           <div className="flex justify-center">

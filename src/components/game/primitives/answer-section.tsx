@@ -8,10 +8,7 @@ interface AnswerSectionProps {
     className?: string
 }
 
-/**
- * Container for answer input area
- * Provides consistent spacing and layout for input fields, keypads, or option lists
- */
+
 export function AnswerSection({ children, className }: AnswerSectionProps) {
     return (
         <div className={cn("space-y-4", className)}>

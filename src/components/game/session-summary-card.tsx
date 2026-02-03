@@ -17,13 +17,13 @@ interface SessionSummaryCardProps {
   onSwitchToInfinite: () => void
   restartLabel: string
   switchLabel: string
-  /** Characters the user got wrong, with occurrence count and romaji */
+  
   incorrectChars?: Map<string, { count: number; romaji: string }>
-  /** Label for the incorrect chars section */
+  
   incorrectCharsLabel?: string
-  /** Table header for character column */
+  
   tableCharacterLabel?: string
-  /** Table header for errors column */
+  
   tableErrorsLabel?: string
 }
 
@@ -66,7 +66,7 @@ export function SessionSummaryCard({
         </div>
       </div>
 
-      {/* Incorrect characters table */}
+      {}
       {incorrectChars && incorrectChars.size > 0 && (
         <div className="relative z-10 pt-4 border-t border-border/30">
           <p className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">{incorrectCharsLabel}</p>

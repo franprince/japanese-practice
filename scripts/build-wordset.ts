@@ -11,18 +11,18 @@ const WORDSET_LANG = (process.env.WORDSET_LANG || process.env.NEXT_PUBLIC_WORDSE
 const SOURCE_FILE =
   WORDSET_LANG === "en"
     ? "jmdict-eng-3.6.2.json"
-    : "jmdict-spa-3.6.1.json" // default to Spanish if unknown
+    : "jmdict-spa-3.6.1.json" 
 
 const hiraToKata = (char: string) => {
   const code = char.charCodeAt(0)
-  // hiragana block: 3040-309F; katakana starts at 30A0
+  
   return String.fromCharCode(code + 0x60)
 }
 const kataToHira = (text: string) =>
   Array.from(text)
     .map(ch => {
       const code = ch.charCodeAt(0)
-      // katakana block: 30A0-30FF; hiragana starts at 3040 (subtract 0x60)
+      
       if (code >= 0x30a0 && code <= 0x30ff) {
         return String.fromCharCode(code - 0x60)
       }
@@ -57,7 +57,7 @@ const kanaToRomaji = (text: string) => {
   while (i < normalized.length) {
     const char = normalized[i]
 
-    // Handle sokuon (small tsu) by doubling the next consonant sound
+    
     if (char === "っ" || char === "ッ") {
       const nextTri = normalized.slice(i + 1, i + 3)
       const nextChar = normalized[i + 1]
@@ -75,18 +75,18 @@ const kanaToRomaji = (text: string) => {
       continue
     }
 
-    // Handle Katakana Chouonpu (ー)
+    
     if (char === "ー") {
       if (romaji.length > 0) {
         const lastChar = romaji[romaji.length - 1]
-        // Extend the previous vowel
+        
         switch (lastChar) {
           case 'a': romaji = romaji.slice(0, -1) + 'ā'; break;
           case 'i': romaji = romaji.slice(0, -1) + 'ī'; break;
           case 'u': romaji = romaji.slice(0, -1) + 'ū'; break;
           case 'e': romaji = romaji.slice(0, -1) + 'ē'; break;
           case 'o': romaji = romaji.slice(0, -1) + 'ō'; break;
-          // Handle existing macrons
+          
           case 'ā': case 'ī': case 'ū': case 'ē': case 'ō':
             break;
           default:
@@ -109,7 +109,7 @@ const kanaToRomaji = (text: string) => {
     i += 1
   }
 
-  // Post-processing for Hiragana Long Vowels to Macrons
+  
   return romaji
     .replace(/aa/g, "ā")
     .replace(/ii/g, "ī")
@@ -234,7 +234,7 @@ const buildWordSet = async () => {
   const hiraSet = new Set(hiraganaWords.map(w => w.kana))
   const bothForms = katakanaWords.filter(w => hiraSet.has(kataToHira(w.kana)))
 
-  // Determine version and filename logic
+  
   const publicDir = path.join(process.cwd(), "public")
   await fs.promises.mkdir(publicDir, { recursive: true })
 
@@ -250,11 +250,11 @@ const buildWordSet = async () => {
     const existingVersion = typeof existingData.version === "number" ? existingData.version : 0
     nextVersion = Math.max(existingVersion + 1, 1)
   } catch {
-    // No existing base file; start at v1
+    
     nextVersion = 1
   }
 
-  // Build payload with version
+  
   const payload = {
     version: nextVersion,
     hiraganaWords,
@@ -262,7 +262,7 @@ const buildWordSet = async () => {
     bothForms,
   }
 
-  // Compare with existing (ignore version)
+  
   if (existingData) {
     const { version: _, ...existingRest } = existingData
     const { version: __, ...newRest } = payload
@@ -274,7 +274,7 @@ const buildWordSet = async () => {
 
   const payloadStr = JSON.stringify(payload)
 
-  // Write base filename (version embedded in JSON)
+  
   const newPath = basePath
   await fs.promises.writeFile(newPath, payloadStr, "utf8")
   console.log(`Wrote wordset: ${baseFilename} (v${nextVersion})`)

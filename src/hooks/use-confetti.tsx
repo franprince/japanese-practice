@@ -20,7 +20,7 @@ export function useConfetti(count: number = 50) {
                 color: colors[Math.floor(Math.random() * colors.length)] ?? "#22c55e",
                 left: `${Math.random() * 100}%`,
                 delay: `${Math.random() * 4}s`,
-                drift: Math.random() * 100 - 50 // Random horizontal drift between -50px and 50px
+                drift: Math.random() * 100 - 50
             }))
         )
     }, [count])
@@ -45,10 +45,9 @@ export function useConfetti(count: number = 50) {
                         backgroundColor: p.color,
                         left: p.left,
                         top: "-10px",
-                        // @ts-expect-error - CSS custom properties are valid but not typed in React.CSSProperties
                         "--confetti-drift": `${p.drift}px`,
                         animation: `confetti-fall 3s linear ${p.delay} infinite`
-                    }}
+                    } as React.CSSProperties}
                 />
             ))}
         </div>

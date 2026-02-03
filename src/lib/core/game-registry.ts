@@ -1,7 +1,4 @@
-/**
- * Centralized game registry for all available games
- * This serves as the single source of truth for game definitions
- */
+
 
 export interface GameDefinition {
     id: string
@@ -12,14 +9,7 @@ export interface GameDefinition {
     descriptionKey: string
 }
 
-/**
- * Registry of all available games
- * To add a new game:
- * 1. Add the game definition here
- * 2. Create the page component in app/[game-name]/page.tsx
- * 3. Create game-specific components in src/components/[game-name]/
- * 4. Add translation keys to src/lib/translations.ts
- */
+
 export const GAMES: GameDefinition[] = [
     {
         id: 'romaji',

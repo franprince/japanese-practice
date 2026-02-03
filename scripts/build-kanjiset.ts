@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from "path"
-// Playwright is optional; the fallback module will attempt to require it at runtime.
+
 
 type JMDictEntry = {
   kanji?: { text: string }[]
@@ -30,7 +30,7 @@ const resolveOutputPath = async (dataDir: string) => {
     .filter((n): n is number => n !== null)
     .sort((a, b) => b - a)
 
-  // If a preferred version is provided and not present, use it; otherwise bump from the max.
+  
   if (preferredVersion) {
     const preferredPath = path.join(dataDir, `kanjiset-${preferredVersion}.json`)
     const preferredExists = files.includes(`kanjiset-${preferredVersion}.json`)
@@ -99,14 +99,14 @@ const buildKanjiSet = async () => {
   const dataDir = path.join(baseDir, "public")
   const { outputPath, versionUsed } = await resolveOutputPath(dataDir)
 
-  // If a previous dataset exists (any version), reuse its English meanings to avoid re-requesting
+  
   const previousMeaningLookup: Record<string, string | null> = {}
   const previousReadingLookup: Record<string, string | null> = {}
   const previousJlptLookup: Record<string, string | null> = {}
   try {
     const files = await fs.promises.readdir(dataDir)
     const candidates = files.filter(f => /^kanjiset-.*\.json$/.test(f))
-    // Prefer latest by lexicographic order (e.g., v2 > v1). Adjust if semantic versions are used.
+    
     const latest = candidates.sort().reverse()[0]
     const target = latest ? path.join(dataDir, latest) : outputPath
     if (target && (await fs.promises.stat(target)).isFile()) {
@@ -133,7 +133,7 @@ const buildKanjiSet = async () => {
 
 
 
-  // Fallback to Jisho API for missing English meanings
+  
   const missingJishoChars = mostUsed
     .map(item => item.char)
     .filter(char => {
@@ -255,7 +255,7 @@ const buildKanjiSet = async () => {
 
         let chromium: any
         try {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          
           chromium = require("playwright").chromium
         } catch (err) {
           console.warn("Playwright not installed; skipping playwright-scrape fallback.")

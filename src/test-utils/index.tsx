@@ -3,9 +3,7 @@ import type { ReactElement } from 'react'
 import { I18nProvider } from '@/lib/i18n'
 import { ThemeProvider } from '@/lib/theme'
 
-/**
- * Custom render function that wraps components with necessary providers
- */
+
 function customRender(
     ui: ReactElement,
     options?: Omit<RenderOptions, 'wrapper'>
@@ -23,6 +21,6 @@ function customRender(
     return render(ui, { wrapper: Wrapper, ...options })
 }
 
-// Re-export everything
+
 export * from '@testing-library/react'
 export { customRender as render }

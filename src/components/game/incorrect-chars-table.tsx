@@ -11,7 +11,7 @@ export function IncorrectCharsTable({
     tableErrorsLabel,
     maxItems = 3,
 }: IncorrectCharsTableProps) {
-    // Sort by occurrence count (highest first) and limit to maxItems
+    
     const sortedChars = Array.from(incorrectChars.entries())
         .sort(([, a], [, b]) => {
             const countA = typeof a === 'object' ? a.count : (typeof a === 'number' ? a : 0)

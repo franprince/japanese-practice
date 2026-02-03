@@ -70,12 +70,12 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
   const displayValue = mode === "months" && showNumbers ? question.displayNumber : question.display
   const displayLang = mode === "months" && showNumbers ? undefined : "ja"
 
-  // Map feedback state for GameCardContainer
+  
   const feedback = showResult ? (isCorrect ? "correct" : "incorrect") : null
 
   return (
     <GameCardContainer feedback={feedback}>
-      {/* Mode Toggle Button (for months/week_days) */}
+      {}
       {(mode === "months" || mode === "week_days") && (
         <div className="absolute top-4 right-4 md:top-6 md:right-6">
           <button
@@ -88,7 +88,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         </div>
       )}
 
-      {/* Question Display */}
+      {}
       <QuestionDisplay
         value={displayValue || ""}
         prompt={getPromptText()}
@@ -96,7 +96,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         icon={getModeIcon()}
       />
 
-      {/* Input Section */}
+      {}
       <div className="mb-4">
         <input
           ref={inputRef}
@@ -114,7 +114,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         />
       </div>
 
-      {/* Result Display */}
+      {}
       {showResult && (
         <div className="mb-4">
           <ResultDisplay
@@ -128,7 +128,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         </div>
       )}
 
-      {/* Action Bar */}
+      {}
       <ActionBar
         showResult={showResult}
         onSubmit={handleSubmit}

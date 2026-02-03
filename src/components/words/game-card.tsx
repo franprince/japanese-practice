@@ -23,7 +23,7 @@ interface GameCardProps {
   disableNext?: boolean
   isCharacterMode?: boolean
   onToggleCharacterMode?: () => void
-  /** Callback when incorrect characters change (for session summary) */
+  
   onIncorrectCharsChange?: (chars: Map<string, { count: number; romaji: string }>) => void
 }
 
@@ -73,7 +73,7 @@ export function GameCard({
 
 
 
-  // Loading state
+  
   if (isLoading) {
     return (
       <div className="w-full max-w-xl mx-auto">
@@ -88,7 +88,7 @@ export function GameCard({
 
 
 
-  // No words available state
+  
   if (noWordsAvailable) {
     return (
       <div className="w-full max-w-xl mx-auto">
@@ -116,7 +116,7 @@ export function GameCard({
 
   return (
     <div className="w-full max-w-xl mx-auto">
-      {/* Score and Streak Display */}
+      {}
       <div className="flex items-center justify-between mb-6 px-1">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
@@ -133,12 +133,12 @@ export function GameCard({
         </Badge>
       </div>
 
-      {/* Main Game Card */}
+      {}
       <GameCardContainer
         feedback={feedback}
         className="backdrop-blur-sm"
       >
-        {/* Character Mode Toggle */}
+        {}
         {onToggleCharacterMode && (
           <div className="absolute top-4 right-4 md:top-6 md:right-6">
             <Button
@@ -153,19 +153,19 @@ export function GameCard({
           </div>
         )}
 
-        {/* Mode Indicator */}
+        {}
         <div className="flex items-center justify-center gap-2 mb-6 text-muted-foreground text-sm font-medium">
           {isCharacterMode ? <Shuffle className="w-4 h-4" /> : <Type className="w-4 h-4" />}
           <span>{isCharacterMode ? t("modeCharacters") : t("modeWords")}</span>
         </div>
 
-        {/* Japanese Character Display */}
+        {}
         <QuestionDisplay
           value={currentWord.kana}
           lang="ja"
         />
 
-        {/* Input Section */}
+        {}
         <AnswerSection>
           <div className="relative">
             <Input
@@ -190,7 +190,7 @@ export function GameCard({
             <FeedbackIcon feedback={feedback} />
           </div>
 
-          {/* Feedback Section */}
+          {}
           <GameFeedbackSection
             feedback={feedback}
             displayRomaji={displayRomaji}
@@ -199,7 +199,7 @@ export function GameCard({
             t={t}
           />
 
-          {/* Action Buttons */}
+          {}
           <ActionBar
             showResult={feedback !== null}
             onSubmit={checkAnswer}
@@ -213,14 +213,14 @@ export function GameCard({
         </AnswerSection>
       </GameCardContainer>
 
-      {/* Accuracy Display */}
+      {}
       {totalAttempts > 0 && (
         <p className="text-center text-xs text-muted-foreground mt-6 tabular-nums">
           {t("accuracy")}: {accuracyPercent}%
         </p>
       )}
 
-      {/* Session Incorrect Characters Summary */}
+      {}
       {incorrectChars.size > 0 && (
         <div className="mt-4 text-center">
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">

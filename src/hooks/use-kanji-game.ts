@@ -12,14 +12,14 @@ export interface UseKanjiGameProps {
 }
 
 export interface UseKanjiGameReturn {
-    // State
+    
     currentKanji: KanjiEntry | null
     options: KanjiEntry[]
     selectedOption: KanjiEntry | null
     isRevealed: boolean
     isCorrect: boolean
 
-    // Actions
+    
     handleOptionClick: (option: KanjiEntry) => void
     handleNext: () => void
 }
@@ -34,7 +34,7 @@ export function useKanjiGame({
     const [options, setOptions] = useState<KanjiEntry[]>([])
     const [selectedOption, setSelectedOption] = useState<KanjiEntry | null>(null)
 
-    // Use unified base game logic
+    
     const {
         feedback,
         setFeedback,
@@ -59,7 +59,7 @@ export function useKanjiGame({
         }
 
         loadKanjiByLevels(levels)
-            .then(list => list.filter(k => k.reading)) // Ensure we only use kanji with readings
+            .then(list => list.filter(k => k.reading)) 
             .then(list => {
                 if (!list.length) throw new Error("No kanji found")
                 setKanjiSet(list)
@@ -118,14 +118,14 @@ export function useKanjiGame({
     )
 
     return {
-        // State
+        
         currentKanji,
         options,
         selectedOption,
         isRevealed,
         isCorrect,
 
-        // Actions
+        
         handleOptionClick,
         handleNext,
     }

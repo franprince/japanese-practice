@@ -40,7 +40,7 @@ export function NumberPad({
 
   const renderedKeys: NumberPadKey[] = useMemo(() => {
     const base = Array.from(keys) as NumberPadKey[]
-    // Avoid SSR/client mismatch by only shuffling after mount
+    
     if (!shuffleNumbers || !hasMounted) return base
     const shuffled: NumberPadKey[] = Array.from(base) as NumberPadKey[]
     for (let i = shuffled.length - 1; i > 0; i -= 1) {

@@ -2,7 +2,6 @@ import { describe, it, expect, beforeAll } from "bun:test"
 import { tokenizeKana, getValidRomaji, detectErrors } from "../error-detection"
 import { loadKanaDictionary } from "../kana-dictionary-loader"
 
-// Ensure dictionary is loaded before tests
 beforeAll(async () => {
     await loadKanaDictionary()
 })
@@ -80,25 +79,21 @@ describe("detectErrors", () => {
 
             expect(result.characters).toHaveLength(4)
 
-            // ぴゃ -> pya ✅
-            expect(result.characters[0].kana).toBe("ぴゃ")
-            expect(result.characters[0].userInput).toBe("pya")
-            expect(result.characters[0].isCorrect).toBe(true)
+            expect(result.characters[0]!.kana).toBe("ぴゃ")
+            expect(result.characters[0]!.userInput).toBe("pya")
+            expect(result.characters[0]!.isCorrect).toBe(true)
 
-            // ぼ -> bo ✅
-            expect(result.characters[1].kana).toBe("ぼ")
-            expect(result.characters[1].userInput).toBe("bo")
-            expect(result.characters[1].isCorrect).toBe(true)
+            expect(result.characters[1]!.kana).toBe("ぼ")
+            expect(result.characters[1]!.userInput).toBe("bo")
+            expect(result.characters[1]!.isCorrect).toBe(true)
 
-            // で -> te ❌ (expected de)
-            expect(result.characters[2].kana).toBe("で")
-            expect(result.characters[2].userInput).toBe("te")
-            expect(result.characters[2].isCorrect).toBe(false)
+            expect(result.characters[2]!.kana).toBe("で")
+            expect(result.characters[2]!.userInput).toBe("te")
+            expect(result.characters[2]!.isCorrect).toBe(false)
 
-            // だ -> ka ❌ (expected da)
-            expect(result.characters[3].kana).toBe("だ")
-            expect(result.characters[3].userInput).toBe("ka")
-            expect(result.characters[3].isCorrect).toBe(false)
+            expect(result.characters[3]!.kana).toBe("だ")
+            expect(result.characters[3]!.userInput).toBe("ka")
+            expect(result.characters[3]!.isCorrect).toBe(false)
 
             expect(result.correctCount).toBe(2)
             expect(result.incorrectCount).toBe(2)
@@ -110,20 +105,17 @@ describe("detectErrors", () => {
 
             expect(result.characters).toHaveLength(3)
 
-            // ぶ -> bu ✅
-            expect(result.characters[0].kana).toBe("ぶ")
-            expect(result.characters[0].userInput).toBe("bu")
-            expect(result.characters[0].isCorrect).toBe(true)
+            expect(result.characters[0]!.kana).toBe("ぶ")
+            expect(result.characters[0]!.userInput).toBe("bu")
+            expect(result.characters[0]!.isCorrect).toBe(true)
 
-            // ぼ -> go ❌ (expected bo)
-            expect(result.characters[1].kana).toBe("ぼ")
-            expect(result.characters[1].userInput).toBe("go")
-            expect(result.characters[1].isCorrect).toBe(false)
+            expect(result.characters[1]!.kana).toBe("ぼ")
+            expect(result.characters[1]!.userInput).toBe("go")
+            expect(result.characters[1]!.isCorrect).toBe(false)
 
-            // ば -> ba ✅
-            expect(result.characters[2].kana).toBe("ば")
-            expect(result.characters[2].userInput).toBe("ba")
-            expect(result.characters[2].isCorrect).toBe(true)
+            expect(result.characters[2]!.kana).toBe("ば")
+            expect(result.characters[2]!.userInput).toBe("ba")
+            expect(result.characters[2]!.isCorrect).toBe(true)
 
             expect(result.correctCount).toBe(2)
             expect(result.incorrectCount).toBe(1)
@@ -135,11 +127,9 @@ describe("detectErrors", () => {
 
             expect(result.characters).toHaveLength(4)
 
-            // え -> e ✅ (first char matches)
-            expect(result.characters[0].kana).toBe("え")
-            expect(result.characters[0].isCorrect).toBe(true)
+            expect(result.characters[0]!.kana).toBe("え")
+            expect(result.characters[0]!.isCorrect).toBe(true)
 
-            // The algorithm should detect errors and find 'sen' later
             expect(result.incorrectCount).toBeGreaterThanOrEqual(1)
         })
     })
@@ -225,10 +215,10 @@ describe("detectErrors", () => {
         it("handles mixed digraphs and singles", async () => {
             const result = await detectErrors("きょうと", "kyouto")
 
-            expect(result.characters[0].kana).toBe("きょ")
-            expect(result.characters[0].isCorrect).toBe(true)
-            expect(result.characters[1].kana).toBe("う")
-            expect(result.characters[2].kana).toBe("と")
+            expect(result.characters[0]!.kana).toBe("きょ")
+            expect(result.characters[0]!.isCorrect).toBe(true)
+            expect(result.characters[1]!.kana).toBe("う")
+            expect(result.characters[2]!.kana).toBe("と")
         })
     })
 
@@ -237,17 +227,17 @@ describe("detectErrors", () => {
             const result = await detectErrors("にっぽん", "nippon")
 
             expect(result.characters).toHaveLength(3)
-            expect(result.characters[0].kana).toBe("に")
-            expect(result.characters[0].userInput).toBe("ni")
-            expect(result.characters[0].isCorrect).toBe(true)
+            expect(result.characters[0]!.kana).toBe("に")
+            expect(result.characters[0]!.userInput).toBe("ni")
+            expect(result.characters[0]!.isCorrect).toBe(true)
 
-            expect(result.characters[1].kana).toBe("っぽ") // combined token
-            expect(result.characters[1].userInput).toBe("ppo") // doubled consonant
-            expect(result.characters[1].isCorrect).toBe(true)
+            expect(result.characters[1]!.kana).toBe("っぽ")
+            expect(result.characters[1]!.userInput).toBe("ppo")
+            expect(result.characters[1]!.isCorrect).toBe(true)
 
-            expect(result.characters[2].kana).toBe("ん")
-            expect(result.characters[2].userInput).toBe("n")
-            expect(result.characters[2].isCorrect).toBe(true)
+            expect(result.characters[2]!.kana).toBe("ん")
+            expect(result.characters[2]!.userInput).toBe("n")
+            expect(result.characters[2]!.isCorrect).toBe(true)
 
             expect(result.isFullyCorrect).toBe(true)
         })
@@ -277,7 +267,6 @@ describe("detectErrors", () => {
         it("rejects extended vowel as hyphen: コイネー (koine-)", async () => {
             const result = await detectErrors("コイネー", "koine-")
             expect(result.isFullyCorrect).toBe(false)
-            // Should properly identify the hyphen as incorrect input for the chouonpu
             expect(result.incorrectCount).toBeGreaterThan(0)
         })
 
@@ -288,6 +277,31 @@ describe("detectErrors", () => {
 
         it("handles multiple chouonpu: コーヒー (koohii)", async () => {
             const result = await detectErrors("コーヒー", "koohii")
+            expect(result.isFullyCorrect).toBe(true)
+        })
+    })
+
+    describe("macron alignment", () => {
+        it("handles macron input for split tokens: こう (kou) with 'kō'", async () => {
+            const result = await detectErrors("こう", "kō")
+            expect(result.isFullyCorrect).toBe(true)
+            expect(result.characters).toHaveLength(2)
+            expect(result.characters[0]!.kana).toBe("こ")
+            expect(result.characters[1]!.kana).toBe("う")
+        })
+
+        it("handles macron input for chouonpu: コーヒー (kōhī) with 'kōhī'", async () => {
+            const result = await detectErrors("コーヒー", "kōhī")
+            expect(result.isFullyCorrect).toBe(true)
+        })
+
+        it("handles macron input for ou: おう (ou) with 'ō'", async () => {
+            const result = await detectErrors("おう", "ō")
+            expect(result.isFullyCorrect).toBe(true)
+        })
+
+        it("handles mixed input: こう (kou) with 'kou'", async () => {
+            const result = await detectErrors("こう", "kou")
             expect(result.isFullyCorrect).toBe(true)
         })
     })

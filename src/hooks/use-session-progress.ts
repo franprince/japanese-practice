@@ -5,7 +5,7 @@ export type PlayMode = "infinite" | "session"
 
 type SessionProgressOptions = {
     defaultTargetCount?: number
-    /** Translator function (i18n) for building UI labels */
+    
     t?: (key: TranslationKey) => string
 }
 

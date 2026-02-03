@@ -25,7 +25,7 @@ function getDayData(day: number) {
   let romaji = ""
 
   if (day >= 10) {
-    if (day === 10) { // covered by irregular but logic works
+    if (day === 10) { 
       reading = "じゅう"
       romaji = "juu"
     } else if (day < 20) {

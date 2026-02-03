@@ -22,7 +22,7 @@ export interface UseWordGameProps {
 }
 
 export interface UseWordGameReturn {
-    // State
+    
     currentWord: JapaneseWord | null
     userInput: string
     setUserInput: (value: string) => void
@@ -38,10 +38,10 @@ export interface UseWordGameReturn {
     incorrectChars: Map<string, { count: number; romaji: string }>
     inputRef: React.RefObject<HTMLInputElement | null>
 
-    // Computed
+    
     accuracyPercent: number
 
-    // Actions
+    
     checkAnswer: () => void
     skipWord: () => void
     handleKeyDown: (e: React.KeyboardEvent) => void
@@ -58,7 +58,7 @@ export function useWordGame({
     onScoreUpdate,
     onIncorrectCharsChange,
 }: UseWordGameProps): UseWordGameReturn {
-    // State
+    
     const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
     const [userInput, setUserInput] = useState("")
     const [totalAttempts, setTotalAttempts] = useState(0)
@@ -70,10 +70,10 @@ export function useWordGame({
     const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
     const inputRef = useRef<HTMLInputElement>(null)
 
-    // Use transition for non-urgent updates
+    
     const [, startTransition] = useTransition()
 
-    // Use unified base game logic
+    
     const {
         score,
         streak,
@@ -83,10 +83,10 @@ export function useWordGame({
         skipQuestion
     } = useBaseGame({ onScoreUpdate })
 
-    // Computed values
+    
     const accuracyPercent = totalAttempts > 0 ? Math.round((correctAttempts / totalAttempts) * 100) : 100
 
-    // Load new word
+    
     const loadNewWord = useCallback(async () => {
         if (disableNext) return
         setIsLoading(true)
@@ -118,7 +118,7 @@ export function useWordGame({
             setUserInput("")
             setFeedback(null)
             setErrorDetails(null)
-            // Use requestAnimationFrame for better timing sync with browser paint
+            
             requestAnimationFrame(() => {
                 if (!suppressFocus) inputRef.current?.focus()
             })
@@ -133,7 +133,7 @@ export function useWordGame({
         let isCorrect = validateAnswer(userInput, currentWord)
         let detectionResult: ErrorDetectionResult | null = null
 
-        // If basic validation fails, try detailed detection (supports chouonpu)
+        
         if (!isCorrect) {
             try {
                 detectionResult = await detectErrors(currentWord.kana, userInput)
@@ -153,16 +153,16 @@ export function useWordGame({
         if (isCorrect) {
             setCorrectAttempts((prev) => prev + 1)
             setErrorDetails(null)
-            submitAnswer(true, 1) // Base points 1 for words
+            submitAnswer(true, 1) 
         } else {
-            // Submit answer immediately for fast feedback
+            
             submitAnswer(false)
 
-            // Helper to update error state
+            
             const handleDetectionResult = (result: ErrorDetectionResult) => {
                 startTransition(() => {
                     setErrorDetails(result)
-                    // Accumulate incorrect characters with romaji
+                    
                     setIncorrectChars((prev) => {
                         const newMap = new Map(prev)
                         for (const char of result.characters) {
@@ -183,21 +183,21 @@ export function useWordGame({
             if (detectionResult) {
                 handleDetectionResult(detectionResult)
             } else {
-                // Should rare/never happen in failure case if detectErrors was called
-                // But if isCorrect was false initially and we somehow skipped detection? 
-                // (Only if detectErrors threw, in which case we retry here?)
+                
+                
+                
                 detectErrors(currentWord.kana, userInput).then(handleDetectionResult)
             }
         }
     }, [currentWord, userInput, submitAnswer, startTransition])
 
-    // Skip word
+    
     const skipWord = useCallback(() => {
         skipQuestion()
         if (currentWord) setDisplayRomaji(currentWord.romaji)
     }, [currentWord, skipQuestion])
 
-    // Handle key down
+    
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === "Enter") {
             if (feedback) {
@@ -208,25 +208,25 @@ export function useWordGame({
         }
     }, [feedback, disableNext, loadNewWord, checkAnswer])
 
-    // Load word on mount and when dependencies change
+    
     useEffect(() => {
         loadNewWord()
     }, [loadNewWord])
 
-    // Restore focus when suppressFocus changes
+    
     useEffect(() => {
         if (!suppressFocus) {
             requestAnimationFrame(() => inputRef.current?.focus())
         }
     }, [suppressFocus])
 
-    // Notify parent when incorrect chars change
+    
     useEffect(() => {
         onIncorrectCharsChange?.(incorrectChars)
     }, [incorrectChars, onIncorrectCharsChange])
 
     return {
-        // State
+        
         currentWord,
         userInput,
         setUserInput,
@@ -242,10 +242,10 @@ export function useWordGame({
         incorrectChars,
         inputRef,
 
-        // Computed
+        
         accuracyPercent,
 
-        // Actions
+        
         checkAnswer,
         skipWord,
         handleKeyDown,

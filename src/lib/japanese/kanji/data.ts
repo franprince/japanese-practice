@@ -1,9 +1,9 @@
 import { openDb, STORE_KANJI } from "@/lib/core/db"
 
-// Import types from centralized location for use in this file
+
 import type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
 
-// Re-export types from centralized location
+
 export type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
 
 const CACHE_PREFIX = "kanji-level-"
@@ -25,7 +25,7 @@ interface CachedKanjiData {
   timestamp: number
 }
 
-// In-memory cache per level
+
 const memoryCache: Record<string, Promise<KanjiEntry[]>> = {}
 
 const readCache = async (level: string): Promise<KanjiEntry[] | null> => {
@@ -80,7 +80,7 @@ const writeCache = async (level: string, data: KanjiEntry[]) => {
   }
 }
 
-// Retry logic with exponential backoff
+
 async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
   let lastError: Error | null = null
 
@@ -104,25 +104,25 @@ async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
 }
 
 async function loadLevel(level: string): Promise<KanjiEntry[]> {
-  // Check memory cache
+  
   if (memoryCache[level]) return memoryCache[level]
 
   memoryCache[level] = (async () => {
-    // Try IndexedDB cache first
+    
     const cached = await readCache(level).catch(() => null)
     if (cached) return cached
 
-    // Fetch from static file
+    
     try {
       const res = await fetchWithRetry(`/kanji-${level}.json`)
       const data = await res.json() as KanjiEntry[]
 
-      // Cache result
+      
       writeCache(level, data).catch(console.error)
 
       return data
     } catch (err) {
-      delete memoryCache[level] // Clear failed promise
+      delete memoryCache[level] 
       throw err
     }
   })()

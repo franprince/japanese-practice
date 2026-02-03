@@ -13,27 +13,27 @@ async function splitKanjiSet() {
 
     console.log(`Total entries: ${kanjiList.length}`)
 
-    // Initialize buckets
+    
     const buckets: Record<string, any[]> = {}
     LEVELS.forEach(level => {
         buckets[level] = []
     })
 
-    // Distribute entries
+    
     kanjiList.forEach((entry: any) => {
         if (!entry.jlpt) return
 
-        // JLPT format is "jlpt-n5", etc.
+        
         const levelMatch = entry.jlpt.toLowerCase().match(/n[1-5]/)
         if (levelMatch) {
-            const level = levelMatch[0] // "n5"
+            const level = levelMatch[0] 
             if (buckets[level]) {
                 buckets[level].push(entry)
             }
         }
     })
 
-    // Write files
+    
     LEVELS.forEach(level => {
         const entries = buckets[level]
         if (!entries) return
