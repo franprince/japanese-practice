@@ -1,3 +1,17 @@
+# [3.2.0](https://github.com/franprince/japanese-practice/compare/v3.1.0...v3.2.0) (2026-02-03)
+
+
+### Features
+
+* add mobile safeguards and fix 304 handling in loader ([ae0bb99](https://github.com/franprince/japanese-practice/commit/ae0bb99c5abcacc64d45062bce75a2105b7e4d16))
+* add sonner toaster component ([c9af7c8](https://github.com/franprince/japanese-practice/commit/c9af7c8a4e389a1208cf08cc07cde27b9b5e92c5))
+* enhance input validation, word logic, and add tests ([64706e9](https://github.com/franprince/japanese-practice/commit/64706e92691be629409d5f89811166e57fcee9de))
+* implement cache invalidator component and hook ([a14cee2](https://github.com/franprince/japanese-practice/commit/a14cee2cd6f34bbd03a0c8f92402e6287c8706a3))
+* integrate cache invalidator and toaster ([1308dfb](https://github.com/franprince/japanese-practice/commit/1308dfb9d12fce8c3acbc0f63c2b0590f15c4773))
+* **japanese:** enhance chouonpu handling and macron validation ([034f4d2](https://github.com/franprince/japanese-practice/commit/034f4d20b7c462def24be3d80ca72e7462399192))
+* **japanese:** refine chōonpu and macron error detection logic ([ca8a871](https://github.com/franprince/japanese-practice/commit/ca8a8711b9c5e5fe58a22c1c182c5c8f37757437))
+* **words:** update romaji conversion and random generation logic ([af18745](https://github.com/franprince/japanese-practice/commit/af187459ef20f3b0c0bd53d995269690a20fda40))
+
 # [3.1.0](https://github.com/franprince/japanese-practice/compare/v3.0.0...v3.1.0) (2026-02-02)
 
 
