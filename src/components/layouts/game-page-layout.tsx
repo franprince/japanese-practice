@@ -6,10 +6,7 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 import { useI18n } from "@/lib/i18n"
 import type { GamePageLayoutProps } from "@/types/ui"
 
-/**
- * Shared layout component for all game pages
- * Provides consistent structure: header, controls, game content, stats, and footer
- */
+
 export function GamePageLayout({
     title,
     subtitle,
@@ -41,29 +38,29 @@ export function GamePageLayout({
                     </div>
                 </header>
 
-                {/* Controls section (mode selectors, settings, etc.) */}
+                {}
                 {controls && (
                     <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-4 relative">
                         {controls}
                     </div>
                 )}
 
-                {/* Main game content */}
+                {}
                 <div className="mt-6 mb-6">
                     {children}
                 </div>
 
-                {/* Stats section */}
+                {}
                 {stats && (
                     <div className="mb-6">
                         {stats}
                     </div>
                 )}
 
-                {/* Footer section */}
+                {}
                 {footer && footer}
 
-                {/* Default enter hint footer */}
+                {}
                 {showEnterHint && !footer && (
                     <footer className="mt-10 text-center">
                         <p className="text-xs text-muted-foreground/60">

@@ -6,20 +6,20 @@ import type { JapaneseWord } from "@/types/japanese"
 describe("Japanese Input Validation", () => {
     describe("normalizeRomaji", () => {
         it("normalizes variations to standard forms", () => {
-            // si -> shi
+            
             expect(normalizeRomaji("susi")).toBe("sushi")
             expect(normalizeRomaji("watasi")).toBe("watashi")
 
-            // tu -> tsu
+            
             expect(normalizeRomaji("matu")).toBe("matsu")
 
-            // ti -> chi
+            
             expect(normalizeRomaji("tiizu")).toBe("chiizu")
 
-            // hu -> fu
+            
             expect(normalizeRomaji("huzi")).toBe("fuji")
 
-            // compounds
+            
             expect(normalizeRomaji("sya")).toBe("sha")
             expect(normalizeRomaji("syu")).toBe("shu")
             expect(normalizeRomaji("syo")).toBe("sho")
@@ -63,16 +63,16 @@ describe("Japanese Input Validation", () => {
         })
 
         it("accepts e for he particle", async () => {
-            // "he" is rarely used alone as "he" sound in words unless it's a particle "to/towards"
-            // Example: どこへ (dokohe -> dokoe)
+            
+            
             const word = mockWord("どこへ", "dokohe")
             expect(await validateAnswer("dokoe", word)).toBe(true)
             expect(await validateAnswer("dokohe", word)).toBe(true)
         })
 
         it("accepts o for wo particle", async () => {
-            // "wo" is pronounced "o" in modern Japanese
-            // Example: みずを (mizuwo -> mizuo)
+            
+            
             const word = mockWord("みずを", "mizuwo")
             expect(await validateAnswer("mizuo", word)).toBe(true)
             expect(await validateAnswer("mizuwo", word)).toBe(true)

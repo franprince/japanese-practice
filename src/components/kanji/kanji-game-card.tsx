@@ -35,7 +35,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
 
   return (
     <div className="space-y-6">
-      {/* Kanji Display */}
+      {}
       <div className="bg-card border border-border/50 rounded-2xl p-6 md:p-8 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
 
@@ -43,7 +43,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
 
         <div lang="ja" className="text-7xl md:text-9xl font-bold mb-4 relative">{currentKanji.char}</div>
 
-        {/* Result feedback */}
+        {}
         {isRevealed && (
           <div className="mt-4">
             <ResultDisplay
@@ -75,7 +75,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
         )}
       </div>
 
-      {/* Options */}
+      {}
       <div id="kanji-options" className="grid grid-cols-1 gap-3">
         {options.map((option) => (
           <KanjiOptionCard
@@ -92,7 +92,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
         ))}
       </div>
 
-      {/* Action Button */}
+      {}
       <div className="flex justify-center">
         {isRevealed && (
           <Button onClick={handleNext} size="lg" className="gap-2" disabled={disableNext}>

@@ -1,13 +1,13 @@
 import { openDb, STORE_WORDSETS } from "@/lib/core/db"
 import type { JapaneseWord } from "@/types/japanese"
 
-// Import types from centralized location for use in this file
+
 import type { LoaderDeps, WordSets } from "@/types/api"
 
-// Re-export types from centralized location
+
 export type { LoaderDeps, WordSets } from "@/types/api"
 
-// Mobile data protection helpers
+
 export const isMobileDevice = () => {
   if (typeof window === "undefined") return false
   if (window.matchMedia?.("(max-width: 768px)").matches) return true
@@ -78,12 +78,12 @@ const fetchPrebuiltWordset = async (lang: string, currentVersion?: number): Prom
     }
 
     const res = await fetch(`/api/wordset?lang=${lang}`, {
-      cache: "no-store", // Forces validation with ETag every time
+      cache: "no-store", 
       headers
     });
 
     if (res.status === 304) {
-      return "not-modified"; // Signal that cache is valid
+      return "not-modified"; 
     }
 
     if (!res.ok) {
@@ -109,7 +109,7 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
   const datasetLang = normalizeLang(lang)
   if (!cachedPromises[datasetLang]) {
     cachedPromises[datasetLang] = (async () => {
-      // 1. Check cache first
+      
       let cached: WordSets | null = null
       try {
         cached = await readWordsetCache(datasetLang)
@@ -118,7 +118,7 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
         console.warn("Failed to read cache", e)
       }
 
-      // 2. Define fetch/revalidate logic
+      
       const performFetch = async (checkOnly = false): Promise<WordSets | "update-available" | null> => {
         const etagHeader = cached?.version ? `"${cached.version}"` : undefined
         const method = checkOnly ? "HEAD" : "GET"
@@ -137,14 +137,14 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
           if (res.status === 304) {
             console.log(`[Loader] Network result: 304 Not Modified`)
             if (cached) return cached
-            // Fallback logic for when we get 304 but have no cache (shouldn't happen with correct browser behavior but possible)
+            
             const fallback = await fetchPrebuiltWordset(datasetLang)
             return fallback === "not-modified" ? null : fallback
           }
 
           if (checkOnly) {
-            // If we get here (and not 304), it means there is an update
-            // We don't have the body because it was HEAD
+            
+            
             console.log(`[Loader] Update detected via HEAD`)
             if (typeof window !== "undefined") {
               window.dispatchEvent(new CustomEvent("WORDSET_UPDATE_AVAILABLE", { detail: { lang: datasetLang } }))
@@ -157,7 +157,7 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
           const data = await res.json() as WordSets
           await writeCache(datasetLang, data)
 
-          // Dispatch event to notify UI of update
+          
           if (typeof window !== "undefined") {
             window.dispatchEvent(new CustomEvent("WORDSET_UPDATED", { detail: { lang: datasetLang } }))
           }
@@ -170,17 +170,17 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
         }
       }
 
-      // 3. SWR Strategy
+      
       if (cached) {
         console.log("[Loader] SWR: Serving cached content immediately")
-        // Revalidate in background without awaiting
-        // If mobile, only CHECK (HEAD). If desktop, FETCH (GET).
+        
+        
         const isMobile = isMobileDevice()
         performFetch(isMobile).catch(err => console.error("[Loader] Background revalidation failed:", err))
         return cached
       }
 
-      // 3b. Mobile guard: do not fetch until user confirms
+      
       if (isMobileDevice() && !isWordsetConfirmed(datasetLang)) {
         const error = new Error(`Wordset fetch blocked until user confirms`)
           ; (error as any).code = "MOBILE_AUTH_REQUIRED"
@@ -188,7 +188,7 @@ export const loadWordSets = (_deps: LoaderDeps, lang?: string): Promise<WordSets
       }
 
 
-      // 4. Cold Start
+      
       console.log("[Loader] Cold start: Waiting for network")
       return performFetch() as Promise<WordSets>
     })().catch((err) => {
@@ -207,7 +207,7 @@ export const updateWordset = async (lang: string) => {
     const data = await res.json()
     await writeCache(datasetLang, data)
     confirmWordset(datasetLang)
-    // Dispatch updated event
+    
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("WORDSET_UPDATED", { detail: { lang: datasetLang } }))
     }

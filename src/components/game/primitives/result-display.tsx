@@ -15,10 +15,7 @@ interface ResultDisplayProps {
     className?: string
 }
 
-/**
- * Show correct/incorrect feedback with answer details
- * Displays expected answer, user answer, and optional additional information
- */
+
 export function ResultDisplay({
     isCorrect,
     expectedAnswer,
@@ -37,7 +34,7 @@ export function ResultDisplay({
             )}
         >
             <div className="space-y-3">
-                {/* Correct/Incorrect indicator */}
+                {}
                 <div className="flex items-center gap-2">
                     {isCorrect ? (
                         <Check className="w-5 h-5 text-green-500" />
@@ -49,7 +46,7 @@ export function ResultDisplay({
                     </span>
                 </div>
 
-                {/* Answer comparison */}
+                {}
                 <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">{t("correctAnswer")}:</span>
@@ -67,7 +64,7 @@ export function ResultDisplay({
                     </div>
                 </div>
 
-                {/* Additional info (e.g., kanji meaning, reading) */}
+                {}
                 {additionalInfo && <div className="pt-2 border-t border-border/50">{additionalInfo}</div>}
             </div>
         </div>

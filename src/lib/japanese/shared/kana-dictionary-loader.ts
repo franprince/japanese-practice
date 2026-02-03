@@ -8,15 +8,13 @@ export interface CharacterGroup {
     characters: string[]
 }
 
-// Singleton cache
+
 let kanaDictionaryCache: KanaDictionary | null = null
 let characterGroupsCache: CharacterGroup[] | null = null
 let kanaRomajiMapCache: Record<string, string> | null = null
 let loadingPromise: Promise<KanaDictionary> | null = null
 
-/**
- * Lazily loads the kana dictionary with singleton caching
- */
+
 export async function loadKanaDictionary(): Promise<KanaDictionary> {
     if (kanaDictionaryCache) {
         return kanaDictionaryCache
@@ -40,9 +38,7 @@ export async function loadKanaDictionary(): Promise<KanaDictionary> {
     return loadingPromise
 }
 
-/**
- * Builds character groups from the kana dictionary
- */
+
 function buildCharacterGroups(dictionary: KanaDictionary): CharacterGroup[] {
     return Object.entries(dictionary).flatMap(([typeKey, groups]) =>
         Object.entries(groups as Record<string, KanaGroup>).map(([groupId, group]) => {
@@ -61,9 +57,7 @@ function buildCharacterGroups(dictionary: KanaDictionary): CharacterGroup[] {
     )
 }
 
-/**
- * Builds kana to romaji mapping from the dictionary
- */
+
 function buildKanaRomajiMap(dictionary: KanaDictionary): Record<string, string> {
     const map: Record<string, string> = {}
         ; (Object.values(dictionary) as Record<string, KanaGroup>[]).forEach(groups => {
@@ -78,9 +72,7 @@ function buildKanaRomajiMap(dictionary: KanaDictionary): Record<string, string> 
     return map
 }
 
-/**
- * Gets character groups with lazy loading and caching
- */
+
 export async function getCharacterGroups(): Promise<CharacterGroup[]> {
     if (characterGroupsCache) {
         return characterGroupsCache
@@ -91,9 +83,7 @@ export async function getCharacterGroups(): Promise<CharacterGroup[]> {
     return characterGroupsCache
 }
 
-/**
- * Gets kana to romaji map with lazy loading and caching
- */
+
 export async function getKanaRomajiMap(): Promise<Record<string, string>> {
     if (kanaRomajiMapCache) {
         return kanaRomajiMapCache
@@ -104,26 +94,17 @@ export async function getKanaRomajiMap(): Promise<Record<string, string>> {
     return kanaRomajiMapCache
 }
 
-/**
- * Synchronously gets cached character groups (returns empty array if not loaded)
- * Use this only when you're sure the data has been preloaded
- */
+
 export function getCharacterGroupsSync(): CharacterGroup[] {
     return characterGroupsCache ?? []
 }
 
-/**
- * Synchronously gets cached kana romaji map (returns empty object if not loaded)
- * Use this only when you're sure the data has been preloaded
- */
+
 export function getKanaRomajiMapSync(): Record<string, string> {
     return kanaRomajiMapCache ?? {}
 }
 
-/**
- * Preloads the kana dictionary in the background
- * Call this early in the app lifecycle for better performance
- */
+
 export function preloadKanaDictionary(): void {
     if (!kanaDictionaryCache && !loadingPromise) {
         loadKanaDictionary().catch(err => {

@@ -20,7 +20,7 @@ export interface UseNumberGameProps {
 }
 
 export interface UseNumberGameReturn {
-    // State
+    
     currentNumber: number
     userAnswer: string
     showResult: boolean
@@ -31,7 +31,7 @@ export interface UseNumberGameReturn {
     questionText: string
     correctAnswerDisplay: string
 
-    // Actions
+    
     handleKeyPress: (key: string) => void
     handleDelete: () => void
     handleClear: () => void
@@ -49,7 +49,7 @@ export function useNumberGame({
     const [currentNumber, setCurrentNumber] = useState<number>(1)
     const [userAnswer, setUserAnswer] = useState("")
 
-    // Use unified base game logic
+    
     const {
         feedback,
         setFeedback,
@@ -115,7 +115,7 @@ export function useNumberGame({
         !disableNext
     )
 
-    // Derive shuffle from mode (no shuffle in Kanji → Arabic mode)
+    
     const shuffleNumbers = mode !== "kanjiToArabic"
 
     const correctAnswerKanji = arabicToJapanese(currentNumber)
@@ -132,7 +132,7 @@ export function useNumberGame({
     }, [correctAnswerKanji])
 
     return {
-        // State
+        
         currentNumber,
         userAnswer,
         showResult,
@@ -143,7 +143,7 @@ export function useNumberGame({
         questionText,
         correctAnswerDisplay,
 
-        // Actions
+        
         handleKeyPress,
         handleDelete,
         handleClear,

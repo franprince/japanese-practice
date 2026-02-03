@@ -23,13 +23,13 @@ export function GameFeedbackSection({
 
     return (
         <div className="text-center p-4 bg-secondary/50 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200 border border-border/50 space-y-2">
-            {/* Correct answer display */}
+            {}
             <div>
                 <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("correctAnswer")}</p>
                 <p className="text-xl font-mono font-semibold text-primary">{displayRomaji || currentWord.romaji}</p>
             </div>
 
-            {/* Character-level error feedback */}
+            {}
             {feedback === "incorrect" && errorDetails && errorDetails.characters.length > 0 && (
                 <div className="pt-3 border-t border-border/30">
                     <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">{t("yourAnswer") || "Your Answer"}</p>
@@ -53,7 +53,7 @@ export function GameFeedbackSection({
                                 </span>
                             </div>
                         ))}
-                        {/* Show extra unmatched input as error */}
+                        {}
                         {errorDetails.extraInput && (
                             <div
                                 className="flex flex-col items-center px-2 py-1 rounded-md text-sm font-mono bg-destructive/20 text-destructive border border-destructive/30"
@@ -66,7 +66,7 @@ export function GameFeedbackSection({
                 </div>
             )}
 
-            {/* Word meaning */}
+            {}
             {currentWord.meaning && (
                 <div className="pt-2 border-t border-border/30">
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("meaning")}</p>
@@ -74,7 +74,7 @@ export function GameFeedbackSection({
                 </div>
             )}
 
-            {/* Kanji with Jisho link */}
+            {}
             {currentWord.kanji && (
                 <div className="pt-2 border-t border-border/30">
                     <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("word")}</p>

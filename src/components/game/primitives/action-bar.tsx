@@ -17,10 +17,7 @@ interface ActionBarProps {
     t: (key: TranslationKey) => string
 }
 
-/**
- * Action buttons for game card (Submit, Next, Skip)
- * Conditionally renders based on game state
- */
+
 export function ActionBar({
     showResult,
     onSubmit,
@@ -34,7 +31,7 @@ export function ActionBar({
     t,
 }: ActionBarProps) {
     if (showResult) {
-        // Show Next button after answer is revealed
+        
         return (
             <div className="flex justify-center pt-2">
                 <Button
@@ -49,7 +46,7 @@ export function ActionBar({
         )
     }
 
-    // Show Submit and Skip buttons before answer
+    
     return (
         <div className="flex gap-3 pt-2">
             {onSkip && (

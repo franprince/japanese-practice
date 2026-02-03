@@ -1,7 +1,4 @@
-/**
- * Get responsive font size classes based on content length
- * Used across game components for consistent text sizing
- */
+
 export function getResponsiveFontSize(content: string | number): string {
     const length = typeof content === 'string' ? content.length : String(content).length
 

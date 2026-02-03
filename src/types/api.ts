@@ -1,8 +1,6 @@
 import type { JapaneseWord, CharacterGroup } from "./japanese"
 
-/**
- * Dependencies for word loader
- */
+
 export type LoaderDeps = {
     characterGroups: CharacterGroup[]
     kanaToRomaji: (text: string) => string
@@ -10,9 +8,7 @@ export type LoaderDeps = {
     hasKatakana: (text: string) => boolean
 }
 
-/**
- * Loaded word sets
- */
+
 export type WordSets = {
     version: number
     hiraganaWords: JapaneseWord[]

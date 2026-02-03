@@ -19,13 +19,13 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { language, setLanguage } = useLanguage()
   const [mounted, setMounted] = useState(false)
 
-  // Only render after client hydration to avoid mismatch
+  
   useEffect(() => {
     setMounted(true)
   }, [])
 
   if (!mounted) {
-    // Render placeholder during SSR/hydration
+    
     return (
       <div
         className={cn(

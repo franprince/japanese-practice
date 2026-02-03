@@ -9,10 +9,7 @@ interface GameCardContainerProps {
     className?: string
 }
 
-/**
- * Card container with feedback-based styling
- * Provides visual feedback through border colors and shadows
- */
+
 export function GameCardContainer({ feedback, children, className }: GameCardContainerProps) {
     return (
         <div

@@ -8,9 +8,7 @@ export interface KeyboardHandlers {
     onBackspace?: () => void
 }
 
-/**
- * Hook for consistent keyboard navigation across game components
- */
+
 export function useKeyboardNavigation(
     handlers: KeyboardHandlers,
     enabled = true

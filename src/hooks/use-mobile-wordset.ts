@@ -81,7 +81,7 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
                 const mb = Math.round((bytes / 1024 / 1024) * 10) / 10
                 setWordsetSizeMB(mb)
             } catch {
-                // keep fallback
+                
             }
         }
 
@@ -141,14 +141,14 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
                 await primeWordsetCache(datasetLang, data)
             }
         } catch {
-            // allow fallback loading via normal flow
+            
         }
         try {
             if (typeof window !== "undefined") {
                 localStorage.setItem(`wordset-confirmed-${datasetLang}`, "1")
             }
         } catch {
-            // ignore storage failures
+            
         }
         setDownloadProgress(100)
         setMobileConfirmOpen(false)

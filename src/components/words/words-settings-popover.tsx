@@ -24,7 +24,7 @@ export function WordsSettingsPopover({
 }: WordsSettingsPopoverProps) {
   const [characterGroups, setCharacterGroups] = useState<CharacterGroup[]>([])
 
-  // Load character groups on mount
+  
   useEffect(() => {
     getCharacterGroups().then(setCharacterGroups)
   }, [])
@@ -64,7 +64,7 @@ export function WordsSettingsPopover({
     return match ? parseInt(match[0], 10) : Number.MAX_SAFE_INTEGER
   }
 
-  // Include ALL groups from characterGroups (including _a groups)
+  
   const { hiraganaBase, hiraganaAlt, katakanaBase, katakanaAlt } = useMemo(() => {
     const hiraAll = characterGroups.filter((g) => g.type === "hiragana")
     const kataAll = characterGroups.filter((g) => g.type === "katakana")
@@ -107,18 +107,18 @@ export function WordsSettingsPopover({
 
   return (
     <div className="relative inline-block">
-      {/* Backdrop */}
+      {}
       <div
         className="fixed inset-0 z-40 bg-black/20"
         onClick={() => onOpenChange(false)}
       />
 
-      {/* Popover */}
+      {}
       <div
         className="fixed left-1/2 top-24 -translate-x-1/2 z-50 w-[calc(100vw-1.5rem)] max-w-[24rem] sm:w-80 sm:max-w-none md:w-96 rounded-xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-lg max-h-[calc(100vh-3rem)] overflow-y-auto touch-pan-y"
         onPointerDown={(e) => e.stopPropagation()}
       >
-        {/* Header + actions pinned at top */}
+        {}
         <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-border/50 p-3 md:p-4">
           <Button
             variant="ghost"
@@ -156,7 +156,7 @@ export function WordsSettingsPopover({
         </div>
 
         <div className="p-3 md:p-4 space-y-4 pb-14">
-          {/* Word length slider */}
+          {}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground uppercase tracking-wider">{t("wordLength")}</p>
@@ -182,7 +182,7 @@ export function WordsSettingsPopover({
             </div>
           </div>
 
-          {/* Character groups */}
+          {}
           <div className="space-y-3 pt-2 border-t border-border/50">
             <p className="text-xs text-muted-foreground">{t("charactersDescription")}</p>
 
@@ -192,7 +192,7 @@ export function WordsSettingsPopover({
               </div>
             )}
 
-            {/* Hiragana Base */}
+            {}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium"><span lang="ja">ひらがな</span> ({selectedHiraganaCount}/{allHiragana.length})</span>
@@ -220,7 +220,7 @@ export function WordsSettingsPopover({
                   </button>
                 ))}
               </div>
-              {/* Hiragana Alt (dakuten, handakuten, combos) */}
+              {}
               {hiraganaAlt.length > 0 && (
                 <div className="grid grid-cols-5 gap-1 pt-1">
                   {hiraganaAlt.map((group) => (
@@ -242,7 +242,7 @@ export function WordsSettingsPopover({
               )}
             </div>
 
-            {/* Katakana Base */}
+            {}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium"><span lang="ja">カタカナ</span> ({selectedKatakanaCount}/{allKatakana.length})</span>
@@ -270,7 +270,7 @@ export function WordsSettingsPopover({
                   </button>
                 ))}
               </div>
-              {/* Katakana Alt */}
+              {}
               {katakanaAlt.length > 0 && (
                 <div className="grid grid-cols-5 gap-1 pt-1">
                   {katakanaAlt.map((group) => (

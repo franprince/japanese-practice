@@ -1,6 +1,6 @@
-// Japanese number characters and their readings
+
 export const japaneseNumbers = {
-    // Basic digits 0-10
+    
     〇: { reading: "zero", value: 0 },
     零: { reading: "rei", value: 0 },
     一: { reading: "ichi", value: 1 },
@@ -18,7 +18,7 @@ export const japaneseNumbers = {
     万: { reading: "man", value: 10000 },
 } as const
 
-// Number pad keys for input
+
 export const numberPadKeysKanji = [
     { char: "一", value: "一" },
     { char: "二", value: "二" },
@@ -49,11 +49,11 @@ export const numberPadKeysArabic = [
     { char: "0", value: "0" },
 ] as const
 
-// Mappings for conversion
+
 const digitMap = ["〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"]
 const unitMap = ["", "十", "百", "千", "万"]
 
-// Function to convert Arabic number to Japanese
+
 export function arabicToJapanese(num: number): string {
     if (num === 0) return "〇"
     if (num < 0) return ""
@@ -66,21 +66,21 @@ export function arabicToJapanese(num: number): string {
         const char = s[i]
         if (!char) continue
         const n = parseInt(char)
-        const pos = len - i - 1 // 0-based position from right (0=units, 1=tens, etc)
+        const pos = len - i - 1 
 
-        // Handling for 10000 (Man) is special in simple cases, but standard multiplier logic:
-        // This simple version handles up to 99999 as requested by difficulty ranges
+        
+        
 
         if (n === 0) continue
 
-        // Special handling for patterns like 10 -> juu (not ichijuu), 100 -> hyaku
-        // But 10000 is ichiman
+        
+        
 
-        // Simplified Logic for < 100000
+        
         const unit = unitMap[pos] || ""
 
-        if (pos === 4) { // Man
-            // Always show digit for Man (e.g. 10000 -> ichiman)
+        if (pos === 4) { 
+            
             result += (digitMap[n] || "") + "万"
             continue
         }
@@ -100,7 +100,7 @@ const valueMap: Record<string, number> = {
     "千": 1000, "万": 10000
 }
 
-// Function to convert Japanese number string to Arabic
+
 export function japaneseToArabic(japanese: string): number {
     if (japanese === "〇" || japanese === "零") return 0
     if (!japanese) return -1
@@ -115,7 +115,7 @@ export function japaneseToArabic(japanese: string): number {
         if (val < 10) {
             current = val
         } else {
-            // Multiplier (10, 100, 1000, 10000)
+            
             if (val === 10000) {
                 total = (total + (current || 1)) * val
                 current = 0
@@ -128,15 +128,15 @@ export function japaneseToArabic(japanese: string): number {
     return total + current
 }
 
-// Generate a random number within a range
+
 export function generateRandomNumber(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-// Difficulty presets
-// Re-export type from centralized location
+
+
 export type { NumberDifficulty } from "@/types/japanese"
-// Backward compatibility alias
+
 export type Difficulty = import("@/types/japanese").NumberDifficulty
 
 export const difficultyRanges: Record<Difficulty, { min: number; max: number; label: string }> = {
