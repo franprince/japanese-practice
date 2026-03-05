@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/franprince/japanese-practice/compare/v3.2.0...v3.3.0) (2026-03-05)
+
+
+### Features
+
+* optimize project for coolify deployment on vps ([c2cae12](https://github.com/franprince/japanese-practice/commit/c2cae12fd9482ff9f25fbfb7cdf5336d2acfe8b0))
+
 # [3.2.0](https://github.com/franprince/japanese-practice/compare/v3.1.0...v3.2.0) (2026-02-03)
 
 
