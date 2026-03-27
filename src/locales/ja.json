@@ -134,6 +134,8 @@
     "switchToCharacters": "文字モードへ",
     "modeWords": "単語",
     "modeCharacters": "ランダム文字",
+    "modeGuess": "推測モード",
+    "guessLabel": "推測",
     "incorrectChars": "よく間違える文字",
     "tableCharacter": "文字",
     "tableErrors": "エラー",
@@ -145,5 +147,8 @@
     "words.downloadMessage": "単語セットはサイズが大きいです",
     "common.download": "ダウンロード",
     "common.cancel": "キャンセル",
-    "common.next": "次へ"
+    "common.next": "次へ",
+    "home": "ホーム",
+    "practice": "練習",
+    "sessionStats": "セッション統計"
 }

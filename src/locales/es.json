@@ -134,6 +134,8 @@
     "switchToCharacters": "Cambiar a Caracteres",
     "modeWords": "Palabras",
     "modeCharacters": "Caracteres Aleatorios",
+    "modeGuess": "Adivinar Carácter",
+    "guessLabel": "Adivina",
     "incorrectChars": "Errores más frecuentes",
     "tableCharacter": "Caracter",
     "tableErrors": "Errores",
@@ -145,5 +147,8 @@
     "words.downloadMessage": "El set de palabras es grande",
     "common.download": "Descargar",
     "common.cancel": "Cancelar",
-    "common.next": "Siguiente"
+    "common.next": "Siguiente",
+    "home": "Inicio",
+    "practice": "Práctica",
+    "sessionStats": "Estadísticas de la Sesión"
 }

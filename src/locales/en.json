@@ -134,6 +134,8 @@
     "switchToCharacters": "Switch to Characters",
     "modeWords": "Words",
     "modeCharacters": "Random Characters",
+    "modeGuess": "Guess the Char",
+    "guessLabel": "Guess",
     "incorrectChars": "Most frequent errors",
     "tableCharacter": "Character",
     "tableErrors": "Errors",
@@ -145,5 +147,8 @@
     "words.downloadMessage": "The word set is large",
     "common.download": "Download",
     "common.cancel": "Cancel",
-    "common.next": "Next"
+    "common.next": "Next",
+    "home": "Home",
+    "practice": "Practice",
+    "sessionStats": "Session Stats"
 }

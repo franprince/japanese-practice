@@ -2,14 +2,13 @@
 
 import { useCallback, useState, useEffect } from "react"
 import { GameCard } from "@/components/words/game-card"
-import { ModeSelector } from "@/components/words/mode-selector"
+import { WordsTopbar } from "@/components/words/words-topbar"
+import { WordsSettingsOverlay } from "@/components/words/words-settings-overlay"
 import { StatsDisplay } from "@/components/game/stats-display"
 import { RemainingBadge } from "@/components/game/remaining-badge"
 import { type WordFilter, type CharacterGroup } from "@/lib/japanese/words"
 import { getCharacterGroups } from "@/lib/japanese/shared"
-import type { GameMode } from "@/types/game"
-import { GameSettingsPopover } from "@/components/game/game-settings-popover"
-import { WordsSettingsPopover } from "@/components/words/words-settings-popover"
+import type { GameMode, WordsGameType } from "@/types/game"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
 import { useSessionProgress } from "@/hooks/use-session-progress"
@@ -27,8 +26,6 @@ export default function WordsPage() {
         playMode,
         targetCount,
         sessionComplete,
-        correctCount,
-        accuracy,
         handleScoreUpdate,
         resetSession,
         setTargetCount,
@@ -40,6 +37,7 @@ export default function WordsPage() {
     const [characterGroups, setCharacterGroups] = useState<CharacterGroup[]>([])
     const [isLoadingGroups, setIsLoadingGroups] = useState(true)
     const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
+    const [showSettings, setShowSettings] = useState(false)
 
     // Preload character groups on mount
     useEffect(() => {
@@ -61,15 +59,13 @@ export default function WordsPage() {
         minLength: 3,
         maxLength: 6,
     })
-    const [customSettingsOpen, setCustomSettingsOpen] = useState(false)
 
-    // Use the mobile hook for mode and confirmations
     const {
-        isCharacterMode,
+        gameType,
         mobileConfirmOpen,
         downloadProgress,
         wordsetSizeMB,
-        requestToggleCharacterMode,
+        setGameType,
         confirmWordMode,
         cancelConfirm
     } = useMobileWordset(lang)
@@ -77,83 +73,53 @@ export default function WordsPage() {
     const handleScoreUpdateWithUi = useCallback(
         (newScore: number, newStreak: number, correct: boolean) => {
             handleScoreUpdate(newScore, newStreak, correct)
-            if (!correct) {
-                setCustomSettingsOpen(false)
-            }
         },
         [handleScoreUpdate],
     )
 
     const handleModeChange = (nextMode: GameMode) => {
-        // Prevent re-render if mode is same (unless custom, which toggles settings)
-        if (nextMode === mode && nextMode !== "custom") return
-
-        // Custom: open popover and avoid resetting the game so the menu stays open
-        if (nextMode === "custom") {
-            setMode(nextMode)
-            setCustomSettingsOpen(true)
-            return
-        }
-
-        // Preset modes: close popover, auto-select relevant groups, and reset session
-        setCustomSettingsOpen(false)
         setMode(nextMode)
-        const allowedGroups =
-            nextMode === "both"
-                ? characterGroups.map((g) => g.id)
-                : characterGroups.filter((g) => g.type === nextMode).map((g) => g.id)
-        setFilter((prev) => ({
-            ...prev,
-            selectedGroups: allowedGroups,
-        }))
-        resetSession()
-        setBestStreak(0)
-    }
-
-    const handleFilterChange = (next: WordFilter) => {
-        setFilter(next)
+        
+        // Preset modes: auto-select relevant groups
+        if (nextMode !== "custom") {
+            const allowedGroups =
+                nextMode === "both"
+                    ? characterGroups.map((g) => g.id)
+                    : characterGroups.filter((g) => g.type === nextMode).map((g) => g.id)
+            setFilter((prev) => ({
+                ...prev,
+                selectedGroups: allowedGroups,
+            }))
+            resetSession()
+            setBestStreak(0)
+        }
     }
 
     const handleResetSession = useCallback(() => {
         resetSession()
-        setIncorrectChars(new Map()) // Clear incorrect chars on session reset
+        setIncorrectChars(new Map())
     }, [resetSession])
-
 
     return (
         <GamePageLayout
             title={t("wordsLabel")}
             subtitle={t("tip")}
-            controls={
-                <>
-                    <GameSettingsPopover
-                        playMode={playMode}
-                        onSelectMode={resetSession}
-                        targetCount={targetCount}
-                        onSelectCount={(count) => {
-                            setTargetCount(count)
-                            handleResetSession()
-                        }}
-                        remainingQuestions={0}
-                    />
-                    <ModeSelector
-                        mode={mode}
-                        onModeChange={handleModeChange}
-                        onCustomClick={() => setCustomSettingsOpen(true)}
-                    />
-                    <WordsSettingsPopover
-                        filter={filter}
-                        onFilterChange={handleFilterChange}
-                        open={customSettingsOpen}
-                        onOpenChange={setCustomSettingsOpen}
-                    />
-                </>
+            topbarContent={
+                <WordsTopbar
+                    mode={mode}
+                    playMode={playMode}
+                    targetCount={targetCount}
+                    gameType={gameType}
+                    onOpenSettings={() => setShowSettings(true)}
+                />
             }
             stats={
-                <>
-                    <RemainingBadge label={remainingLabel} />
-                    <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
-                </>
+                <div className="w-full flex flex-col items-center gap-4">
+                    <div className="md:hidden">
+                        <RemainingBadge label={remainingLabel} />
+                    </div>
+                    <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} remainingLabel={remainingLabel} />
+                </div>
             }
         >
             {sessionComplete && playMode === "session" && (
@@ -176,14 +142,34 @@ export default function WordsPage() {
                     mode={mode}
                     filter={filter}
                     onScoreUpdate={handleScoreUpdateWithUi}
-                    onRequestCloseSettings={() => setCustomSettingsOpen(false)}
-                    onRequestOpenSettings={() => setCustomSettingsOpen(true)}
+                    onRequestCloseSettings={() => setShowSettings(false)}
+                    onRequestOpenSettings={() => setShowSettings(true)}
                     disableNext={sessionComplete && playMode === "session"}
-                    isCharacterMode={isCharacterMode}
-                    onToggleCharacterMode={requestToggleCharacterMode}
+                    gameType={gameType}
                     onIncorrectCharsChange={setIncorrectChars}
                 />
             )}
+
+            <WordsSettingsOverlay
+                open={showSettings}
+                onOpenChange={setShowSettings}
+                mode={mode}
+                onModeChange={handleModeChange}
+                gameType={gameType}
+                onGameTypeChange={setGameType}
+                playMode={playMode}
+                onPlayModeChange={(m) => {
+                    if (m === "infinite") resetSession("infinite")
+                    else resetSession("session")
+                }}
+                targetCount={targetCount}
+                onTargetCountChange={(count) => {
+                    setTargetCount(count)
+                    handleResetSession()
+                }}
+                filter={filter}
+                onFilterChange={setFilter}
+            />
 
             <MobileWordsetModal
                 open={mobileConfirmOpen}

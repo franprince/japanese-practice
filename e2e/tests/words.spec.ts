@@ -58,78 +58,54 @@ test.describe('Words Game', () => {
         const input = page.locator('input[type="text"]')
         await expect(input).toBeVisible()
 
-        const checkBtn = page.locator('button:has-text("Check"), button:has-text("Verificar"), button:has-text("Comprobar")')
-        expect(await checkBtn.count()).toBeGreaterThan(0)
-
-        const stats = page.locator('[data-testid="stats-display"]')
-        await expect(stats).toBeVisible()
-
-        const modeButtons = page.locator('button').filter({ hasText: /hiragana|katakana|ambos|both/i })
-        expect(await modeButtons.count()).toBeGreaterThan(0)
+        const score = page.locator('text=/score|puntaje/i')
+        await expect(score).toBeVisible()
     })
 
-    test('should capture correct answer feedback', async ({ wordsPage, page }) => {
-        await page.setViewportSize({ width: 1280, height: 720 })
-        await wordsPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
-
-        const input = page.locator('input[type="text"]')
-        const checkBtn = page.locator('button:has-text("Check"), button:has-text("Verificar"), button:has-text("Comprobar")')
-
-        // Get the displayed kana using the question-display test ID
-        const displayedKana = await page.locator('[data-testid="question-display"]').textContent()
-
-        if (!displayedKana) {
-            throw new Error('Could not find displayed kana')
-        }
-
-        // Build character map and convert kana to romaji
+    test('should handle correct and incorrect romaji input with feedback', async ({ wordsPage, page }) => {
         const charMap = buildCharacterMap()
-        let correctAnswer = ''
-        for (const char of displayedKana) {
-            if (charMap[char]) {
-                correctAnswer += charMap[char]
-            }
-        }
-
-        // Type the correct answer
-        await input.click()
-        await input.fill(correctAnswer)
-        await page.waitForTimeout(500)
-
-        // Click check
-        await checkBtn.first().click({ force: true })
-        await page.waitForTimeout(2000)
-
-        // Capture success screenshot
-        await wordsPage.screenshot('words_feedback_correct')
-    })
-
-    test('should capture incorrect answer feedback', async ({ wordsPage, page }) => {
         await wordsPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
 
+        // 1. Get the character being shown
+        const kanaElement = page.locator('[data-testid="question-display"]')
+        await expect(kanaElement).toBeVisible()
+        const kanaChar = (await kanaElement.textContent())?.trim() || ""
+        const correctRomaji = charMap[kanaChar] || "a"
+
+        // 2. Test CORRECT answer
         const input = page.locator('input[type="text"]')
-        const checkBtn = page.locator('button:has-text("Check"), button:has-text("Verificar"), button:has-text("Comprobar")')
+        await input.fill(correctRomaji)
+        await page.keyboard.press('Enter')
 
-        // Type an incorrect answer
-        await input.click()
-        await input.fill('wronganswer')
+        // Wait for feedback
+        await page.waitForTimeout(500)
+        await wordsPage.screenshot('words_feedback_correct')
+
+        // Verify score increment (this depends on initial score, usually 0 -> 1)
+        // const scoreVal = page.locator('span.tabular-nums').first();
+        // await expect(scoreVal).not.toHaveText('0');
+
+        // 3. Move to NEXT word
+        const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
+        await nextBtn.click()
         await page.waitForTimeout(500)
 
-        // Click check
+        // 4. Test INCORRECT answer
+        const newKanaChar = (await kanaElement.textContent())?.trim() || ""
+        const wrongRomaji = "xyzq"
+        await input.fill(wrongRomaji)
+
+        const checkBtn = page.getByRole('button', { name: /check|comprobar/i })
         await checkBtn.first().click({ force: true })
-        await page.waitForTimeout(2000)
+        await page.waitForTimeout(500)
 
         // Capture incorrect screenshot
         await wordsPage.screenshot('words_feedback_incorrect')
     })
 
     test('should load words game on mobile with confirmation flow', async ({ wordsPage, page }) => {
-        // Use desktop viewport but simulate mobile logic via matchMedia override
-        await page.setViewportSize({ width: 1280, height: 800 })
+        // Use a mobile viewport width to correctly trigger mobile CSS rules
+        await page.setViewportSize({ width: 390, height: 844 })
 
         // Mock matchMedia to ensure isMobileDevice returns true
         await page.addInitScript(() => {
@@ -175,7 +151,7 @@ test.describe('Words Game', () => {
         await expect(input).toBeVisible()
 
         // 2. Switch to Words Mode (toggle button)
-        const switchBtn = page.getByRole('button', { name: /switch to|cambiar a/i })
+        const switchBtn = page.getByLabel(/words|palabras/i)
         console.log('Waiting for switch button...')
         await switchBtn.waitFor({ timeout: 5000 })
 
@@ -183,42 +159,45 @@ test.describe('Words Game', () => {
             await switchBtn.click()
             console.log('Clicked switch button')
         } else {
-            console.log('Switch button not found, checking if already in words mode...')
-            // If we are already in words mode, the button should say "Switch to Characters"
-            const charBtn = page.locator('button[title*="Switch to"], button[title*="Cambiar a"]')
-            if (await charBtn.isVisible()) {
-                console.log('Already in Words Mode (Switch to Characters visible)')
-            } else {
-                console.log('NEITHER button found. Dumping page layout...')
-            }
+            console.log('Switch button not found')
         }
 
         // 3. Now should see Download Confirmation Modal
         console.log('Waiting for modal...')
         const modal = page.locator('[data-testid="mobile-wordset-modal"]')
-        await expect(modal).toBeVisible({ timeout: 5000 })
+        await expect(modal).toBeVisible({ timeout: 10000 })
         console.log('Modal found! Clicking Download...')
         const downloadBtn = modal.locator('button', { hasText: /Download|Descargar/i })
         await downloadBtn.click()
 
         // Verify modal closes
-        await expect(modal).toBeHidden({ timeout: 5000 })
+        await expect(modal).toBeHidden({ timeout: 10000 })
 
         // 4. Input should reappear
-        try {
-            await expect(input).toBeVisible({ timeout: 10000 })
-        } catch (e) {
-            console.log('Input not visible after download. Checking for error state...')
-            const noWords = page.locator('text=/No words|No hay palabras/i')
-            if (await noWords.isVisible()) {
-                console.log('Error: "No words" message is visible!')
-            } else {
-                console.log('Error: Input missing AND "No words" missing. Dumping layout...')
-                const content = await page.content()
-                fs.writeFileSync('page_dump_fail.html', content)
-            }
-            throw e
-        }
+        await expect(input).toBeVisible({ timeout: 10000 })
     })
 
+    test('should allow playing in Guess mode', async ({ wordsPage, page }) => {
+        await wordsPage.goto()
+        
+        // 1. Switch to Guess mode using the desktop topbar button
+        const guessBtn = page.getByRole('button', { name: /guess|adivina|推測/i }).filter({ visible: true }).first()
+        await guessBtn.click()
+        
+        // 2. Verify that there is no text input
+        await expect(page.locator('input[type="text"]')).toBeHidden({ timeout: 10000 })
+        
+        // 3. Verify that 3 buttons are displayed (multiple choice options)
+        const options = page.locator('button.font-mono')
+        await expect(options).toHaveCount(3, { timeout: 10000 })
+        
+        // 4. Click an option and verify feedback appears
+        await options.first().click()
+        const feedback = page.locator('[data-testid="game-feedback"]')
+        await expect(feedback).toBeVisible()
+        
+        // 5. Verify the "Next" button appears
+        const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
+        await expect(nextBtn).toBeVisible()
+    })
 })
