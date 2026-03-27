@@ -6,14 +6,14 @@ import { getRandomWord, getRandomCharacter } from "@/lib/japanese/words"
 import { confirmWordset, normalizeLang } from "@/lib/japanese/words/loader"
 import { validateAnswer } from "@/lib/japanese/shared/input"
 import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared/error-detection"
-import type { GameMode } from "@/types/game"
+import type { GameMode, WordsGameType } from "@/types/game"
 import type { Language } from "@/lib/i18n/translations"
 import { useBaseGame } from "./use-base-game"
 
 export interface UseWordGameProps {
     mode: GameMode
     filter: WordFilter
-    isCharacterMode: boolean
+    gameType: WordsGameType
     disableNext: boolean
     suppressFocus: boolean
     lang: Language
@@ -37,12 +37,13 @@ export interface UseWordGameReturn {
     errorDetails: ErrorDetectionResult | null
     incorrectChars: Map<string, { count: number; romaji: string }>
     inputRef: React.RefObject<HTMLInputElement | null>
+    options: string[] | null
 
     
     accuracyPercent: number
 
     
-    checkAnswer: () => void
+    checkAnswer: (value?: string) => void
     skipWord: () => void
     handleKeyDown: (e: React.KeyboardEvent) => void
     loadNewWord: () => Promise<void>
@@ -51,7 +52,7 @@ export interface UseWordGameReturn {
 export function useWordGame({
     mode,
     filter,
-    isCharacterMode,
+    gameType,
     disableNext,
     suppressFocus,
     lang,
@@ -61,6 +62,7 @@ export function useWordGame({
     
     const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
     const [userInput, setUserInput] = useState("")
+    const [options, setOptions] = useState<string[] | null>(null)
     const [totalAttempts, setTotalAttempts] = useState(0)
     const [correctAttempts, setCorrectAttempts] = useState(0)
     const [noWordsAvailable, setNoWordsAvailable] = useState(false)
@@ -93,20 +95,56 @@ export function useWordGame({
         let word: JapaneseWord | null = null
 
         try {
-            if (isCharacterMode) {
-                word = await getRandomCharacter(mode, filter)
-            } else {
+            if (gameType === "words") {
                 word = await getRandomWord(mode, filter, lang)
+            } else {
+                // For both characters and guess, we want single characters
+                word = await getRandomCharacter(mode, {
+                    ...filter,
+                    minLength: 1,
+                    maxLength: 1,
+                })
             }
 
             if (word) {
                 setCurrentWord(word)
                 setDisplayRomaji(word.romaji)
                 setNoWordsAvailable(false)
+
+                // Generate distractors for guess mode
+                if (gameType === "guess") {
+                    const distractors: string[] = []
+                    // Try to get 2 unique distractors
+                    for (let i = 0; i < 10 && distractors.length < 2; i++) {
+                        const dist = await getRandomCharacter(mode, {
+                            ...filter,
+                            minLength: 1,
+                            maxLength: 1,
+                        })
+                        if (dist && dist.romaji !== word.romaji && !distractors.includes(dist.romaji)) {
+                            distractors.push(dist.romaji)
+                        }
+                    }
+                    
+                    // Fallback distractors if we couldn't get unique ones from the pool
+                    const fallbacks = ["a", "i", "u", "e", "o", "ka", "ki", "ku", "ke", "ko"]
+                    while (distractors.length < 2) {
+                        const fallback = fallbacks[Math.floor(Math.random() * fallbacks.length)]!
+                        if (fallback !== word.romaji && !distractors.includes(fallback)) {
+                            distractors.push(fallback)
+                        }
+                    }
+
+                    const allOptions = [word.romaji, ...distractors].sort(() => Math.random() - 0.5)
+                    setOptions(allOptions)
+                } else {
+                    setOptions(null)
+                }
             } else {
                 setCurrentWord(null)
                 setDisplayRomaji("")
                 setNoWordsAvailable(true)
+                setOptions(null)
             }
         } catch (error: any) {
             console.error("Failed to load word:", error)
@@ -123,20 +161,21 @@ export function useWordGame({
                 if (!suppressFocus) inputRef.current?.focus()
             })
         }
-    }, [mode, filter, suppressFocus, lang, isCharacterMode, disableNext, setFeedback])
+    }, [mode, filter, suppressFocus, lang, gameType, disableNext, setFeedback])
 
 
 
-    const checkAnswer = useCallback(async () => {
-        if (!currentWord || !userInput.trim()) return
+    const checkAnswer = useCallback(async (value?: string) => {
+        const answerToTest = (value || userInput).trim()
+        if (!currentWord || !answerToTest) return
 
-        let isCorrect = validateAnswer(userInput, currentWord)
+        let isCorrect = validateAnswer(answerToTest, currentWord)
         let detectionResult: ErrorDetectionResult | null = null
 
         
-        if (!isCorrect) {
+        if (!isCorrect && gameType !== "guess") {
             try {
-                detectionResult = await detectErrors(currentWord.kana, userInput)
+                detectionResult = await detectErrors(currentWord.kana, answerToTest)
                 if (detectionResult.isFullyCorrect) {
                     isCorrect = true
                 }
@@ -158,6 +197,10 @@ export function useWordGame({
             
             submitAnswer(false)
 
+            if (gameType === "guess") {
+                // No complex error detection for multiple choice
+                return
+            }
             
             const handleDetectionResult = (result: ErrorDetectionResult) => {
                 startTransition(() => {
@@ -186,10 +229,10 @@ export function useWordGame({
                 
                 
                 
-                detectErrors(currentWord.kana, userInput).then(handleDetectionResult)
+                detectErrors(currentWord.kana, answerToTest).then(handleDetectionResult)
             }
         }
-    }, [currentWord, userInput, submitAnswer, startTransition])
+    }, [currentWord, userInput, submitAnswer, startTransition, gameType])
 
     
     const skipWord = useCallback(() => {
@@ -202,11 +245,11 @@ export function useWordGame({
         if (e.key === "Enter") {
             if (feedback) {
                 if (!disableNext) loadNewWord()
-            } else {
+            } else if (gameType !== "guess") {
                 checkAnswer()
             }
         }
-    }, [feedback, disableNext, loadNewWord, checkAnswer])
+    }, [feedback, disableNext, loadNewWord, checkAnswer, gameType])
 
     
     useEffect(() => {
@@ -241,6 +284,7 @@ export function useWordGame({
         errorDetails,
         incorrectChars,
         inputRef,
+        options,
 
         
         accuracyPercent,
