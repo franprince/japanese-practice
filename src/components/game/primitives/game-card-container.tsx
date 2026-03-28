@@ -14,14 +14,23 @@ export function GameCardContainer({ feedback, children, className }: GameCardCon
     return (
         <div
             className={cn(
-                "relative rounded-2xl border-2 bg-card p-6 md:p-8 transition-all duration-300",
-                feedback === "correct" && "border-green-500/50 shadow-lg shadow-green-500/10",
-                feedback === "incorrect" && "border-red-500/50 shadow-lg shadow-red-500/10",
-                !feedback && "border-border",
+                "relative rounded-[2rem] border-2 bg-card/40 backdrop-blur-2xl p-8 md:p-12 transition-all duration-500 glass-card",
+                feedback === "correct" && "border-success/50 shadow-[0_0_40px_rgba(var(--success),0.15)] scale-[1.01]",
+                feedback === "incorrect" && "border-destructive/50 shadow-[0_0_40px_rgba(var(--destructive),0.15)] animate-shake",
+                !feedback && "border-border/40 shadow-2xl",
                 className
             )}
         >
-            {children}
+            {/* Inner Glow */}
+            <div className={cn(
+                "absolute inset-0 rounded-[2rem] pointer-events-none transition-opacity duration-500 opacity-0",
+                feedback === "correct" && "bg-success/5 opacity-100",
+                feedback === "incorrect" && "bg-destructive/5 opacity-100"
+            )} />
+            
+            <div className="relative z-10">
+                {children}
+            </div>
         </div>
     )
 }

@@ -25,7 +25,10 @@ export interface GamePageLayoutProps {
     subtitle: string
     children: React.ReactNode
     controls?: React.ReactNode
+    topbarContent?: React.ReactNode
     stats?: React.ReactNode
     footer?: React.ReactNode
     showEnterHint?: boolean
+    remainingLabel?: string | null
+    settingsTrigger?: React.ReactNode
 }

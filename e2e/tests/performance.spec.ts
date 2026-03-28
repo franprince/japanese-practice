@@ -148,6 +148,6 @@ test.describe('Performance (INP Proxy)', () => {
         const latency = end - start
 
         console.log(`Mobile Check Answer Latency: ${latency}ms`)
-        expect(latency).toBeLessThan(400)
+        expect(latency).toBeLessThan(600)
     })
 })

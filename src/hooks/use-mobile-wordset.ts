@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import type { Language } from "@/lib/i18n"
 import { normalizeLang, primeWordsetCache, readWordsetCache } from "@/lib/japanese/words"
+import type { WordsGameType } from "@/types/game"
 
 const isMobileDevice = () => {
     if (typeof window === "undefined") return false
@@ -16,18 +17,18 @@ const WORDSET_SIZE_MB_BY_LANG: Record<"en" | "es" | "ja", number> = {
 }
 
 export type MobileWordsetState = {
-    isCharacterMode: boolean
+    gameType: WordsGameType
     isMobile: boolean
     mobileConfirmOpen: boolean
     downloadProgress: number | null
     wordsetSizeMB: number
-    requestToggleCharacterMode: () => void
+    setGameType: (type: WordsGameType) => void
     confirmWordMode: () => Promise<void>
     cancelConfirm: () => void
 }
 
 export const useMobileWordset = (lang: Language): MobileWordsetState => {
-    const [isCharacterMode, setIsCharacterMode] = useState(false)
+    const [gameType, setGameTypeState] = useState<WordsGameType>("words")
     const [mobileConfirmOpen, setMobileConfirmOpen] = useState(false)
     const [downloadProgress, setDownloadProgress] = useState<number | null>(null)
     const [wordsetSizeMB, setWordsetSizeMB] = useState<number>(WORDSET_SIZE_MB_BY_LANG[lang])
@@ -40,7 +41,7 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
         const mobile = isMobileDevice()
         setIsMobile(mobile)
         if (mobile) {
-            setIsCharacterMode(true)
+            setGameTypeState("characters")
         }
     }, [])
 
@@ -52,14 +53,14 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
             .then((cached) => {
                 if (cached) {
                     setConfirmedWordLang(datasetLang)
-                } else if (!isCharacterMode && confirmedWordLang && confirmedWordLang !== datasetLang) {
-                    setIsCharacterMode(true)
+                } else if (gameType === "words" && confirmedWordLang && confirmedWordLang !== datasetLang) {
+                    setGameTypeState("characters")
                     setMobileConfirmOpen(true)
                 }
             })
             .finally(() => setIsCheckingCache(false))
             .catch(() => undefined)
-    }, [lang, isCharacterMode, confirmedWordLang])
+    }, [lang, gameType, confirmedWordLang])
 
     useEffect(() => {
         const datasetLang = normalizeLang(lang)
@@ -89,16 +90,16 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
         return () => controller.abort()
     }, [lang])
 
-    const requestToggleCharacterMode = useCallback(() => {
-        if (isCharacterMode && isMobileDevice()) {
+    const setGameType = useCallback((type: WordsGameType) => {
+        if (type === "words" && isMobileDevice()) {
             const datasetLang = normalizeLang(lang)
             if (confirmedWordLang !== datasetLang) {
                 setMobileConfirmOpen(true)
                 return
             }
         }
-        setIsCharacterMode((prev) => !prev)
-    }, [isCharacterMode, confirmedWordLang, lang])
+        setGameTypeState(type)
+    }, [confirmedWordLang, lang])
 
     const confirmWordMode = useCallback(async () => {
         const datasetLang = normalizeLang(lang)
@@ -153,7 +154,7 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
         setDownloadProgress(100)
         setMobileConfirmOpen(false)
         setConfirmedWordLang(datasetLang)
-        setIsCharacterMode(false)
+        setGameTypeState("words")
         setDownloadProgress(null)
     }, [lang, wordsetSizeBytes])
 
@@ -162,17 +163,17 @@ export const useMobileWordset = (lang: Language): MobileWordsetState => {
         setMobileConfirmOpen(false)
     }, [downloadProgress])
 
-    const effectiveCharacterMode = isMobile && !isCheckingCache && confirmedWordLang !== normalizeLang(lang)
-        ? true
-        : isCharacterMode
+    const effectiveGameType = isMobile && !isCheckingCache && confirmedWordLang !== normalizeLang(lang) && gameType === "words"
+        ? "characters"
+        : gameType
 
     return {
-        isCharacterMode: effectiveCharacterMode,
+        gameType: effectiveGameType,
         isMobile,
         mobileConfirmOpen,
         downloadProgress,
         wordsetSizeMB,
-        requestToggleCharacterMode,
+        setGameType,
         confirmWordMode,
         cancelConfirm,
     }

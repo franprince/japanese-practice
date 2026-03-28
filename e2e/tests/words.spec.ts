@@ -44,7 +44,6 @@ test.describe('Words Game', () => {
     test('should load the words game page and capture initial state', async ({ wordsPage, page }) => {
         await wordsPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1000)
 
         await expect(page).toHaveURL('/words')
         await wordsPage.screenshot('words_initial_load')
@@ -53,83 +52,60 @@ test.describe('Words Game', () => {
     test('should display all UI components', async ({ wordsPage, page }) => {
         await wordsPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
+        
+        // Settings button should be visible (either in header or controls)
+        const settingsBtn = page.getByTestId('settings-trigger').filter({ visible: true })
+        await expect(settingsBtn).toBeVisible({ timeout: 15000 })
 
-        const input = page.locator('input[type="text"]')
-        await expect(input).toBeVisible()
-
-        const checkBtn = page.locator('button:has-text("Check"), button:has-text("Verificar"), button:has-text("Comprobar")')
-        expect(await checkBtn.count()).toBeGreaterThan(0)
-
-        const stats = page.locator('[data-testid="stats-display"]')
-        await expect(stats).toBeVisible()
-
-        const modeButtons = page.locator('button').filter({ hasText: /hiragana|katakana|ambos|both/i })
-        expect(await modeButtons.count()).toBeGreaterThan(0)
+        // Score HUD should be visible
+        const stats = page.getByTestId('stats-display')
+        await expect(stats).toBeVisible({ timeout: 10000 })
+        
+        // Use a more specific locator for Score text within the Stats display
+        await expect(stats.locator('text=/score|puntaje/i').first()).toBeVisible()
     })
 
-    test('should capture correct answer feedback', async ({ wordsPage, page }) => {
-        await page.setViewportSize({ width: 1280, height: 720 })
-        await wordsPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
-
-        const input = page.locator('input[type="text"]')
-        const checkBtn = page.locator('button:has-text("Check"), button:has-text("Verificar"), button:has-text("Comprobar")')
-
-        // Get the displayed kana using the question-display test ID
-        const displayedKana = await page.locator('[data-testid="question-display"]').textContent()
-
-        if (!displayedKana) {
-            throw new Error('Could not find displayed kana')
-        }
-
-        // Build character map and convert kana to romaji
+    test('should handle correct and incorrect romaji input with feedback', async ({ wordsPage, page }) => {
         const charMap = buildCharacterMap()
-        let correctAnswer = ''
-        for (const char of displayedKana) {
-            if (charMap[char]) {
-                correctAnswer += charMap[char]
-            }
-        }
-
-        // Type the correct answer
-        await input.click()
-        await input.fill(correctAnswer)
-        await page.waitForTimeout(500)
-
-        // Click check
-        await checkBtn.first().click({ force: true })
-        await page.waitForTimeout(2000)
-
-        // Capture success screenshot
-        await wordsPage.screenshot('words_feedback_correct')
-    })
-
-    test('should capture incorrect answer feedback', async ({ wordsPage, page }) => {
         await wordsPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
 
+        // 1. Get the character being shown
+        const kanaElement = page.locator('[data-testid="question-display"]')
+        await expect(kanaElement).toBeVisible()
+        const kanaChar = (await kanaElement.textContent())?.trim() || ""
+        const correctRomaji = charMap[kanaChar] || "a"
+
+        // 2. Test CORRECT answer
         const input = page.locator('input[type="text"]')
-        const checkBtn = page.locator('button:has-text("Check"), button:has-text("Verificar"), button:has-text("Comprobar")')
+        await input.fill(correctRomaji)
+        await page.keyboard.press('Enter')
 
-        // Type an incorrect answer
-        await input.click()
-        await input.fill('wronganswer')
-        await page.waitForTimeout(500)
+        // Wait for feedback
+        await expect(page.locator('[data-testid="game-feedback"]')).toBeVisible()
+        await wordsPage.screenshot('words_feedback_correct')
 
-        // Click check
-        await checkBtn.first().click({ force: true })
-        await page.waitForTimeout(2000)
+        // 3. Move to NEXT word
+        const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
+        await nextBtn.click()
+        await expect(nextBtn).not.toBeVisible()
+
+        // 4. Test INCORRECT answer
+        const wrongRomaji = "xyzq"
+        await input.fill(wrongRomaji)
+
+        const checkBtn = page.getByRole('button', { name: /check|comprobar/i }).first()
+        await checkBtn.click({ force: true })
+        
+        // Wait for incorrect feedback
+        await expect(page.locator('[data-testid="game-feedback"]')).toBeVisible()
 
         // Capture incorrect screenshot
         await wordsPage.screenshot('words_feedback_incorrect')
     })
 
     test('should load words game on mobile with confirmation flow', async ({ wordsPage, page }) => {
-        // Use desktop viewport but simulate mobile logic via matchMedia override
-        await page.setViewportSize({ width: 1280, height: 800 })
+        // Use a mobile viewport width to correctly trigger mobile CSS rules
+        await page.setViewportSize({ width: 390, height: 844 })
 
         // Mock matchMedia to ensure isMobileDevice returns true
         await page.addInitScript(() => {
@@ -174,51 +150,60 @@ test.describe('Words Game', () => {
         const input = page.locator('input[type="text"]')
         await expect(input).toBeVisible()
 
-        // 2. Switch to Words Mode (toggle button)
-        const switchBtn = page.getByRole('button', { name: /switch to|cambiar a/i })
-        console.log('Waiting for switch button...')
-        await switchBtn.waitFor({ timeout: 5000 })
+        // Open settings to enable Words mode (default)
+        await page.getByTestId('settings-trigger').filter({ visible: true }).click()
+        await expect(page.getByRole('dialog')).toBeVisible({ timeout: 15000 })
+        
+        const wordsBtn = page.getByRole('button', { name: /words practice|palabras/i }).first()
+        await wordsBtn.click()
 
-        if (await switchBtn.isVisible()) {
-            await switchBtn.click()
-            console.log('Clicked switch button')
-        } else {
-            console.log('Switch button not found, checking if already in words mode...')
-            // If we are already in words mode, the button should say "Switch to Characters"
-            const charBtn = page.locator('button[title*="Switch to"], button[title*="Cambiar a"]')
-            if (await charBtn.isVisible()) {
-                console.log('Already in Words Mode (Switch to Characters visible)')
-            } else {
-                console.log('NEITHER button found. Dumping page layout...')
-            }
-        }
+        const applyBtn = page.getByRole('button', { name: /apply|save|aplicar/i }).first()
+        await applyBtn.click()
 
         // 3. Now should see Download Confirmation Modal
         console.log('Waiting for modal...')
         const modal = page.locator('[data-testid="mobile-wordset-modal"]')
-        await expect(modal).toBeVisible({ timeout: 5000 })
-        console.log('Modal found! Clicking Download...')
+        await expect(modal).toBeVisible({ timeout: 10000 })
         const downloadBtn = modal.locator('button', { hasText: /Download|Descargar/i })
         await downloadBtn.click()
 
         // Verify modal closes
-        await expect(modal).toBeHidden({ timeout: 5000 })
+        await expect(modal).toBeHidden({ timeout: 10000 })
 
         // 4. Input should reappear
-        try {
-            await expect(input).toBeVisible({ timeout: 10000 })
-        } catch (e) {
-            console.log('Input not visible after download. Checking for error state...')
-            const noWords = page.locator('text=/No words|No hay palabras/i')
-            if (await noWords.isVisible()) {
-                console.log('Error: "No words" message is visible!')
-            } else {
-                console.log('Error: Input missing AND "No words" missing. Dumping layout...')
-                const content = await page.content()
-                fs.writeFileSync('page_dump_fail.html', content)
-            }
-            throw e
-        }
+        await expect(input).toBeVisible({ timeout: 10000 })
     })
 
+    test('should allow playing in Guess mode', async ({ wordsPage, page }) => {
+        await wordsPage.goto()
+        
+        // 1. Open Settings
+        await page.getByTestId('settings-trigger').filter({ visible: true }).click()
+        const modal = page.getByRole('dialog')
+        await expect(modal).toBeVisible()
+        
+        // 2. Switch to Guess mode
+        const guessBtn = page.getByRole('button', { name: /guess|adivina/i }).first()
+        await guessBtn.click()
+        // 3. Apply
+        const applyBtn = page.getByRole('button', { name: /apply|save|aplicar|guardar/i }).first()
+        await applyBtn.click({ force: true })
+        await expect(modal).not.toBeVisible({ timeout: 15000 })
+        
+        // 3. Verify that there is no text input
+        await expect(page.locator('input[type="text"]')).toBeHidden({ timeout: 10000 })
+        
+        // 4. Verify that 3 buttons are displayed (multiple choice options)
+        const options = page.getByTestId('guess-option')
+        await expect(options).toHaveCount(3, { timeout: 10000 })
+        
+        // 5. Click an option and verify feedback appears
+        await options.first().click()
+        const feedback = page.locator('[data-testid="game-feedback"]')
+        await expect(feedback).toBeVisible()
+        
+        // 6. Verify the "Next" button appears
+        const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
+        await expect(nextBtn).toBeVisible()
+    })
 })

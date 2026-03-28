@@ -19,7 +19,7 @@ export default function HomePage() {
 
 
   return (
-    <main className="min-h-screen bg-background relative overflow-hidden">
+    <main className="flex-1 flex flex-col bg-background relative overflow-hidden">
       {/* Subtle wave-like shapes in background */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-primary/[0.02] blur-3xl" />

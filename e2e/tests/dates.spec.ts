@@ -4,7 +4,6 @@ test.describe('Dates Game', () => {
     test('should load the dates game page and capture initial state', async ({ datesPage, page }) => {
         await datesPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1000)
 
         await expect(page).toHaveURL('/dates')
         await datesPage.screenshot('dates_initial_load')
@@ -13,7 +12,6 @@ test.describe('Dates Game', () => {
     test('should display all UI components', async ({ datesPage, page }) => {
         await datesPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
 
         // Verify stats display
         const stats = page.locator('[data-testid="stats-display"]')
@@ -35,7 +33,6 @@ test.describe('Dates Game', () => {
     test('should allow date mode selection', async ({ datesPage, page }) => {
         await datesPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
 
         // Get mode buttons
         const modeButtons = page.locator('button').filter({ has: page.locator('svg.lucide-calendar, svg.lucide-calendar-days, svg.lucide-calendar-range') })
@@ -44,7 +41,6 @@ test.describe('Dates Game', () => {
         if (buttonCount >= 2) {
             // Click second mode button
             await modeButtons.nth(1).click()
-            await page.waitForTimeout(1000)
             await datesPage.screenshot('dates_mode_switched')
         }
     })
@@ -52,19 +48,20 @@ test.describe('Dates Game', () => {
     test('should capture incorrect answer feedback', async ({ datesPage, page }) => {
         await datesPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
 
         const input = page.locator('input[type="text"]')
+        await expect(input).toBeVisible()
         const checkBtn = page.locator('button').filter({ has: page.locator('svg.lucide-check') }).first()
 
         // Type an incorrect answer
         await input.click()
         await input.fill('wronganswer')
-        await page.waitForTimeout(500)
 
         // Click check
         await checkBtn.click()
-        await page.waitForTimeout(1500)
+        
+        // Wait for next button or feedback to appear
+        await expect(page.locator('button:has-text("Next"), button:has-text("Siguiente")')).toBeVisible()
 
         // Capture screenshot
         await datesPage.screenshot('dates_feedback_incorrect')
@@ -112,51 +109,46 @@ test.describe('Dates Game', () => {
     test('should complete session mode and show summary', async ({ datesPage, page }) => {
         await datesPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
 
         // Open settings popover
         const settingsBtn = page.getByRole('button').filter({ has: page.locator('svg') }).first()
         await settingsBtn.click()
-        await page.waitForTimeout(500)
+        
+        // Wait for popover to appear
+        const sessionBtn = page.locator('button:has-text("Session"), button:has-text("Sesión")').first()
+        await expect(sessionBtn).toBeVisible()
 
         // Select session mode
-        const sessionBtn = page.locator('button:has-text("Session"), button:has-text("Sesión")').first()
         await sessionBtn.click()
-        await page.waitForTimeout(300)
 
         // Set count to 5
         const count5Btn = page.locator('button:has-text("5")').first()
         await count5Btn.click()
-        await page.waitForTimeout(300)
 
         // Close popover
-        await page.locator('.fixed.inset-0').click()
-        await page.waitForTimeout(500)
+        await page.keyboard.press('Escape')
+        await expect(page.getByTestId('popover-backdrop')).not.toBeVisible()
 
         // Answer 5 questions
         for (let i = 0; i < 5; i++) {
-            await page.waitForTimeout(1000)
-
             const input = page.locator('input[type="text"]')
+            await expect(input).toBeVisible()
             await input.click()
             await input.fill('test')
             await page.keyboard.press('Enter')
-            await page.waitForTimeout(1500)
 
             // Click next button if visible and enabled
             const nextBtn = page.locator('button:has-text("Next"), button:has-text("Siguiente")').first()
-            if (await nextBtn.isVisible() && await nextBtn.isEnabled()) {
+            await expect(nextBtn).toBeVisible()
+            if (await nextBtn.isEnabled()) {
                 await nextBtn.click()
-                await page.waitForTimeout(1000)
+                await expect(nextBtn).not.toBeVisible()
             }
         }
 
-        // Wait for session summary
-        await page.waitForTimeout(2000)
-
         // Verify and capture session summary
         const summaryCard = page.locator('text=/Session complete|Sesión completada/i, text=/Restart|Reiniciar/i').first()
-        await expect(summaryCard).toBeVisible({ timeout: 5000 })
+        await expect(summaryCard).toBeVisible({ timeout: 10000 })
 
         await datesPage.screenshot('dates_session_complete')
     })
