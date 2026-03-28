@@ -1,3 +1,35 @@
+# [3.4.0](https://github.com/franprince/japanese-practice/compare/v3.3.0...v3.4.0) (2026-03-28)
+
+
+### Bug Fixes
+
+* **game:** add data-testid to guess options for more robust testing ([d5d642d](https://github.com/franprince/japanese-practice/commit/d5d642dcba42a2d11e2768d13788d46dfa457e40))
+* **game:** add Escape key support to settings popover ([3d546f2](https://github.com/franprince/japanese-practice/commit/3d546f2cb68f79c2dc9dc2ef5e95ceee764501c8))
+* **game:** update QuestionDisplay props and fix type error ([0f5927b](https://github.com/franprince/japanese-practice/commit/0f5927b8f31c104bbcf61364dfdab993dcd5b4ef))
+* **hooks:** allow character practice mode to honor length settings ([01fc16e](https://github.com/franprince/japanese-practice/commit/01fc16eacf685bf00e46488e7a96e61d76c41e85))
+* **i18n:** internationalize game settings menu, theme switcher, and UI labels ([7eada87](https://github.com/franprince/japanese-practice/commit/7eada87312efb92b35de02f5b6380df4cff7ff65))
+* **layout:** move Footer inside I18nProvider to fix context error ([88660dd](https://github.com/franprince/japanese-practice/commit/88660ddf8ca605a1146c724d296b7e302efa93e0))
+* **ui:** harden Slider component to prevent pointer capture runtime errors ([cbb7cdb](https://github.com/franprince/japanese-practice/commit/cbb7cdbbfe9d14b0d16cf0b21c144731a27fa46f))
+* **words:** resolve settings overlay pointer capture and component runtime errors ([425b232](https://github.com/franprince/japanese-practice/commit/425b232072159e9e71b8c943199df0b94f24d054))
+
+
+### Features
+
+* **game:** added support for multiple-choice Guess mode in hooks ([710e150](https://github.com/franprince/japanese-practice/commit/710e150ef0c50f205ca09a84dd0fbb31910aa55c))
+* **game:** implemented one-line Japanese scaling and reactive glows ([d2cb860](https://github.com/franprince/japanese-practice/commit/d2cb860e8c9c2eacdaef2a03c88c49f96547c644))
+* **layout:** centralized game focus and redesigned stats HUD ([5ad4e2c](https://github.com/franprince/japanese-practice/commit/5ad4e2cc1cca8903ca8f320fb07cd658d2f65f16))
+* **layout:** implement responsive sticky footer with mobile auto-hide ([dfde4ba](https://github.com/franprince/japanese-practice/commit/dfde4bad0c2c98dba594466fee77a55726ed2f8a))
+* **nav:** redesigned topbar into minimalist Zen Nav ([d7422eb](https://github.com/franprince/japanese-practice/commit/d7422ebfbecf7105b464cd50dcdb5a62b9d88a4f))
+* **settings:** implemented premium Zen Command Center overlay ([d0eecce](https://github.com/franprince/japanese-practice/commit/d0eecce872183de85237d6d589678f93b6b48b9f))
+* **theme:** overhauled design system with solid OKLCH glassmorphism ([c3dcea5](https://github.com/franprince/japanese-practice/commit/c3dcea5899a14d8e77c689ffecfa376bae5e4fbd))
+* **words:** enhance feedback display and cleanup deprecated components ([8abb8d4](https://github.com/franprince/japanese-practice/commit/8abb8d4e98dd891b9859bed160cc67801754eeed))
+* **words:** integrated Zen Command Center and updated e2e tests ([d3dd500](https://github.com/franprince/japanese-practice/commit/d3dd500f7a24e3870b0602f13bc183ee8d0ebc2c))
+
+
+### Performance Improvements
+
+* **game:** preload kana dictionary and optimize UI transitions for lag reduction ([13e8cd3](https://github.com/franprince/japanese-practice/commit/13e8cd33ec02b10678ab1125855a47678c11d9a8))
+
 # [3.3.0](https://github.com/franprince/japanese-practice/compare/v3.2.0...v3.3.0) (2026-03-05)
 
 
