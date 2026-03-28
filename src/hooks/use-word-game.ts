@@ -165,8 +165,8 @@ export function useWordGame({
 
 
 
-    const checkAnswer = useCallback(async (value?: string) => {
-        const answerToTest = (value || userInput).trim()
+    const checkAnswer = useCallback(async (value?: string | React.MouseEvent) => {
+        const answerToTest = (typeof value === "string" ? value : userInput).trim()
         if (!currentWord || !answerToTest) return
 
         let isCorrect = validateAnswer(answerToTest, currentWord)

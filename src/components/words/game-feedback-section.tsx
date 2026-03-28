@@ -9,6 +9,7 @@ export interface GameFeedbackSectionProps {
     displayRomaji: string
     currentWord: JapaneseWord
     errorDetails: ErrorDetectionResult | null
+    gameType: "words" | "characters" | "guess"
     t: (key: TranslationKey) => string
 }
 
@@ -17,9 +18,19 @@ export function GameFeedbackSection({
     displayRomaji,
     currentWord,
     errorDetails,
+    gameType,
     t,
 }: GameFeedbackSectionProps) {
     if (!feedback) return null
+
+    const hasMeaning = !!currentWord.meaning
+    const hasKanji = !!currentWord.kanji
+    const hasErrors = feedback === "incorrect" && errorDetails && errorDetails.characters.length > 0
+    const showAnswer = gameType !== "guess"
+
+    if (!hasMeaning && !hasKanji && !hasErrors && !showAnswer) {
+        return null
+    }
 
     return (
         <div className="text-center p-6 glass-card rounded-2xl animate-in fade-in slide-in-from-top-4 duration-500 border-primary/20 space-y-4 shadow-2xl relative overflow-hidden">
@@ -29,12 +40,14 @@ export function GameFeedbackSection({
                 feedback === "correct" ? "bg-success" : "bg-destructive"
             )} />
             
-            <div className="relative z-10">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mb-1">{t("correctAnswer")}</p>
-                <p className="text-2xl font-black tracking-tight text-primary neon-text-primary underline decoration-primary/20 underline-offset-8">
-                    {displayRomaji || currentWord.romaji}
-                </p>
-            </div>
+            {gameType !== "guess" && (
+                <div className="relative z-10">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mb-1">{t("correctAnswer")}</p>
+                    <p className="text-2xl font-black tracking-tight text-primary neon-text-primary underline decoration-primary/20 underline-offset-8">
+                        {displayRomaji || currentWord.romaji}
+                    </p>
+                </div>
+            )}
 
             {}
             {feedback === "incorrect" && errorDetails && errorDetails.characters.length > 0 && (

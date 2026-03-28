@@ -29,4 +29,6 @@ export interface GamePageLayoutProps {
     stats?: React.ReactNode
     footer?: React.ReactNode
     showEnterHint?: boolean
+    remainingLabel?: string | null
+    settingsTrigger?: React.ReactNode
 }
