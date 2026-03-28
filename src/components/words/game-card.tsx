@@ -77,7 +77,7 @@ export function GameCard({
       <div className="w-full max-w-xl mx-auto">
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground animate-pulse">Loading...</p>
+            <p className="text-muted-foreground animate-pulse">{t("loading")}</p>
           </CardContent>
         </Card>
       </div>
@@ -115,33 +115,6 @@ export function GameCard({
   return (
     <div className="w-full max-w-xl mx-auto">
       {}
-      <div className="flex items-center justify-between mb-8 px-2 md:hidden animate-in fade-in slide-in-from-top-4 duration-500">
-        <div className="flex items-center gap-6">
-          <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mb-0.5">{t("score")}</span>
-            <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-              <Trophy className="w-3.5 h-3.5 text-primary" />
-              <span className="text-sm font-black tabular-nums text-primary">{score}</span>
-            </div>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mb-0.5">{t("streak")}</span>
-            <div className={cn(
-              "flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all duration-300",
-              streak > 0 ? "bg-accent/10 border-accent/20 text-accent" : "bg-muted/5 border-border/10 text-muted-foreground/40"
-            )}>
-              <Flame className="w-3.5 h-3.5" />
-              <span className="text-sm font-black tabular-nums">{streak}</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-end flex-col gap-2">
-           <Badge variant="secondary" className="rounded-full bg-background/40 backdrop-blur-md border-border/20 px-3 py-1 text-[10px] font-black uppercase tracking-widest">
-            <span lang="ja" className="mr-1">{currentWord.type === "hiragana" ? "あ" : "ア"}</span>
-            {currentWord.type === "hiragana" ? "Hiragana" : "Katakana"}
-          </Badge>
-        </div>
-      </div>
 
       {}
       <GameCardContainer
@@ -159,18 +132,20 @@ export function GameCard({
         {}
         <AnswerSection>
           {gameType === "guess" ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 min-h-[4rem] w-full max-w-sm mx-auto p-4">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 min-h-[4rem] w-full max-w-[340px] sm:max-w-md mx-auto p-4">
               {options ? (
                 options.map((option) => (
                   <Button
                     key={option}
                     variant={feedback === null ? "outline" : option === currentWord.romaji ? "success" : "secondary"}
                     className={cn(
-                      "h-20 text-2xl font-black tracking-tight glass-card transition-all duration-300 active:scale-95",
-                      feedback === null && "hover:border-primary hover:bg-primary/10 hover:shadow-[0_0_20px_oklch(var(--primary)/0.2)]",
-                      feedback === "correct" && option === currentWord.romaji && "bg-success/20 border-success shadow-[0_0_20px_rgba(var(--success),0.2)] scale-105",
-                      feedback === "incorrect" && option === currentWord.romaji && "bg-success/10 border-success/50 opacity-80",
-                      feedback !== null && option !== currentWord.romaji && "opacity-40 scale-95 grayscale"
+                      "h-14 sm:h-20 text-xl sm:text-3xl font-black tracking-tight transition-all duration-300 active:scale-95",
+                      // High-contrast text and distinct background
+                      "bg-secondary/20 hover:bg-secondary/40 text-foreground border-white/10 shadow-lg shadow-black/20",
+                      feedback === null && "hover:border-primary hover:text-primary hover:shadow-[0_0_20px_oklch(var(--primary)/0.3)]",
+                      feedback === "correct" && option === currentWord.romaji && "bg-success text-success-foreground border-transparent shadow-[0_0_30px_rgba(var(--success-rgb),0.4)] scale-105 opacity-100",
+                      feedback === "incorrect" && option === currentWord.romaji && "bg-success/20 text-success border-success opacity-90",
+                      feedback !== null && option !== currentWord.romaji && "opacity-20 scale-95 grayscale"
                     )}
                     onClick={() => feedback === null && checkAnswer(option)}
                     disabled={feedback !== null}
@@ -215,6 +190,7 @@ export function GameCard({
             displayRomaji={displayRomaji}
             currentWord={currentWord}
             errorDetails={errorDetails}
+            gameType={gameType}
             t={t}
           />
 

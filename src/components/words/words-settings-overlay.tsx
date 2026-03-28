@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import * as React from "react"
 import * as Dialog from "@radix-ui/react-dialog"
 import { 
   X, 
@@ -8,108 +8,100 @@ import {
   Type, 
   Shuffle, 
   Dice5, 
-  Infinity as InfinityIcon, 
-  RotateCcw,
-  Check
+  Infinity as InfinityIcon,
+  Layers,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Slider } from "@/components/ui/slider"
 import { cn } from "@/lib/core"
 import { useI18n } from "@/lib/i18n"
-import { type WordFilter, type CharacterGroup } from "@/lib/japanese/words"
-import { getCharacterGroups } from "@/lib/japanese/shared"
+import { Button } from "@/components/ui/button"
+import { Slider } from "@/components/ui/slider"
 import type { GameMode, WordsGameType } from "@/types/game"
+import type { WordFilter, CharacterGroup } from "@/lib/japanese/words"
 
 interface WordsSettingsOverlayProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  
-  // Game State
   mode: GameMode
-  onModeChange: (mode: GameMode) => void
-  
   gameType: WordsGameType
-  onGameTypeChange: (type: WordsGameType) => void
-  
   playMode: "infinite" | "session"
-  onPlayModeChange: (mode: "infinite" | "session") => void
-  
   targetCount: number
-  onTargetCountChange: (count: number) => void
-  
   filter: WordFilter
-  onFilterChange: (filter: WordFilter) => void
+  onApply: (mode: GameMode, gameType: WordsGameType, playMode: "infinite" | "session", targetCount: number, filter: WordFilter) => void
+  characterGroups: CharacterGroup[]
 }
 
 export function WordsSettingsOverlay({
   open,
   onOpenChange,
   mode,
-  onModeChange,
   gameType,
-  onGameTypeChange,
   playMode,
-  onPlayModeChange,
   targetCount,
-  onTargetCountChange,
   filter,
-  onFilterChange,
+  onApply,
+  characterGroups,
 }: WordsSettingsOverlayProps) {
   const { t } = useI18n()
-  const [characterGroups, setCharacterGroups] = useState<CharacterGroup[]>([])
-  const [draftFilter, setDraftFilter] = useState<WordFilter>(filter)
+  const customSectionRef = React.useRef<HTMLDivElement>(null)
+  const [shouldScroll, setShouldScroll] = React.useState(false)
+  const [localMode, setLocalMode] = React.useState<GameMode>(mode)
+  const [localGameType, setLocalGameType] = React.useState<WordsGameType>(gameType)
+  const [localPlayMode, setLocalPlayMode] = React.useState<"infinite" | "session">(playMode)
+  const [localTargetCount, setLocalTargetCount] = React.useState(targetCount)
+  const [localFilter, setLocalFilter] = React.useState<WordFilter>(filter)
 
-  useEffect(() => {
-    getCharacterGroups().then(setCharacterGroups)
-  }, [])
-
-  useEffect(() => {
+  // Sync with props when opening
+  React.useEffect(() => {
     if (open) {
-      setDraftFilter(filter)
+      setLocalMode(mode)
+      setLocalGameType(gameType)
+      setLocalPlayMode(playMode)
+      setLocalTargetCount(targetCount)
+      setLocalFilter(filter)
     }
-  }, [filter, open])
+  }, [open, mode, gameType, playMode, targetCount, filter])
 
-  const toOrderNumber = (id: string) => {
-    const match = id.match(/\d+/)
-    return match ? parseInt(match[0], 10) : Number.MAX_SAFE_INTEGER
+  // Scroll to custom section when selected
+  React.useEffect(() => {
+    if (localMode === "custom" && shouldScroll) {
+      customSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+      setShouldScroll(false)
+    }
+  }, [localMode, shouldScroll])
+
+  const handleModeChange = (m: GameMode) => {
+    setLocalMode(m)
+    if (m === "custom") {
+      setShouldScroll(true)
+    }
   }
 
-  const { hiraganaBase, hiraganaAlt, katakanaBase, katakanaAlt } = useMemo(() => {
-    const hiraAll = characterGroups.filter((g) => g.type === "hiragana")
-    const kataAll = characterGroups.filter((g) => g.type === "katakana")
-    return {
-      hiraganaBase: hiraAll.filter((g) => !g.id.includes("_a")).sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
-      hiraganaAlt: hiraAll.filter((g) => g.id.includes("_a")).sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
-      katakanaBase: kataAll.filter((g) => !g.id.includes("_a")).sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
-      katakanaAlt: kataAll.filter((g) => g.id.includes("_a")).sort((a, b) => toOrderNumber(a.id) - toOrderNumber(b.id)),
-    }
-  }, [characterGroups])
-
-  const allHiragana = [...hiraganaBase, ...hiraganaAlt]
-  const allKatakana = [...katakanaBase, ...katakanaAlt]
+  const handleApply = () => {
+    onOpenChange(false)
+    onApply(localMode, localGameType, localPlayMode, localTargetCount, localFilter)
+  }
 
   const toggleGroup = (groupId: string) => {
-    const alreadySelected = draftFilter.selectedGroups.includes(groupId)
-    const newGroups = alreadySelected
-      ? draftFilter.selectedGroups.filter((g) => g !== groupId)
-      : [...draftFilter.selectedGroups, groupId]
-    setDraftFilter({ ...draftFilter, selectedGroups: newGroups })
+    setLocalFilter(prev => {
+      const selectedGroups = prev.selectedGroups.includes(groupId)
+        ? prev.selectedGroups.filter(id => id !== groupId)
+        : [...prev.selectedGroups, groupId]
+      return { ...prev, selectedGroups }
+    })
   }
 
-  const selectAllGroups = (type: "hiragana" | "katakana") => {
-    const groups = type === "hiragana" ? allHiragana : allKatakana
-    const groupIds = groups.map((g) => g.id)
-    const allSelected = groupIds.every((id) => draftFilter.selectedGroups.includes(id))
-
-    if (allSelected) {
-      setDraftFilter({ ...draftFilter, selectedGroups: draftFilter.selectedGroups.filter((g) => !groupIds.includes(g)) })
-    } else {
-      const newGroups = new Set([...draftFilter.selectedGroups, ...groupIds])
-      setDraftFilter({ ...draftFilter, selectedGroups: Array.from(newGroups) })
-    }
+  const selectAll = () => {
+    const allIds = characterGroups.map(g => g.id)
+    setLocalFilter(prev => ({ ...prev, selectedGroups: allIds }))
   }
 
-  const modes: { value: GameMode; label: string; icon: string }[] = [
+  const deselectAll = () => {
+    setLocalFilter(prev => ({ ...prev, selectedGroups: [] }))
+  }
+
+  const gameModes: { value: GameMode; label: string; icon: string }[] = [
     { value: "hiragana", label: t("hiraganaLabel"), icon: "あ" },
     { value: "katakana", label: t("katakanaLabel"), icon: "ア" },
     { value: "both", label: t("bothLabel"), icon: "あア" },
@@ -117,268 +109,330 @@ export function WordsSettingsOverlay({
   ]
 
   const gameTypes = [
-    { value: "words", label: t("modeWords"), icon: Type },
-    { value: "characters", label: t("modeCharacters"), icon: Shuffle },
-    { value: "guess", label: t("modeGuess"), icon: Dice5 },
+    { value: "words", label: t("modeWords"), icon: Type, description: t("games.words.description") || "Vocabulary practice" },
+    { value: "characters", label: t("modeCharacters"), icon: Shuffle, description: t("games.characters.description") || "Random characters" },
+    { value: "guess", label: t("modeGuess"), icon: Dice5, description: t("games.guess.description") || "Multiple choice" },
   ]
 
-  const sessionLengths = [10, 20, 50]
-
-  const handleApply = () => {
-    onFilterChange(draftFilter)
-    onOpenChange(false)
-  }
+  const sessionCounts = [5, 10, 20, 50]
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xl animate-in fade-in duration-300" />
-        <Dialog.Content className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-          <div className="relative w-full max-w-4xl glass-card border-primary/20 bg-card/95 shadow-2xl rounded-[2.5rem] p-6 sm:p-10 animate-in zoom-in-95 fade-in duration-300 max-h-[95vh] flex flex-col">
-            
-            {}
+        <Dialog.Overlay className="fixed inset-0 bg-background/60 backdrop-blur-sm z-[100] animate-in fade-in duration-300" />
+        <Dialog.Content className={cn(
+          "fixed z-[101] bg-card/95 backdrop-blur-2xl border border-primary/20 shadow-2xl flex flex-col overflow-hidden transition-all duration-500",
+          // Mobile: Bottom Sheet
+          "inset-x-0 bottom-0 top-auto rounded-t-[2.5rem] border-b-0 max-h-[92vh] animate-in slide-in-from-bottom duration-500 ease-out",
+          // Desktop: Centered Modal
+          "md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[700px] md:max-h-[85vh] md:rounded-[2.5rem] md:border-b md:zoom-in-95 md:slide-in-from-bottom-0"
+        )}>
+          {/* Mobile Drag Handle */}
+          <div className="w-12 h-1.5 bg-foreground/10 rounded-full mx-auto mt-4 mb-2 md:hidden shrink-0" />
+
+          <div className="p-6 md:p-8 flex items-center justify-between border-b border-border/20 shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 rounded-2xl border border-primary/20 text-primary">
+                <Settings2 className="w-6 h-6" />
+              </div>
+              <div>
+                <Dialog.Title className="text-xl md:text-2xl font-black tracking-tight uppercase">
+                  {t("practiceSettings") || "Command Center"}
+                </Dialog.Title>
+                <Dialog.Description className="text-xs text-muted-foreground font-medium uppercase tracking-widest opacity-60">
+                  {t("settings.subtitle") || "Configure your learning experience"}
+                </Dialog.Description>
+              </div>
+            </div>
             <Dialog.Close asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="absolute right-6 top-6 rounded-full hover:bg-primary/10"
-              >
-                <X className="w-6 h-6" />
-              </Button>
+              <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
             </Dialog.Close>
+          </div>
 
-            <Dialog.Title className="text-3xl font-black tracking-tight mb-8 shrink-0">
-              {t("practiceSettings")}
-            </Dialog.Title>
+          <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-10 custom-scrollbar">
+            
+            {/* 1. Game Mode */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">01</span>
+                <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t("modeLabel")}</h3>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {gameModes.map(m => (
+                  <button
+                    key={m.value}
+                    onClick={() => handleModeChange(m.value)}
+                    className={cn(
+                      "group flex flex-col items-center gap-3 p-4 rounded-3xl border transition-all duration-300",
+                      localMode === m.value 
+                        ? "bg-primary text-primary-foreground border-primary shadow-xl shadow-primary/20 scale-[1.02]" 
+                        : "bg-white/5 border-white/5 hover:border-primary/30 text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">{m.icon}</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest">{m.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 overflow-y-auto flex-1 pr-2 custom-scrollbar">
-              
-              {}
-              <div className="space-y-8">
-                
-                {}
-                <section>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-4">
-                    {t("hiraganaLabel")} / {t("katakanaLabel")}
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-3">
-                    {modes.map((m) => (
-                      <button
-                        key={m.value}
-                        onClick={() => onModeChange(m.value)}
-                        className={cn(
-                          "relative group flex flex-col items-start p-4 rounded-2xl border-2 transition-all duration-300",
-                          mode === m.value 
-                            ? "bg-primary/10 border-primary shadow-[0_0_20px_oklch(var(--primary)/0.1)]" 
-                            : "bg-background/20 border-border/20 hover:border-border/40"
-                        )}
-                      >
-                        <span className="text-2xl mb-1 filter grayscale group-hover:grayscale-0 transition-all">{m.icon}</span>
-                        <span className="font-bold text-sm tracking-tight">{m.label}</span>
-                        {mode === m.value && (
-                          <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                            <Check className="w-3 h-3 text-primary-foreground stroke-[3]" />
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </section>
+            {/* 2. Game Type */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">02</span>
+                <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t("settings.gameType") || "Game Type"}</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {gameTypes.map(t => (
+                  <button
+                    key={t.value}
+                    onClick={() => setLocalGameType(t.value as WordsGameType)}
+                    className={cn(
+                      "flex items-center gap-4 p-4 rounded-3xl border transition-all duration-300 text-left",
+                      localGameType === t.value 
+                        ? "bg-accent text-accent-foreground border-accent shadow-xl shadow-accent/20" 
+                        : "bg-white/5 border-white/5 hover:border-accent/30 text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <div className={cn(
+                      "p-3 rounded-2xl transition-colors",
+                      localGameType === t.value ? "bg-accent-foreground/10" : "bg-white/5"
+                    )}>
+                      <t.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5">{t.label}</p>
+                      <p className="text-[9px] opacity-60 font-medium leading-tight">{t.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-                {}
-                <section>
-                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-4">
-                    {t("playModeInfinite")}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
+            {/* 3. Session & Length */}
+            <section className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">03</span>
+                <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t("settings.sessionGoals") || "Session Goals"}</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-1 bg-white/5 rounded-3xl border border-white/5 flex gap-2">
+                  <button
+                    onClick={() => setLocalPlayMode("infinite")}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl transition-all",
+                      localPlayMode === "infinite" ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:bg-white/5"
+                    )}
+                  >
+                    <InfinityIcon className="w-4 h-4" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">{t("playModeInfinite")}</span>
+                  </button>
+                  <button
+                    onClick={() => setLocalPlayMode("session")}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl transition-all",
+                      localPlayMode === "session" ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:bg-white/5"
+                    )}
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">{t("playModeSession")}</span>
+                  </button>
+                </div>
+
+                <div className={cn(
+                  "p-1 bg-white/5 rounded-3xl border border-white/5 flex gap-2 transition-all",
+                  localPlayMode !== "session" && "opacity-30 pointer-events-none grayscale"
+                )}>
+                  {sessionCounts.map(count => (
                     <button
-                      onClick={() => onPlayModeChange("infinite")}
+                      key={count}
+                      onClick={() => setLocalTargetCount(count)}
                       className={cn(
-                        "flex items-center gap-2 px-5 py-2.5 rounded-full border-2 font-bold text-sm transition-all",
-                        playMode === "infinite" 
-                          ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20" 
-                          : "bg-background/20 border-border/20 hover:border-border/40"
+                        "flex-1 py-4 rounded-2xl text-[10px] font-black transition-all",
+                        localTargetCount === count ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:bg-white/5"
                       )}
                     >
-                      <InfinityIcon className="w-4 h-4" />
-                      {t("playModeInfinite")}
+                      {count}
                     </button>
-                    <div className="w-px h-8 bg-border/20 mx-1" />
-                    {sessionLengths.map((count) => (
-                      <button
-                        key={count}
-                        onClick={() => {
-                          onPlayModeChange("session")
-                          onTargetCountChange(count)
-                        }}
-                        className={cn(
-                          "px-5 py-2.5 rounded-full border-2 font-bold text-sm transition-all",
-                          playMode === "session" && targetCount === count
-                            ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20"
-                            : "bg-background/20 border-border/20 hover:border-border/40"
-                        )}
-                      >
-                        {count}
-                      </button>
-                    ))}
-                  </div>
-                </section>
+                  ))}
+                </div>
+              </div>
+            </section>
 
-                {}
-                <section>
-                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-4">
-                    {t("modeWords")} / {t("modeCharacters")}
-                  </h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    {gameTypes.map((type) => (
-                      <button
-                        key={type.value}
-                        onClick={() => onGameTypeChange(type.value as WordsGameType)}
-                        className={cn(
-                          "group flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-300",
-                          gameType === type.value
-                            ? "bg-accent/10 border-accent shadow-[0_0_20px_oklch(var(--accent)/0.1)]"
-                            : "bg-background/20 border-border/20 hover:border-border/40"
-                        )}
-                      >
-                        <type.icon className={cn(
-                          "w-5 h-5",
-                          gameType === type.value ? "text-accent" : "text-muted-foreground"
-                        )} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">{type.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </section>
+            {/* 4. Advanced Filters (Group Selection) */}
+            <section 
+              ref={customSectionRef}
+              className={cn(
+                "space-y-4 transition-all scroll-mt-6",
+                localMode !== "custom" && "opacity-30 pointer-events-none grayscale"
+              )}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">04</span>
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t("characters")}</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" onClick={selectAll} className="text-[8px] h-6 px-3 uppercase tracking-widest bg-white/5 hover:bg-white/10">{t("selectAll")}</Button>
+                  <Button variant="ghost" size="sm" onClick={deselectAll} className="text-[8px] h-6 px-3 uppercase tracking-widest bg-white/5 hover:bg-white/10">{t("deselectAll")}</Button>
+                </div>
               </div>
 
-              {}
-              <div className="lg:pl-10 lg:border-l border-border/20 space-y-8">
-                {mode === "custom" ? (
-                  <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
-                    <section className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-                          {t("wordLength")}
-                        </h3>
-                        <span className="text-xs font-black tabular-nums bg-muted px-2 py-0.5 rounded">
-                          {draftFilter.minLength} - {draftFilter.maxLength}
+              {(localGameType === "words" || localGameType === "characters") && (
+                <div className="space-y-6 pt-2 pb-2">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 px-1">
+                        {localGameType === "words" ? t("settings.wordLength") : t("settings.characterLength")}
+                      </h4>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          type="button"
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setLocalFilter(prev => ({ ...prev, minLength: 1, maxLength: 100 }));
+                          }}
+                          className="text-[10px] h-8 px-3 uppercase tracking-widest bg-white/5 hover:bg-white/10"
+                        >
+                          {t("settings.any") || "Any"}
+                        </Button>
+                        <span className="flex items-center gap-1 text-[9px] font-black tabular-nums bg-primary/10 text-primary px-2 py-1.5 rounded-lg border border-primary/20 transition-all duration-300">
+                          {localFilter.maxLength > 10 ? (
+                            <>
+                              <InfinityIcon className="w-3 h-3" />
+                              <span className="uppercase tracking-widest text-[8px]">{t("settings.any") || "Any"}</span>
+                            </>
+                          ) : (
+                            <>{localFilter.minLength} — {localFilter.maxLength}</>
+                          )}
                         </span>
                       </div>
+                    </div>
+                    
+                    <div className="px-2 py-2">
                       <Slider
-                        value={[draftFilter.minLength, draftFilter.maxLength]}
                         min={1}
                         max={10}
                         step={1}
-                        onValueChange={([min, max]) =>
-                          setDraftFilter({
-                            ...draftFilter,
-                            minLength: min ?? draftFilter.minLength,
-                            maxLength: max ?? draftFilter.maxLength,
-                          })
-                        }
+                        value={[localFilter.minLength, localFilter.maxLength]}
+                        onValueChange={(vals: number[]) => {
+                          if (vals.length === 2 && vals[0] !== undefined && vals[1] !== undefined) {
+                            setLocalFilter(prev => ({
+                              ...prev,
+                              minLength: vals[0] ?? 1,
+                              maxLength: vals[1] ?? 10
+                            }))
+                          }
+                        }}
+                        className="w-full"
                       />
-                    </section>
+                    </div>
+                  </div>
+                  <div className="h-px bg-white/5 mx-auto w-1/2" />
+                </div>
+              )}
 
-                    <section className="space-y-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
-                         {t("charactersDescription")}
-                        </h3>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => setDraftFilter({ ...filter, selectedGroups: [] })}
-                          className="h-6 text-[10px] font-black uppercase tracking-widest"
+              <div className="space-y-6">
+                {/* Hiragana Subsection */}
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 px-1">{t("hiraganaLabel")}</h4>
+                  <div className="grid grid-cols-[repeat(4,1fr)] sm:grid-cols-[repeat(6,1fr)] gap-2 max-w-sm mx-auto w-full">
+                    {characterGroups.filter(g => g.type === "hiragana").map(group => {
+                      const isSelected = localFilter.selectedGroups.includes(group.id)
+                      const char = group.characters?.[0] || "?"
+                      
+                      return (
+                        <button
+                          key={group.id}
+                          onClick={() => toggleGroup(group.id)}
+                          className={cn(
+                            "flex aspect-square w-full items-center justify-center p-0 rounded-2xl border transition-all relative overflow-hidden",
+                            isSelected
+                              ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
+                              : "bg-white/5 border-white/5 text-muted-foreground hover:bg-white/10"
+                          )}
                         >
-                          <RotateCcw className="w-3 h-3 mr-1" />
-                          {t("reset")}
-                        </Button>
-                      </div>
-
-                      <div className="space-y-6">
-                        {}
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between sticky top-0 bg-card/95 py-2 z-10 border-b border-border/10">
-                            <span className="text-xs font-black tracking-tight"><span lang="ja">ひらがな</span></span>
-                            <button onClick={() => selectAllGroups("hiragana")} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
-                              {t("selectAll")}
-                            </button>
-                          </div>
-                          <div className="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-7 xl:grid-cols-8 gap-2">
-                            {allHiragana.map((group) => (
-                              <button
-                                key={group.id}
-                                onClick={() => toggleGroup(group.id)}
-                                className={cn(
-                                  "w-8 h-8 flex items-center justify-center rounded-lg text-sm font-bold transition-all",
-                                  draftFilter.selectedGroups.includes(group.id)
-                                    ? "bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/20"
-                                    : "bg-background/40 border border-border/20 text-muted-foreground hover:bg-muted"
-                                )}
-                              >
-                                <span lang="ja">{group.characters[0]}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {}
-                        <div className="space-y-4 pt-2">
-                          <div className="flex items-center justify-between sticky top-0 bg-card/95 py-2 z-10 border-b border-border/10">
-                            <span className="text-xs font-black tracking-tight"><span lang="ja">カタカナ</span></span>
-                            <button onClick={() => selectAllGroups("katakana")} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">
-                               {t("selectAll")}
-                            </button>
-                          </div>
-                          <div className="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-7 xl:grid-cols-8 gap-2">
-                            {allKatakana.map((group) => (
-                              <button
-                                key={group.id}
-                                onClick={() => toggleGroup(group.id)}
-                                className={cn(
-                                  "w-8 h-8 flex items-center justify-center rounded-lg text-sm font-bold transition-all",
-                                  draftFilter.selectedGroups.includes(group.id)
-                                    ? "bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/20"
-                                    : "bg-background/40 border border-border/20 text-muted-foreground hover:bg-muted"
-                                )}
-                              >
-                                <span lang="ja">{group.characters[0]}</span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </section>
+                          <span className="text-xl font-black leading-none">{char}</span>
+                          {isSelected && (
+                            <div className="absolute top-1 right-1">
+                              <CheckCircle2 className="w-2.5 h-2.5" />
+                            </div>
+                          )}
+                        </button>
+                      )
+                    })}
                   </div>
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center p-6 bg-primary/5 rounded-[2rem] border border-primary/10">
-                    <Settings2 className="w-12 h-12 text-primary/20 mb-4" />
-                    <h4 className="font-bold text-lg mb-2">Ready to Practice?</h4>
-                    <p className="text-sm text-muted-foreground max-w-[200px]">
-                      Select "Custom" if you want to filter by specific word length or character groups.
-                    </p>
+                </div>
+
+                {/* Katakana Subsection */}
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 px-1">{t("katakanaLabel")}</h4>
+                  <div className="grid grid-cols-[repeat(4,1fr)] sm:grid-cols-[repeat(6,1fr)] gap-2 max-w-sm mx-auto w-full">
+                    {characterGroups.filter(g => g.type === "katakana").map(group => {
+                      const isSelected = localFilter.selectedGroups.includes(group.id)
+                      const char = group.characters?.[0] || "?"
+                      
+                      return (
+                        <button
+                          key={group.id}
+                          onClick={() => toggleGroup(group.id)}
+                          className={cn(
+                            "flex aspect-square w-full items-center justify-center p-0 rounded-2xl border transition-all relative overflow-hidden",
+                            isSelected
+                              ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 scale-[1.05] z-10"
+                              : "bg-white/5 border-white/5 text-muted-foreground hover:bg-white/10"
+                          )}
+                        >
+                          <span className="text-xl font-black leading-none">{char}</span>
+                          {isSelected && (
+                            <div className="absolute top-1 right-1">
+                              <CheckCircle2 className="w-2.5 h-2.5" />
+                            </div>
+                          )}
+                        </button>
+                      )
+                    })}
                   </div>
-                )}
+                </div>
               </div>
-            </div>
 
-            {}
-            <div className="mt-8 flex items-center justify-end gap-3 pt-6 border-t border-border/20 shrink-0">
-              <Button 
-                variant="ghost" 
-                onClick={() => onOpenChange(false)}
-                className="rounded-full px-8 font-black uppercase tracking-widest text-xs h-12"
-              >
-                {t("common.cancel") || "Cancel"}
-              </Button>
-              <Button 
-                onClick={handleApply}
-                className="rounded-full px-12 font-black uppercase tracking-widest text-xs h-12 shadow-xl shadow-primary/20"
-              >
-                {t("apply") || "Apply"}
-              </Button>
-            </div>
+              {localMode === "custom" && localFilter.selectedGroups.length === 0 && (
+                <div className="flex items-center gap-2 p-3 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-[9px] font-medium animate-in slide-in-from-top-2">
+                  <AlertCircle className="w-3 h-3" />
+                  {t("selectGroupsHint")}
+                </div>
+              )}
+            </section>
+
+            {localMode !== "custom" && (
+              <div className="p-4 rounded-3xl bg-primary/5 border border-primary/20">
+                <p className="text-[10px] text-muted-foreground leading-relaxed leading-relaxed font-medium">
+                  {t("settings.customHint") || "Select \"Custom\" if you want to filter by specific word length or character groups."}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="p-6 md:p-8 flex items-center justify-center gap-4 bg-background/40 border-t border-border/20 shrink-0">
+            <Button 
+              variant="ghost" 
+              onClick={() => onOpenChange(false)}
+              className="flex-1 rounded-full font-black uppercase tracking-widest text-[10px] h-14"
+            >
+              {t("common.cancel") || "Cancel"}
+            </Button>
+            <Button 
+              onClick={handleApply}
+              disabled={localMode === "custom" && localFilter.selectedGroups.length === 0}
+              className="flex-[2] rounded-full font-black uppercase tracking-widest text-[10px] h-14 shadow-xl shadow-primary/20 bg-primary hover:bg-primary/90"
+            >
+              {t("settings.saveSettings") || "Save Settings"}
+            </Button>
           </div>
         </Dialog.Content>
       </Dialog.Portal>

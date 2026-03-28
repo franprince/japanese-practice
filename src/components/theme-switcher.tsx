@@ -13,17 +13,17 @@ export function ThemeSwitcher() {
   const ref = useRef<HTMLDivElement>(null)
 
   const darkThemes = [
-    { value: "default", label: "Default", description: "Clean dark theme" },
-    { value: "sakura", label: "Sakura", description: "Pink cherry blossom" },
-    { value: "ocean", label: "Ocean", description: "Deep blue waves" },
-    { value: "forest", label: "Forest", description: "Green bamboo" },
-    { value: "sunset", label: "Sunset", description: "Warm orange glow" },
+    { value: "default", label: t("themes.default.label"), description: t("themes.default.description") },
+    { value: "sakura", label: t("themes.sakura.label"), description: t("themes.sakura.description") },
+    { value: "ocean", label: t("themes.ocean.label"), description: t("themes.ocean.description") },
+    { value: "forest", label: t("themes.forest.label"), description: t("themes.forest.description") },
+    { value: "sunset", label: t("themes.sunset.label"), description: t("themes.sunset.description") },
   ] as const
 
   const lightThemes = [
-    { value: "daylight", label: "Daylight", description: "Clean modern light" },
-    { value: "lavender", label: "Lavender", description: "Soft purple tones" },
-    { value: "mint", label: "Mint", description: "Fresh green vibes" },
+    { value: "daylight", label: t("themes.daylight.label"), description: t("themes.daylight.description") },
+    { value: "lavender", label: t("themes.lavender.label"), description: t("themes.lavender.description") },
+    { value: "mint", label: t("themes.mint.label"), description: t("themes.mint.description") },
   ] as const
 
   const allThemes = [...darkThemes, ...lightThemes]
@@ -61,7 +61,7 @@ export function ThemeSwitcher() {
             <div className="px-3 py-2 border-b border-border/30">
               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 <Moon className="w-3.5 h-3.5" />
-                <span>Dark Themes</span>
+                <span>{t("themes.dark.title")}</span>
               </div>
             </div>
             {darkThemes.map((themeOption) => (
@@ -86,7 +86,7 @@ export function ThemeSwitcher() {
             <div className="px-3 py-2 border-b border-border/30 mt-1">
               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 <Sun className="w-3.5 h-3.5" />
-                <span>Light Themes</span>
+                <span>{t("themes.light.title")}</span>
               </div>
             </div>
             {lightThemes.map((themeOption) => (
