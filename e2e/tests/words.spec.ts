@@ -53,13 +53,17 @@ test.describe('Words Game', () => {
     test('should display all UI components', async ({ wordsPage, page }) => {
         await wordsPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
+        
+        // Settings button should be visible (either in header or controls)
+        const settingsBtn = page.getByTestId('settings-trigger').filter({ visible: true })
+        await expect(settingsBtn).toBeVisible({ timeout: 15000 })
 
-        const input = page.locator('input[type="text"]')
-        await expect(input).toBeVisible()
-
-        const score = page.locator('text=/score|puntaje/i')
-        await expect(score).toBeVisible()
+        // Score HUD should be visible
+        const stats = page.getByTestId('stats-display')
+        await expect(stats).toBeVisible({ timeout: 10000 })
+        
+        // Use a more flexible text check for cross-language compatibility
+        await expect(page.locator('body')).toContainText(/score|puntaje/i)
     })
 
     test('should handle correct and incorrect romaji input with feedback', async ({ wordsPage, page }) => {
@@ -150,23 +154,20 @@ test.describe('Words Game', () => {
         const input = page.locator('input[type="text"]')
         await expect(input).toBeVisible()
 
-        // 2. Switch to Words Mode (toggle button)
-        const switchBtn = page.getByLabel(/words|palabras/i)
-        console.log('Waiting for switch button...')
-        await switchBtn.waitFor({ timeout: 5000 })
+        // Open settings to enable Words mode (default)
+        await page.getByTestId('settings-trigger').filter({ visible: true }).click()
+        await expect(page.getByRole('dialog')).toBeVisible({ timeout: 15000 })
+        
+        const wordsBtn = page.getByRole('button', { name: /words practice|palabras/i }).first()
+        await wordsBtn.click()
 
-        if (await switchBtn.isVisible()) {
-            await switchBtn.click()
-            console.log('Clicked switch button')
-        } else {
-            console.log('Switch button not found')
-        }
+        const applyBtn = page.getByRole('button', { name: /apply|save|aplicar/i }).first()
+        await applyBtn.click()
 
         // 3. Now should see Download Confirmation Modal
         console.log('Waiting for modal...')
         const modal = page.locator('[data-testid="mobile-wordset-modal"]')
         await expect(modal).toBeVisible({ timeout: 10000 })
-        console.log('Modal found! Clicking Download...')
         const downloadBtn = modal.locator('button', { hasText: /Download|Descargar/i })
         await downloadBtn.click()
 
@@ -180,23 +181,32 @@ test.describe('Words Game', () => {
     test('should allow playing in Guess mode', async ({ wordsPage, page }) => {
         await wordsPage.goto()
         
-        // 1. Switch to Guess mode using the desktop topbar button
-        const guessBtn = page.getByRole('button', { name: /guess|adivina|推測/i }).filter({ visible: true }).first()
-        await guessBtn.click()
+        // 1. Open Settings
+        await page.getByTestId('settings-trigger').filter({ visible: true }).click()
+        const modal = page.getByRole('dialog')
+        await expect(modal).toBeVisible()
         
-        // 2. Verify that there is no text input
+        // 2. Switch to Guess mode
+        const guessBtn = page.getByRole('button', { name: /guess|adivina/i }).first()
+        await guessBtn.click()
+        // 3. Apply
+        const applyBtn = page.getByRole('button', { name: /apply|save|aplicar|guardar/i }).first()
+        await applyBtn.click({ force: true })
+        await expect(modal).not.toBeVisible({ timeout: 15000 })
+        
+        // 3. Verify that there is no text input
         await expect(page.locator('input[type="text"]')).toBeHidden({ timeout: 10000 })
         
-        // 3. Verify that 3 buttons are displayed (multiple choice options)
+        // 4. Verify that 3 buttons are displayed (multiple choice options)
         const options = page.locator('button.font-mono')
         await expect(options).toHaveCount(3, { timeout: 10000 })
         
-        // 4. Click an option and verify feedback appears
+        // 5. Click an option and verify feedback appears
         await options.first().click()
         const feedback = page.locator('[data-testid="game-feedback"]')
         await expect(feedback).toBeVisible()
         
-        // 5. Verify the "Next" button appears
+        // 6. Verify the "Next" button appears
         const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
         await expect(nextBtn).toBeVisible()
     })
