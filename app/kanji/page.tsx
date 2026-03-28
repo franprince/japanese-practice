@@ -68,10 +68,7 @@ export default function KanjiPage() {
                 </>
             }
             stats={
-                <>
-                    <RemainingBadge label={remainingLabel} />
-                    <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} />
-                </>
+                <StatsDisplay score={score} streak={streak} bestStreak={bestStreak} remainingLabel={remainingLabel} />
             }
         >
             {sessionComplete && playMode === "session" && (
