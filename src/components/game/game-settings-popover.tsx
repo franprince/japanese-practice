@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useI18n } from "@/lib/i18n"
@@ -24,6 +24,17 @@ export function GameSettingsPopover({
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
 
+  // Handle Escape key to close
+  useEffect(() => {
+    if (open) {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setOpen(false)
+      }
+      window.addEventListener("keydown", handleKeyDown)
+      return () => window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [open])
+
   return (
     <div className="relative">
       <Button
@@ -39,7 +50,11 @@ export function GameSettingsPopover({
       {open && (
         <>
           {}
-          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={() => setOpen(false)} 
+            data-testid="popover-backdrop"
+          />
 
           {}
           <div className="absolute left-0 top-full mt-2 z-50 w-56 md:w-64 rounded-xl border border-border/50 bg-card/95 backdrop-blur-sm p-3 md:p-4 shadow-lg space-y-3 md:space-y-4">

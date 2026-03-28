@@ -111,6 +111,7 @@ export function WordsSettingsPopover({
       <div
         className="fixed inset-0 z-40 bg-black/20"
         onClick={() => onOpenChange(false)}
+        data-testid="popover-backdrop"
       />
 
       {}
