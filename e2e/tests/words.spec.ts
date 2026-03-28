@@ -62,8 +62,8 @@ test.describe('Words Game', () => {
         const stats = page.getByTestId('stats-display')
         await expect(stats).toBeVisible({ timeout: 10000 })
         
-        // Use a more flexible text check for cross-language compatibility
-        await expect(page.locator('body')).toContainText(/score|puntaje/i)
+        // Use a more specific locator for Score text within the Stats display
+        await expect(stats.locator('text=/score|puntaje/i').first()).toBeVisible()
     })
 
     test('should handle correct and incorrect romaji input with feedback', async ({ wordsPage, page }) => {
@@ -198,7 +198,7 @@ test.describe('Words Game', () => {
         await expect(page.locator('input[type="text"]')).toBeHidden({ timeout: 10000 })
         
         // 4. Verify that 3 buttons are displayed (multiple choice options)
-        const options = page.locator('button.font-mono')
+        const options = page.getByTestId('guess-option')
         await expect(options).toHaveCount(3, { timeout: 10000 })
         
         // 5. Click an option and verify feedback appears
