@@ -97,13 +97,16 @@ export function useWordGame({
         try {
             if (gameType === "words") {
                 word = await getRandomWord(mode, filter, lang)
-            } else {
-                // For both characters and guess, we want single characters
+            } else if (gameType === "guess") {
+                // For guess mode (multiple choice), we want single characters
                 word = await getRandomCharacter(mode, {
                     ...filter,
                     minLength: 1,
                     maxLength: 1,
                 })
+            } else {
+                // For character shuffle/practice mode, use the actual filter lengths
+                word = await getRandomCharacter(mode, filter)
             }
 
             if (word) {
