@@ -3,14 +3,10 @@ import * as SliderPrimitive from "@radix-ui/react-slider"
 
 import { cn } from "@/lib/core"
 
-function Slider({
-  className,
-  defaultValue,
-  value,
-  min = 0,
-  max = 100,
-  ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>) {
+const Slider = React.forwardRef<
+  React.ElementRef<typeof SliderPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
+>(({ className, defaultValue, value, min = 0, max = 100, ...props }, ref) => {
   const _values = React.useMemo(
     () =>
       Array.isArray(value)
@@ -23,6 +19,7 @@ function Slider({
 
   return (
     <SliderPrimitive.Root
+      ref={ref}
       data-slot="slider"
       defaultValue={defaultValue}
       value={value}
@@ -47,15 +44,17 @@ function Slider({
           )}
         />
       </SliderPrimitive.Track>
-      {Array.from({ length: _values.length }, (_, index) => (
+      {_values.map((_, index) => (
         <SliderPrimitive.Thumb
-          data-slot="slider-thumb"
           key={index}
+          data-slot="slider-thumb"
+          onPointerDown={(e) => e.stopPropagation()}
           className="border-primary ring-ring/50 block size-4 shrink-0 rounded-full border bg-white shadow-sm transition-[color,box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>
   )
-}
+})
+Slider.displayName = SliderPrimitive.Root.displayName
 
 export { Slider }
