@@ -206,13 +206,15 @@ export default function WordsPage() {
             />
 
             {/* Mobile-only Bottom Menu HUD */}
-            <WordsMobileMenu 
-                score={score}
-                streak={streak}
-                mode={mode}
-                gameType={gameType}
-                onOpenSettings={() => setSettingsOpen(true)}
-            />
+            {!settingsOpen && (
+              <WordsMobileMenu 
+                  score={score}
+                  streak={streak}
+                  mode={mode}
+                  gameType={gameType}
+                  onOpenSettings={() => setSettingsOpen(true)}
+              />
+            )}
         </GamePageLayout>
     )
 }

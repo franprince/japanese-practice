@@ -8,10 +8,11 @@ import {
   Type, 
   Shuffle, 
   Dice5, 
-  Infinity as InfinityIcon,
+  Infinity as LucideInfinity,
   Layers,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  type LucideIcon
 } from "lucide-react"
 import { cn } from "@/lib/core"
 import { useI18n } from "@/lib/i18n"
@@ -185,26 +186,26 @@ export function WordsSettingsOverlay({
                 <h3 className="text-xs font-black uppercase tracking-[0.2em]">{t("settings.gameType") || "Game Type"}</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {gameTypes.map(t => (
+                {gameTypes.map(gt => (
                   <button
-                    key={t.value}
-                    onClick={() => setLocalGameType(t.value as WordsGameType)}
+                    key={gt.value}
+                    onClick={() => setLocalGameType(gt.value as WordsGameType)}
                     className={cn(
                       "flex items-center gap-4 p-4 rounded-3xl border transition-all duration-300 text-left",
-                      localGameType === t.value 
+                      localGameType === gt.value 
                         ? "bg-accent text-accent-foreground border-accent shadow-xl shadow-accent/20" 
                         : "bg-white/5 border-white/5 hover:border-accent/30 text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <div className={cn(
                       "p-3 rounded-2xl transition-colors",
-                      localGameType === t.value ? "bg-accent-foreground/10" : "bg-white/5"
+                      localGameType === gt.value ? "bg-accent-foreground/10" : "bg-white/5"
                     )}>
-                      <t.icon className="w-5 h-5" />
+                      <gt.icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5">{t.label}</p>
-                      <p className="text-[9px] opacity-60 font-medium leading-tight">{t.description}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest mb-0.5">{gt.label}</p>
+                      <p className="text-[9px] opacity-60 font-medium leading-tight">{gt.description}</p>
                     </div>
                   </button>
                 ))}
@@ -226,7 +227,7 @@ export function WordsSettingsOverlay({
                       localPlayMode === "infinite" ? "bg-primary text-primary-foreground shadow-lg" : "text-muted-foreground hover:bg-white/5"
                     )}
                   >
-                    <InfinityIcon className="w-4 h-4" />
+                    <LucideInfinity className="w-4 h-4" />
                     <span className="text-[10px] font-black uppercase tracking-widest">{t("playModeInfinite")}</span>
                   </button>
                   <button
@@ -304,7 +305,7 @@ export function WordsSettingsOverlay({
                         <span className="flex items-center gap-1 text-[9px] font-black tabular-nums bg-primary/10 text-primary px-2 py-1.5 rounded-lg border border-primary/20 transition-all duration-300">
                           {localFilter.maxLength > 10 ? (
                             <>
-                              <InfinityIcon className="w-3 h-3" />
+                              <LucideInfinity className="w-3 h-3" />
                               <span className="uppercase tracking-widest text-[8px]">{t("settings.any") || "Any"}</span>
                             </>
                           ) : (
