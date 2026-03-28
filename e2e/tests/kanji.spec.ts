@@ -248,8 +248,8 @@ test.describe('Kanji Game', () => {
         await count5Btn.click()
         await page.waitForTimeout(300)
 
-        // Close popover by clicking backdrop
-        await page.locator('.fixed.inset-0').click()
+        // Close popover
+        await page.keyboard.press('Escape')
         await page.waitForTimeout(500)
 
         // Answer 5 questions

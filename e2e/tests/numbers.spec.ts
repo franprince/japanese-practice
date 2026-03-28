@@ -166,7 +166,7 @@ test.describe('Numbers Game', () => {
         await page.waitForTimeout(300)
 
         // Close popover
-        await page.locator('.fixed.inset-0').click()
+        await page.keyboard.press('Escape')
         await page.waitForTimeout(500)
 
         // Answer 5 questions
