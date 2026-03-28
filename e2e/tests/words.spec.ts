@@ -44,7 +44,6 @@ test.describe('Words Game', () => {
     test('should load the words game page and capture initial state', async ({ wordsPage, page }) => {
         await wordsPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1000)
 
         await expect(page).toHaveURL('/words')
         await wordsPage.screenshot('words_initial_load')
@@ -82,26 +81,23 @@ test.describe('Words Game', () => {
         await page.keyboard.press('Enter')
 
         // Wait for feedback
-        await page.waitForTimeout(500)
+        await expect(page.locator('[data-testid="game-feedback"]')).toBeVisible()
         await wordsPage.screenshot('words_feedback_correct')
-
-        // Verify score increment (this depends on initial score, usually 0 -> 1)
-        // const scoreVal = page.locator('span.tabular-nums').first();
-        // await expect(scoreVal).not.toHaveText('0');
 
         // 3. Move to NEXT word
         const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
         await nextBtn.click()
-        await page.waitForTimeout(500)
+        await expect(nextBtn).not.toBeVisible()
 
         // 4. Test INCORRECT answer
-        const newKanaChar = (await kanaElement.textContent())?.trim() || ""
         const wrongRomaji = "xyzq"
         await input.fill(wrongRomaji)
 
-        const checkBtn = page.getByRole('button', { name: /check|comprobar/i })
-        await checkBtn.first().click({ force: true })
-        await page.waitForTimeout(500)
+        const checkBtn = page.getByRole('button', { name: /check|comprobar/i }).first()
+        await checkBtn.click({ force: true })
+        
+        // Wait for incorrect feedback
+        await expect(page.locator('[data-testid="game-feedback"]')).toBeVisible()
 
         // Capture incorrect screenshot
         await wordsPage.screenshot('words_feedback_incorrect')

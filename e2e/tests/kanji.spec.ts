@@ -16,7 +16,6 @@ test.describe('Kanji Game', () => {
     test('should load the kanji game page and capture initial state', async ({ kanjiPage, page }) => {
         await kanjiPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1000)
 
         await expect(page).toHaveURL('/kanji')
         await kanjiPage.screenshot('kanji_initial_load')
@@ -25,7 +24,6 @@ test.describe('Kanji Game', () => {
     test('should display all UI components', async ({ kanjiPage, page }) => {
         await kanjiPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
 
         // Verify stats display
         const stats = page.locator('[data-testid="stats-display"]')
@@ -56,34 +54,30 @@ test.describe('Kanji Game', () => {
     test('should allow difficulty selection and show different hints', async ({ kanjiPage, page }) => {
         await kanjiPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
 
         // Test Easy difficulty (shows meaning + reading)
         const easyBtn = page.locator('button:has-text("Easy"), button:has-text("Fácil")').first()
         await easyBtn.click()
-        await page.waitForTimeout(1000)
         await kanjiPage.screenshot('kanji_difficulty_easy')
 
         // Test Medium difficulty (shows meaning only)
         const mediumBtn = page.locator('button:has-text("Medium"), button:has-text("Medio")').first()
         await mediumBtn.click()
-        await page.waitForTimeout(1000)
         await kanjiPage.screenshot('kanji_difficulty_medium')
 
         // Test Hard difficulty (shows reading only)
         const hardBtn = page.locator('button:has-text("Hard"), button:has-text("Difícil")').first()
         await hardBtn.click()
-        await page.waitForTimeout(1000)
         await kanjiPage.screenshot('kanji_difficulty_hard')
     })
 
     test('should capture correct answer feedback', async ({ kanjiPage, page }) => {
         await kanjiPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
 
         // Get the displayed kanji character
         const kanjiDisplay = page.locator('.text-7xl, .text-9xl').first()
+        await expect(kanjiDisplay).toBeVisible()
         const displayedKanji = await kanjiDisplay.textContent()
 
         if (!displayedKanji) {
@@ -119,11 +113,9 @@ test.describe('Kanji Game', () => {
             throw new Error('Could not find correct option to click')
         }
 
-        await page.waitForTimeout(1000)
-
         // Verify success feedback - ResultDisplay uses bg-green-500/10 border-green-500/30
         const successFeedback = page.locator('.bg-green-500\\/10.border-green-500\\/30').first()
-        await expect(successFeedback).toBeVisible()
+        await expect(successFeedback).toBeVisible({ timeout: 5000 })
 
         // Capture screenshot
         await kanjiPage.screenshot('kanji_feedback_correct')
@@ -132,7 +124,6 @@ test.describe('Kanji Game', () => {
     test('should capture incorrect answer feedback', async ({ kanjiPage, page }) => {
         await kanjiPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
 
         // Get the displayed kanji character
         const kanjiDisplay = page.locator('.text-7xl, .text-9xl').first()
@@ -170,11 +161,9 @@ test.describe('Kanji Game', () => {
             throw new Error('Could not find incorrect option to click')
         }
 
-        await page.waitForTimeout(1000)
-
         // Verify error feedback - ResultDisplay uses bg-red-500/10 border-red-500/30
         const errorFeedback = page.locator('.bg-red-500\\/10.border-red-500\\/30').first()
-        await expect(errorFeedback).toBeVisible()
+        await expect(errorFeedback).toBeVisible({ timeout: 5000 })
 
         // Capture screenshot
         await kanjiPage.screenshot('kanji_feedback_incorrect')
@@ -183,13 +172,11 @@ test.describe('Kanji Game', () => {
     test('should allow keyboard navigation with Enter key', async ({ kanjiPage, page }) => {
         await kanjiPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
 
         // Click any option to answer
         const options = page.locator('#kanji-options button')
         await options.first().click()
-        await page.waitForTimeout(1000)
-
+        
         // Verify Next button appears
         const nextBtn = page.locator('button:has-text("Next"), button:has-text("Siguiente")')
         await expect(nextBtn.first()).toBeVisible()
@@ -200,11 +187,9 @@ test.describe('Kanji Game', () => {
 
         // Press Enter
         await page.keyboard.press('Enter')
-        await page.waitForTimeout(1000)
-
+        
         // Verify new kanji loaded
-        const newKanji = await kanjiDisplay.textContent()
-        expect(newKanji).not.toBe(currentKanji)
+        await expect(kanjiDisplay).not.toHaveText(currentKanji!)
     })
 
     test('should open and close settings popover', async ({ kanjiPage, page }) => {
@@ -231,50 +216,44 @@ test.describe('Kanji Game', () => {
     test('should complete session mode and show summary', async ({ kanjiPage, page }) => {
         await kanjiPage.goto()
         await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
 
-        // Open settings popover - use simpler selector for the settings icon button
+        // Open settings popover
         const settingsBtn = page.getByRole('button').filter({ has: page.locator('svg') }).first()
         await settingsBtn.click()
-        await page.waitForTimeout(500)
+        
+        // Wait for popover content
+        const sessionBtn = page.locator('button:has-text("Session"), button:has-text("Sesión")').first()
+        await expect(sessionBtn).toBeVisible()
 
         // Select session mode
-        const sessionBtn = page.locator('button:has-text("Session"), button:has-text("Sesión")').first()
         await sessionBtn.click()
-        await page.waitForTimeout(300)
 
         // Set count to 5
         const count5Btn = page.locator('button:has-text("5")').first()
         await count5Btn.click()
-        await page.waitForTimeout(300)
 
         // Close popover
         await page.keyboard.press('Escape')
-        await page.waitForTimeout(500)
+        await expect(page.getByTestId('popover-backdrop')).not.toBeVisible()
 
         // Answer 5 questions
         for (let i = 0; i < 5; i++) {
-            await page.waitForTimeout(1000)
-
             // Click any option to answer
             const options = page.locator('#kanji-options button')
             await options.first().click()
-            await page.waitForTimeout(1000)
-
+            
             // Click next button to proceed (skip if disabled - happens on last question in session mode)
             const nextBtn = page.locator('button:has-text("Next"), button:has-text("Siguiente"), button:has-text("Próximo")').first()
-            if (await nextBtn.isVisible() && await nextBtn.isEnabled()) {
+            await expect(nextBtn).toBeVisible()
+            if (await nextBtn.isEnabled()) {
                 await nextBtn.click()
-                await page.waitForTimeout(1000)
+                await expect(nextBtn).not.toBeVisible()
             }
         }
 
-        // Wait for session summary to appear
-        await page.waitForTimeout(2000)
-
         // Verify and capture session summary
         const summaryCard = page.locator('text=/Session complete|Sesión completada/i, text=/Restart|Reiniciar/i').first()
-        await expect(summaryCard).toBeVisible({ timeout: 5000 })
+        await expect(summaryCard).toBeVisible({ timeout: 10000 })
 
         await kanjiPage.screenshot('kanji_session_complete')
     })
