@@ -137,6 +137,7 @@ export function GameCard({
                 options.map((option) => (
                   <Button
                     key={option}
+                    data-testid="guess-option"
                     variant={feedback === null ? "outline" : option === currentWord.romaji ? "success" : "secondary"}
                     className={cn(
                       "h-14 sm:h-20 text-xl sm:text-3xl font-black tracking-tight transition-all duration-300 active:scale-95",
