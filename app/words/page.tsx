@@ -7,7 +7,7 @@ import { GameCard } from "@/components/words/game-card"
 import { WordsSettingsOverlay } from "@/components/words/words-settings-overlay"
 import { StatsDisplay } from "@/components/game/stats-display"
 import { type WordFilter, type CharacterGroup } from "@/lib/japanese/words"
-import { getCharacterGroups } from "@/lib/japanese/shared"
+import { getCharacterGroups, preloadKanaDictionary } from "@/lib/japanese/shared"
 import type { GameMode, WordsGameType } from "@/types/game"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
@@ -40,8 +40,9 @@ export default function WordsPage() {
     const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
     const [settingsOpen, setSettingsOpen] = useState(false)
 
-    // Preload character groups on mount
+    // Preload character groups and kana dictionary on mount
     useEffect(() => {
+        preloadKanaDictionary()
         getCharacterGroups().then(groups => {
             setCharacterGroups(groups)
             setIsLoadingGroups(false)

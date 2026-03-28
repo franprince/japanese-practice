@@ -12,6 +12,8 @@ import type { GameMode, WordsGameType } from "@/types/game"
 import { useWordGame } from "@/hooks/use-word-game"
 import { GameFeedbackSection, FeedbackIcon } from "./game-feedback-section"
 import { GameCardContainer, QuestionDisplay, AnswerSection, ActionBar } from "@/components/game/primitives"
+import { useEffect } from "react"
+import { preloadKanaDictionary } from "@/lib/japanese/shared"
 
 interface GameCardProps {
   mode: GameMode
@@ -37,6 +39,10 @@ export function GameCard({
   onIncorrectCharsChange,
 }: GameCardProps) {
   const { t, lang } = useI18n()
+
+  useEffect(() => {
+    preloadKanaDictionary()
+  }, [])
 
   const {
     currentWord,
@@ -170,10 +176,11 @@ export function GameCard({
                 onKeyDown={handleKeyDown}
                 placeholder={t("placeholder")}
                 className={cn(
-                  "text-center text-lg h-14 font-mono bg-background/50 border-2 transition-all",
+                  "text-center text-lg h-14 font-mono bg-background/50 border-2",
+                  "transition-[box-shadow,background-color] duration-200", // Focused transition only for specific props
                   feedback === "correct" && "border-success",
                   feedback === "incorrect" && "border-destructive",
-                  !feedback && "border-border/50 focus:border-primary"
+                  !feedback && "border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                 )}
                 readOnly={feedback !== null}
                 autoComplete="off"

@@ -11,6 +11,8 @@ import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
 import { useSessionProgress } from "@/hooks/use-session-progress"
 import { useI18n } from "@/lib/i18n"
+import { useEffect } from "react"
+import { preloadKanaDictionary } from "@/lib/japanese/shared"
 
 export default function DatesPage() {
     const { t } = useI18n()
@@ -30,6 +32,10 @@ export default function DatesPage() {
         remainingLabel,
         sessionSummaryProps,
     } = useSessionProgress({ t })
+
+    useEffect(() => {
+        preloadKanaDictionary()
+    }, [])
 
     const [mode, setMode] = useState<DateMode>("week_days")
     const [key, setKey] = useState(0)
