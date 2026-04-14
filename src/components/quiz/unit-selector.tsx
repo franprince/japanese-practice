@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { CurriculumUnit } from "@/lib/japanese/curriculum";
+import type { CurriculumUnit } from "@/lib/japanese/curriculum";
 
 interface UnitSelectorProps {
   units: CurriculumUnit[];
