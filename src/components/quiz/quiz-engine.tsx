@@ -50,7 +50,8 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
     if (hasBlank) {
       if (Object.keys(userAnswers).length < blankCount) return;
       
-      const correctParts = currentQuestion.options[currentQuestion.answerIndex].split(/[,，]\s*/);
+      const correctOption = currentQuestion.options[currentQuestion.answerIndex] ?? "";
+      const correctParts = correctOption.split(/[,，]\s*/);
       isCorrect = correctParts.every((part, idx) => userAnswers[idx] === part);
     } else {
       if (selectedOptionIndex === null) return;
