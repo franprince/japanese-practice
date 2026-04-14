@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { curriculum } from "@/lib/japanese/curriculum";
 import { UnitSelector } from "@/components/quiz/unit-selector";
-import { QuizEngine, DbQuizQuestion } from "@/components/quiz/quiz-engine";
+import { QuizEngine } from "@/components/quiz/quiz-engine";
+import type { DbQuizQuestion } from "@/components/quiz/quiz-engine";
 import { useQuizProgress } from "@/hooks/use-quiz-progress";
 
 export default function OllamaPracticePage() {
