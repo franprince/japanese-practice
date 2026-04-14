@@ -17,10 +17,11 @@ interface QuizEngineProps {
 export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }: QuizEngineProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(null);
+  const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
   const [showExplanation, setShowExplanation] = useState(false);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
-
+  
   if (!questions || questions.length === 0) {
     return <div className="p-4 text-center text-muted-foreground">No questions available.</div>;
   }
@@ -29,17 +30,32 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
   const isLastQuestion = currentIndex === questions.length - 1;
   const parts = currentQuestion.question.split("___");
   const hasBlank = parts.length > 1;
+  const blankCount = parts.length - 1;
 
   const handleOptionSelect = (index: number) => {
-    if (showExplanation) return; // Prevent changing answer after revealing
+    if (showExplanation) return;
     setSelectedOptionIndex(index);
   };
 
+  const handleBlankSelect = (blankIndex: number, value: string) => {
+    if (showExplanation) return;
+    setUserAnswers(prev => ({ ...prev, [blankIndex]: value }));
+  };
+
   const checkAnswer = () => {
-    if (selectedOptionIndex === null) return;
+    let isCorrect = false;
+
+    if (hasBlank) {
+      if (Object.keys(userAnswers).length < blankCount) return;
+      
+      const correctParts = currentQuestion.options[currentQuestion.answerIndex].split(/[,，]\s*/);
+      isCorrect = correctParts.every((part, idx) => userAnswers[idx] === part);
+    } else {
+      if (selectedOptionIndex === null) return;
+      isCorrect = selectedOptionIndex === currentQuestion.answerIndex;
+    }
     
     setShowExplanation(true);
-    const isCorrect = selectedOptionIndex === currentQuestion.answerIndex;
     if (isCorrect) {
       setScore((s) => s + 1);
     }
@@ -58,6 +74,7 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
     } else {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOptionIndex(null);
+      setUserAnswers({});
       setShowExplanation(false);
     }
   };
@@ -133,38 +150,42 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
           {(() => {
             if (!hasBlank) return <FuriganaText text={currentQuestion.question} />;
             
-            return parts.map((part, index) => (
-              <React.Fragment key={index}>
-                <FuriganaText text={part} />
-                {index < parts.length - 1 && (
-                  <select
-                    className={`inline-block mx-1.5 text-base md:text-lg border-b-2 bg-transparent focus:outline-none transition-colors min-w-[4rem] py-0 leading-none align-baseline translate-y-[0.15em]
-                      ${showExplanation 
-                        ? (selectedOptionIndex === currentQuestion.answerIndex 
-                            ? "border-green-500 text-green-700 font-bold" 
-                            : "border-red-500 text-red-700 font-bold")
-                        : "border-primary cursor-pointer hover:border-primary/70 text-card-foreground"
-                      }`}
-                    value={selectedOptionIndex ?? ""}
-                    onChange={(e) => handleOptionSelect(Number(e.target.value))}
-                    disabled={showExplanation}
-                  >
-                    <option value="" disabled></option>
-                    {currentQuestion.options.map((opt, optIdx) => {
-                      // Split option by comma (handles both half-width and full-width)
-                      const optParts = opt.split(/[,，]\s*/);
-                      const displayValue = optParts.length > index ? optParts[index] : opt;
-                      
-                      return (
-                        <option key={optIdx} value={optIdx} className="text-black bg-white">
-                          {formatOption(displayValue || "")}
+            return parts.map((part, index) => {
+              const blankIndex = index;
+              const isLastPart = index === parts.length - 1;
+              const correctParts = currentQuestion.options[currentQuestion.answerIndex].split(/[,，]\s*/);
+              const isCorrectAtThisBlank = showExplanation && userAnswers[blankIndex] === (correctParts[blankIndex] || "");
+
+              return (
+                <React.Fragment key={index}>
+                  <FuriganaText text={part} />
+                  {!isLastPart && (
+                    <select
+                      className={`inline-block mx-1.5 text-base md:text-lg border-b-2 bg-transparent focus:outline-none transition-colors min-w-[4rem] py-0 leading-none align-baseline translate-y-[0.15em]
+                        ${showExplanation 
+                          ? (isCorrectAtThisBlank 
+                              ? "border-green-500 text-green-700 font-bold" 
+                              : "border-red-500 text-red-700 font-bold")
+                          : "border-primary cursor-pointer hover:border-primary/70 text-card-foreground"
+                        }`}
+                      value={userAnswers[blankIndex] ?? ""}
+                      onChange={(e) => handleBlankSelect(blankIndex, e.target.value)}
+                      disabled={showExplanation}
+                    >
+                      <option value="" disabled></option>
+                      {Array.from(new Set(currentQuestion.options.map(opt => {
+                        const optParts = opt.split(/[,，]\s*/);
+                        return optParts[blankIndex] || opt;
+                      }))).map((displayValue, optIdx) => (
+                        <option key={optIdx} value={displayValue} className="text-black bg-white">
+                          {formatOption(displayValue)}
                         </option>
-                      );
-                    })}
-                  </select>
-                )}
-              </React.Fragment>
-            ));
+                      ))}
+                    </select>
+                  )}
+                </React.Fragment>
+              );
+            });
           })()}
         </h3>
 
@@ -205,13 +226,20 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
           </div>
         )}
 
-        {showExplanation && (
-          <div className={`p-6 rounded-xl mt-6 space-y-4 animate-in slide-in-from-top-2 duration-300 ${selectedOptionIndex === currentQuestion.answerIndex ? 'bg-green-100/40 border border-green-200 text-green-900' : 'bg-red-100/40 border border-red-200 text-red-900'}`}>
-            <div className="flex items-center gap-2">
-              <span className={`text-xs font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full ${selectedOptionIndex === currentQuestion.answerIndex ? 'bg-green-600 text-white shadow-sm' : 'bg-red-600 text-white shadow-sm'}`}>
-                {selectedOptionIndex === currentQuestion.answerIndex ? 'Correct' : 'Incorrect'}
-              </span>
-            </div>
+        {(() => {
+          const correctParts = hasBlank ? currentQuestion.options[currentQuestion.answerIndex].split(/[,，]\s*/) : [];
+          const isCorrectGlobal = hasBlank 
+            ? correctParts.every((part, idx) => userAnswers[idx] === part)
+            : selectedOptionIndex === currentQuestion.answerIndex;
+
+          if (showExplanation) {
+            return (
+              <div className={`p-6 rounded-xl mt-6 space-y-4 animate-in slide-in-from-top-2 duration-300 ${isCorrectGlobal ? 'bg-green-100/40 border border-green-200 text-green-900' : 'bg-red-100/40 border border-red-200 text-red-900'}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full ${isCorrectGlobal ? 'bg-green-600 text-white shadow-sm' : 'bg-red-600 text-white shadow-sm'}`}>
+                    {isCorrectGlobal ? 'Correct' : 'Incorrect'}
+                  </span>
+                </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
@@ -223,16 +251,19 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Grammar Note</p>
                 <p className="text-sm italic font-medium opacity-90"><FuriganaText text={currentQuestion.explanation} /></p>
               </div>
-            </div>
-          </div>
-        )}
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })()}
       </div>
 
       <div className="p-4 bg-muted/50 flex justify-end gap-3 border-t">
         {!showExplanation ? (
           <button
             onClick={checkAnswer}
-            disabled={selectedOptionIndex === null}
+            disabled={hasBlank ? Object.keys(userAnswers).length < blankCount : selectedOptionIndex === null}
             className="inline-flex items-center justify-center rounded-lg text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 h-10 px-6 py-2"
           >
             Check Answer

@@ -49,7 +49,7 @@ CRITICAL INSTRUCTIONS:
 5. NO AMBIGUITY: Every question MUST be solvable without looking at the "meaning" or "explanation" fields. If multiple options are grammatically correct in a generic sentence (e.g. "whose" vs "what kind"), you MUST use a dialogue (A & B) where the response (B) provides the necessary context to resolve the ambiguity.
 6. SPECIFIC CONTEXTUAL HINTS: For standalone fill-in-the-blank sentences, YOU MUST add a trailing English hint in parentheses. DO NOT use generic hints like "(Question)" or "(Blank)". Instead, specify the intent or form required, e.g., "(Whose?)", "(What kind?)", "(Negative form)", "(Polite)", "(Location?)", or "(Age?)".
 7. DIALOGUE PREFERENCE: Heavily prioritize short 2-line dialogues (A & B) for questions about possession, time, or location, as they provide natural context. Use a newline (\n) between speakers.
-8. ALWAYS USE KANJI WITH FURIGANA: Whenever a word has a standard Kanji representation, you MUST use the Kanji followed immediately by its reading in brackets: 漢字[かんじ].
+8. ALWAYS USE KANJI WITH FURIGANA: Whenever a word has a standard Kanji representation, you MUST use the Kanji followed immediately by its reading in brackets: 漢字[かんじ]. This applies to EVERY occurrence of the word, even if it appears multiple times in the same dialogue.
 9. FURIGANA FORMAT: Append the reading inside brackets immediately after the Kanji: 漢字[かんじ]. DO NOT use spaces before the bracket.
 10. MEANING: You must provide the English meaning (translation) of the full Japanese sentence/dialogue in the "meaning" field.
 11. FORMAT: Output MUST be strictly in JSON without wrapping it in markdown. Do not return markdown code blocks, just raw JSON.
