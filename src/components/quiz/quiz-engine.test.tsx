@@ -90,7 +90,7 @@ describe("QuizEngine", () => {
     expect(dropdown).toBeInTheDocument();
 
     // Select an option
-    await user.selectOptions(dropdown, "学生 (学生)"); // formatOption results in "学生 (学生)" for non-rubied text
+    await user.selectOptions(dropdown, "学生"); 
 
     const checkButton = screen.getByRole("button", { name: /check answer/i });
     await user.click(checkButton);
