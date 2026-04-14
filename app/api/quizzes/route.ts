@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sqliteDb, DbQuizQuestion } from "@/lib/server/db";
+import { sqliteDb } from "@/lib/server/db";
 import { generateBackgroundQuizzes } from "@/lib/server/quiz-worker";
 
 export async function POST(req: Request) {
