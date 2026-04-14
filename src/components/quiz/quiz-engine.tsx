@@ -156,7 +156,8 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
             return parts.map((part, index) => {
               const blankIndex = index;
               const isLastPart = index === parts.length - 1;
-              const correctParts = currentQuestion.options[currentQuestion.answerIndex].split(/[,，]\s*/);
+              const correctOption = currentQuestion.options[currentQuestion.answerIndex] ?? "";
+              const correctParts = correctOption.split(/[,，]\s*/);
               const isCorrectAtThisBlank = showExplanation && userAnswers[blankIndex] === (correctParts[blankIndex] || "");
 
               return (
