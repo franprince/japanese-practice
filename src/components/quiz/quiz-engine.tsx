@@ -231,7 +231,8 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
         )}
 
         {(() => {
-          const correctParts = hasBlank ? currentQuestion.options[currentQuestion.answerIndex].split(/[,，]\s*/) : [];
+          const correctOption = hasBlank ? (currentQuestion.options[currentQuestion.answerIndex] ?? "") : "";
+          const correctParts = hasBlank ? correctOption.split(/[,，]\s*/) : [];
           const isCorrectGlobal = hasBlank 
             ? correctParts.every((part, idx) => userAnswers[idx] === part)
             : selectedOptionIndex === currentQuestion.answerIndex;
