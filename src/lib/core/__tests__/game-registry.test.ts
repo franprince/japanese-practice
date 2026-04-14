@@ -3,8 +3,8 @@ import { describe, test, expect } from 'bun:test'
 import { GAMES } from '@/lib/core'
 
 describe('Game Registry', () => {
-    test('should have all 4 games defined', () => {
-        expect(GAMES).toHaveLength(4)
+    test('should have all 5 games defined', () => {
+        expect(GAMES).toHaveLength(5)
     })
 
     test('each game should have required properties', () => {
@@ -46,5 +46,11 @@ describe('Game Registry', () => {
         const datesGame = GAMES.find(g => g.id === 'dates')
         expect(datesGame).toBeDefined()
         expect(datesGame?.href).toBe('/dates')
+    })
+
+    test('should include ollama practice', () => {
+        const ollamaGame = GAMES.find(g => g.id === 'ollama')
+        expect(ollamaGame).toBeDefined()
+        expect(ollamaGame?.href).toBe('/practice/ollama')
     })
 })

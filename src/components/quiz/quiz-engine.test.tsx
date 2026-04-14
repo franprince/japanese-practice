@@ -78,7 +78,9 @@ describe("QuizEngine", () => {
       question: "わたし は ___ です。",
       options: ["学生", "先生", "会社員", "銀行員"],
       answerIndex: 0,
-      explanation: "I am a student."
+      explanation: "I am a student.",
+      meaning: "I am a student.",
+      unitId: 1
     }];
 
     render(<QuizEngine questions={blankQuestion} />);
@@ -88,11 +90,11 @@ describe("QuizEngine", () => {
     expect(dropdown).toBeInTheDocument();
 
     // Select an option
-    await user.selectOptions(dropdown, "0"); // Value is the index string
+    await user.selectOptions(dropdown, "学生 (学生)"); // formatOption results in "学生 (学生)" for non-rubied text
 
     const checkButton = screen.getByRole("button", { name: /check answer/i });
     await user.click(checkButton);
 
-    expect(screen.getByText("Correct!")).toBeInTheDocument();
+    expect(screen.getByText("Correct")).toBeInTheDocument();
   });
 });
