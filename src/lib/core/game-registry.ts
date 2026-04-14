@@ -43,4 +43,12 @@ export const GAMES: GameDefinition[] = [
         titleKey: 'games.dates.title',
         descriptionKey: 'games.dates.description',
     },
+    {
+        id: 'ollama',
+        href: '/practice/ollama',
+        icon: '機',
+        gradient: 'bg-gradient-to-br from-indigo-500/20 via-black to-black',
+        titleKey: 'games.ollama.title',
+        descriptionKey: 'games.ollama.description',
+    },
 ]

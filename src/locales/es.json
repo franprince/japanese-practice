@@ -3,6 +3,8 @@
     "heroTitle": "Domina los kana japoneses",
     "heroSubtitle": "Practica el rōmaji para palabras en hiragana y katakana con rachas, filtros y cambio rápido de modo.",
     "heroTagline": "Domina el arte del japonés con juegos cuidadosamente diseñados. Cada desafío te acerca más a la fluidez.",
+    "games.ollama.title": "Generación de Cuestionarios AI",
+    "games.ollama.description": "Genera ejercicios japoneses de opción múltiple dinámicos a partir de tu unidad de currículo.",
     "games.romaji.title": "Práctica de Rōmaji",
     "games.romaji.description": "Practica el rōmaji para palabras en hiragana y katakana con rachas, filtros y cambio rápido de modo.",
     "games.numbers.title": "Desafío de Números",
