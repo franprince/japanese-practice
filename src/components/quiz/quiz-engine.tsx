@@ -27,6 +27,8 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
   }
 
   const currentQuestion = questions[currentIndex];
+  if (!currentQuestion) return null;
+
   const isLastQuestion = currentIndex === questions.length - 1;
   const parts = currentQuestion.question.split("___");
   const hasBlank = parts.length > 1;
