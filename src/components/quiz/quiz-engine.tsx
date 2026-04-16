@@ -149,49 +149,76 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
       </div>
 
       <div className="p-6 md:p-8 space-y-6">
-        <h3 className="text-xl md:text-2xl font-medium leading-[2.8] tracking-wide whitespace-pre-line" lang="ja">
+        <div className="space-y-6">
           {(() => {
-            if (!hasBlank) return <FuriganaText text={currentQuestion.question} />;
-            
-            return parts.map((part, index) => {
-              const blankIndex = index;
-              const isLastPart = index === parts.length - 1;
-              const correctOption = currentQuestion.options[currentQuestion.answerIndex] ?? "";
-              const correctParts = correctOption.split(/[,，]\s*/);
-              const isCorrectAtThisBlank = showExplanation && userAnswers[blankIndex] === (correctParts[blankIndex] || "");
+            const lines = currentQuestion.question.split("\n");
+            let globalBlankIndex = 0;
+
+            const correctOption = currentQuestion.options[currentQuestion.answerIndex] ?? "";
+            const correctParts = correctOption.split(/[,，]\s*/);
+
+            return lines.map((line, lineIdx) => {
+              // Match Speaker labels (e.g., A:, B:, 先生:)
+              const speakerMatch = line.match(/^([A-Z]|先生|学生|店員):\s*/);
+              const speaker = speakerMatch ? speakerMatch[1] : null;
+              const lineContent = speaker ? line.slice(speakerMatch[0].length) : line;
+              const lineParts = lineContent.split("___");
 
               return (
-                <React.Fragment key={index}>
-                  <FuriganaText text={part} />
-                  {!isLastPart && (
-                    <select
-                      className={`inline-block mx-1.5 text-base md:text-lg border-b-2 bg-transparent focus:outline-none transition-colors min-w-[4rem] py-0 leading-none align-baseline translate-y-[0.15em]
-                        ${showExplanation 
-                          ? (isCorrectAtThisBlank 
-                              ? "border-green-500 text-green-700 font-bold" 
-                              : "border-red-500 text-red-700 font-bold")
-                          : "border-primary cursor-pointer hover:border-primary/70 text-card-foreground"
-                        }`}
-                      value={userAnswers[blankIndex] ?? ""}
-                      onChange={(e) => handleBlankSelect(blankIndex, e.target.value)}
-                      disabled={showExplanation}
+                <div key={lineIdx} className="flex gap-3 md:gap-4 items-start animate-in fade-in slide-in-from-left-4 duration-500" style={{ animationDelay: `${lineIdx * 150}ms` }}>
+                  {speaker && (
+                    <div className={`flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-xl border-2 flex items-center justify-center text-xs md:text-sm font-black transition-colors shadow-sm
+                      ${speaker === 'A' || speaker === '先生' 
+                        ? "bg-primary text-primary-foreground border-primary" 
+                        : "bg-background text-primary border-primary/30"}`}
                     >
-                      <option value="" disabled></option>
-                      {Array.from(new Set(currentQuestion.options.map(opt => {
-                        const optParts = opt.split(/[,，]\s*/);
-                        return optParts[blankIndex] || opt;
-                      }))).map((displayValue, optIdx) => (
-                        <option key={optIdx} value={displayValue} className="text-black bg-white">
-                          {formatOption(displayValue)}
-                        </option>
-                      ))}
-                    </select>
+                      {speaker}
+                    </div>
                   )}
-                </React.Fragment>
+                  <div className={`flex-grow text-xl md:text-2xl font-medium leading-[2.5] tracking-wide ${speaker ? "pt-1" : ""}`} lang="ja">
+                    {lineParts.map((part, partIdx) => {
+                      const blankIndexForThisSelect = globalBlankIndex;
+                      const isLastPartInLine = partIdx === lineParts.length - 1;
+                      if (!isLastPartInLine) globalBlankIndex++;
+
+                      const isCorrectAtThisBlank = showExplanation && userAnswers[blankIndexForThisSelect] === (correctParts[blankIndexForThisSelect] || "");
+
+                      return (
+                        <React.Fragment key={partIdx}>
+                          <FuriganaText text={part} />
+                          {!isLastPartInLine && (
+                            <select
+                              className={`inline-block mx-1.5 text-base md:text-lg border-b-2 bg-transparent focus:outline-none transition-all min-w-[5rem] py-0 leading-none align-baseline translate-y-[0.15em]
+                                ${showExplanation 
+                                  ? (isCorrectAtThisBlank 
+                                      ? "border-green-500 text-green-700 font-bold bg-green-50/50 rounded-t-sm" 
+                                      : "border-red-500 text-red-700 font-bold bg-red-50/50 rounded-t-sm")
+                                  : "border-primary cursor-pointer hover:border-primary/70 text-card-foreground hover:bg-primary/5"
+                                }`}
+                              value={userAnswers[blankIndexForThisSelect] ?? ""}
+                              onChange={(e) => handleBlankSelect(blankIndexForThisSelect, e.target.value)}
+                              disabled={showExplanation}
+                            >
+                              <option value="" disabled></option>
+                              {Array.from(new Set(currentQuestion.options.map(opt => {
+                                const optParts = opt.split(/[,，]\s*/);
+                                return optParts[blankIndexForThisSelect] || opt;
+                              }))).map((displayValue, optIdx) => (
+                                <option key={optIdx} value={displayValue} className="text-black bg-white">
+                                  {formatOption(displayValue)}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             });
           })()}
-        </h3>
+        </div>
 
         {!hasBlank && (
           <div className="space-y-3">
