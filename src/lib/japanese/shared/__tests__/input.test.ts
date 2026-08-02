@@ -83,5 +83,20 @@ describe("Japanese Input Validation", () => {
             expect(await validateAnswer("sashimi", word)).toBe(false)
             expect(await validateAnswer("sus", word)).toBe(false)
         })
+
+        it("rejects a dropped letter even when the answer has a genuine double n", async () => {
+            // あんな ("that sort of") is "anna" — "ana" is a real spelling
+            // mistake, not an n/nn input-method ambiguity, and must not be
+            // silently accepted.
+            const word = mockWord("あんな", "anna")
+            expect(await validateAnswer("ana", word)).toBe(false)
+            expect(await validateAnswer("anna", word)).toBe(true)
+        })
+
+        it("still forgives an accidental extra n when the answer has no genuine double n", async () => {
+            const word = mockWord("しんかんせん", "shinkansen")
+            expect(await validateAnswer("shinnkansen", word)).toBe(true)
+            expect(await validateAnswer("shinkansen", word)).toBe(true)
+        })
     })
 })
