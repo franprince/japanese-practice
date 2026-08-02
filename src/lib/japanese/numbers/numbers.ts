@@ -60,7 +60,7 @@ export function arabicToJapanese(num: number): string {
 
     let result = ""
     const s = num.toString()
-    let len = s.length
+    const len = s.length
 
     for (let i = 0; i < len; i++) {
         const char = s[i]

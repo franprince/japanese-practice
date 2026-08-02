@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     // Build the query to get randomly up to 10 questions the user hasn't seen for the given units
     const unitsPlaceholder = selectedUnitIds.map(() => '?').join(',');
-    let queryArgs: any[] = [...selectedUnitIds];
+    const queryArgs: any[] = [...selectedUnitIds];
     
     let seenFilter = '';
     if (seenIds.length > 0) {
