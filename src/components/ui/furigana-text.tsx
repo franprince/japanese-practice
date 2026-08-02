@@ -10,7 +10,7 @@ export function FuriganaText({ text, className = "" }: FuriganaTextProps) {
   // Matches Kanji (or mixed Kanji/Kana) up to the bracket.
   // Group 1: The Base word (Kanji)
   // Group 2: The Reading (Kana inside brackets)
-  const furiganaRegex = /([一-龯ぁ-んァ-ン]+)\s*\[([ぁ-んァ-ン]+)\]/g;
+  const furiganaRegex = /([一-龯ぁ-んァ-ンー]+)\s*\[([ぁ-んァ-ンー]+)\]/g;
 
   const parts = [];
   let lastIndex = 0;
