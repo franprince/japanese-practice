@@ -1,21 +1,28 @@
 import React from "react";
+import { describe, it, expect, mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { QuizEngine, DbQuizQuestion } from "./quiz-engine";
-import { QuizQuestion } from "@/lib/core/ollama";
+import { QuizEngine, type DbQuizQuestion } from "./quiz-engine";
+import type { QuizQuestion } from "@/lib/core/ollama";
 
+// `meaning` renders in the explanation panel, so these strings are kept
+// distinct from anything asserted on via getByText below.
 const mockQuestions: QuizQuestion[] = [
   {
     question: "Test question 1",
     options: ["Option A", "Option B", "Option C", "Option D"],
     answerIndex: 1, // Option B is correct
     explanation: "Because B is correct.",
+    meaning: "Translation of the first test question.",
+    unitId: 1,
   },
   {
     question: "Test question 2",
     options: ["Option E", "Option F", "Option G", "Option H"],
     answerIndex: 0, // Option E is correct
     explanation: "Because E is correct.",
+    meaning: "Translation of the second test question.",
+    unitId: 1,
   }
 ];
 
@@ -45,17 +52,17 @@ describe("QuizEngine", () => {
 
   it("handles the final question correctly", async () => {
     const user = userEvent.setup();
-    const mockOnComplete = jest.fn();
+    const mockOnComplete = mock();
 
     render(<QuizEngine questions={mockQuestions} onComplete={mockOnComplete} />);
 
     // Skip to second question
     // We cannot skip without answering, so let's answer Q1
-    let optionB = screen.getByRole("button", { name: "Option B" });
+    const optionB = screen.getByRole("button", { name: "Option B" });
     await user.click(optionB);
     let checkButton = screen.getByRole("button", { name: /check answer/i });
     await user.click(checkButton);
-    let nextButton = screen.getByRole("button", { name: /next question/i });
+    const nextButton = screen.getByRole("button", { name: /next question/i });
     await user.click(nextButton);
 
     // Answer Q2

@@ -1,4 +1,5 @@
 import React from "react";
+import { describe, it, expect, mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { UnitSelector } from "./unit-selector";
@@ -7,7 +8,7 @@ import { curriculum } from "@/lib/japanese/curriculum";
 describe("UnitSelector", () => {
   it("allows selecting and deselecting units", async () => {
     const user = userEvent.setup();
-    const onChange = jest.fn();
+    const onChange = mock();
     
     // Initial state: Unit 1 selected
     render(
@@ -27,7 +28,7 @@ describe("UnitSelector", () => {
 
   it("selects all units when Select All is clicked", async () => {
     const user = userEvent.setup();
-    const onChange = jest.fn();
+    const onChange = mock();
     
     render(
       <UnitSelector
@@ -45,7 +46,7 @@ describe("UnitSelector", () => {
 
   it("clears all units when Clear All is clicked", async () => {
     const user = userEvent.setup();
-    const onChange = jest.fn();
+    const onChange = mock();
     
     render(
       <UnitSelector
