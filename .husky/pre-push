@@ -5,9 +5,13 @@ export PATH="$HOME/.bun/bin:$PATH"
 
 # Skip wordset build in CI (semantic-release environment)
 if [ -z "$CI" ]; then
+  bun run typecheck
+  bun run lint
   bun test src
   bun run build
   bun run wordset:build
 else
+  bun run typecheck
+  bun run lint
   bun test src
 fi
