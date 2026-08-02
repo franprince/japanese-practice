@@ -11,4 +11,4 @@ lost.
 
 | Date | Slug | Title | Status |
 | --- | --- | --- | --- |
-| 2026-08-02 | [restore-quality-gates](2026-08-02-restore-quality-gates/spec.md) | Restore the project's quality gates | Spec approved · [plan](2026-08-02-restore-quality-gates/implementation_plan.md) awaiting approval |
+| 2026-08-02 | [restore-quality-gates](2026-08-02-restore-quality-gates/spec.md) | Restore the project's quality gates | Done — see [plan](2026-08-02-restore-quality-gates/implementation_plan.md) |
