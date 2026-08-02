@@ -67,8 +67,9 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
     setUserInput(value)
   }
 
-  const displayValue = mode === "months" && showNumbers ? question.displayNumber : question.display
-  const displayLang = mode === "months" && showNumbers ? undefined : "ja"
+  const usesNumberToggle = mode === "months" || mode === "week_days"
+  const displayValue = usesNumberToggle && showNumbers ? question.displayNumber : question.display
+  const displayLang = usesNumberToggle && showNumbers ? undefined : "ja"
 
   
   const feedback = showResult ? (isCorrect ? "correct" : "incorrect") : null
