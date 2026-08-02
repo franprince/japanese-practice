@@ -161,7 +161,7 @@ export function QuizEngine({ questions, onComplete, onRestart, onAnswerChecked }
               // Match Speaker labels (e.g., A:, B:, 先生:)
               const speakerMatch = line.match(/^([A-Z]|先生|学生|店員):\s*/);
               const speaker = speakerMatch ? speakerMatch[1] : null;
-              const lineContent = speaker ? line.slice(speakerMatch[0].length) : line;
+              const lineContent = speakerMatch ? line.slice(speakerMatch[0].length) : line;
               const lineParts = lineContent.split("___");
 
               return (
