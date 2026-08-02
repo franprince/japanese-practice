@@ -139,11 +139,11 @@ export async function loadKanjiByLevels(levels: string[]): Promise<KanjiEntry[]>
 
 export function getRandomKanji(list: KanjiEntry[], exclude?: KanjiEntry) {
   if (!list.length) throw new Error("Kanji list is empty")
-  let kanji: KanjiEntry | undefined
-  do {
-    kanji = list[Math.floor(Math.random() * list.length)]
-  } while (exclude && kanji && kanji.char === exclude.char)
-  return kanji!
+  const candidates = exclude ? list.filter(k => k.char !== exclude.char) : list
+  // Fall back to the full list if excluding leaves nothing (e.g. a
+  // single-entry list equal to `exclude`) rather than hanging forever.
+  const pool = candidates.length ? candidates : list
+  return pool[Math.floor(Math.random() * pool.length)]!
 }
 
 export function getRandomOptions(list: KanjiEntry[], correct: KanjiEntry, count = 3): KanjiEntry[] {
