@@ -1,4 +1,5 @@
 import { openDb, STORE_KANJI } from "@/lib/core/db"
+import { shuffleArray } from "@/lib/core/random"
 
 
 import type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
@@ -8,17 +9,6 @@ export type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
 
 const CACHE_PREFIX = "kanji-level-"
 const CACHE_EXPIRY_DAYS = 7
-
-const shuffle = <T,>(arr: T[]) => {
-  const copy = [...arr]
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const temp = copy[i]!
-    copy[i] = copy[j]!
-    copy[j] = temp
-  }
-  return copy
-}
 
 interface CachedKanjiData {
   data: KanjiEntry[]
@@ -156,5 +146,5 @@ export function getRandomOptions(list: KanjiEntry[], correct: KanjiEntry, count 
     available.splice(randomIndex, 1)
   }
 
-  return shuffle(options)
+  return shuffleArray(options)
 }
