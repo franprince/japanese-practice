@@ -7,14 +7,26 @@ import { UnitSelector } from "@/components/quiz/unit-selector";
 import { QuizEngine } from "@/components/quiz/quiz-engine";
 import type { DbQuizQuestion } from "@/components/quiz/quiz-engine";
 import { useQuizProgress } from "@/hooks/use-quiz-progress";
+import { isOllamaPracticeEnabled } from "@/lib/core/feature-flags";
 
 export default function OllamaPracticePage() {
   const [selectedUnitIds, setSelectedUnitIds] = useState<number[]>([1]); // Default select unit 1
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [questions, setQuestions] = useState<DbQuizQuestion[] | null>(null);
-  
+
   const { progress, markSeen, isLoaded } = useQuizProgress();
+
+  if (!isOllamaPracticeEnabled) {
+    return (
+      <div className="container mx-auto py-16 px-4 max-w-lg text-center space-y-3">
+        <h1 className="text-2xl font-bold">Not available</h1>
+        <p className="text-muted-foreground">
+          This experimental practice mode isn&apos;t enabled in this environment.
+        </p>
+      </div>
+    );
+  }
 
   const handleGenerate = async () => {
     if (selectedUnitIds.length === 0) {

@@ -6,6 +6,7 @@ import { getRandomWord, getRandomCharacter } from "@/lib/japanese/words"
 import { confirmWordset, normalizeLang } from "@/lib/japanese/words/loader"
 import { validateAnswer } from "@/lib/japanese/shared/input"
 import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared/error-detection"
+import { shuffleArray } from "@/lib/core/random"
 import type { GameMode, WordsGameType } from "@/types/game"
 import type { Language } from "@/lib/i18n/translations"
 import { useBaseGame } from "./use-base-game"
@@ -139,7 +140,7 @@ export function useWordGame({
                     }
                 }
 
-                nextOptions = [word.romaji, ...distractors].sort(() => Math.random() - 0.5)
+                nextOptions = shuffleArray([word.romaji, ...distractors])
             }
         } catch (error: any) {
             console.error("Failed to load word:", error)
