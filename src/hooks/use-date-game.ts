@@ -54,14 +54,14 @@ export function useDateGame({
 
     const generateNewQuestion = useCallback(() => {
         if (disableNext) return
-        setQuestion(generateDateQuestion(mode, t, showNumbers))
+        setQuestion(generateDateQuestion(mode, t))
         setUserInput("")
         setFeedback(null)
-    }, [mode, disableNext, showNumbers, t, setFeedback])
+    }, [mode, disableNext, t, setFeedback])
 
     useEffect(() => {
         generateNewQuestion()
-    }, [generateNewQuestion, showNumbers])
+    }, [generateNewQuestion])
 
     useEffect(() => {
         if (!showResult && inputRef.current) {
