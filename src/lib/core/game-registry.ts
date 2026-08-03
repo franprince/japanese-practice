@@ -1,3 +1,4 @@
+import { isOllamaPracticeEnabled } from "./feature-flags"
 
 
 export interface GameDefinition {
@@ -10,7 +11,7 @@ export interface GameDefinition {
 }
 
 
-export const GAMES: GameDefinition[] = [
+const ALL_GAMES: GameDefinition[] = [
     {
         id: 'romaji',
         href: '/words',
@@ -52,3 +53,9 @@ export const GAMES: GameDefinition[] = [
         descriptionKey: 'games.ollama.description',
     },
 ]
+
+export function buildGamesList(ollamaEnabled: boolean): GameDefinition[] {
+    return ALL_GAMES.filter(g => g.id !== 'ollama' || ollamaEnabled)
+}
+
+export const GAMES: GameDefinition[] = buildGamesList(isOllamaPracticeEnabled)
