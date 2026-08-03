@@ -61,7 +61,7 @@ export default [
     // false positives — most visibly every react-hooks/rules-of-hooks error,
     // which fires on Playwright's `use` fixture callback in e2e/fixtures
     // because the plugin reads it as React's `use` hook.
-    files: ["e2e/**", "scripts/**", "build.ts", "types/**", "src/types/**"],
+    files: ["e2e/**", "scripts/**", "types/**", "src/types/**"],
     rules: {
       "react-hooks/rules-of-hooks": "off",
       "react-hooks/purity": "off",

@@ -41,7 +41,6 @@
   "exclude": [
     "dist",
     "node_modules",
-    "build.ts",
     "src/index.ts"
   ],
   "include": [
