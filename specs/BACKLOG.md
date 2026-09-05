@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PR 1 merged; PR 2 implemented and verified locally, awaiting pull request
+- **Status:** Approved sequence — PRs 1 and 2 merged; E2E hardening verified on `test/e2e-reliability` before PR 3
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -41,8 +41,8 @@ The standard quality gates pass.
 
 ## PR 2 — Make wordset acquisition reliable
 
-**Status:** Implemented and verified on `fix/wordset-acquisition-reliability`.
-Pull request and merge are pending. Continue PR 3 after this item merges.
+**Status:** Merged via [#57](https://github.com/franprince/japanese-practice/pull/57).
+Follow-up E2E hardening covers additional browser failure paths before PR 3.
 
 **Verification (2026-09-05):** Typecheck and production build pass; 121 unit
 tests and all 8 relevant Words/browser lifecycle tests pass. Lint reports zero

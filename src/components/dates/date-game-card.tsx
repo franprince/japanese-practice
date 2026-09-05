@@ -78,7 +78,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
     <GameCardContainer feedback={feedback}>
       {}
       {(mode === "months" || mode === "week_days") && (
-        <div className="absolute top-4 right-4 md:top-6 md:right-6">
+        <div className="absolute top-4 right-4 z-10 md:top-6 md:right-6">
           <button
             onClick={() => setShowNumbers(!showNumbers)}
             className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
