@@ -1,6 +1,6 @@
 # Implementation plan
 
-**Status:** Implemented and verified on 2026-09-05; PR creation pending.
+**Status:** Implemented and verified on 2026-09-05; [PR #62](https://github.com/franprince/japanese-practice/pull/62) open against `develop`.
 **Specification:** [Approved by the user on 2026-09-05](spec.md).
 **Branch/base:** `refactor/split-large-feature-modules`, from `develop` at `a959f8b`.
 **Delivery:** One backlog item and one PR against `develop`.
@@ -372,8 +372,9 @@ feature or behavior change is planned.
   acquisition dependencies in the build contract remain.
 - `bun run build` passes. After the corrected build,
   `E2E_SKIP_BUILD=1 bun run test:e2e`: **49 passing Chromium tests**, including
-  two additional desktop/mobile Words draft regressions. Browser fixtures report
-  no uncaught page exceptions or hydration failures.
+  two additional desktop/mobile Words draft regressions. Shared-fixture
+  exception/hydration checks pass; the three static-delivery tests use bare
+  Playwright fixtures without that collector.
 - SHA-256 comparisons confirm both source wordsets and the generated manifest
   match the pre-refactor bytes. Static publication contract tests also pass.
 - The final fetch confirms the base remains `origin/develop` at `a959f8b`.
@@ -381,7 +382,14 @@ feature or behavior change is planned.
 - Code, tests, and module documentation committed as `7caf9b8`
   (`refactor(words): separate practice and dataset responsibilities`).
   Specification/results/proof are recorded in the following documentation commit.
-- PR creation is awaiting user approval; no branch push or PR creation has run.
+- The user approved PR creation on 2026-09-05. The branch was pushed after the
+  mandatory pre-push typecheck, lint, 302-test unit suite, production build and
+  wordset build passed. Both source datasets and the manifest still match the
+  recorded SHA-256 checksums.
+- [PR #62](https://github.com/franprince/japanese-practice/pull/62) is open against
+  `develop`, with visual proof and verification results. GitHub reported
+  `MERGEABLE` at creation; CI and the Vercel preview were still running.
+  Merging remains the user's decision.
 
 ### Visual proof
 

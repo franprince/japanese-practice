@@ -1,6 +1,6 @@
 # Decompose feature concentration points
 
-**Status:** Implemented and verified on 2026-09-05; PR creation pending.
+**Status:** Implemented and verified on 2026-09-05; [PR #62](https://github.com/franprince/japanese-practice/pull/62) open against `develop`.
 **Backlog:** PR 6, following the lifecycle cleanup merged in
 [PR #61](https://github.com/franprince/japanese-practice/pull/61).
 **Base:** `develop` at `a959f8b`.
@@ -214,5 +214,7 @@ the page's existing comparison behavior. No remaining scope gap was identified.
 
 The user approved this specification on 2026-09-05. See the
 [implementation plan](implementation_plan.md) and [task checklist](tasks.md).
-The user approved the implementation plan on 2026-09-05. Implementation and
-verification are complete; PR creation approval is pending.
+The user approved the implementation plan and PR creation on 2026-09-05.
+Implementation and verification are complete. [PR #62](https://github.com/franprince/japanese-practice/pull/62)
+is open against `develop`; GitHub reports no merge conflicts. Remote checks
+were still running at creation. Merging remains the user's decision.

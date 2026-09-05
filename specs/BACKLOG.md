@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PRs 1–5 and E2E hardening (#58) merged; PR 6 implemented and verified, awaiting PR creation approval
+- **Status:** Approved sequence — PRs 1–5 and E2E hardening (#58) merged; PR 6 implemented and verified, [#62](https://github.com/franprince/japanese-practice/pull/62) open against `develop`
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -206,7 +206,8 @@ remain green.
 ## PR 6 — Decompose feature concentration points
 
 **Status:** Implemented and verified on `refactor/split-large-feature-modules`,
-from `develop` at `a959f8b`; awaiting PR creation approval. See the
+from `develop` at `a959f8b`; [PR #62](https://github.com/franprince/japanese-practice/pull/62)
+is open against `develop` without merge conflicts. See the
 [specification](2026-09-05-split-large-feature-modules/spec.md),
 [implementation plan](2026-09-05-split-large-feature-modules/implementation_plan.md),
 and [task checklist](2026-09-05-split-large-feature-modules/tasks.md).

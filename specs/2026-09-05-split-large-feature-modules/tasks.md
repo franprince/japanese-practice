@@ -1,6 +1,6 @@
 # Tasks
 
-**Status:** Implemented and verified; PR creation approval pending.
+**Status:** Implemented and verified; [PR #62](https://github.com/franprince/japanese-practice/pull/62) open against `develop`, without merge conflicts.
 **Plan:** [implementation_plan.md](implementation_plan.md).
 
 ## Preparation
@@ -63,6 +63,9 @@ read-only review can check coverage and regressions alongside implementation.
 - [x] T10 — Review the full diff and whitespace; refresh/check the base; record
   actual verification/proof/limitations in the plan, checklist, index and
   backlog; make coherent Conventional Commits on this task branch.
-- [ ] Obtain PR creation approval unless already granted; open one PR against
+- [x] Obtain PR creation approval unless already granted; open one PR against
   `develop` with final scope, visual proof, and validation; verify mergeability
   and resolve conflicts on this branch if needed. Leave merging to the user.
+
+PR creation was approved on 2026-09-05. GitHub reported `MERGEABLE` at creation;
+CI and the Vercel preview were still running.
