@@ -13,4 +13,4 @@ lost.
 | --- | --- | --- | --- |
 | 2026-08-02 | [restore-quality-gates](2026-08-02-restore-quality-gates/spec.md) | Restore the project's quality gates | Done — see [plan](2026-08-02-restore-quality-gates/implementation_plan.md) |
 | 2026-08-02 | [remediate-review-findings](2026-08-02-remediate-review-findings/spec.md) | Remediate 2026-08-02 architecture review findings | In progress — Phase 1 of 4 done |
-| 2026-09-04 | [seo-improvements](2026-09-04-seo-improvements/spec.md) | Improve search and social metadata | In progress — see [plan](2026-09-04-seo-improvements/implementation_plan.md) |
+| 2026-09-04 | [seo-improvements](2026-09-04-seo-improvements/spec.md) | Improve search and social metadata | Done — see [plan](2026-09-04-seo-improvements/implementation_plan.md) |

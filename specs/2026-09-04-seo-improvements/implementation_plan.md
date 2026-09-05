@@ -2,7 +2,7 @@
 
 - **Spec:** [spec.md](./spec.md)
 - **Branch:** `feat/seo-improvements` from `develop`
-- **Status:** Approved through implementation handoff
+- **Status:** Done
 
 ## Design
 

@@ -2,7 +2,7 @@
 
 - **Date:** 2026-09-04
 - **Slug:** `seo-improvements`
-- **Status:** Approved through implementation handoff
+- **Status:** Done
 
 ## Problem statement
 
