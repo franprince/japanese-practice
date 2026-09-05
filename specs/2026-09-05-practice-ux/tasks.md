@@ -7,4 +7,5 @@
 - [x] Improve home discovery and persist validated practice configurations.
 - [x] Synchronize all localized copy and update meaningful regression coverage.
 - [x] Run quality gates and inspect desktop/mobile visual proof.
-- [ ] Review, commit, push and open the feature PR; check mergeability.
+- [x] Review and commit implementation and visual evidence.
+- [ ] Push and open the feature PR; check mergeability. Automatic approval review rejected the push because it requires explicit approval to upload source and history to github.com/franprince/japanese-practice.
