@@ -4,7 +4,6 @@ import { useState } from "react"
 import { DateGameCard } from "@/components/dates/date-game-card"
 import { DateModeSelector } from "@/components/dates/date-mode-selector"
 import { StatsDisplay } from "@/components/game/stats-display"
-import { RemainingBadge } from "@/components/game/remaining-badge"
 import type { DateMode } from "@/lib/japanese/dates"
 import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
@@ -24,11 +23,10 @@ export default function DatesPage() {
         playMode,
         targetCount,
         sessionComplete,
-        correctCount,
-        accuracy,
-        handleScoreUpdate,
+        handleSessionEvent,
         resetSession,
         setTargetCount,
+        setPlayMode,
         remainingLabel,
         sessionSummaryProps,
     } = useSessionProgress({ t })
@@ -38,11 +36,9 @@ export default function DatesPage() {
     }, [])
 
     const [mode, setMode] = useState<DateMode>("week_days")
-    const [key, setKey] = useState(0)
 
     const handleModeChange = (newMode: DateMode) => {
         setMode(newMode)
-        setKey((prev) => prev + 1)
         resetSession()
     }
 
@@ -55,12 +51,9 @@ export default function DatesPage() {
                 <>
                     <GameSettingsPopover
                         playMode={playMode}
-                        onSelectMode={resetSession}
+                        onSelectMode={setPlayMode}
                         targetCount={targetCount}
-                        onSelectCount={(count) => {
-                            setTargetCount(count)
-                            resetSession()
-                        }}
+                        onSelectCount={setTargetCount}
                         remainingQuestions={0}
                     />
                     <DateModeSelector mode={mode} onModeChange={handleModeChange} />
@@ -82,9 +75,9 @@ export default function DatesPage() {
 
             <div className="mb-6">
                 <DateGameCard
-                    key={`${key}-${sessionId}`}
+                    sessionId={sessionId}
                     mode={mode}
-                    onScoreUpdate={handleScoreUpdate}
+                    onSessionEvent={handleSessionEvent}
                     disableNext={sessionComplete && playMode === "session"}
                 />
             </div>

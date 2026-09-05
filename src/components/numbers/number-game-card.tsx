@@ -1,5 +1,7 @@
 "use client"
 
+import type { GameSessionProps } from "@/lib/core/game-session"
+
 import { Button } from "@/components/ui/button"
 import { NumberPad } from "@/components/numbers/number-pad"
 import { ArrowRight, SkipForward } from "lucide-react"
@@ -11,14 +13,13 @@ import { useI18n } from "@/lib/i18n"
 import { useNumberGame } from "@/hooks/use-number-game"
 import { GameCardContainer, QuestionDisplay, ResultDisplay } from "@/components/game/primitives"
 
-interface NumberGameCardProps {
+interface NumberGameCardProps extends GameSessionProps {
   difficulty: Difficulty
   mode: "arabicToKanji" | "kanjiToArabic"
-  onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   disableNext?: boolean
 }
 
-export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = false }: NumberGameCardProps) {
+export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, disableNext = false }: NumberGameCardProps) {
   const { t } = useI18n()
   const {
     userAnswer,
@@ -34,7 +35,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
     handleSubmit,
     handleNext,
     handleSkip,
-  } = useNumberGame({ difficulty, mode, onScoreUpdate, disableNext })
+  } = useNumberGame({ difficulty, mode, sessionId, onSessionEvent, disableNext })
 
   const promptLabel = mode === "arabicToKanji" ? t("writeInJapanese") : t("writeInArabic")
 
@@ -104,7 +105,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
               disableShuffle={mode === "kanjiToArabic"}
             />
             <div className="flex justify-center">
-              <Button variant="ghost" onClick={handleSkip} className="text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" onClick={handleSkip} disabled={disableNext} className="text-muted-foreground hover:text-foreground">
                 <SkipForward className="h-4 w-4 mr-1" />
                 {t("skip")}
               </Button>

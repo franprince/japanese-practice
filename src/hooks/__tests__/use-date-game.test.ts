@@ -7,7 +7,7 @@ const t = (key: string) => key
 describe("useDateGame", () => {
     it("toggling showNumbers changes only the display format, not the question", () => {
         const { result } = renderHook(() =>
-            useDateGame({ mode: "months", onScoreUpdate: mock(), t })
+            useDateGame({ mode: "months", sessionId: 0, onSessionEvent: mock(), t })
         )
 
         const questionBefore = result.current.question
@@ -29,7 +29,7 @@ describe("useDateGame", () => {
 
     it("preserves a partially typed answer across the toggle", () => {
         const { result } = renderHook(() =>
-            useDateGame({ mode: "week_days", onScoreUpdate: mock(), t })
+            useDateGame({ mode: "week_days", sessionId: 0, onSessionEvent: mock(), t })
         )
 
         act(() => {

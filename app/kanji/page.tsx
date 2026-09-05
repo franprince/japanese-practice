@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { KanjiGameCard } from "@/components/kanji/kanji-game-card"
 import { KanjiDifficultySelector } from "@/components/kanji/kanji-difficulty-selector"
 import { StatsDisplay } from "@/components/game/stats-display"
-import { RemainingBadge } from "@/components/game/remaining-badge"
 import type { KanjiDifficulty } from "@/lib/japanese/kanji"
 import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
@@ -23,17 +22,15 @@ export default function KanjiPage() {
         playMode,
         targetCount,
         sessionComplete,
-        correctCount,
-        accuracy,
-        handleScoreUpdate,
+        handleSessionEvent,
         resetSession,
         setTargetCount,
+        setPlayMode,
         remainingLabel,
         sessionSummaryProps,
     } = useSessionProgress({ t })
 
     const [difficulty, setDifficulty] = useState<KanjiDifficulty>("easy")
-    const [key, setKey] = useState(0)
 
     // Preload kana dictionary for romaji conversion in option cards
     useEffect(() => {
@@ -43,7 +40,6 @@ export default function KanjiPage() {
     const handleDifficultyChange = (newDifficulty: KanjiDifficulty) => {
         if (newDifficulty === difficulty) return // Don't reset if same difficulty
         setDifficulty(newDifficulty)
-        setKey((prev) => prev + 1)
         resetSession()
     }
 
@@ -56,12 +52,9 @@ export default function KanjiPage() {
                 <>
                     <GameSettingsPopover
                         playMode={playMode}
-                        onSelectMode={resetSession}
+                        onSelectMode={setPlayMode}
                         targetCount={targetCount}
-                        onSelectCount={(count) => {
-                            setTargetCount(count)
-                            resetSession()
-                        }}
+                        onSelectCount={setTargetCount}
                         remainingQuestions={0}
                     />
                     <KanjiDifficultySelector difficulty={difficulty} onDifficultyChange={handleDifficultyChange} />
@@ -83,9 +76,9 @@ export default function KanjiPage() {
 
             <div className="mb-6">
                 <KanjiGameCard
-                    key={`${key}-${sessionId}`}
+                    sessionId={sessionId}
                     difficulty={difficulty}
-                    onScoreUpdate={handleScoreUpdate}
+                    onSessionEvent={handleSessionEvent}
                     disableNext={sessionComplete && playMode === "session"}
                 />
             </div>

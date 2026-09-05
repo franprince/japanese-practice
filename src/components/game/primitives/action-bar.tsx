@@ -11,6 +11,7 @@ interface ActionBarProps {
     onSkip?: () => void
     submitDisabled?: boolean
     nextDisabled?: boolean
+    skipDisabled?: boolean
     submitLabel?: string
     nextLabel?: string
     skipLabel?: string
@@ -25,6 +26,7 @@ export function ActionBar({
     onSkip,
     submitDisabled = false,
     nextDisabled = false,
+    skipDisabled = false,
     submitLabel,
     nextLabel,
     skipLabel,
@@ -53,6 +55,7 @@ export function ActionBar({
                 <Button
                     variant="outline"
                     onClick={onSkip}
+                    disabled={skipDisabled}
                     className="flex-1 bg-transparent border-border/50 hover:bg-secondary/50"
                 >
                     <SkipForward className="w-4 h-4 mr-2" />
