@@ -3,12 +3,10 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/core"
 import type { GameSessionProps } from "@/lib/core/game-session"
 import type { WordFilter } from "@/lib/japanese/words"
 import { useI18n } from "@/lib/i18n"
-import { Flame, Zap, Type, Shuffle, Trophy } from "lucide-react"
 import type { GameMode, WordsGameType } from "@/types/game"
 import { useWordGame } from "@/hooks/use-word-game"
 import { GameFeedbackSection, FeedbackIcon } from "./game-feedback-section"
@@ -23,7 +21,6 @@ interface GameCardProps extends GameSessionProps {
   submittedCount: number
   answerAccuracy: number
   suppressFocus?: boolean
-  onRequestCloseSettings?: () => void
   onRequestOpenSettings?: () => void
   disableNext?: boolean
   onIncorrectCharsChange?: (chars: Map<string, { count: number; romaji: string }>) => void
@@ -38,7 +35,6 @@ export function GameCard({
   submittedCount,
   answerAccuracy,
   suppressFocus = false,
-  onRequestCloseSettings,
   onRequestOpenSettings,
   disableNext = false,
   onIncorrectCharsChange,

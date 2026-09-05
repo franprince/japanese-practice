@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { cn } from "@/lib/core"
 import { useLanguage } from "@/lib/i18n"
 import type { Language } from "@/lib/i18n"
@@ -17,12 +17,7 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { language, setLanguage } = useLanguage()
-  const [mounted, setMounted] = useState(false)
-
-  
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useHydrated()
 
   if (!mounted) {
     

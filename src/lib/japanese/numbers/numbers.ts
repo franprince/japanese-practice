@@ -129,8 +129,8 @@ export function japaneseToArabic(japanese: string): number {
 }
 
 
-export function generateRandomNumber(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min
+export function generateRandomNumber(min: number, max: number, random: () => number = Math.random): number {
+    return Math.floor(random() * (max - min + 1)) + min
 }
 
 

@@ -54,3 +54,18 @@ test.describe('Numbers game', () => {
         await testInfo.attach('restarted-session', { body: await page.screenshot(), contentType: 'image/png' })
     })
 })
+
+
+test('keypad and question stay stable while entering and clearing input', async ({ page }, testInfo) => {
+    await page.goto('/numbers')
+    const pad = page.locator('#number-pad')
+    await expect(pad).toBeVisible()
+    const order = await pad.getByRole('button').allTextContents()
+    const question = await page.getByTestId('question-display').textContent()
+    await pad.getByRole('button', { name: '一', exact: true }).click()
+    await expect(pad.getByRole('button')).toHaveText(order)
+    await page.getByRole('button', { name: 'Clear', exact: true }).click()
+    await expect(page.getByTestId('question-display')).toHaveText(question!)
+    await expect(pad.getByRole('button')).toHaveText(order)
+    await testInfo.attach('lifecycle-keypad', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' })
+})

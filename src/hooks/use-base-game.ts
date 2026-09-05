@@ -1,37 +1,42 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, useLayoutEffect } from "react"
 import type { GameSessionProps, SessionOutcomeEvent } from "@/lib/core/game-session"
 
 interface UseBaseGameProps extends GameSessionProps {
+    questionId: number
     disabled?: boolean
 }
 
 // Owns question feedback and admission only. The session reducer owns scoring.
-export function useBaseGame({ sessionId, onSessionEvent, disabled = false }: UseBaseGameProps) {
-    const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null)
-    const [questionId, setQuestionId] = useState(0)
-    const question = useRef({ sessionId, id: 0, settled: true })
+export function useBaseGame({ sessionId, questionId, onSessionEvent, disabled = false }: UseBaseGameProps) {
+    const [result, setResult] = useState<{ sessionId: number; questionId: number; correct: boolean } | null>(null)
+    const question = useRef({ sessionId, questionId, settled: false, active: false, disabled })
+    useLayoutEffect(() => {
+        const previous = question.current
+        question.current = {
+            sessionId, questionId, active: true, disabled,
+            settled: previous.sessionId === sessionId && previous.questionId === questionId && previous.settled,
+        }
+        return () => { question.current.active = false }
+    }, [sessionId, questionId, disabled])
 
-    const beginQuestion = useCallback(() => {
-        question.current = { sessionId, id: question.current.id + 1, settled: false }
-        setQuestionId(question.current.id)
-        setFeedback(null)
-    }, [sessionId])
-
-    const emitOutcome = useCallback((outcome: { type: "answer-submitted"; correct: boolean } | { type: "question-skipped" }) => {
+    const isCurrentQuestion = useCallback(() => {
         const current = question.current
-        if (disabled || current.settled || current.sessionId !== sessionId || current.id !== questionId) return false
-        // Lock synchronously: two handlers in the same render cannot score twice.
-        current.settled = true
-        setFeedback(outcome.type === "answer-submitted" && outcome.correct ? "correct" : "incorrect")
-        const event: SessionOutcomeEvent = { ...outcome, sessionId, questionId: current.id }
+        return !disabled && !current.disabled && current.active && current.sessionId === sessionId && current.questionId === questionId
+    }, [disabled, sessionId, questionId])
+    const emitOutcome = useCallback((outcome: { type: "answer-submitted"; correct: boolean } | { type: "question-skipped" }) => {
+        if (!isCurrentQuestion() || question.current.settled) return false
+        question.current.settled = true
+        setResult({ sessionId, questionId, correct: outcome.type === "answer-submitted" && outcome.correct })
+        const event: SessionOutcomeEvent = { ...outcome, sessionId, questionId }
         onSessionEvent(event)
         return true
-    }, [disabled, onSessionEvent, sessionId, questionId])
+    }, [isCurrentQuestion, onSessionEvent, sessionId, questionId])
 
+    const feedback = result?.sessionId === sessionId && result.questionId === questionId
+        ? result.correct ? "correct" as const : "incorrect" as const : null
     const submitAnswer = useCallback((correct: boolean) => emitOutcome({ type: "answer-submitted", correct }), [emitOutcome])
     const skipQuestion = useCallback(() => emitOutcome({ type: "question-skipped" }), [emitOutcome])
-
-    return { feedback, beginQuestion, submitAnswer, skipQuestion }
+    return { feedback, submitAnswer, skipQuestion, isCurrentQuestion }
 }

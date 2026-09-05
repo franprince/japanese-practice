@@ -30,9 +30,8 @@ export function useSessionProgress({ defaultTargetCount = 10, basePoints = 10, t
     const sessionSummaryProps = {
         title: translate("sessionCompleteTitle"),
         targetLabel: translate("sessionTargetLabel"),
-        correctLabel: translate("sessionCorrectLabel"),
         accuracyLabel: translate("sessionAccuracyLabel"),
-        targetCount, correctCount, accuracy,
+        targetCount, accuracy,
         restartLabel: translate("sessionRestart"),
         switchLabel: translate("sessionSwitchToInfinite"),
     }

@@ -1,3 +1,4 @@
+import { StrictMode } from "react"
 import { describe, expect, it, mock, spyOn } from "bun:test"
 import { renderHook, act } from "@testing-library/react"
 import type { JapaneseWord, ErrorDetectionResult } from "@/types/japanese"
@@ -10,11 +11,6 @@ let resolvers: Resolver[] = []
 mock.module("@/lib/japanese/words", () => ({
     getRandomWord: mock(() => new Promise<JapaneseWord>((resolve) => { resolvers.push(resolve) })),
     getRandomCharacter: mock(() => new Promise<JapaneseWord>((resolve) => { resolvers.push(resolve) })),
-}))
-
-mock.module("@/lib/japanese/words/loader", () => ({
-    confirmWordset: mock(),
-    normalizeLang: mock((lang: string) => lang),
 }))
 
 const { useWordGame } = await import("../use-word-game")
@@ -183,5 +179,41 @@ describe("Words session integration", () => {
         } finally {
             validate.mockRestore()
         }
+    })
+})
+
+
+describe("Words lifecycle stability", () => {
+    it("does not load on focus, equivalent filter or callback-only changes", async () => {
+        resolvers = []
+        const { result, rerender } = renderHook(({ suppressFocus, groups }) => useWordGame({
+            mode: "hiragana", filter: { ...filter, selectedGroups: groups }, gameType: "words",
+            disableNext: false, suppressFocus, lang: "en", sessionId: 0, onSessionEvent: mock(),
+        }), { initialProps: { suppressFocus: true, groups: ["a", "b"] } })
+        await resolveWord()
+        act(() => result.current.setUserInput("partial"))
+        const currentWord = result.current.currentWord
+        rerender({ suppressFocus: false, groups: ["b", "a"] })
+        expect(resolvers).toHaveLength(1)
+        expect(result.current.currentWord).toBe(currentWord)
+        expect(result.current.userInput).toBe("partial")
+    })
+    it("commits only the current request after Strict Mode effect replay", async () => {
+        resolvers = []
+        const outcomes = mock()
+        const { result, unmount } = renderHook(() => useWordGame({
+            mode: "hiragana", filter, gameType: "words", disableNext: false,
+            suppressFocus: true, lang: "en", sessionId: 0, onSessionEvent: outcomes,
+        }), { wrapper: StrictMode })
+        expect(resolvers).toHaveLength(2)
+        await resolveWord(1, "current")
+        await resolveWord(0, "obsolete")
+        expect(result.current.currentWord?.romaji).toBe("current")
+        expect(outcomes).not.toHaveBeenCalled()
+        const before = result.current.currentWord
+        act(() => { void result.current.loadNewWord() })
+        unmount()
+        await resolveWord(2, "unmounted")
+        expect(result.current.currentWord).toBe(before)
     })
 })

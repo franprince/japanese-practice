@@ -54,7 +54,6 @@ export default function DatesPage() {
                         onSelectMode={setPlayMode}
                         targetCount={targetCount}
                         onSelectCount={setTargetCount}
-                        remainingQuestions={0}
                     />
                     <DateModeSelector mode={mode} onModeChange={handleModeChange} />
                 </>

@@ -8,10 +8,8 @@ import { IncorrectCharsTable } from "./incorrect-chars-table"
 interface SessionSummaryCardProps {
   title: string
   targetLabel: string
-  correctLabel: string
   accuracyLabel: string
   targetCount: number
-  correctCount: number
   accuracy: number
   onRestart: () => void
   onSwitchToInfinite: () => void
@@ -30,10 +28,8 @@ interface SessionSummaryCardProps {
 export function SessionSummaryCard({
   title,
   targetLabel,
-  correctLabel,
   accuracyLabel,
   targetCount,
-  correctCount,
   accuracy,
   onRestart,
   onSwitchToInfinite,

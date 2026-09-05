@@ -55,7 +55,6 @@ export default function KanjiPage() {
                         onSelectMode={setPlayMode}
                         targetCount={targetCount}
                         onSelectCount={setTargetCount}
-                        remainingQuestions={0}
                     />
                     <KanjiDifficultySelector difficulty={difficulty} onDifficultyChange={handleDifficultyChange} />
                 </>

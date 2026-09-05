@@ -1,6 +1,8 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
+import { createRandomSeed, createSeededRandom, shuffleArray } from "@/lib/core/random"
 import { Button } from "@/components/ui/button"
 import { Delete, CornerDownLeft } from "lucide-react"
 import { numberPadKeysArabic, numberPadKeysKanji } from "@/lib/japanese/numbers"
@@ -32,26 +34,17 @@ export function NumberPad({
   disableShuffle = false,
 }: NumberPadProps) {
   const { t } = useI18n()
-  const [hasMounted, setHasMounted] = useState(false)
-
-  useEffect(() => {
-    setHasMounted(true)
-  }, [])
-
-  const renderedKeys: NumberPadKey[] = useMemo(() => {
-    const base = Array.from(keys) as NumberPadKey[]
-    
-    if (!shuffleNumbers || !hasMounted) return base
-    const shuffled: NumberPadKey[] = Array.from(base) as NumberPadKey[]
-    for (let i = shuffled.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1))
-      const iVal = shuffled[i]!
-      const jVal = shuffled[j]!
-      shuffled[i] = jVal
-      shuffled[j] = iVal
-    }
-    return shuffled
-  }, [keys, shuffleNumbers, hasMounted])
+  const hydrated = useHydrated()
+  const [seed] = useState(createRandomSeed)
+  const signature = JSON.stringify(keys)
+  const [order, setOrder] = useState({ signature, shuffled: shuffleNumbers, revision: 0 })
+  if (order.signature !== signature || order.shuffled !== shuffleNumbers) {
+    setOrder({ signature, shuffled: shuffleNumbers, revision: order.revision + 1 })
+  }
+  const renderedKeys = useMemo(() => {
+    if (!shuffleNumbers || !hydrated) return keys
+    return shuffleArray([...keys], createSeededRandom(seed + order.revision))
+  }, [keys, shuffleNumbers, hydrated, seed, order.revision])
 
   return (
     <div className="w-full max-w-md mx-auto">

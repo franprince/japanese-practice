@@ -1,6 +1,7 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import React, { createContext, useContext, useEffect, type ReactNode } from "react"
+import { useStoredPreference } from "@/hooks/use-stored-preference"
 
 
 import type { Theme } from "@/types/ui"
@@ -14,19 +15,13 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const isTheme = (value: string | null): value is Theme => value !== null &&
+  ["default", "sakura", "ocean", "forest", "sunset", "daylight", "lavender", "mint"].includes(value)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("default")
+  const [theme, setTheme] = useStoredPreference<Theme>("theme", "default", isTheme)
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme") as Theme
-    if (saved && ["default", "sakura", "ocean", "forest", "sunset", "daylight", "lavender", "mint"].includes(saved)) {
-      setTheme(saved)
-    }
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme)
     document.documentElement.setAttribute("data-theme", theme)
   }, [theme])
 

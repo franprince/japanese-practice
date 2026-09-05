@@ -55,7 +55,6 @@ export default function NumbersPage() {
                         onSelectMode={setPlayMode}
                         targetCount={targetCount}
                         onSelectCount={setTargetCount}
-                        remainingQuestions={0}
                     />
 
                     <DifficultySelector difficulty={difficulty} onDifficultyChange={handleDifficultyChange} />

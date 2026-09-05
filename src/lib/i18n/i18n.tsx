@@ -3,6 +3,7 @@
 import { createContext, useContext, useMemo, useState, useEffect, type ReactNode } from "react"
 import type { Language, TranslationKey } from "@/lib/i18n/translations"
 import en from "@/locales/en.json"
+import { useStoredPreference } from "@/hooks/use-stored-preference"
 
 const LANG_STORAGE_KEY = "kana-words-lang"
 
@@ -15,12 +16,7 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | null>(null)
 
-const getStoredLang = (): Language | null => {
-  if (typeof window === "undefined") return null
-  const stored = localStorage.getItem(LANG_STORAGE_KEY)
-  if (stored === "en" || stored === "es" || stored === "ja") return stored as Language
-  return null
-}
+const isLanguage = (value: string | null): value is Language => value === "en" || value === "es" || value === "ja"
 
 const loadTranslations = async (lang: Language): Promise<Record<string, string>> => {
   switch (lang) {
@@ -34,54 +30,39 @@ const loadTranslations = async (lang: Language): Promise<Record<string, string>>
   }
 }
 
-export function I18nProvider({ children, initialLang = "es" }: { children: ReactNode; initialLang?: Language }) {
-  
-  const getInitialLang = (): Language => {
-    if (typeof window === "undefined") return initialLang
-    const stored = getStoredLang()
-    return stored || initialLang
-  }
-
-  const [lang, setLangState] = useState<Language>(getInitialLang)
-  const [translationsMap, setTranslationsMap] = useState<Record<string, string>>(en) 
-  const [isLoading, setIsLoading] = useState(false)
+export function I18nProvider({ children, initialLang = "es", translationLoader = loadTranslations }: {
+  children: ReactNode
+  initialLang?: Language
+  translationLoader?: typeof loadTranslations
+}) {
+  const [lang, setLang] = useStoredPreference(LANG_STORAGE_KEY, initialLang, isLanguage)
+  const [loaded, setLoaded] = useState<{ lang: Language; messages: Record<string, string> } | null>(null)
+  const translationsMap = lang === "en" ? en : loaded?.lang === lang ? loaded.messages : en
+  const isLoading = lang !== "en" && loaded?.lang !== lang
 
   
   useEffect(() => {
-    if (lang === "en") {
-      setTranslationsMap(en)
-      setIsLoading(false)
-      document.documentElement.lang = "en"
-      return
-    }
-
-    setIsLoading(true)
-    loadTranslations(lang)
+    if (lang === "en") return
+    let active = true
+    translationLoader(lang)
       .then((trans) => {
-        setTranslationsMap(trans)
-        document.documentElement.lang = lang
+        if (active) setLoaded({ lang, messages: trans })
       })
       .catch((err) => {
+        if (!active) return
         console.error("Failed to load translations", err)
-        setTranslationsMap(en) 
+        setLoaded({ lang, messages: en })
       })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [lang])
+    return () => { active = false }
+  }, [lang, translationLoader])
 
-  const setLang = (next: Language) => {
-    setLangState(next)
-    if (typeof window !== "undefined") {
-      localStorage.setItem(LANG_STORAGE_KEY, next)
-    }
-  }
+  useEffect(() => { document.documentElement.lang = lang }, [lang])
 
   const t = useMemo(() => {
     return (key: TranslationKey) => translationsMap[key] || en[key as keyof typeof en] || key
   }, [translationsMap])
 
-  const value = useMemo<I18nContextValue>(() => ({ lang, setLang, t, isLoading }), [lang, t, isLoading])
+  const value = useMemo<I18nContextValue>(() => ({ lang, setLang, t, isLoading }), [lang, setLang, t, isLoading])
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
