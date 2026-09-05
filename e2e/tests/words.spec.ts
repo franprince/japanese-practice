@@ -36,7 +36,7 @@ test('mobile downloads the real payload only after consent and saves it', async 
     await page.setViewportSize({ width: 390, height: 844 })
     let downloads = 0
     page.on('request', request => {
-        if (request.url().includes('/api/wordset?') && request.method() === 'GET') downloads++
+        if (/\/wordsets\/(en|es)-[a-f0-9]{64}\.json$/.test(new URL(request.url()).pathname) && request.method() === 'GET') downloads++
     })
     await page.goto('/words')
     await expect(page.getByRole('textbox')).toBeEditable()

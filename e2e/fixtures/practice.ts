@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test'
+import { fixtureManifest } from "../../src/test/wordset-fixture"
 import type { WordSets } from '../../src/types/api'
 
 export const wordset: WordSets = {
@@ -11,11 +12,12 @@ export const kanji = [
     { char: '月', reading: 'つき', meaning_en: 'moon', meaning_es: 'luna', jlpt: 'jlpt-5' },
     { char: '水', reading: 'みず', meaning_en: 'water', meaning_es: 'agua', jlpt: 'jlpt-5' },
 ]
+export async function mockWordsetManifest(page: Page) {
+    await page.route('**/wordsets/manifest.json', route => route.fulfill({ json: fixtureManifest(wordset) }))
+}
 export async function mockWordset(page: Page) {
-    await page.route('**/api/wordset?*', route => route.fulfill({
-        status: 200, contentType: 'application/json',
-        body: route.request().method() === 'HEAD' ? '' : JSON.stringify(wordset),
-    }))
+    await mockWordsetManifest(page)
+    await page.route('**/wordsets/*-*.json', route => route.fulfill({ json: wordset }))
 }
 export async function selectWords(page: Page) {
     await page.getByRole('button', { name: 'Command Center', exact: true }).click()

@@ -179,7 +179,7 @@ docs: update README
 - Source: JMdict simplified (see above).
 - Build: filtered and normalized into `data/jmdict-spa-3.6.1.json` with language fields `meaning_en` and `meaning_es`, plus kana/romaji for practice.
 - Storage: shipped via Git LFS; loaded lazily in the browser and cached in IndexedDB.
-- **Distribution:** Wordsets ship as `public/wordset-<lang>.json` (no version suffix in filename). Each file embeds a numeric `version`, which the API surfaces via ETag for cache invalidation.
+- **Distribution:** Builds publish immutable `/wordsets/<lang>-<sha256>.json` assets and a small revalidated `/wordsets/manifest.json`. See [the artifact and deployment contract](docs/static-wordsets.md).
 
 ### Kanji
 - **Frequency Source**: [kanji-frequency](https://github.com/scriptin/kanji-frequency) by scriptin - provides frequency-ranked kanji based on newspaper corpus analysis.
@@ -215,19 +215,11 @@ docs: update README
 
 ## Data Architecture
 
-### Wordset Delivery (v2)
-
-![Data Flow Diagram](docs/diagrams/data-flow.png)
-
 ### Word Data Pipeline
 1. **Sources**: `kanaDictionary.json` (kana groups) and `jmdict-spa-3.6.1.json` / `jmdict-eng-3.6.2.json` (vocabulary).
-2. **Build Process**: `scripts/build-wordset.ts` merges sources, filters blacklist, embeds `version`, and writes `public/wordset-<lang>.json` (ES and EN variants).
-3. **API Delivery**: `/api/wordset?lang=<lang>` reads the embedded `version`, sets `ETag`, and serves JSON. Clients validate with `If-None-Match` for lightweight 304 responses.
-4. **Caching**:
-   - **Architecture**: Centralized management via `src/lib/db.ts` ensures the `kana-words` IndexedDB (v3) initializes correctly with both `kanjiData` and `wordSets` stores, resolving schema race conditions.
-   - **Lifecycle**: Check IndexedDB → Fetch API (If-None-Match) → Reuse Cache (304) or Update (200).
-
-   ![Cache Workflow Diagram](docs/diagrams/cache-workflow.png)
+2. **Dataset build**: `scripts/build-wordset.ts` filters and merges sources into versioned payloads in `public/wordset-<lang>.json`.
+3. **Static publication**: `scripts/publish-wordsets.ts` validates both languages and emits exact-byte, SHA-256-named assets and a small metadata manifest during dev and production builds.
+4. **Acquisition**: Check IndexedDB, then revalidate manifest metadata. Download only a changed or missing asset; verify its size, checksum, version and word shape before durable persistence. Mobile downloads require consent, and failed refreshes preserve cached data.
 
 ### Kanji Data Pipeline
 

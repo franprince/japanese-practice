@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PRs 1 and 2 merged; E2E hardening verified on `test/e2e-reliability` before PR 3
+- **Status:** Approved sequence — PRs 1–2 and E2E hardening (#58) merged; PR 3 open for review
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -41,8 +41,7 @@ The standard quality gates pass.
 
 ## PR 2 — Make wordset acquisition reliable
 
-**Status:** Merged via [#57](https://github.com/franprince/japanese-practice/pull/57).
-Follow-up E2E hardening covers additional browser failure paths before PR 3.
+**Status:** Merged in [PR #57](https://github.com/franprince/japanese-practice/pull/57).
 
 **Verification (2026-09-05):** Typecheck and production build pass; 121 unit
 tests and all 8 relevant Words/browser lifecycle tests pass. Lint reports zero
@@ -85,6 +84,13 @@ remain functional.
 [2026-09-04-wordset-download-lifecycle/spec.md](2026-09-04-wordset-download-lifecycle/spec.md)
 
 ## PR 3 — Move wordset payloads to static delivery
+
+**Status:** Implemented and verified; [PR #59](https://github.com/franprince/japanese-practice/pull/59)
+is open against `develop` without merge conflicts. Continue PR 4 after it merges.
+See the
+[specification](2026-09-05-static-wordset-delivery/spec.md),
+[plan](2026-09-05-static-wordset-delivery/implementation_plan.md), and
+[tasks](2026-09-05-static-wordset-delivery/tasks.md).
 
 **Problem:** The application route reads, parses, and serializes wordsets up to
 approximately 32 MB. Validation requests can therefore consume unnecessary

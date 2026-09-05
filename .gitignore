@@ -42,3 +42,6 @@ playwright-report/
 
 # old versioned wordset files (replaced by base filename pattern)
 public/wordset-*-v*.json
+
+# Generated immutable delivery assets and manifest
+public/wordsets/

@@ -1,6 +1,9 @@
+import { fixtureChecksum, fixtureManifest } from "../../src/test/wordset-fixture"
 import { type Page } from '@playwright/test'
 import { test, expect } from '../fixtures'
-import { wordset, readWordset, selectWords, mockWordset } from '../fixtures/practice'
+import { wordset, readWordset, selectWords, mockWordset, mockWordsetManifest } from '../fixtures/practice'
+
+const cachedWordset = { ...wordset, assetChecksum: fixtureChecksum(wordset) }
 
 async function openConsent(page: Page) {
     await page.setViewportSize({ width: 390, height: 844 })
@@ -19,8 +22,12 @@ for (const fault of [
 ]) {
     test(`mobile ${fault.name} failure does not confirm or persist; retry saves a usable wordset`, async ({ page }, testInfo) => {
         let downloads = 0
-        await page.route('**/api/wordset?lang=en', async route => {
-            if (route.request().method() === 'HEAD') { await route.fulfill({ status: 200 }); return }
+        await page.route('**/wordsets/manifest.json', route => {
+            const manifest = fixtureManifest(wordset)
+            if (downloads === 0 && fault.status === 200) manifest.datasets.en.bytes = Buffer.byteLength(fault.body)
+            return route.fulfill({ json: manifest })
+        })
+        await page.route('**/wordsets/en-*.json', async route => {
             downloads++
             await route.fulfill(downloads === 1 ? fault : { json: wordset })
         })
@@ -36,7 +43,7 @@ for (const fault of [
         await expect(modal).toBeHidden()
         await expect(page.getByTestId('question-display')).toHaveText('あいう')
         expect(await confirmation(page)).toBe('1')
-        expect(await readWordset(page)).toEqual(wordset)
+        expect(await readWordset(page)).toEqual(cachedWordset)
         expect(downloads).toBe(2)
     })
 }
@@ -62,9 +69,9 @@ test('mobile storage failure never confirms; cancel keeps character mode usable'
 })
 
 test('cancels a pending request and permits a fresh download', async ({ page }) => {
+    await mockWordsetManifest(page)
     let downloads = 0
-    await page.route('**/api/wordset?lang=en', async route => {
-        if (route.request().method() === 'HEAD') { await route.fulfill({ status: 200 }); return }
+    await page.route('**/wordsets/en-*.json', async route => {
         downloads++
         if (downloads > 1) await route.fulfill({ json: wordset })
         // The first request remains intercepted until cancellation/context teardown.
@@ -77,7 +84,7 @@ test('cancels a pending request and permits a fresh download', async ({ page }) 
     await expect(modal.getByRole('status')).not.toContainText('100%')
     await expect(modal.getByRole('button', { name: 'Download', exact: true })).toBeDisabled()
     const cancelled = page.waitForEvent('requestfailed', request =>
-        request.url().includes('/api/wordset?lang=en') && request.method() === 'GET')
+        new URL(request.url()).pathname.startsWith('/wordsets/en-') && request.method() === 'GET')
     await modal.getByRole('button', { name: 'Cancel', exact: true }).click()
     expect((await cancelled).failure()?.errorText).toContain('ERR_ABORTED')
     await expect(modal).toBeHidden()
@@ -87,19 +94,21 @@ test('cancels a pending request and permits a fresh download', async ({ page }) 
     await modal.getByRole('button', { name: 'Download', exact: true }).click()
     await expect(modal).toBeHidden()
     await expect(page.getByTestId('question-display')).toHaveText('あいう')
-    expect(await readWordset(page)).toEqual(wordset)
+    expect(await readWordset(page)).toEqual(cachedWordset)
     expect(downloads).toBe(2)
 })
 
 test('reload reuses durable data despite a failed background version check', async ({ page }) => {
     let downloads = 0
-    let headFailures = 0
-    let failHead = false
-    await page.route('**/api/wordset?lang=en', async route => {
-        if (route.request().method() === 'HEAD') {
-            if (failHead) headFailures++
-            await route.fulfill({ status: failHead ? 503 : 200 }); return
-        }
+    let metadataFailures = 0
+    let failMetadata = false
+    await page.route('**/wordsets/manifest.json', async route => {
+        if (failMetadata) {
+            metadataFailures++
+            await route.fulfill({ status: 503 })
+        } else await route.fulfill({ json: fixtureManifest(wordset) })
+    })
+    await page.route('**/wordsets/en-*.json', async route => {
         downloads++
         await route.fulfill({ json: wordset })
     })
@@ -107,21 +116,21 @@ test('reload reuses durable data despite a failed background version check', asy
     const modal = page.getByTestId('mobile-wordset-modal')
     await modal.getByRole('button', { name: 'Download', exact: true }).click()
     await expect(modal).toBeHidden()
-    failHead = true
+    failMetadata = true
     await page.reload()
-    await expect.poll(() => headFailures).toBeGreaterThan(0)
+    await expect.poll(() => metadataFailures).toBeGreaterThan(0)
     await selectWords(page)
     await expect(page.getByTestId('question-display')).toHaveText('あいう')
     await expect(modal).toBeHidden()
-    expect(await readWordset(page)).toEqual(wordset)
+    expect(await readWordset(page)).toEqual(cachedWordset)
     expect(downloads).toBe(1)
 })
 
 test('Japanese reuses English data; Spanish needs its own consent and durable entry', async ({ page }) => {
+    await mockWordsetManifest(page)
     const downloads: string[] = []
-    await page.route('**/api/wordset?*', async route => {
-        if (route.request().method() === 'HEAD') { await route.fulfill({ status: 304 }); return }
-        downloads.push(new URL(route.request().url()).searchParams.get('lang')!)
+    await page.route('**/wordsets/*-*.json', async route => {
+        downloads.push(new URL(route.request().url()).pathname.split('/').at(-1)!.slice(0, 2))
         await route.fulfill({ json: wordset })
     })
     await openConsent(page)
@@ -142,7 +151,7 @@ test('Japanese reuses English data; Spanish needs its own consent and durable en
     await expect(modal).toBeHidden()
     await expect(page.getByTestId('question-display')).toHaveText('あいう')
     expect(downloads).toEqual(['en', 'es'])
-    expect(await readWordset(page, 'en')).toEqual(wordset)
-    expect(await readWordset(page, 'es')).toEqual(wordset)
+    expect(await readWordset(page, 'en')).toEqual(cachedWordset)
+    expect(await readWordset(page, 'es')).toEqual(cachedWordset)
     expect(await confirmation(page, 'es')).toBe('1')
 })

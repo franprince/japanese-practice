@@ -11,6 +11,8 @@ export type LoaderDeps = {
 
 export type WordSets = {
     version: number
+    /** Checksum of the static asset; absent on legacy cache entries. */
+    assetChecksum?: string
     hiraganaWords: JapaneseWord[]
     katakanaWords: JapaneseWord[]
     bothForms?: JapaneseWord[]

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
+import { fetchWordsetMetadata } from "@/lib/japanese/words/manifest"
 import type { Language } from "@/lib/i18n"
 import type { WordsGameType } from "@/types/game"
 import {
@@ -44,12 +45,10 @@ export const useMobileWordset = (lang: Language, acquisition: WordsetAcquisition
 
     useEffect(() => {
         const controller = new AbortController()
-        fetch(`/api/wordset?lang=${datasetLang}`, { method: "HEAD", signal: controller.signal })
-            .then(response => {
-                if (!response.ok) throw new Error("Wordset size check failed")
-                const bytes = Number(response.headers.get("content-length"))
-                if (!controller.signal.aborted && Number.isFinite(bytes) && bytes > 0) {
-                    setSize({ lang: datasetLang, mb: Math.round(bytes / 1024 / 1024 * 10) / 10 })
+        fetchWordsetMetadata(fetch, datasetLang, controller.signal)
+            .then(metadata => {
+                if (!controller.signal.aborted) {
+                    setSize({ lang: datasetLang, mb: Math.round(metadata.bytes / 1024 / 1024 * 10) / 10 })
                 }
             }).catch(error => {
                 if (!controller.signal.aborted) console.warn("Wordset size unavailable; using estimate", error)
