@@ -8,4 +8,4 @@
 - [x] Synchronize all localized copy and update meaningful regression coverage.
 - [x] Run quality gates and inspect desktop/mobile visual proof.
 - [x] Review and commit implementation and visual evidence.
-- [ ] Push and open the feature PR; check mergeability. Automatic approval review rejected the push because it requires explicit approval to upload source and history to github.com/franprince/japanese-practice.
+- [x] Push and open [PR #63](https://github.com/franprince/japanese-practice/pull/63) against develop; confirmed no merge conflicts. CI and preview checks run on the PR.
