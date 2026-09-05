@@ -1,4 +1,5 @@
 "use client"
+import type { PracticeReviewProps } from "./use-mistake-review"
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese/dates"
@@ -9,7 +10,7 @@ import type { GameSessionProps } from "@/lib/core/game-session"
 import { useKeyboardNavigation } from "./use-keyboard-navigation"
 import type { TranslationKey } from "@/lib/i18n/translations"
 
-export interface UseDateGameProps extends GameSessionProps {
+export interface UseDateGameProps extends GameSessionProps, PracticeReviewProps<DateQuestion> {
     mode: DateMode
     disableNext?: boolean
     t: (key: TranslationKey) => string
@@ -37,16 +38,18 @@ export function useDateGame({
     sessionId,
     onSessionEvent,
     disableNext = false,
+    reviewQuestions,
+    onQuestionMissed,
     t,
 }: UseDateGameProps): UseDateGameReturn {
     const hydrated = useHydrated()
-    const [round, setRound] = useState(() => ({ sessionId, mode, translate: t, id: 1, seed: createRandomSeed(), input: "" }))
+    const [round, setRound] = useState(() => ({ sessionId, mode, translate: t, index: 0, id: 1, seed: createRandomSeed(), input: "" }))
     if (round.sessionId !== sessionId || (!disableNext && (round.mode !== mode || round.translate !== t))) {
-        setRound({ sessionId, mode, translate: t, id: round.id + 1, seed: round.seed + 1, input: "" })
+        setRound({ sessionId, mode, translate: t, index: 0, id: round.id + 1, seed: round.seed + 1, input: "" })
     }
     const generated = useMemo(() => generateDateQuestion(round.mode, round.translate, createSeededRandom(round.seed)),
         [round.mode, round.translate, round.seed])
-    const question = hydrated ? generated : null
+    const question = hydrated ? (reviewQuestions?.length ? reviewQuestions[round.index % reviewQuestions.length]! : generated) : null
     const userInput = round.input
     const setUserInput = useCallback((input: string) => setRound(previous => ({ ...previous, input })), [])
     const [numberDisplay, setNumberDisplay] = useState({ sessionId, visible: false })
@@ -69,8 +72,8 @@ export function useDateGame({
 
     const generateNewQuestion = useCallback(() => {
         if (!isCurrentQuestion()) return
-        setRound({ sessionId, mode, translate: t, id: round.id + 1, seed: createRandomSeed(), input: "" })
-    }, [sessionId, mode, t, round.id, isCurrentQuestion])
+        setRound({ sessionId, mode, translate: t, index: round.index + 1, id: round.id + 1, seed: createRandomSeed(), input: "" })
+    }, [sessionId, mode, t, round.index, round.id, isCurrentQuestion])
 
     useEffect(() => {
         if (!showResult && !disableNext && inputRef.current) {
@@ -87,8 +90,8 @@ export function useDateGame({
 
         const correct = userAnswer === normalizedAnswer || userAnswer === normalizedRomaji
 
-        submitAnswer(correct)
-    }, [question, showResult, disableNext, userInput, submitAnswer])
+        if (submitAnswer(correct) && !correct) onQuestionMissed?.(question)
+    }, [question, showResult, disableNext, userInput, submitAnswer, onQuestionMissed])
 
     const handleNext = useCallback(() => {
         if (disableNext) return
@@ -97,8 +100,9 @@ export function useDateGame({
 
     const handleSkip = useCallback(() => {
         if (disableNext || !skipQuestion()) return
+        if (question) onQuestionMissed?.(question)
         generateNewQuestion()
-    }, [disableNext, skipQuestion, generateNewQuestion])
+    }, [disableNext, skipQuestion, generateNewQuestion, question, onQuestionMissed])
 
     const handleDelete = useCallback(() => {
         if (showResult || disableNext) return

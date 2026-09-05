@@ -1,4 +1,6 @@
 "use client"
+import type { PracticeReviewProps } from "./use-mistake-review"
+import type { WordQuestion } from "@/lib/japanese/words"
 
 import { useState, useEffect, useRef, useCallback, useTransition, useMemo, useLayoutEffect } from "react"
 import type { JapaneseWord, WordFilter } from "@/lib/japanese/words"
@@ -9,7 +11,7 @@ import type { GameSessionProps } from "@/lib/core/game-session"
 import type { Language } from "@/lib/i18n/translations"
 import { useBaseGame } from "./use-base-game"
 
-export interface UseWordGameProps extends GameSessionProps {
+export interface UseWordGameProps extends GameSessionProps, PracticeReviewProps<WordQuestion> {
     mode: GameMode
     filter: WordFilter
     gameType: WordsGameType
@@ -53,6 +55,8 @@ export function useWordGame({
     sessionId,
     onSessionEvent,
     onIncorrectCharsChange,
+    reviewQuestions,
+    onQuestionMissed,
 }: UseWordGameProps): UseWordGameReturn {
     
     const [currentWord, setCurrentWord] = useState<JapaneseWord | null>(null)
@@ -81,6 +85,7 @@ export function useWordGame({
     // Guards against an in-flight loadNewWord() call applying its (now
     // stale) result after a later call has already started/finished —
     // e.g. double-clicking Next or holding Enter.
+    const reviewCursor = useRef({ sessionId, index: 0 })
     const requestIdRef = useRef(0)
     const validationRequestRef = useRef<number | null>(null)
     const diagnosticsSessionRef = useRef(sessionId)
@@ -98,7 +103,8 @@ export function useWordGame({
         if (generation.current !== configKey) return
         const requestId = ++requestIdRef.current
         validationRequestRef.current = null
-        const question = await loadWordQuestion({
+        const index = reviewCursor.current.sessionId === sessionId ? reviewCursor.current.index : 0
+        const question = reviewQuestions?.length ? reviewQuestions[index % reviewQuestions.length]! : await loadWordQuestion({
             mode, gameType, filter: stableFilter, lang,
         })
         const { word, options: nextOptions } = question
@@ -107,6 +113,7 @@ export function useWordGame({
         // A newer loadNewWord() call has already superseded this one —
         // discard this (stale) result instead of overwriting newer state.
         if (requestId !== requestIdRef.current || generation.current !== configKey) return
+        reviewCursor.current = { sessionId, index: index + 1 }
         setPending(false)
         setLoaded({ configKey, sessionId, questionId: requestId })
         if (diagnosticsSessionRef.current !== sessionId) {
@@ -128,7 +135,7 @@ export function useWordGame({
             setOptions(null)
         }
 
-    }, [mode, stableFilter, lang, gameType, sessionId, configKey])
+    }, [mode, stableFilter, lang, gameType, sessionId, configKey, reviewQuestions])
 
     const loadNewWord = useCallback(async () => {
         if (disableNext || generation.current !== configKey) return
@@ -150,6 +157,7 @@ export function useWordGame({
 
         // A skip, new question, restart or unmount invalidates this result.
         if (requestId !== requestIdRef.current || !submitAnswer(isCorrect)) return
+        if (!isCorrect) onQuestionMissed?.({ word: currentWord, options })
         setDisplayRomaji(currentWord.romaji.toLowerCase().trim())
         if (isCorrect) {
             setErrorDetails(null)
@@ -172,16 +180,17 @@ export function useWordGame({
                 })
             })
         }
-    }, [currentWord, userInput, feedback, disableNext, isLoading, submitAnswer, startTransition, gameType])
+    }, [currentWord, userInput, feedback, disableNext, isLoading, submitAnswer, startTransition, gameType, onQuestionMissed, options])
 
     const skipWord = useCallback(() => {
         if (!currentWord || isLoading || !skipQuestion()) return
-        if (currentWord) setDisplayRomaji(currentWord.romaji)
-    }, [currentWord, isLoading, skipQuestion])
+        onQuestionMissed?.({ word: currentWord, options })
+        setDisplayRomaji(currentWord.romaji)
+    }, [currentWord, isLoading, skipQuestion, onQuestionMissed, options])
 
     
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !e.nativeEvent.isComposing) {
             if (feedback) {
                 if (!disableNext && !isLoading) loadNewWord()
             } else if (gameType !== "guess") {
