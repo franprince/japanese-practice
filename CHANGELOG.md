@@ -1,3 +1,33 @@
+# [3.5.0](https://github.com/franprince/japanese-practice/compare/v3.4.0...v3.5.0) (2026-09-05)
+
+
+### Bug Fixes
+
+* currentQuestion possibly undefined type error ([571dc11](https://github.com/franprince/japanese-practice/commit/571dc115911d19a4112a600fe61722cf64e2c61f))
+* **dates:** decouple display toggle from question generation ([37bd2d2](https://github.com/franprince/japanese-practice/commit/37bd2d257e78041ad97fa31565a83cbf2d59a795))
+* explicit type import for CurriculumUnit in selector ([2d641d8](https://github.com/franprince/japanese-practice/commit/2d641d8886ff5a35325ce999d70126952226c3b6))
+* explicit type import for DbQuizQuestion on practice page ([0893ee8](https://github.com/franprince/japanese-practice/commit/0893ee89096f1756ec03b6c14d8852e896367164))
+* final possibly undefined type error in total score logic ([cb31e7f](https://github.com/franprince/japanese-practice/commit/cb31e7f8180785c9256471be8a4ee7af51d93971))
+* **furigana:** recognize chōonpu (ー) in bracketed readings ([b552c1e](https://github.com/franprince/japanese-practice/commit/b552c1e5bab8c0f31a2d67b00787c8c7c0106f0f))
+* **input:** stop nn-collapse from accepting dropped-letter typos ([dceab6a](https://github.com/franprince/japanese-practice/commit/dceab6a027f423d60d34dacf35a6ae2f337205db))
+* **kanji:** prevent getRandomKanji from hanging ([4542e4c](https://github.com/franprince/japanese-practice/commit/4542e4cd140783036bd5fdc82fa9af6c69a3369a))
+* **quiz:** add bun:test imports and required fixture fields to quiz tests ([aa7a249](https://github.com/franprince/japanese-practice/commit/aa7a249bf1639db873fc1e0cdac4f1c65c805fbe))
+* **quiz:** gate the Ollama practice tile behind an explicit opt-in flag ([ff790d6](https://github.com/franprince/japanese-practice/commit/ff790d6dd498fd20d9aa03bc74ca4268d25db889))
+* **quiz:** narrow speakerMatch instead of speaker before indexing ([388ded1](https://github.com/franprince/japanese-practice/commit/388ded1e82bd180b07e6ab71db9373813bb293ad))
+* remove unused type import in quizzes route ([ca574b5](https://github.com/franprince/japanese-practice/commit/ca574b560baa3ceea90fc06b36e6adcf5b1f7c13))
+* repetitive possibly undefined type error in render map ([f0dc84e](https://github.com/franprince/japanese-practice/commit/f0dc84e828afdd0b28c5b86709d9dca658a91875))
+* safe access to opt-in parts in checkAnswer ([6023ed0](https://github.com/franprince/japanese-practice/commit/6023ed0a6da3b057036e666b5d6c5c122515d2e5))
+* **words:** discard stale loadNewWord responses ([d739090](https://github.com/franprince/japanese-practice/commit/d739090ca3611b6f24e2f3f53fde6788bc5b0314))
+
+
+### Features
+
+* **quiz:** decouple multi-blank selections and enforce redundant furigana ([7525a25](https://github.com/franprince/japanese-practice/commit/7525a25568eb47bbdd4e65fe097651efd5d4f50b))
+* **quiz:** exclude katakana from furigana rules ([14eadcd](https://github.com/franprince/japanese-practice/commit/14eadcd539eb05545b75fe62d64a8a90ae5e51e6))
+* **quiz:** implement premium dialogue UI with structured speaker rows ([b9fd2fc](https://github.com/franprince/japanese-practice/commit/b9fd2fc414537136bbeefd6838ae52b10ecf478d))
+* **quiz:** implement robust japanese quiz generator with multi-blank and themed logic ([6ab4604](https://github.com/franprince/japanese-practice/commit/6ab46040030b555831bfe8edd4aeadb7ffe22def))
+* **seo:** publish search and social metadata ([f5c602f](https://github.com/franprince/japanese-practice/commit/f5c602f5051f26abbf99a3430b50839a194bd167))
+
 # [3.4.0](https://github.com/franprince/japanese-practice/compare/v3.3.0...v3.4.0) (2026-03-28)
 
 
