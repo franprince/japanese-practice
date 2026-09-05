@@ -2,15 +2,10 @@
 import type { JapaneseWord } from "@/types/japanese"
 
 
-export function normalizeRomaji(text: string): string {
+function normalizeRomajiCore(text: string): string {
     if (!text) return ""
     let norm = text.toLowerCase().trim()
 
-    
-    
-
-    
-    
     const replacements: Record<string, string> = {
         
         "sha": "sha", "shu": "shu", "sho": "sho",
@@ -61,18 +56,12 @@ export function normalizeRomaji(text: string): string {
     }
     norm = result
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    norm = norm.replace(/nn/g, "n")
-
     return norm
+}
+
+
+export function normalizeRomaji(text: string): string {
+    return normalizeRomajiCore(text).replace(/nn/g, "n")
 }
 
 
@@ -94,18 +83,22 @@ export function validateAnswer(input: string, word: JapaneseWord): boolean {
     const rawAnswer = word.romaji.toLowerCase().trim()
     const kana = word.kana
 
-    
     if (rawInput === rawAnswer) return true
 
-    
-    const normInput = normalizeRomaji(rawInput)
-    const normAnswer = normalizeRomaji(rawAnswer)
+    const normInput = normalizeRomajiCore(rawInput)
+    const normAnswer = normalizeRomajiCore(rawAnswer)
 
     if (normInput === normAnswer) return true
 
-    
-    
-    
+    // Forgive an accidental extra "n" after ん (e.g. "shinnkansen" for
+    // "shinkansen"), but only when the correct answer doesn't itself rely
+    // on a genuine doubled "nn" (e.g. "anna" for あんな) — collapsing
+    // unconditionally here would accept "ana" as correct for あんな.
+    if (!normAnswer.includes("nn")) {
+        const collapsedInput = normInput.replace(/nn/g, "n")
+        if (collapsedInput === normAnswer) return true
+    }
+
     const macronInput = toMacronForm(normInput)
     const macronAnswer = toMacronForm(normAnswer)
 

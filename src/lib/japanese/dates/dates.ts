@@ -105,22 +105,6 @@ export interface DateQuestion {
 }
 
 
-export function generateDayQuestion(): DateQuestion {
-  const day = Math.floor(Math.random() * 31) + 1
-  const dayData = daysOfMonth[day]
-  if (!dayData) {
-    throw new Error(`Invalid day generated: ${day}`)
-  }
-  return {
-    display: `${day}`,
-    displayName: `${day}`,
-    displayNumber: `${day}`,
-    answer: dayData.reading,
-    romaji: dayData.romaji,
-  }
-}
-
-
 export function generateMonthQuestion(t?: (key: TranslationKey) => string): DateQuestion {
   const month = Math.floor(Math.random() * 12) + 1
   const monthData = months[month]
@@ -160,9 +144,14 @@ export function generateMonthQuestion(t?: (key: TranslationKey) => string): Date
 }
 
 
+// Conservatively caps February at 28 (never generates the leap-year-only
+// 29th) since this question type has no year context to make Feb 29
+// well-defined.
+const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
 export function generateFullDateQuestion(): DateQuestion {
   const month = Math.floor(Math.random() * 12) + 1
-  const day = Math.floor(Math.random() * 31) + 1
+  const day = Math.floor(Math.random() * daysInMonth[month - 1]!) + 1
   const monthData = months[month]
   const dayData = daysOfMonth[day]
   if (!monthData || !dayData) {
@@ -203,13 +192,13 @@ export function generateWeekDaysQuestion(t?: (key: TranslationKey) => string): D
   return generateWeekDayQuestion(t)
 }
 
-export function generateDateQuestion(mode: DateMode, t?: (key: TranslationKey) => string, useNumbers: boolean = false): DateQuestion {
+export function generateDateQuestion(mode: DateMode, t?: (key: TranslationKey) => string): DateQuestion {
   switch (mode) {
     case "months":
       return generateMonthQuestion(t)
     case "full":
       return generateFullDateQuestion()
     case "week_days":
-      return useNumbers ? generateDayQuestion() : generateWeekDaysQuestion(t)
+      return generateWeekDaysQuestion(t)
   }
 }

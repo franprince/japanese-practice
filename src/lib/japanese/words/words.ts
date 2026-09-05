@@ -1,5 +1,6 @@
 import { blacklist } from "../shared/blacklist";
 import { loadWordSets, normalizeLang } from "./loader";
+import { shuffleArray } from "@/lib/core/random";
 import type { GameMode } from "@/types/game";
 import {
   getCharacterGroups,
@@ -43,14 +44,7 @@ const buildFilterKey = (type: GameMode, filter: WordFilter | undefined, lang: st
 
 const clampWordsetForMobile = (words: JapaneseWord[]) => {
   if (!isMobileDevice() || words.length <= MOBILE_WORDSET_MAX) return words
-  const shuffled = [...words]
-  for (let i = shuffled.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const current = shuffled[i]!
-    shuffled[i] = shuffled[j]!
-    shuffled[j] = current
-  }
-  return shuffled.slice(0, MOBILE_WORDSET_MAX)
+  return shuffleArray(words).slice(0, MOBILE_WORDSET_MAX)
 }
 
 const hiraToKata = (text: string) =>

@@ -77,7 +77,7 @@ export async function getValidRomaji(kana: string): Promise<string[]> {
         return []
     }
 
-    let baseRomajiOptions = await processBase(baseKana)
+    const baseRomajiOptions = await processBase(baseKana)
 
     if (suffix === "ー" && baseRomajiOptions.length > 0) {
         const extendedOptions: string[] = []

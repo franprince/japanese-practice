@@ -1,4 +1,5 @@
 import { openDb, STORE_KANJI } from "@/lib/core/db"
+import { shuffleArray } from "@/lib/core/random"
 
 
 import type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
@@ -8,17 +9,6 @@ export type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
 
 const CACHE_PREFIX = "kanji-level-"
 const CACHE_EXPIRY_DAYS = 7
-
-const shuffle = <T,>(arr: T[]) => {
-  const copy = [...arr]
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const temp = copy[i]!
-    copy[i] = copy[j]!
-    copy[j] = temp
-  }
-  return copy
-}
 
 interface CachedKanjiData {
   data: KanjiEntry[]
@@ -139,11 +129,11 @@ export async function loadKanjiByLevels(levels: string[]): Promise<KanjiEntry[]>
 
 export function getRandomKanji(list: KanjiEntry[], exclude?: KanjiEntry) {
   if (!list.length) throw new Error("Kanji list is empty")
-  let kanji: KanjiEntry | undefined
-  do {
-    kanji = list[Math.floor(Math.random() * list.length)]
-  } while (exclude && kanji && kanji.char === exclude.char)
-  return kanji!
+  const candidates = exclude ? list.filter(k => k.char !== exclude.char) : list
+  // Fall back to the full list if excluding leaves nothing (e.g. a
+  // single-entry list equal to `exclude`) rather than hanging forever.
+  const pool = candidates.length ? candidates : list
+  return pool[Math.floor(Math.random() * pool.length)]!
 }
 
 export function getRandomOptions(list: KanjiEntry[], correct: KanjiEntry, count = 3): KanjiEntry[] {
@@ -156,5 +146,5 @@ export function getRandomOptions(list: KanjiEntry[], correct: KanjiEntry, count 
     available.splice(randomIndex, 1)
   }
 
-  return shuffle(options)
+  return shuffleArray(options)
 }

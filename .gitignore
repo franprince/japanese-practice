@@ -42,3 +42,7 @@ playwright-report/
 
 # old versioned wordset files (replaced by base filename pattern)
 public/wordset-*-v*.json
+
+# generated quiz database (bun:sqlite, created at runtime)
+*.sqlite
+quizzes.sqlite

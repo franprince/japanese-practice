@@ -5,15 +5,20 @@ This project uses **Bun** as the test runner with **React Testing Library** for 
 ## Running Tests
 
 ```bash
-# Run all tests
-bun test
+# Run all unit tests
+bun run test:unit
 
 # Run tests in watch mode
-bun test --watch
+bun test src --watch
 
 # Run a specific test file
-bun test src/lib/game-registry.test.ts
+bun test src/lib/core/__tests__/game-registry.test.ts
 ```
+
+> [!NOTE]
+> Use `bun run test:unit` (or `bun test src`), not a bare `bun test` — the
+> latter also picks up the Playwright specs under `e2e/`, which aren't valid
+> `bun:test` files and fail to run.
 
 ## Test Structure
 
@@ -24,7 +29,7 @@ bun test src/lib/game-registry.test.ts
 
 ### Example Tests
 
-- **`src/lib/game-registry.test.ts`**: Tests for the game registry configuration
+- **`src/lib/core/__tests__/game-registry.test.ts`**: Tests for the game registry configuration
 
 ## Writing Tests
 
@@ -53,13 +58,6 @@ test('renders component', () => {
 })
 ```
 
-## Current Limitations
-
-> [!NOTE]
-> **Component Testing**: Due to compatibility issues between React 19, Bun, and happy-dom, full component rendering tests may encounter errors. For comprehensive UI testing, consider using:
-> - **Playwright** for E2E tests (already installed)
-> - **Unit tests** for business logic and utilities (working perfectly)
-
 ## Test Guidelines
 
 Following your testing principles:
@@ -71,9 +69,9 @@ Following your testing principles:
 ## Example: Testing Business Logic
 
 ```typescript
-// src/lib/game-registry.test.ts
+// src/lib/core/__tests__/game-registry.test.ts
 import { describe, test, expect } from 'bun:test'
-import { GAMES } from '@/lib/game-registry'
+import { GAMES } from '@/lib/core'
 
 describe('Game Registry', () => {
   test('should have all 4 games defined', () => {

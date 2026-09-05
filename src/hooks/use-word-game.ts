@@ -6,6 +6,7 @@ import { getRandomWord, getRandomCharacter } from "@/lib/japanese/words"
 import { confirmWordset, normalizeLang } from "@/lib/japanese/words/loader"
 import { validateAnswer } from "@/lib/japanese/shared/input"
 import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared/error-detection"
+import { shuffleArray } from "@/lib/core/random"
 import type { GameMode, WordsGameType } from "@/types/game"
 import type { Language } from "@/lib/i18n/translations"
 import { useBaseGame } from "./use-base-game"
@@ -75,7 +76,11 @@ export function useWordGame({
     
     const [, startTransition] = useTransition()
 
-    
+    // Guards against an in-flight loadNewWord() call applying its (now
+    // stale) result after a later call has already started/finished —
+    // e.g. double-clicking Next or holding Enter.
+    const requestIdRef = useRef(0)
+
     const {
         score,
         streak,
@@ -91,8 +96,10 @@ export function useWordGame({
     
     const loadNewWord = useCallback(async () => {
         if (disableNext) return
+        const requestId = ++requestIdRef.current
         setIsLoading(true)
         let word: JapaneseWord | null = null
+        let nextOptions: string[] | null = null
 
         try {
             if (gameType === "words") {
@@ -109,57 +116,59 @@ export function useWordGame({
                 word = await getRandomCharacter(mode, filter)
             }
 
-            if (word) {
-                setCurrentWord(word)
-                setDisplayRomaji(word.romaji)
-                setNoWordsAvailable(false)
-
-                // Generate distractors for guess mode
-                if (gameType === "guess") {
-                    const distractors: string[] = []
-                    // Try to get 2 unique distractors
-                    for (let i = 0; i < 10 && distractors.length < 2; i++) {
-                        const dist = await getRandomCharacter(mode, {
-                            ...filter,
-                            minLength: 1,
-                            maxLength: 1,
-                        })
-                        if (dist && dist.romaji !== word.romaji && !distractors.includes(dist.romaji)) {
-                            distractors.push(dist.romaji)
-                        }
+            // Generate distractors for guess mode
+            if (word && gameType === "guess") {
+                const distractors: string[] = []
+                // Try to get 2 unique distractors
+                for (let i = 0; i < 10 && distractors.length < 2; i++) {
+                    const dist = await getRandomCharacter(mode, {
+                        ...filter,
+                        minLength: 1,
+                        maxLength: 1,
+                    })
+                    if (dist && dist.romaji !== word.romaji && !distractors.includes(dist.romaji)) {
+                        distractors.push(dist.romaji)
                     }
-                    
-                    // Fallback distractors if we couldn't get unique ones from the pool
-                    const fallbacks = ["a", "i", "u", "e", "o", "ka", "ki", "ku", "ke", "ko"]
-                    while (distractors.length < 2) {
-                        const fallback = fallbacks[Math.floor(Math.random() * fallbacks.length)]!
-                        if (fallback !== word.romaji && !distractors.includes(fallback)) {
-                            distractors.push(fallback)
-                        }
-                    }
-
-                    const allOptions = [word.romaji, ...distractors].sort(() => Math.random() - 0.5)
-                    setOptions(allOptions)
-                } else {
-                    setOptions(null)
                 }
-            } else {
-                setCurrentWord(null)
-                setDisplayRomaji("")
-                setNoWordsAvailable(true)
-                setOptions(null)
+
+                // Fallback distractors if we couldn't get unique ones from the pool
+                const fallbacks = ["a", "i", "u", "e", "o", "ka", "ki", "ku", "ke", "ko"]
+                while (distractors.length < 2) {
+                    const fallback = fallbacks[Math.floor(Math.random() * fallbacks.length)]!
+                    if (fallback !== word.romaji && !distractors.includes(fallback)) {
+                        distractors.push(fallback)
+                    }
+                }
+
+                nextOptions = shuffleArray([word.romaji, ...distractors])
             }
         } catch (error: any) {
             console.error("Failed to load word:", error)
         } finally {
-            setIsLoading(false)
+            if (requestId === requestIdRef.current) setIsLoading(false)
+        }
+
+        // A newer loadNewWord() call has already superseded this one —
+        // discard this (stale) result instead of overwriting newer state.
+        if (requestId !== requestIdRef.current) return
+
+        if (word) {
+            setCurrentWord(word)
+            setDisplayRomaji(word.romaji)
+            setNoWordsAvailable(false)
+            setOptions(nextOptions)
+        } else {
+            setCurrentWord(null)
+            setDisplayRomaji("")
+            setNoWordsAvailable(true)
+            setOptions(null)
         }
 
         if (word) {
             setUserInput("")
             setFeedback(null)
             setErrorDetails(null)
-            
+
             requestAnimationFrame(() => {
                 if (!suppressFocus) inputRef.current?.focus()
             })
@@ -247,12 +256,12 @@ export function useWordGame({
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
         if (e.key === "Enter") {
             if (feedback) {
-                if (!disableNext) loadNewWord()
+                if (!disableNext && !isLoading) loadNewWord()
             } else if (gameType !== "guess") {
                 checkAnswer()
             }
         }
-    }, [feedback, disableNext, loadNewWord, checkAnswer, gameType])
+    }, [feedback, disableNext, isLoading, loadNewWord, checkAnswer, gameType])
 
     
     useEffect(() => {
