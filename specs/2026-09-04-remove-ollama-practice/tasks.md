@@ -2,7 +2,7 @@
 
 - **Spec:** [spec.md](./spec.md)
 - **Plan:** [implementation_plan.md](./implementation_plan.md)
-- **Status:** Done — pull request pending authorization
+- **Status:** Done — [PR #56](https://github.com/franprince/japanese-practice/pull/56) open
 
 ## Runtime removal
 
@@ -37,7 +37,7 @@
 - [x] Mark the spec, plan, tasks, index, and backlog statuses complete.
 - [x] Create the runtime-removal commit.
 - [x] Create the architecture-documentation commit.
-- [ ] Ask whether to push and open the pull request against `develop`.
+- [x] Ask whether to push and open the pull request against `develop`.
 
 ## Verification results
 

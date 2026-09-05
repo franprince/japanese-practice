@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PR 1 implemented; pull request pending authorization
+- **Status:** Approved sequence — [PR 1](https://github.com/franprince/japanese-practice/pull/56) open
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
