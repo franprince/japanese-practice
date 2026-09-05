@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PRs 1–3 and E2E hardening (#58) merged; PR 4 implemented and verified
+- **Status:** Approved sequence — PRs 1–3 and E2E hardening (#58) merged; PR 4 open for review
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -121,7 +121,8 @@ metadata; both English and Spanish datasets load correctly.
 
 ## PR 4 — Unify game session state
 
-**Status:** Implemented and verified on `refactor/unify-game-session-state`.
+**Status:** Implemented and verified; [PR #60](https://github.com/franprince/japanese-practice/pull/60)
+is open against `develop` without merge conflicts.
 See the [specification](2026-09-05-unify-game-session-state/spec.md),
 [plan](2026-09-05-unify-game-session-state/implementation_plan.md), and
 [tasks](2026-09-05-unify-game-session-state/tasks.md).

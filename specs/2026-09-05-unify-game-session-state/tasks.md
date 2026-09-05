@@ -8,3 +8,6 @@
 - [x] Cover reducer transitions and integration across all four game hooks.
 - [x] Verify typecheck, lint, unit tests, build and relevant E2E; capture proof.
 - [x] Review diff and record verification and delivery status.
+
+- [x] Commit and open [PR #60](https://github.com/franprince/japanese-practice/pull/60)
+  into `develop`; verify there are no merge conflicts.
