@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback, useTransition } from "react"
 import type { JapaneseWord, WordFilter } from "@/lib/japanese/words"
 import { getRandomWord, getRandomCharacter } from "@/lib/japanese/words"
-import { confirmWordset, normalizeLang } from "@/lib/japanese/words/loader"
 import { validateAnswer } from "@/lib/japanese/shared/input"
 import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared/error-detection"
 import { shuffleArray } from "@/lib/core/random"

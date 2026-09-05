@@ -66,6 +66,9 @@ export default function WordsPage() {
         gameType,
         mobileConfirmOpen,
         downloadProgress,
+        busy,
+        downloadError,
+        persisting,
         wordsetSizeMB,
         setGameType,
         confirmWordMode,
@@ -198,12 +201,14 @@ export default function WordsPage() {
                 title={t("words.downloadTitle") || "Download Word Set"}
                 message={`${t("words.downloadMessage") || "The word set is large"} (~${wordsetSizeMB}MB).`}
                 progress={downloadProgress}
+                busy={busy}
+                error={downloadError ? t(downloadError) : null}
+                statusMessage={t(persisting ? "words.downloadPersisting" : "words.downloading")}
                 onCancel={cancelConfirm}
                 onConfirm={confirmWordMode}
-                confirmLabel={t("common.download") || "Download"}
+                confirmLabel={t(downloadError ? "words.downloadRetry" : "common.download")}
                 cancelLabel={t("common.cancel") || "Cancel"}
-                confirmDisabled={downloadProgress !== null}
-                cancelDisabled={downloadProgress !== null}
+                confirmDisabled={busy}
             />
 
             {/* Mobile-only Bottom Menu HUD */}

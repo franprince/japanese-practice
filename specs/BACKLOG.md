@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PR 1 implemented; pull request pending authorization
+- **Status:** Approved sequence — PR 1 merged; PR 2 implemented and verified locally, awaiting pull request
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -19,7 +19,7 @@ keep every pull request independently reviewable and reversible.
 | 5 | Resolve React lifecycle warnings | `refactor/react-lifecycle-cleanup` | Current hook purity and effect synchronization warnings are removed | PR 4 |
 | 6 | Decompose feature concentration points | `refactor/split-large-feature-modules` | Large words and game modules have focused, testable responsibilities | PR 5 |
 
-## PR 1 — Remove Ollama practice completely — Implemented
+## PR 1 — Remove Ollama practice completely — Merged
 
 **Problem:** The hidden experimental feature exposes unauthenticated model
 generation routes and relies on process-local coordination plus a writable,
@@ -40,6 +40,14 @@ The standard quality gates pass.
 [2026-09-04-remove-ollama-practice/spec.md](2026-09-04-remove-ollama-practice/spec.md)
 
 ## PR 2 — Make wordset acquisition reliable
+
+**Status:** Implemented and verified on `fix/wordset-acquisition-reliability`.
+Pull request and merge are pending. Continue PR 3 after this item merges.
+
+**Verification (2026-09-05):** Typecheck and production build pass; 121 unit
+tests and all 8 relevant Words/browser lifecycle tests pass. Lint reports zero
+errors and 53 warnings (down from 59 in the source checkout). The remaining
+lifecycle warnings belong to PR 5. See the [implementation plan](2026-09-04-wordset-download-lifecycle/implementation_plan.md).
 
 **Problem:** Wordset acquisition currently combines mobile policy, network
 requests, progress reporting, IndexedDB persistence, memory caching, browser
@@ -72,6 +80,9 @@ mobile consent, stale-while-revalidate, and retry after failure.
 no empty catch block remains in the acquisition path; confirmation implies a
 validated dataset is readable from cache; existing desktop and mobile flows
 remain functional.
+
+**Detailed specification:**
+[2026-09-04-wordset-download-lifecycle/spec.md](2026-09-04-wordset-download-lifecycle/spec.md)
 
 ## PR 3 — Move wordset payloads to static delivery
 

@@ -15,3 +15,4 @@ lost.
 | 2026-08-02 | [remediate-review-findings](2026-08-02-remediate-review-findings/spec.md) | Remediate 2026-08-02 architecture review findings | In progress — Phase 1 of 4 done |
 | 2026-09-04 | [seo-improvements](2026-09-04-seo-improvements/spec.md) | Improve search and social metadata | Done — see [plan](2026-09-04-seo-improvements/implementation_plan.md) |
 | 2026-09-04 | [remove-ollama-practice](2026-09-04-remove-ollama-practice/spec.md) | Remove Ollama practice completely | Done — see [plan](2026-09-04-remove-ollama-practice/implementation_plan.md) and [tasks](2026-09-04-remove-ollama-practice/tasks.md) |
+| 2026-09-04 | [wordset-download-lifecycle](2026-09-04-wordset-download-lifecycle/spec.md) | Make wordset acquisition reliable | Implemented and verified — PR pending; see [plan](2026-09-04-wordset-download-lifecycle/implementation_plan.md) and [tasks](2026-09-04-wordset-download-lifecycle/tasks.md) |

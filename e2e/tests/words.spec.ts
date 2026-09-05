@@ -1,44 +1,4 @@
 import { test, expect } from '../fixtures'
-import * as fs from 'fs'
-import * as path from 'path'
-
-// Load kana dictionary for deterministic answers
-const kanaDict = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../../src/lib/japanese/shared/kanaDictionary.json'), 'utf-8')
-)
-
-// Build a lookup map for quick character->romaji conversion
-function buildCharacterMap() {
-    const map: Record<string, string> = {}
-
-    // Add hiragana
-    for (const group of Object.values(kanaDict.hiragana)) {
-        const chars = (group as any).characters
-        if (chars) {
-            for (const [kana, romaji] of Object.entries(chars)) {
-                const firstRomaji = (romaji as string[])[0]
-                if (firstRomaji) {
-                    map[kana] = firstRomaji
-                }
-            }
-        }
-    }
-
-    // Add katakana
-    for (const group of Object.values(kanaDict.katakana)) {
-        const chars = (group as any).characters
-        if (chars) {
-            for (const [kana, romaji] of Object.entries(chars)) {
-                const firstRomaji = (romaji as string[])[0]
-                if (firstRomaji) {
-                    map[kana] = firstRomaji
-                }
-            }
-        }
-    }
-
-    return map
-}
 
 test.describe('Words Game', () => {
     test('should load the words game page and capture initial state', async ({ wordsPage, page }) => {
@@ -66,14 +26,20 @@ test.describe('Words Game', () => {
     })
 
     test('should handle correct and incorrect romaji input with feedback', async ({ wordsPage, page }) => {
-        const charMap = buildCharacterMap()
+        await page.route('**/api/wordset?*', route => route.fulfill({
+            status: 200, contentType: 'application/json', body: JSON.stringify({
+                version: 1,
+                hiraganaWords: [{ kana: 'あいう', romaji: 'aiu', type: 'hiragana', groups: ['h1'] }],
+                katakanaWords: [],
+            }),
+        }))
         await wordsPage.goto()
 
         // 1. Get the character being shown
         const kanaElement = page.locator('[data-testid="question-display"]')
         await expect(kanaElement).toBeVisible()
-        const kanaChar = (await kanaElement.textContent())?.trim() || ""
-        const correctRomaji = charMap[kanaChar] || "a"
+        await expect(kanaElement).toHaveText('あいう')
+        const correctRomaji = 'aiu'
 
         // 2. Test CORRECT answer
         const input = page.locator('input[type="text"]')
@@ -81,11 +47,12 @@ test.describe('Words Game', () => {
         await page.keyboard.press('Enter')
 
         // Wait for feedback
-        await expect(page.locator('[data-testid="game-feedback"]')).toBeVisible()
+        await expect(input).toHaveClass(/border-success/)
+        await expect(input).toHaveAttribute('readonly', '')
         await wordsPage.screenshot('words_feedback_correct')
 
         // 3. Move to NEXT word
-        const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
+        const nextBtn = page.getByRole('button', { name: /^(next word|siguiente palabra|次)/i }).first()
         await nextBtn.click()
         await expect(nextBtn).not.toBeVisible()
 
@@ -97,7 +64,8 @@ test.describe('Words Game', () => {
         await checkBtn.click({ force: true })
         
         // Wait for incorrect feedback
-        await expect(page.locator('[data-testid="game-feedback"]')).toBeVisible()
+        await expect(input).toHaveClass(/border-destructive/)
+        await expect(input).toHaveAttribute('readonly', '')
 
         // Capture incorrect screenshot
         await wordsPage.screenshot('words_feedback_incorrect')
@@ -151,10 +119,10 @@ test.describe('Words Game', () => {
         await expect(input).toBeVisible()
 
         // Open settings to enable Words mode (default)
-        await page.getByTestId('settings-trigger').filter({ visible: true }).click()
+        await page.getByRole('button', { name: 'Command Center', exact: true }).click()
         await expect(page.getByRole('dialog')).toBeVisible({ timeout: 15000 })
         
-        const wordsBtn = page.getByRole('button', { name: /words practice|palabras/i }).first()
+        const wordsBtn = page.getByRole('button', { name: 'Words Vocabulary practice', exact: true })
         await wordsBtn.click()
 
         const applyBtn = page.getByRole('button', { name: /apply|save|aplicar/i }).first()
@@ -199,11 +167,10 @@ test.describe('Words Game', () => {
         
         // 5. Click an option and verify feedback appears
         await options.first().click()
-        const feedback = page.locator('[data-testid="game-feedback"]')
-        await expect(feedback).toBeVisible()
+        await expect(options.first()).toBeDisabled()
         
         // 6. Verify the "Next" button appears
-        const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
+        const nextBtn = page.getByRole('button', { name: /^(next word|siguiente palabra|次)/i }).first()
         await expect(nextBtn).toBeVisible()
     })
 })

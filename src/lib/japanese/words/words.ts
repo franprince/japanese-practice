@@ -1,5 +1,5 @@
 import { blacklist } from "../shared/blacklist";
-import { loadWordSets, normalizeLang } from "./loader";
+import { loadWordSets, normalizeLang, isMobileDevice } from "./loader";
 import { shuffleArray } from "@/lib/core/random";
 import type { GameMode } from "@/types/game";
 import {
@@ -28,13 +28,6 @@ const hasKatakana = (text: string) => /[\u30A0-\u30FF]/.test(text)
 
 const MOBILE_WORDSET_MAX = 1500
 const filteredWordCache = new Map<string, JapaneseWord[]>()
-
-const isMobileDevice = () => {
-  if (typeof window === "undefined") return false
-  if (window.matchMedia?.("(max-width: 768px)").matches) return true
-  const ua = navigator.userAgent.toLowerCase()
-  return /android|iphone|ipad|ipod|mobile|tablet/.test(ua)
-}
 
 const buildFilterKey = (type: GameMode, filter: WordFilter | undefined, lang: string, isMobile: boolean) => {
   if (!filter) return `${type}:${lang}:${isMobile ? "mobile" : "desktop"}:none`
