@@ -41,3 +41,16 @@ The build and browser server need local socket/process access beyond the sandbox
 verification succeeded with that access. Existing browser-data-age and standalone
 start warnings remain unrelated to this change. The production test configuration
 and reproduction commands are included in `docs/static-wordsets.md`.
+
+## Integration with E2E hardening — 2026-09-05
+
+Merged `develop` at `a723abd` after PR #58. Preserved its expanded browser tests,
+CI browser gate, Node-based Playwright scripts and synchronous cache-request fix.
+Resolved the overlapping word tests by migrating shared fixtures, failure injection,
+request counts, cancellation checks and language switching to manifest/static URLs.
+Malformed JSON/schema fixtures declare their actual byte count so those validation
+paths remain covered; cached results include the verified asset checksum.
+
+Post-merge verification: typecheck and production build pass, all 136 unit tests
+and the full 37-test browser suite pass, and lint reports zero errors with 52
+existing warnings. `git diff --check` and the unresolved-index check are clean.

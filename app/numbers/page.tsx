@@ -20,6 +20,7 @@ export default function NumbersPage() {
         score,
         streak,
         bestStreak,
+        sessionId,
         playMode,
         targetCount,
         sessionComplete,
@@ -37,12 +38,10 @@ export default function NumbersPage() {
     }, [])
 
     const [difficulty, setDifficulty] = useState<Difficulty>("easy")
-    const [sessionId, setSessionId] = useState(() => Math.random().toString(36).slice(2))
     const [numbersMode, setNumbersMode] = useState<"arabicToKanji" | "kanjiToArabic">("arabicToKanji")
 
     const handleDifficultyChange = (newDifficulty: Difficulty) => {
         setDifficulty(newDifficulty)
-        setSessionId(Math.random().toString(36).slice(2))
         resetSession()
     }
 
@@ -105,6 +104,7 @@ export default function NumbersPage() {
 
             <div className="mt-6 mb-6">
                 <NumberGameCard
+                    key={sessionId}
                     difficulty={difficulty}
                     mode={numbersMode}
                     onScoreUpdate={handleSessionScoreUpdate}

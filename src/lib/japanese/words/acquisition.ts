@@ -79,12 +79,14 @@ export async function cacheTransaction(
       checkAbort(signal)
       return await new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_WORDSETS, mode)
+        // A synchronous request failure (for example quota exhaustion) must not
+        // leave completion handlers closing over an uninitialized request.
+        const req = request(tx.objectStore(STORE_WORDSETS), getWordsetCacheKey(lang))
         const abort = () => tx.abort()
         const cleanup = () => signal?.removeEventListener("abort", abort)
         tx.oncomplete = () => { cleanup(); resolve(req.result) }
         tx.onerror = () => { cleanup(); reject(new WordsetError("storage", tx.error)) }
         tx.onabort = () => { cleanup(); reject(new WordsetError("storage", tx.error)) }
-        const req = request(tx.objectStore(STORE_WORDSETS), getWordsetCacheKey(lang))
         req.onerror = () => { cleanup(); reject(new WordsetError("storage", req.error)) }
         signal?.addEventListener("abort", abort, { once: true })
       })

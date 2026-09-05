@@ -60,4 +60,5 @@ node node_modules/@playwright/test/cli.js test e2e/tests/words.spec.ts e2e/tests
 The production config starts the built application on port 3016. Tests cover
 real English/Spanish downloads, durable cache reuse after reload, mobile failure,
 retry and cancellation, immutable headers, manifest ETag/304, and missing assets.
-The same HTTP tests also run with the default development configuration.
+The default Playwright configuration also uses a production server and includes
+these tests in the full CI suite.

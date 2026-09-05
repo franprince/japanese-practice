@@ -1,4 +1,6 @@
 import { test, expect } from '../fixtures'
+import en from '../../src/locales/en.json'
+import es from '../../src/locales/es.json'
 
 test.describe('Home Page', () => {
     test('should display the hero section with title', async ({ homePage }) => {
@@ -22,14 +24,16 @@ test.describe('Home Page', () => {
         await expect(page).toHaveURL('/words')
     })
 
-    test('should switch language', async ({ homePage, page }) => {
+    test('switches language and preserves the selection on reload', async ({ homePage, page }) => {
         await homePage.goto()
 
-        // Switch to English
-        await homePage.switchLanguage('EN')
-
-        // Verify language changed (check for English text)
-        const title = await homePage.getTitle()
-        expect(title).toBeTruthy()
+        await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+        await expect(page.locator('a[href="/numbers"]')).toContainText(en['games.numbers.title'])
+        await homePage.switchLanguage('ES')
+        await expect(page.locator('html')).toHaveAttribute('lang', 'es')
+        await expect(page.locator('a[href="/numbers"]')).toContainText(es['games.numbers.title'])
+        await page.reload()
+        await expect(page.locator('html')).toHaveAttribute('lang', 'es')
+        await expect(page.locator('a[href="/numbers"]')).toContainText(es['games.numbers.title'])
     })
 })

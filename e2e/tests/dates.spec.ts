@@ -1,155 +1,54 @@
 import { test, expect } from '../fixtures'
+import { fiveQuestionSession, finishSession } from '../fixtures/practice'
 
-test.describe('Dates Game', () => {
-    test('should load the dates game page and capture initial state', async ({ datesPage, page }) => {
+test.describe('Dates game', () => {
+    test.beforeEach(async ({ datesPage, page }) => {
         await datesPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        await expect(page).toHaveURL('/dates')
-        await datesPage.screenshot('dates_initial_load')
+        await expect(page.getByRole('textbox')).toBeEditable()
     })
-
-    test('should display all UI components', async ({ datesPage, page }) => {
-        await datesPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        // Verify stats display
-        const stats = page.locator('[data-testid="stats-display"]')
-        await expect(stats).toBeVisible()
-
-        // Verify date mode selector buttons (just check they exist)
-        const modeButtons = page.locator('button').filter({ has: page.locator('svg.lucide-calendar, svg.lucide-calendar-days, svg.lucide-calendar-range') })
-        expect(await modeButtons.count()).toBeGreaterThanOrEqual(2)
-
-        // Verify input field
-        const input = page.locator('input[type="text"]')
-        await expect(input).toBeVisible()
-
-        // Verify check button
-        const checkBtn = page.locator('button').filter({ has: page.locator('svg.lucide-check') })
-        expect(await checkBtn.count()).toBeGreaterThan(0)
-    })
-
-    test('should allow date mode selection', async ({ datesPage, page }) => {
-        await datesPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        // Get mode buttons
-        const modeButtons = page.locator('button').filter({ has: page.locator('svg.lucide-calendar, svg.lucide-calendar-days, svg.lucide-calendar-range') })
-        const buttonCount = await modeButtons.count()
-
-        if (buttonCount >= 2) {
-            // Click second mode button
-            await modeButtons.nth(1).click()
-            await datesPage.screenshot('dates_mode_switched')
+    test('mode selection changes the prompt and keeps the input usable', async ({ page }) => {
+        for (const [label, prompt] of [['Months', 'Write the month'], ['Full Dates', 'Write the full date'], ['Days', 'Write the day']] as const) {
+            const button = page.getByRole('button', { name: label, exact: true })
+            await button.click()
+            await expect(button).toHaveClass(/bg-primary/)
+            await expect(page.getByTestId('question-display')).toBeVisible()
+            await expect(page.getByText(new RegExp(prompt, 'i')).first()).toBeVisible()
+            await expect(page.getByRole('textbox')).toBeEditable()
         }
     })
-
-    test('should capture incorrect answer feedback', async ({ datesPage, page }) => {
-        await datesPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        const input = page.locator('input[type="text"]')
-        await expect(input).toBeVisible()
-        const checkBtn = page.locator('button').filter({ has: page.locator('svg.lucide-check') }).first()
-
-        // Type an incorrect answer
-        await input.click()
+    test('Enter submits an incorrect answer and advances to an editable question', async ({ page }) => {
+        const input = page.getByRole('textbox')
         await input.fill('wronganswer')
-
-        // Click check
-        await checkBtn.click()
-        
-        // Wait for next button or feedback to appear
-        await expect(page.locator('button:has-text("Next"), button:has-text("Siguiente")')).toBeVisible()
-
-        // Capture screenshot
-        await datesPage.screenshot('dates_feedback_incorrect')
+        await input.press('Enter')
+        await expect(page.getByText('Incorrect', { exact: true })).toBeVisible()
+        await expect(input).toHaveAttribute('readonly', '')
+        await expect(page.getByRole('button', { name: 'Next Date', exact: true })).toBeVisible()
+        await input.press('Enter')
+        await expect(input).toBeEditable()
+        await expect(input).toHaveValue('')
+        await expect(page.getByText('Incorrect', { exact: true })).toBeHidden()
     })
-
-    test('should capture answer feedback', async ({ datesPage, page }) => {
-        await datesPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
-
-        const input = page.locator('input[type="text"]')
-
-        // Type any answer and submit
-        await input.click()
-        await input.fill('test')
-        await page.keyboard.press('Enter')
-        await page.waitForTimeout(1500)
-
-        // Capture screenshot (will show either correct or incorrect feedback)
-        await datesPage.screenshot('dates_feedback')
+    test('month answer is correct and toggling its display preserves typed input', async ({ page }, testInfo) => {
+        await page.getByRole('button', { name: 'Months', exact: true }).click()
+        const input = page.getByRole('textbox')
+        await input.fill('partial')
+        await page.getByRole('button', { name: 'Show Number', exact: true }).click()
+        await expect(input).toHaveValue('partial')
+        const month = Number((await page.getByTestId('question-display').textContent())?.trim())
+        expect(month).toBeGreaterThanOrEqual(1)
+        expect(month).toBeLessThanOrEqual(12)
+        const answers = ['ichigatsu', 'nigatsu', 'sangatsu', 'shigatsu', 'gogatsu', 'rokugatsu', 'shichigatsu', 'hachigatsu', 'kugatsu', 'juugatsu', 'juuichigatsu', 'juunigatsu']
+        await input.fill(answers[month - 1]!)
+        await page.getByRole('button', { name: 'Check', exact: true }).click()
+        await expect(page.getByText('Correct!', { exact: true })).toBeVisible()
+        await testInfo.attach('month-display-toggle', { body: await page.screenshot(), contentType: 'image/png' })
     })
-
-    test('should allow keyboard navigation with Enter key', async ({ datesPage, page }) => {
-        await datesPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
-
-        const input = page.locator('input[type="text"]')
-
-        // Type any answer and press Enter
-        await input.click()
-        await input.fill('test')
-        await page.keyboard.press('Enter')
-        await page.waitForTimeout(1500)
-
-        // Verify Next button appears or new question loads
-        const nextBtn = page.locator('button:has-text("Next"), button:has-text("Siguiente")')
-        if (await nextBtn.first().isVisible()) {
-            // Press Enter again to go to next question
-            await page.keyboard.press('Enter')
-            await page.waitForTimeout(1000)
-        }
-    })
-
-    test('should complete session mode and show summary', async ({ datesPage, page }) => {
-        await datesPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        // Open settings popover
-        const settingsBtn = page.getByRole('button').filter({ has: page.locator('svg') }).first()
-        await settingsBtn.click()
-        
-        // Wait for popover to appear
-        const sessionBtn = page.locator('button:has-text("Session"), button:has-text("Sesión")').first()
-        await expect(sessionBtn).toBeVisible()
-
-        // Select session mode
-        await sessionBtn.click()
-
-        // Set count to 5
-        const count5Btn = page.locator('button:has-text("5")').first()
-        await count5Btn.click()
-
-        // Close popover
-        await page.keyboard.press('Escape')
-        await expect(page.getByTestId('popover-backdrop')).not.toBeVisible()
-
-        // Answer 5 questions
-        for (let i = 0; i < 5; i++) {
-            const input = page.locator('input[type="text"]')
-            await expect(input).toBeVisible()
-            await input.click()
-            await input.fill('test')
-            await page.keyboard.press('Enter')
-
-            // Click next button if visible and enabled
-            const nextBtn = page.locator('button:has-text("Next"), button:has-text("Siguiente")').first()
-            await expect(nextBtn).toBeVisible()
-            if (await nextBtn.isEnabled()) {
-                await nextBtn.click()
-                await expect(nextBtn).not.toBeVisible()
-            }
-        }
-
-        // Verify and capture session summary
-        const summaryCard = page.locator('text=/Session complete|Sesión completada/i, text=/Restart|Reiniciar/i').first()
-        await expect(summaryCard).toBeVisible({ timeout: 10000 })
-
-        await datesPage.screenshot('dates_session_complete')
+    test('completes exactly five answers and restarts the session', async ({ page }) => {
+        await fiveQuestionSession(page)
+        await finishSession(page, async () => {
+            await page.getByRole('textbox').fill('wronganswer')
+            await page.getByRole('textbox').press('Enter')
+        }, 'Next Date')
+        await expect(page.getByRole('textbox')).toBeEditable()
     })
 })

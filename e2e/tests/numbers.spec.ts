@@ -1,190 +1,56 @@
 import { test, expect } from '../fixtures'
+import { fiveQuestionSession, finishSession } from '../fixtures/practice'
 
-test.describe('Numbers Game', () => {
-    test('should load the numbers game page and capture initial state', async ({ numbersPage, page }) => {
+test.describe('Numbers game', () => {
+    test.beforeEach(async ({ numbersPage, page }) => {
         await numbersPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        await expect(page).toHaveURL('/numbers')
-        await numbersPage.screenshot('numbers_initial_load')
+        await expect(page.locator('#number-pad')).toBeVisible()
     })
-
-    test('should display all UI components', async ({ numbersPage, page }) => {
-        await numbersPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        // Verify stats display
-        const stats = page.locator('[data-testid="stats-display"]')
-        await expect(stats).toBeVisible()
-
-        // Verify difficulty selector buttons
-        const easyBtn = page.locator('button:has-text("Easy"), button:has-text("Fácil")')
-        const mediumBtn = page.locator('button:has-text("Medium"), button:has-text("Medio")')
-        const hardBtn = page.locator('button:has-text("Hard"), button:has-text("Difícil")')
-
-        expect(await easyBtn.count()).toBeGreaterThan(0)
-        expect(await mediumBtn.count()).toBeGreaterThan(0)
-        expect(await hardBtn.count()).toBeGreaterThan(0)
-
-        // Verify mode toggle buttons (just check they exist)
-        const modeButtons = page.locator('button').filter({ hasText: /→|漢/ })
-        expect(await modeButtons.count()).toBeGreaterThanOrEqual(2)
-
-        // Verify number pad
-        const numberPad = page.locator('#number-pad')
-        await expect(numberPad).toBeVisible()
-    })
-
-    test('should allow difficulty selection', async ({ numbersPage, page }) => {
-        await numbersPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        // Test Easy difficulty
-        const easyBtn = page.locator('button:has-text("Easy"), button:has-text("Fácil")').first()
-        await easyBtn.click()
-        await numbersPage.screenshot('numbers_difficulty_easy')
-
-        // Test Medium difficulty
-        const mediumBtn = page.locator('button:has-text("Medium"), button:has-text("Medio")').first()
-        await mediumBtn.click()
-        await numbersPage.screenshot('numbers_difficulty_medium')
-
-        // Test Hard difficulty
-        const hardBtn = page.locator('button:has-text("Hard"), button:has-text("Difícil")').first()
-        await hardBtn.click()
-        await numbersPage.screenshot('numbers_difficulty_hard')
-    })
-
-    test('should allow mode switching', async ({ numbersPage, page }) => {
-        await numbersPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(1500)
-
-        // Get mode toggle buttons
-        const modeButtons = page.locator('button').filter({ hasText: /→/ })
-        const buttonCount = await modeButtons.count()
-
-        if (buttonCount >= 2) {
-            // Click second mode button
-            await modeButtons.nth(1).click()
-            await page.waitForTimeout(1000)
-            await numbersPage.screenshot('numbers_mode_switched')
+    test('difficulty selection changes the active range', async ({ page }) => {
+        for (const [label, maximum] of [['Easy', 10], ['Medium', 99], ['Hard', 999], ['Expert', 99999]] as const) {
+            const button = page.getByRole('button', { name: new RegExp(`^${label}`) })
+            await button.click()
+            await expect(button).toHaveClass(/bg-primary/)
+            await expect(page.getByTestId('question-display')).toHaveText(/^\d[\d,]*$/)
+            const value = Number((await page.getByTestId('question-display').textContent())?.replaceAll(',', '').trim())
+            expect(value).toBeGreaterThanOrEqual(1)
+            expect(value).toBeLessThanOrEqual(maximum)
+            await expect(page.locator('#number-pad')).toBeVisible()
         }
     })
-
-    test('should capture incorrect answer feedback', async ({ numbersPage, page }) => {
-        await numbersPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        // Click some number pad buttons
-        const numberPad = page.locator('#number-pad')
-        const buttons = numberPad.locator('button')
-
-        // Click first 3 buttons
-        for (let i = 0; i < 3; i++) {
-            await buttons.nth(i).click()
-        }
-
-        // Click check button (submit)
-        const checkBtn = page.locator('button').filter({ has: page.locator('svg.lucide-corner-down-left') }).first()
-        await checkBtn.click()
-        
-        // Wait for next button or feedback to appear
-        await expect(page.locator('button:has-text("Next"), button:has-text("Siguiente")')).toBeVisible()
-
-        // Capture screenshot
-        await numbersPage.screenshot('numbers_feedback_incorrect')
+    test('mode switching changes both prompt and keypad', async ({ page }) => {
+        await page.getByRole('button', { name: '漢 → 123', exact: true }).click()
+        await expect(page.getByText('Write in Arabic', { exact: true })).toBeVisible()
+        await expect(page.locator('#number-pad').getByRole('button', { name: '1', exact: true })).toBeVisible()
+        await page.getByRole('button', { name: '123 → 漢', exact: true }).click()
+        await expect(page.getByText('Write in Japanese', { exact: true })).toBeVisible()
+        await expect(page.locator('#number-pad').getByRole('button', { name: '一', exact: true })).toBeVisible()
     })
-
-    test('should capture answer feedback', async ({ numbersPage, page }) => {
-        await numbersPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
-
-        // Click a number pad button and submit
-        const numberPad = page.locator('#number-pad')
-        const buttons = numberPad.locator('button')
-        await buttons.first().click()
-        await page.waitForTimeout(300)
-
-        // Submit answer
+    test('answers correctly through the keypad and incorrectly through the keyboard', async ({ page }) => {
+        const value = Number((await page.getByTestId('question-display').textContent())?.replaceAll(',', '').trim())
+        expect(value).toBeGreaterThanOrEqual(1)
+        expect(value).toBeLessThanOrEqual(10)
+        const symbols = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十']
+        await page.locator('#number-pad').getByRole('button', { name: symbols[value]!, exact: true }).click()
+        await page.getByRole('button', { name: 'Check', exact: true }).click()
+        await expect(page.getByText('Correct!', { exact: true })).toBeVisible()
+        await page.getByRole('button', { name: 'Next Number', exact: true }).click()
+        await expect(page.locator('#number-pad')).toBeVisible()
+        // A valid number outside Easy's 1–10 range is always incorrect.
+        for (const symbol of ['十', '一']) await page.locator('#number-pad').getByRole('button', { name: symbol, exact: true }).click()
         await page.keyboard.press('Enter')
-        await page.waitForTimeout(1500)
-
-        // Capture screenshot (will show either correct or incorrect feedback)
-        await numbersPage.screenshot('numbers_feedback')
-    })
-
-    test('should allow keyboard navigation with Enter key', async ({ numbersPage, page }) => {
-        await numbersPage.goto()
-        await page.waitForLoadState('networkidle')
-        await page.waitForTimeout(2000)
-
-        // Click some number pad buttons
-        const numberPad = page.locator('#number-pad')
-        const buttons = numberPad.locator('button')
-        await buttons.first().click()
-        await page.waitForTimeout(300)
-
-        // Press Enter to submit
+        await expect(page.getByText('Incorrect', { exact: true })).toBeVisible()
         await page.keyboard.press('Enter')
-        await page.waitForTimeout(1500)
-
-        // Verify Next button appears or new question loads
-        const nextBtn = page.locator('button:has-text("Next"), button:has-text("Siguiente")')
-        if (await nextBtn.first().isVisible()) {
-            // Press Enter again to go to next question
-            await page.keyboard.press('Enter')
-            await page.waitForTimeout(1000)
-        }
+        await expect(page.locator('#number-pad')).toBeVisible()
+        await expect(page.getByText('Use the keypad below', { exact: true })).toBeVisible()
     })
-
-    test('should complete session mode and show summary', async ({ numbersPage, page }) => {
-        await numbersPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        // Open settings popover
-        const settingsBtn = page.getByRole('button').filter({ has: page.locator('svg') }).first()
-        await settingsBtn.click()
-        
-        // Wait for session mode button
-        const sessionBtn = page.locator('button:has-text("Session"), button:has-text("Sesión")').first()
-        await expect(sessionBtn).toBeVisible()
-
-        // Select session mode
-        await sessionBtn.click()
-
-        // Set count to 5
-        const count5Btn = page.locator('button:has-text("5")').first()
-        await count5Btn.click()
-
-        // Close popover
-        await page.keyboard.press('Escape')
-        await expect(page.getByTestId('popover-backdrop')).not.toBeVisible()
-
-        // Answer 5 questions
-        for (let i = 0; i < 5; i++) {
-            // Click some number pad buttons
-            const numberPad = page.locator('#number-pad')
-            const buttons = numberPad.locator('button')
-            await buttons.first().click()
-
-            // Submit answer with Enter key
-            await page.keyboard.press('Enter')
-            
-            // Click next button if visible and enabled
-            const nextBtn = page.locator('button:has-text("Next"), button:has-text("Siguiente")').first()
-            await expect(nextBtn).toBeVisible()
-            if (await nextBtn.isEnabled()) {
-                await nextBtn.click()
-                await expect(nextBtn).not.toBeVisible()
-            }
-        }
-
-        // Verify and capture session summary
-        const summaryCard = page.locator('text=/Session complete|Sesión completada/i, text=/Restart|Reiniciar/i').first()
-        await expect(summaryCard).toBeVisible({ timeout: 10000 })
-
-        await numbersPage.screenshot('numbers_session_complete')
+    test('completes exactly five answers and restarts the session', async ({ page }, testInfo) => {
+        await fiveQuestionSession(page)
+        await finishSession(page, async () => {
+            await page.locator('#number-pad').getByRole('button', { name: '一', exact: true }).click()
+            await page.getByRole('button', { name: 'Check', exact: true }).click()
+        }, 'Next Number')
+        await expect(page.locator('#number-pad')).toBeVisible()
+        await testInfo.attach('restarted-session', { body: await page.screenshot(), contentType: 'image/png' })
     })
 })

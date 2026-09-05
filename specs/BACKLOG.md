@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PRs 1–2 merged; PR 3 open for review
+- **Status:** Approved sequence — PRs 1–2 and E2E hardening (#58) merged; PR 3 open for review
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in

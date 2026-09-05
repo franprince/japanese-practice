@@ -9,4 +9,4 @@
 - [x] Run quality gates and inspect the final diff.
 - [x] Update backlog/index for the independently reviewable item.
 - [x] Commit the verified change.
-- [ ] Open the pull request against `develop` once requested; merge remains pending.
+- [x] Open the pull request against `develop`: [#57](https://github.com/franprince/japanese-practice/pull/57), now merged.
