@@ -1,8 +1,7 @@
 import { createHash } from "node:crypto"
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises"
 import path from "node:path"
-import { validateWordset } from "../src/lib/japanese/words/acquisition"
-import { validateManifest, type WordsetManifest, type WordsetMetadata } from "../src/lib/japanese/words/manifest"
+import { validateWordset, validateManifest, type WordsetManifest, type WordsetMetadata } from "../src/lib/japanese/wordsets/build"
 
 /** Publish exact source bytes. Never remove older immutable assets in place. */
 export async function publishWordsets(publicDir: string): Promise<WordsetManifest> {

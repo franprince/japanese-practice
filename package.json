@@ -8,6 +8,7 @@
     "start": "bun --bun next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "check:boundaries": "bun scripts/check-feature-boundaries.ts",
     "test": "bun run test:unit",
     "test:unit": "bun test src",
     "test:e2e": "node node_modules/@playwright/test/cli.js test",

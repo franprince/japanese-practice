@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto"
-import type { WordsetManifest } from "@/lib/japanese/words/manifest"
+import type { WordsetManifest } from "@/lib/japanese/wordsets/build"
 
 export const fixtureChecksum = (data: unknown) => createHash("sha256").update(JSON.stringify(data)).digest("hex")
 export function fixtureManifest(data: { version: number }): WordsetManifest {

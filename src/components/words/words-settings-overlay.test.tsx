@@ -9,6 +9,53 @@ const groups: CharacterGroup[] = [{ id: "a", label: "Vowels", labelJp: "母音",
 const base = { mode: "hiragana" as const, gameType: "characters" as const, playMode: "session" as const, targetCount: 10, filter, characterGroups: groups }
 
 describe("Words settings drafts", () => {
+    it("composes batched group and length changes in the same draft", () => {
+        const apply = mock()
+        const available = [...groups, { ...groups[0]!, id: "b", characters: ["い"] }]
+        render(<I18nProvider initialLang="en"><WordsSettingsOverlay {...base} mode="custom" filter={{ ...filter, selectedGroups: [] }} characterGroups={available} open onOpenChange={mock()} onApply={apply} /></I18nProvider>)
+        act(() => {
+            screen.getByRole("button", { name: "あ" }).click()
+            screen.getByRole("button", { name: "い" }).click()
+            screen.getByRole("button", { name: "Any" }).click()
+        })
+        fireEvent.click(screen.getByRole("button", { name: "Save Settings" }))
+        expect(apply).toHaveBeenCalledWith("custom", "characters", "session", 10, {
+            selectedGroups: ["a", "b"], minLength: 1, maxLength: 100,
+        })
+    })
+    it("preserves group toggles and emits a copied filter", () => {
+        const apply = mock()
+        const customFilter = { ...filter, selectedGroups: [] }
+        render(<I18nProvider initialLang="en"><WordsSettingsOverlay {...base} mode="custom" filter={customFilter} open onOpenChange={mock()} onApply={apply} /></I18nProvider>)
+
+        fireEvent.click(screen.getByRole("button", { name: "あ" }))
+        fireEvent.click(screen.getByRole("button", { name: "Save Settings" }))
+
+        expect(apply).toHaveBeenCalledWith("custom", "characters", "session", 10, { ...filter })
+        expect(apply.mock.calls[0]?.[4]).not.toBe(filter)
+    })
+
+    it("keeps session targets and length presets in the draft", () => {
+        const apply = mock()
+        render(<I18nProvider initialLang="en"><WordsSettingsOverlay {...base} mode="custom" open onOpenChange={mock()} onApply={apply} /></I18nProvider>)
+
+        fireEvent.click(screen.getByRole("button", { name: "Infinite" }))
+        fireEvent.click(screen.getByRole("button", { name: "Any" }))
+        fireEvent.click(screen.getByRole("button", { name: "Save Settings" }))
+
+        expect(apply).toHaveBeenCalledWith("custom", "characters", "infinite", 10, { ...filter, minLength: 1, maxLength: 100 })
+    })
+
+    it("hides length controls for Guess while retaining session controls", () => {
+        render(<I18nProvider initialLang="en"><WordsSettingsOverlay {...base} open onOpenChange={mock()} onApply={mock()} /></I18nProvider>)
+
+        fireEvent.click(screen.getByRole("button", { name: /multiple choice/i }))
+
+        expect(screen.queryByText("Character Length")).toBeNull()
+        expect(screen.queryByRole("button", { name: "Infinite" })).toBeTruthy()
+        expect(screen.queryByRole("button", { name: "Session" })).toBeTruthy()
+    })
+
     it("keeps open edits across prop/group updates and applies one draft", () => {
         const apply = mock()
         const close = mock()

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 import { toast } from "sonner"
-import { subscribeWordsetUpdates, updateWordset } from "@/lib/japanese/words/loader"
+import { subscribeWordsetUpdates, updateWordset } from "@/lib/japanese/wordsets"
 
 export function useWordsetUpdate() {
     useEffect(() => subscribeWordsetUpdates(event => {

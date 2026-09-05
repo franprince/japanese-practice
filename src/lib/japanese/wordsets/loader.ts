@@ -1,8 +1,9 @@
+/** Convenience operations delegating to the single acquisition service. */
 import type { LoaderDeps, WordSets } from "@/types/api"
 import { wordsetAcquisition } from "./acquisition"
 
 export type { LoaderDeps, WordSets } from "@/types/api"
-export { normalizeLang, isMobileDevice, getWordsetCacheKey } from "./acquisition"
+export { normalizeLang, isMobileDevice, getWordsetCacheKey } from "./policy"
 export const readWordsetCache = (lang: string) => wordsetAcquisition.readCache(lang)
 export const primeWordsetCache = async (lang: string, data: WordSets): Promise<void> => {
   await wordsetAcquisition.prime(lang, data)

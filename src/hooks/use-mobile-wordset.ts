@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { useMobileDevice } from "./use-mobile-device"
-import { fetchWordsetMetadata } from "@/lib/japanese/words/manifest"
 import type { Language } from "@/lib/i18n"
 import type { WordsGameType } from "@/types/game"
 import {
-    ConsentRequired, isMobileDevice, normalizeLang, wordsetAcquisition,
+    ConsentRequired, isMobileDevice, normalizeLang, wordsetAcquisition, fetchWordsetMetadata,
     type WordsetAcquisition,
-} from "@/lib/japanese/words/acquisition"
+} from "@/lib/japanese/wordsets"
 
 const idleStates = {
     en: { lang: "en", status: "idle" },

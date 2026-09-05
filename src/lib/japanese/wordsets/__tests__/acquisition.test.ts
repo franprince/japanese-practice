@@ -1,9 +1,11 @@
 import { describe, expect, test, mock } from "bun:test"
-import {
-  cacheTransaction, ConsentRequired, downloadWordset, normalizeLang,
-  validateWordset, WordsetAcquisition, WordsetError,
-  type AcquisitionState, type WordsetEvent, type WordsetFetch, type WordsetStorage,
-} from "../acquisition"
+import { WordsetAcquisition } from "../acquisition"
+import { ConsentRequired, WordsetError } from "../errors"
+import { normalizeLang } from "../policy"
+import { cacheTransaction } from "../storage"
+import { validateWordset } from "../validation"
+import { downloadWordset } from "../transport"
+import type { AcquisitionState, WordsetEvent, WordsetFetch, WordsetStorage } from "../contracts"
 import { fixtureChecksum, fixtureManifest } from "@/test/wordset-fixture"
 import type { WordSets } from "@/types/api"
 

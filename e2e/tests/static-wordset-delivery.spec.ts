@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { validateManifest } from "../../src/lib/japanese/words/manifest"
+import { validateManifest } from "../../src/lib/japanese/wordsets/build"
 
 for (const language of ["en", "es"]) {
     test(`${language} static download persists and a repeat visit only checks metadata`, async ({ page }) => {
