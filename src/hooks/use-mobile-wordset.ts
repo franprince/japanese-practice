@@ -1,47 +1,46 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react"
+import { useMobileDevice } from "./use-mobile-device"
 import { fetchWordsetMetadata } from "@/lib/japanese/words/manifest"
 import type { Language } from "@/lib/i18n"
 import type { WordsGameType } from "@/types/game"
 import {
     ConsentRequired, isMobileDevice, normalizeLang, wordsetAcquisition,
-    type AcquisitionState, type WordsetAcquisition,
+    type WordsetAcquisition,
 } from "@/lib/japanese/words/acquisition"
+
+const idleStates = {
+    en: { lang: "en", status: "idle" },
+    es: { lang: "es", status: "idle" },
+} as const
 
 export const useMobileWordset = (lang: Language, acquisition: WordsetAcquisition = wordsetAcquisition) => {
     const datasetLang = normalizeLang(lang)
-    const [gameType, setGameTypeState] = useState<WordsGameType>("words")
-    const [isMobile, setIsMobile] = useState(false)
-    const [mobileConfirmOpen, setMobileConfirmOpen] = useState(false)
-    const [state, setState] = useState<AcquisitionState>({ lang: datasetLang, status: "idle" })
+    const mobile = useMobileDevice()
+    const [selectedType, setSelectedType] = useState<WordsGameType | null>(null)
+    const [modal, setModal] = useState({ lang: datasetLang, open: false, dismissed: false })
     const [size, setSize] = useState<{ lang: string; mb: number } | null>(null)
     const active = useRef<AbortController | null>(null)
-    const selectedType = useRef<WordsGameType>("characters")
-
-    useEffect(() => acquisition.subscribe(next => {
-        if (next.lang === datasetLang) setState(next)
+    const selected = useRef<WordsGameType | null>(null)
+    const subscribe = useCallback((notify: () => void) => acquisition.subscribe(next => {
+        if (next.lang === datasetLang) notify()
     }), [acquisition, datasetLang])
+    const snapshot = useCallback(() => acquisition.state(datasetLang), [acquisition, datasetLang])
+    // The server never acquires a dataset. Its stable snapshot must stay idle.
+    const serverState = idleStates[datasetLang]
+    const serverSnapshot = useCallback(() => serverState, [serverState])
+    const currentState = useSyncExternalStore(subscribe, snapshot, serverSnapshot)
 
     useEffect(() => {
-        const mobile = isMobileDevice()
-        setIsMobile(mobile)
-        setMobileConfirmOpen(false)
-        setState({ lang: datasetLang, status: "checking-cache" })
-        if (!mobile) return
-        setGameTypeState(selectedType.current === "words" ? "characters" : selectedType.current)
+        if (mobile !== true) return
         const controller = new AbortController()
         active.current = controller
-        acquisition.acquire(datasetLang, { signal: controller.signal, verifyCache: true }).then(() => {
+        acquisition.acquire(datasetLang, { signal: controller.signal, verifyCache: true }).catch(error => {
             if (controller.signal.aborted) return
-            setState(acquisition.state(datasetLang))
-            if (selectedType.current === "words") setGameTypeState("words")
-        }).catch(error => {
-            if (controller.signal.aborted) return
-            setState(acquisition.state(datasetLang))
             if (!(error instanceof ConsentRequired)) console.warn("Wordset cache check failed", error)
-            if (selectedType.current === "words") setMobileConfirmOpen(true)
+            if (selected.current === "words") setModal({ lang: datasetLang, open: true, dismissed: false })
         })
         return () => { controller.abort(); active.current?.abort() }
-    }, [acquisition, datasetLang])
+    }, [acquisition, datasetLang, mobile])
 
     useEffect(() => {
         const controller = new AbortController()
@@ -60,49 +59,48 @@ export const useMobileWordset = (lang: Language, acquisition: WordsetAcquisition
         active.current?.abort()
         const controller = new AbortController()
         active.current = controller
-        setMobileConfirmOpen(true)
-        setGameTypeState("characters")
+        setModal({ lang: datasetLang, open: true, dismissed: false })
         try {
             await acquisition.acquire(datasetLang, { consent, signal: controller.signal, verifyCache: true })
             if (controller.signal.aborted) return
-            setState(acquisition.state(datasetLang))
-            setMobileConfirmOpen(false)
-            setGameTypeState("words")
+            setModal({ lang: datasetLang, open: false, dismissed: false })
         } catch (error) {
             if (controller.signal.aborted) return
-            setState(acquisition.state(datasetLang))
             if (!(error instanceof ConsentRequired)) console.warn("Wordset acquisition failed", error)
         }
     }, [acquisition, datasetLang])
 
     const setGameType = useCallback((type: WordsGameType) => {
-        selectedType.current = type
+        selected.current = type
+        setSelectedType(type)
         if (type === "words" && isMobileDevice()) { void requestWords(false); return }
         active.current?.abort()
-        setMobileConfirmOpen(false)
-        setGameTypeState(type)
-    }, [requestWords])
+        setModal({ lang: datasetLang, open: false, dismissed: true })
+    }, [requestWords, datasetLang])
     const confirmWordMode = useCallback(() => {
-        selectedType.current = "words"
+        selected.current = "words"
+        setSelectedType("words")
         return requestWords(true)
     }, [requestWords])
     const cancelConfirm = useCallback(() => {
         active.current?.abort()
-        selectedType.current = "characters"
-        setGameTypeState("characters")
-        setState({ lang: datasetLang, status: "awaiting-consent" })
-        setMobileConfirmOpen(false)
+        selected.current = "characters"
+        setSelectedType("characters")
+        setModal({ lang: datasetLang, open: false, dismissed: true })
     }, [datasetLang])
 
-    const currentState: AcquisitionState = state.lang === datasetLang ? state : { lang: datasetLang, status: "checking-cache" }
-    const busy = ["checking-cache", "downloading", "persisting"].includes(currentState.status)
-    const downloadProgress = currentState.status === "downloading" && currentState.total
+    const isMobile = mobile === true
+    const gameType = selectedType ?? (mobile === false ? "words" : "characters")
+    const mobileConfirmOpen = modal.lang === datasetLang && modal.open
+    const dismissed = modal.lang === datasetLang && modal.dismissed
+    const busy = !dismissed && ["checking-cache", "downloading", "persisting"].includes(currentState.status)
+    const downloadProgress = !dismissed && currentState.status === "downloading" && currentState.total
         ? Math.min(99, Math.floor(currentState.received / currentState.total * 100))
-        : currentState.status === "persisting" ? 99 : null
+        : !dismissed && currentState.status === "persisting" ? 99 : null
     return {
-        gameType: isMobile && gameType === "words" && currentState.status !== "ready" ? "characters" as const : gameType,
+        gameType: mobile !== false && gameType === "words" && currentState.status !== "ready" ? "characters" as const : gameType,
         isMobile, mobileConfirmOpen, downloadProgress, busy,
-        downloadError: currentState.status === "failed" ? currentState.error.messageKey : null,
+        downloadError: !dismissed && currentState.status === "failed" ? currentState.error.messageKey : null,
         persisting: currentState.status === "persisting",
         wordsetSizeMB: size?.lang === datasetLang ? size.mb : datasetLang === "es" ? 5 : 33,
         setGameType, confirmWordMode, cancelConfirm,

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback, useTransition } from "react"
+import { useState, useEffect, useRef, useCallback, useTransition, useMemo, useLayoutEffect } from "react"
 import type { JapaneseWord, WordFilter } from "@/lib/japanese/words"
 import { getRandomWord, getRandomCharacter } from "@/lib/japanese/words"
 import { validateAnswer } from "@/lib/japanese/shared/input"
@@ -60,7 +60,17 @@ export function useWordGame({
     const [userInput, setUserInput] = useState("")
     const [options, setOptions] = useState<string[] | null>(null)
     const [noWordsAvailable, setNoWordsAvailable] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
+    const [pending, setPending] = useState(false)
+    const filterKey = JSON.stringify({ ...filter, selectedGroups: [...filter.selectedGroups].sort() })
+    const stableFilter = useMemo<WordFilter>(() => JSON.parse(filterKey), [filterKey])
+    const configKey = JSON.stringify([mode, gameType, lang, sessionId, filterKey])
+    const [loaded, setLoaded] = useState<{ configKey: string; sessionId: number; questionId: number } | null>(null)
+    const isLoading = pending || !loaded || (!disableNext && loaded.configKey !== configKey)
+    const generation = useRef<string | null>(configKey)
+    useLayoutEffect(() => {
+        generation.current = configKey
+        return () => { generation.current = null }
+    }, [configKey])
     const [displayRomaji, setDisplayRomaji] = useState("")
     const [errorDetails, setErrorDetails] = useState<ErrorDetectionResult | null>(null)
     const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
@@ -78,40 +88,33 @@ export function useWordGame({
 
     const {
         feedback,
-        beginQuestion,
         submitAnswer,
         skipQuestion
-    } = useBaseGame({ sessionId, onSessionEvent, disabled: disableNext })
+    } = useBaseGame({ sessionId, questionId: loaded?.questionId ?? 0, onSessionEvent, disabled: disableNext || isLoading })
 
     
 
     
     const generateWord = useCallback(async () => {
+        if (generation.current !== configKey) return
         const requestId = ++requestIdRef.current
-        setIsLoading(true)
         validationRequestRef.current = null
-        if (diagnosticsSessionRef.current !== sessionId) {
-            diagnosticsSessionRef.current = sessionId
-            setIncorrectChars(new Map())
-            setErrorDetails(null)
-            setUserInput("")
-        }
         let word: JapaneseWord | null = null
         let nextOptions: string[] | null = null
 
         try {
             if (gameType === "words") {
-                word = await getRandomWord(mode, filter, lang)
+                word = await getRandomWord(mode, stableFilter, lang)
             } else if (gameType === "guess") {
                 // For guess mode (multiple choice), we want single characters
                 word = await getRandomCharacter(mode, {
-                    ...filter,
+                    ...stableFilter,
                     minLength: 1,
                     maxLength: 1,
                 })
             } else {
                 // For character shuffle/practice mode, use the actual filter lengths
-                word = await getRandomCharacter(mode, filter)
+                word = await getRandomCharacter(mode, stableFilter)
             }
 
             // Generate distractors for guess mode
@@ -120,7 +123,7 @@ export function useWordGame({
                 // Try to get 2 unique distractors
                 for (let i = 0; i < 10 && distractors.length < 2; i++) {
                     const dist = await getRandomCharacter(mode, {
-                        ...filter,
+                        ...stableFilter,
                         minLength: 1,
                         maxLength: 1,
                     })
@@ -140,15 +143,21 @@ export function useWordGame({
 
                 nextOptions = shuffleArray([word.romaji, ...distractors])
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error("Failed to load word:", error)
-        } finally {
-            if (requestId === requestIdRef.current) setIsLoading(false)
         }
 
         // A newer loadNewWord() call has already superseded this one —
         // discard this (stale) result instead of overwriting newer state.
-        if (requestId !== requestIdRef.current) return
+        if (requestId !== requestIdRef.current || generation.current !== configKey) return
+        setPending(false)
+        setLoaded({ configKey, sessionId, questionId: requestId })
+        if (diagnosticsSessionRef.current !== sessionId) {
+            diagnosticsSessionRef.current = sessionId
+            setIncorrectChars(new Map())
+        }
+        setUserInput("")
+        setErrorDetails(null)
 
         if (word) {
             setCurrentWord(word)
@@ -162,22 +171,13 @@ export function useWordGame({
             setOptions(null)
         }
 
-        if (word) {
-            setUserInput("")
-            beginQuestion()
-            setErrorDetails(null)
-
-            requestAnimationFrame(() => {
-                if (!suppressFocus) inputRef.current?.focus()
-            })
-        }
-    }, [mode, filter, suppressFocus, lang, gameType, sessionId, beginQuestion])
+    }, [mode, stableFilter, lang, gameType, sessionId, configKey])
 
     const loadNewWord = useCallback(async () => {
-        if (!disableNext) await generateWord()
-    }, [disableNext, generateWord])
-
-
+        if (disableNext || generation.current !== configKey) return
+        setPending(true)
+        await generateWord()
+    }, [disableNext, configKey, generateWord])
 
     const checkAnswer = useCallback(async (value?: string | React.MouseEvent) => {
         const answerToTest = (typeof value === "string" ? value : userInput).trim()
@@ -247,27 +247,28 @@ export function useWordGame({
 
     
     useEffect(() => {
-        if (!suppressFocus) {
-            requestAnimationFrame(() => inputRef.current?.focus())
-        }
-    }, [suppressFocus])
+        if (suppressFocus || isLoading || disableNext) return
+        const frame = requestAnimationFrame(() => inputRef.current?.focus())
+        return () => cancelAnimationFrame(frame)
+    }, [suppressFocus, isLoading, disableNext, currentWord])
 
     
+    const visibleIncorrectChars = useMemo(() => loaded?.sessionId === sessionId ? incorrectChars : new Map<string, { count: number; romaji: string }>(), [loaded?.sessionId, sessionId, incorrectChars])
     useEffect(() => {
-        onIncorrectCharsChange?.(incorrectChars)
-    }, [incorrectChars, onIncorrectCharsChange])
+        onIncorrectCharsChange?.(visibleIncorrectChars)
+    }, [visibleIncorrectChars, onIncorrectCharsChange])
 
     return {
         
         currentWord,
-        userInput,
+        userInput: loaded?.sessionId === sessionId ? userInput : "",
         setUserInput,
         feedback,
         noWordsAvailable,
         isLoading,
         displayRomaji,
-        errorDetails,
-        incorrectChars,
+        errorDetails: loaded?.sessionId === sessionId ? errorDetails : null,
+        incorrectChars: visibleIncorrectChars,
         inputRef,
         options,
 

@@ -4,7 +4,6 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { useI18n } from "@/lib/i18n"
-import { cn } from "@/lib/core"
 import type { GamePageLayoutProps } from "@/types/ui"
 
 

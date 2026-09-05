@@ -22,6 +22,7 @@ interface NumberGameCardProps extends GameSessionProps {
 export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, disableNext = false }: NumberGameCardProps) {
   const { t } = useI18n()
   const {
+    isReady,
     userAnswer,
     showResult,
     isCorrect,
@@ -36,6 +37,8 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
     handleNext,
     handleSkip,
   } = useNumberGame({ difficulty, mode, sessionId, onSessionEvent, disableNext })
+
+  if (!isReady) return null
 
   const promptLabel = mode === "arabicToKanji" ? t("writeInJapanese") : t("writeInArabic")
 

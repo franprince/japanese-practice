@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PRs 1–3 and E2E hardening (#58) merged; PR 4 open for review
+- **Status:** Approved sequence — PRs 1–4 and E2E hardening (#58) merged; PR 5 implemented and verified; PR approval pending
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -121,8 +121,8 @@ metadata; both English and Spanish datasets load correctly.
 
 ## PR 4 — Unify game session state
 
-**Status:** Implemented and verified; [PR #60](https://github.com/franprince/japanese-practice/pull/60)
-is open against `develop` without merge conflicts.
+**Status:** Merged in [PR #60](https://github.com/franprince/japanese-practice/pull/60)
+on 2026-09-05. PR 5 starts from `develop` at `c2e5862`.
 See the [specification](2026-09-05-unify-game-session-state/spec.md),
 [plan](2026-09-05-unify-game-session-state/implementation_plan.md), and
 [tasks](2026-09-05-unify-game-session-state/tasks.md).
@@ -159,6 +159,23 @@ answer produces exactly one session event; all four game pages use the same
 session contract; visible behavior remains unchanged.
 
 ## PR 5 — Resolve React lifecycle warnings
+
+**Status:** Implemented and verified on `refactor/react-lifecycle-cleanup`;
+PR approval pending. See the
+[specification](2026-09-05-react-lifecycle-cleanup/spec.md),
+[plan](2026-09-05-react-lifecycle-cleanup/implementation_plan.md), and
+[tasks](2026-09-05-react-lifecycle-cleanup/tasks.md).
+
+**Baseline (2026-09-05):** `bun run lint` passes with 40 warnings: 14 React
+lifecycle/purity warnings, 17 active-source unused declarations, six explicit
+`any` warnings and three configuration-export warnings. The first two groups
+are this task's scope.
+
+**Verification (2026-09-05):** Typecheck and production build pass. All 191
+unit/integration tests and all 47 production browser tests pass. Lint has zero
+errors and eight unrelated warnings; the cleaned lifecycle/dependency and
+unused-declaration rules now fail violations as errors. Browser hydration checks
+and inspected keypad/settings screenshots are recorded in the plan.
 
 **Problem:** Lint reports state-before-declaration, synchronous effect-driven
 state, and render-time impurity warnings. These patterns create extra renders

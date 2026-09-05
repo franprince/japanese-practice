@@ -37,3 +37,23 @@ test.describe('Home Page', () => {
         await expect(page.locator('a[href="/numbers"]')).toContainText(es['games.numbers.title'])
     })
 })
+
+
+test('hydrates saved language and theme, then persists a theme selection on reload', async ({ page }) => {
+    await page.addInitScript(() => {
+        if (!sessionStorage.getItem('lifecycle-preferences')) {
+            localStorage.setItem('kana-words-lang', 'en')
+            localStorage.setItem('theme', 'mint')
+            sessionStorage.setItem('lifecycle-preferences', 'set')
+        }
+    })
+    await page.goto('/')
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'mint')
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+    await page.getByRole('button', { name: en['themes.mint.label'], exact: true }).click()
+    await page.getByRole('button', { name: new RegExp(en['themes.ocean.label']) }).click()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean')
+    await page.reload()
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'ocean')
+    expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('ocean')
+})

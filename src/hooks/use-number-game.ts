@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useState, useCallback, useMemo } from "react"
 import {
     generateRandomNumber,
     arabicToJapanese,
@@ -9,6 +9,8 @@ import {
     japaneseNumbers,
     type Difficulty,
 } from "@/lib/japanese/numbers"
+import { createRandomSeed, createSeededRandom } from "@/lib/core/random"
+import { useHydrated } from "./use-hydrated"
 import { useBaseGame } from "./use-base-game"
 import type { GameSessionProps } from "@/lib/core/game-session"
 import { useKeyboardNavigation } from "./use-keyboard-navigation"
@@ -21,6 +23,7 @@ export interface UseNumberGameProps extends GameSessionProps {
 
 export interface UseNumberGameReturn {
     
+    isReady: boolean
     currentNumber: number
     userAnswer: string
     showResult: boolean
@@ -47,46 +50,43 @@ export function useNumberGame({
     onSessionEvent,
     disableNext = false,
 }: UseNumberGameProps): UseNumberGameReturn {
-    const [currentNumber, setCurrentNumber] = useState<number>(1)
-    const [userAnswer, setUserAnswer] = useState("")
-
-    
-    const {
-        feedback,
-        beginQuestion,
-        submitAnswer,
-        skipQuestion
-    } = useBaseGame({ sessionId, onSessionEvent, disabled: disableNext })
-
+    const isReady = useHydrated()
+    const [round, setRound] = useState(() => ({ sessionId, difficulty, id: 1, seed: createRandomSeed(), input: "" }))
+    if (round.sessionId !== sessionId || round.difficulty !== difficulty) {
+        setRound({ sessionId, difficulty, id: round.id + 1, seed: round.seed + 1, input: "" })
+    }
+    const currentNumber = useMemo(() => {
+        const range = difficultyRanges[round.difficulty]
+        return generateRandomNumber(range.min, range.max, createSeededRandom(round.seed))
+    }, [round.difficulty, round.seed])
+    const userAnswer = round.input
+    const setUserAnswer = useCallback((next: string | ((previous: string) => string)) => {
+        setRound(previous => ({ ...previous, input: typeof next === "function" ? next(previous.input) : next }))
+    }, [])
+    const { feedback, submitAnswer, skipQuestion, isCurrentQuestion } = useBaseGame({
+        sessionId, questionId: round.id, onSessionEvent, disabled: disableNext || !isReady,
+    })
     const showResult = feedback !== null
     const isCorrect = feedback === "correct"
-
     const generateNewNumber = useCallback(() => {
-        const range = difficultyRanges[difficulty]
-        const newNumber = generateRandomNumber(range.min, range.max)
-        setCurrentNumber(newNumber)
-        setUserAnswer("")
-        beginQuestion()
-    }, [difficulty, beginQuestion])
-
-    useEffect(() => {
-        generateNewNumber()
-    }, [generateNewNumber])
+        if (!isCurrentQuestion()) return
+        setRound({ sessionId, difficulty, id: round.id + 1, seed: createRandomSeed(), input: "" })
+    }, [sessionId, difficulty, round.id, isCurrentQuestion])
 
     const handleKeyPress = useCallback((key: string) => {
         if (showResult || disableNext) return
         setUserAnswer((prev) => prev + key)
-    }, [showResult, disableNext])
+    }, [showResult, disableNext, setUserAnswer])
 
     const handleDelete = useCallback(() => {
         if (showResult || disableNext) return
         setUserAnswer((prev) => prev.slice(0, -1))
-    }, [showResult, disableNext])
+    }, [showResult, disableNext, setUserAnswer])
 
     const handleClear = useCallback(() => {
         if (showResult || disableNext) return
         setUserAnswer("")
-    }, [showResult, disableNext])
+    }, [showResult, disableNext, setUserAnswer])
 
     const handleSubmit = useCallback(() => {
         if (showResult || !userAnswer || disableNext) return
@@ -134,6 +134,7 @@ export function useNumberGame({
 
     return {
         
+        isReady,
         currentNumber,
         userAnswer,
         showResult,

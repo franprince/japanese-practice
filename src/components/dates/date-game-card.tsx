@@ -41,17 +41,6 @@ export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = fa
     }
   }
 
-  const getModeLabel = () => {
-    switch (mode) {
-      case "week_days":
-        return t("weekDays")
-      case "months":
-        return t("month")
-      case "full":
-        return t("date")
-    }
-  }
-
   const getPromptText = () => {
     switch (mode) {
       case "full":

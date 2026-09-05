@@ -19,11 +19,16 @@ export const test = base.extend<{
     browserChecks: [async ({ page }, use) => {
         const errors: string[] = []
         page.on('pageerror', error => errors.push(error.message))
+        page.on('console', message => {
+            if (message.type() === 'error' && /hydration|hydrated|server rendered HTML|Minified React error #(418|419|421|422|423|425)/i.test(message.text())) {
+                errors.push(message.text())
+            }
+        })
         await page.addInitScript(() => {
             if (!localStorage.getItem('kana-words-lang')) localStorage.setItem('kana-words-lang', 'en')
         })
         await use()
-        expect(errors, 'uncaught browser exceptions').toEqual([])
+        expect(errors, 'uncaught browser exceptions and hydration errors').toEqual([])
     }, { auto: true }],
     homePage: async ({ page }: PlaywrightTestArgs & PlaywrightTestOptions, use: (r: HomePage) => Promise<void>) => {
         const homePage = new HomePage(page)

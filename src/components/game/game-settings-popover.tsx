@@ -11,7 +11,6 @@ interface GameSettingsPopoverProps {
   onSelectMode: (mode: PlayMode) => void
   targetCount: number
   onSelectCount: (count: number) => void
-  remainingQuestions: number
 }
 
 export function GameSettingsPopover({
@@ -19,7 +18,6 @@ export function GameSettingsPopover({
   onSelectMode,
   targetCount,
   onSelectCount,
-  remainingQuestions,
 }: GameSettingsPopoverProps) {
   const { t } = useI18n()
   const [open, setOpen] = useState(false)

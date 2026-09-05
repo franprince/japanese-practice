@@ -25,33 +25,15 @@ export default [
   ...nextTypescript,
 
   {
-    // Baseline for pre-existing debt in app code. Lint has never run in this
-    // repo, so these start as warnings to get a green gate that still fails
-    // on anything new. Every other rule keeps its upstream severity.
-    //
-    // Declared BEFORE the scoped overrides below: in flat config the last
-    // matching block wins, so a global block placed after them would undo
-    // their "off" settings.
-    //
-    // Burn-down is tracked in specs/INDEX.md; promote each back to "error"
-    // as it reaches zero.
+    // Enforce the cleaned lifecycle and unused-declaration rules. Scoped
+    // non-React/test overrides below retain their existing purposes.
     rules: {
-      // ~33 occurrences. Follow-up: reduce-any-and-unused.
-      "@typescript-eslint/no-unused-vars": "warn",
-      // ~11 occurrences. Follow-up: reduce-any-and-unused.
+      "@typescript-eslint/no-unused-vars": "error",
       "@typescript-eslint/no-explicit-any": "warn",
-      // ~12 occurrences, mostly legitimate localStorage hydration on mount.
-      "react-hooks/set-state-in-effect": "warn",
-
-      // TODO(fix-react-hooks-violations): these two are REAL BUGS, not style.
-      // They are warnings only because fixing them means changing application
-      // code, which the approved spec puts out of scope for this change.
-      //   - src/components/numbers/number-pad.tsx:47 — Math.random() during
-      //     render, so the keypad shuffle can reorder on any re-render.
-      //   - app/words/page.tsx:50 — setFilter read before its declaration, so
-      //     the earlier read never observes later updates.
-      "react-hooks/purity": "warn",
-      "react-hooks/immutability": "warn",
+      "react-hooks/set-state-in-effect": "error",
+      "react-hooks/purity": "error",
+      "react-hooks/immutability": "error",
+      "react-hooks/exhaustive-deps": "error",
     },
   },
 

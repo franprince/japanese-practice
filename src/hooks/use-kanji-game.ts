@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { getRandomKanji, getRandomOptions, loadKanjiByLevels, type KanjiEntry, type KanjiDifficulty } from "@/lib/japanese/kanji"
 import { useBaseGame } from "./use-base-game"
 import type { GameSessionProps } from "@/lib/core/game-session"
@@ -32,6 +32,9 @@ export function useKanjiGame({
 }: UseKanjiGameProps): UseKanjiGameReturn {
     const [kanjiPool, setKanjiPool] = useState<{ difficulty: KanjiDifficulty; entries: KanjiEntry[] } | null>(null)
     const kanjiSet = kanjiPool?.difficulty === difficulty ? kanjiPool.entries : null
+    const [loaded, setLoaded] = useState<{ sessionId: number; difficulty: KanjiDifficulty; id: number } | null>(null)
+    const request = useRef(0)
+    const ready = loaded?.sessionId === sessionId && loaded.difficulty === difficulty
     const [currentKanji, setCurrentKanji] = useState<KanjiEntry | null>(null)
     const [options, setOptions] = useState<KanjiEntry[]>([])
     const [selectedOption, setSelectedOption] = useState<KanjiEntry | null>(null)
@@ -39,14 +42,16 @@ export function useKanjiGame({
     
     const {
         feedback,
-        beginQuestion,
+        isCurrentQuestion,
         submitAnswer
-    } = useBaseGame({ sessionId, onSessionEvent, disabled: disableNext })
+    } = useBaseGame({ sessionId, questionId: loaded?.id ?? 0, onSessionEvent, disabled: disableNext || !ready })
 
-    const isRevealed = feedback !== null
+    const isRevealed = ready && feedback !== null
     const isCorrect = feedback === "correct"
 
     useEffect(() => {
+        if (disableNext) return
+        const id = ++request.current
         let active = true
         let levels: string[] = []
         switch (difficulty) {
@@ -66,7 +71,12 @@ export function useKanjiGame({
             .then(list => {
                 if (!active) return
                 if (!list.length) throw new Error("No kanji found")
+                const nextKanji = getRandomKanji(list)
                 setKanjiPool({ difficulty, entries: list })
+                setCurrentKanji(nextKanji)
+                setOptions(getRandomOptions(list, nextKanji, 3))
+                setSelectedOption(null)
+                setLoaded({ sessionId, difficulty, id })
             })
             .catch((err) => {
                 if (!active) return
@@ -74,25 +84,19 @@ export function useKanjiGame({
                 setKanjiPool(null)
             })
         return () => { active = false }
-    }, [difficulty])
+    }, [difficulty, sessionId, disableNext])
 
     const loadNewKanji = useCallback(
         (exclude?: KanjiEntry | null) => {
-            if (!kanjiSet?.length) return
+            if (!kanjiSet?.length || !isCurrentQuestion()) return
             const newKanji = getRandomKanji(kanjiSet, exclude ?? undefined)
             setCurrentKanji(newKanji)
             setOptions(getRandomOptions(kanjiSet, newKanji, 3))
             setSelectedOption(null)
-            beginQuestion()
+            setLoaded({ sessionId, difficulty, id: ++request.current })
         },
-        [kanjiSet, beginQuestion],
+        [kanjiSet, isCurrentQuestion, sessionId, difficulty],
     )
-
-    useEffect(() => {
-        if (kanjiSet?.length) {
-            loadNewKanji()
-        }
-    }, [kanjiSet, loadNewKanji])
 
     const handleSubmit = useCallback(
         (option?: KanjiEntry) => {
@@ -124,9 +128,9 @@ export function useKanjiGame({
 
     return {
         
-        currentKanji: kanjiSet?.length ? currentKanji : null,
+        currentKanji: ready && kanjiSet?.length ? currentKanji : null,
         options,
-        selectedOption,
+        selectedOption: ready ? selectedOption : null,
         isRevealed,
         isCorrect,
 

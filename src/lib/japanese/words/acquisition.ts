@@ -166,6 +166,10 @@ type Options = { consent?: boolean; signal?: AbortSignal; verifyCache?: boolean 
 type Operation = { controller: AbortController; promise: Promise<WordSets>; users: number }
 export class WordsetAcquisition {
   private states = new Map<DatasetLanguage, AcquisitionState>()
+  private readonly idleStates: Record<DatasetLanguage, AcquisitionState> = {
+    en: { lang: "en", status: "idle" },
+    es: { lang: "es", status: "idle" },
+  }
   private memory = new Map<DatasetLanguage, WordSets>()
   private operations = new Map<DatasetLanguage, Operation>()
   private refreshing = new Map<DatasetLanguage, Promise<void>>()
@@ -177,7 +181,7 @@ export class WordsetAcquisition {
   }) {}
   state(lang: string): AcquisitionState {
     const normalized = normalizeLang(lang)
-    return this.states.get(normalized) ?? { lang: normalized, status: "idle" }
+    return this.states.get(normalized) ?? this.idleStates[normalized]
   }
   subscribe(listener: (state: AcquisitionState) => void) {
     this.stateListeners.add(listener)

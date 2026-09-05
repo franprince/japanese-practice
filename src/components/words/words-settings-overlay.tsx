@@ -9,10 +9,8 @@ import {
   Shuffle, 
   Dice5, 
   Infinity as LucideInfinity,
-  Layers,
   CheckCircle2,
   AlertCircle,
-  type LucideIcon
 } from "lucide-react"
 import { cn } from "@/lib/core"
 import { useI18n } from "@/lib/i18n"
@@ -33,8 +31,13 @@ interface WordsSettingsOverlayProps {
   characterGroups: CharacterGroup[]
 }
 
-export function WordsSettingsOverlay({
-  open,
+export function WordsSettingsOverlay(props: WordsSettingsOverlayProps) {
+  return <Dialog.Root open={props.open} onOpenChange={props.onOpenChange}>
+    {props.open && <WordsSettingsDraft {...props} />}
+  </Dialog.Root>
+}
+
+function WordsSettingsDraft({
   onOpenChange,
   mode,
   gameType,
@@ -46,36 +49,25 @@ export function WordsSettingsOverlay({
 }: WordsSettingsOverlayProps) {
   const { t } = useI18n()
   const customSectionRef = React.useRef<HTMLDivElement>(null)
-  const [shouldScroll, setShouldScroll] = React.useState(false)
+  const shouldScroll = React.useRef(false)
   const [localMode, setLocalMode] = React.useState<GameMode>(mode)
   const [localGameType, setLocalGameType] = React.useState<WordsGameType>(gameType)
   const [localPlayMode, setLocalPlayMode] = React.useState<"infinite" | "session">(playMode)
   const [localTargetCount, setLocalTargetCount] = React.useState(targetCount)
   const [localFilter, setLocalFilter] = React.useState<WordFilter>(filter)
 
-  // Sync with props when opening
-  React.useEffect(() => {
-    if (open) {
-      setLocalMode(mode)
-      setLocalGameType(gameType)
-      setLocalPlayMode(playMode)
-      setLocalTargetCount(targetCount)
-      setLocalFilter(filter)
-    }
-  }, [open, mode, gameType, playMode, targetCount, filter])
-
   // Scroll to custom section when selected
   React.useEffect(() => {
-    if (localMode === "custom" && shouldScroll) {
+    if (localMode === "custom" && shouldScroll.current) {
       customSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-      setShouldScroll(false)
+      shouldScroll.current = false
     }
-  }, [localMode, shouldScroll])
+  }, [localMode])
 
   const handleModeChange = (m: GameMode) => {
     setLocalMode(m)
     if (m === "custom") {
-      setShouldScroll(true)
+      shouldScroll.current = true
     }
   }
 
@@ -118,7 +110,6 @@ export function WordsSettingsOverlay({
   const sessionCounts = [5, 10, 20, 50]
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-background/60 backdrop-blur-sm z-[100] animate-in fade-in duration-300" />
         <Dialog.Content className={cn(
@@ -437,6 +428,5 @@ export function WordsSettingsOverlay({
           </div>
         </Dialog.Content>
       </Dialog.Portal>
-    </Dialog.Root>
   )
 }

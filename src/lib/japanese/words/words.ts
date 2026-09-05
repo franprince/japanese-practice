@@ -7,7 +7,6 @@ import {
   getKanaRomajiMap,
   getCharacterGroupsSync,
   getKanaRomajiMapSync,
-  type CharacterGroup as LoaderCharacterGroup
 } from "../shared/kana-dictionary-loader";
 
 

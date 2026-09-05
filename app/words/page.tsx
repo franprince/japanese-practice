@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState, useEffect, useMemo } from "react"
 import { Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { GameCard } from "@/components/words/game-card"
@@ -40,27 +40,24 @@ export default function WordsPage() {
     const [incorrectChars, setIncorrectChars] = useState<Map<string, { count: number; romaji: string }>>(new Map())
     const [settingsOpen, setSettingsOpen] = useState(false)
 
-    // Preload character groups and kana dictionary on mount
-    useEffect(() => {
-        preloadKanaDictionary()
-        getCharacterGroups().then(groups => {
-            setCharacterGroups(groups)
-            setIsLoadingGroups(false)
-            // Initialize filter with all groups once loaded
-            setFilter({
-                selectedGroups: groups.map(g => g.id),
-                minLength: 3,
-                maxLength: 6,
-            })
-        })
-    }, [])
-
     const [mode, setMode] = useState<GameMode>("hiragana")
-    const [filter, setFilter] = useState<WordFilter>({
-        selectedGroups: [], // Will be populated after groups load
+    const [appliedFilter, setFilter] = useState<WordFilter | null>(null)
+    const filter = useMemo<WordFilter>(() => appliedFilter ?? {
+        selectedGroups: characterGroups.map(group => group.id),
         minLength: 3,
         maxLength: 6,
-    })
+    }, [appliedFilter, characterGroups])
+
+    useEffect(() => {
+        let active = true
+        preloadKanaDictionary()
+        getCharacterGroups().then(groups => {
+            if (!active) return
+            setCharacterGroups(groups)
+            setIsLoadingGroups(false)
+        })
+        return () => { active = false }
+    }, [])
 
     const {
         gameType,
@@ -178,7 +175,6 @@ export default function WordsPage() {
                     onSessionEvent={handleSessionEvent}
                     submittedCount={submittedCount}
                     answerAccuracy={answerAccuracy}
-                    onRequestCloseSettings={() => setSettingsOpen(false)}
                     onRequestOpenSettings={() => setSettingsOpen(true)}
                     disableNext={sessionComplete && playMode === "session"}
                     gameType={gameType}

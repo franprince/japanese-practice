@@ -1,3 +1,4 @@
+import { StrictMode } from "react"
 import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test"
 import { act, renderHook, waitFor } from "@testing-library/react"
 import { useMobileWordset } from "../use-mobile-wordset"
@@ -149,4 +150,16 @@ describe("mobile acquisition UI", () => {
         unmount()
         expect(h.fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(true)
     })
+})
+
+
+test("acquisition snapshots are stable while idle and Strict Mode never downloads without consent", async () => {
+    const h = harness()
+    expect(h.service.state("en")).toBe(h.service.state("ja"))
+    expect(h.service.state("es")).toBe(h.service.state("es"))
+    const { result } = renderHook(() => useMobileWordset("en", h.service), { wrapper: StrictMode })
+    await waitFor(() => expect(result.current.busy).toBe(false))
+    expect(result.current.gameType).toBe("characters")
+    expect(result.current.mobileConfirmOpen).toBe(false)
+    expect(h.fetcher).not.toHaveBeenCalled()
 })

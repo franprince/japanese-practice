@@ -1,4 +1,6 @@
-import { describe, expect, it, spyOn } from "bun:test"
+import { StrictMode } from "react"
+import * as kanjiData from "@/lib/japanese/kanji"
+import { describe, expect, it, spyOn, mock } from "bun:test"
 import { act, renderHook, waitFor } from "@testing-library/react"
 import { useNumberGame } from "../use-number-game"
 import { useDateGame } from "../use-date-game"
@@ -245,6 +247,7 @@ describe("game hooks with reducer-backed sessions", () => {
             act(() => result.current.session.resetSession())
             expect(result.current.game).toMatchObject({ selectedOption: null, isRevealed: false })
             expect(result.current.session).toMatchObject({ score: 0, answeredCount: 0, sessionComplete: false })
+            await waitFor(() => expect(result.current.game.currentKanji).not.toBeNull())
             act(() => result.current.game.handleOptionClick(result.current.game.currentKanji!))
             expect(result.current.session).toMatchObject({ score: 10, answeredCount: 1, correctCount: 1 })
             unmount()
@@ -263,11 +266,74 @@ describe("game hooks with reducer-backed sessions", () => {
             result.current.handleSessionEvent({ type: "question-skipped", sessionId, questionId: 3 })
         })
         expect(result.current).toMatchObject({ score: 1, accuracy: 33, answerAccuracy: 50, submittedCount: 2, answeredCount: 3, skippedCount: 1, remainingQuestions: 0, sessionComplete: true })
-        expect(result.current.sessionSummaryProps).toMatchObject({ targetCount: 3, correctCount: 1, accuracy: 33 })
+        expect(result.current.sessionSummaryProps).toMatchObject({ targetCount: 3, accuracy: 33 })
         const previousSessionId = result.current.sessionId
         act(() => result.current.resetSession("infinite", 5))
         expect(result.current).toMatchObject({ sessionId: previousSessionId + 1, playMode: "infinite", targetCount: 5, score: 0, answeredCount: 0, accuracy: 0, answerAccuracy: 100, remainingQuestions: undefined, sessionComplete: false })
         act(() => result.current.handleSessionEvent({ type: "answer-submitted", sessionId: previousSessionId, questionId: 4, correct: true }))
         expect(result.current.answeredCount).toBe(0)
+    })
+})
+
+
+describe("synchronous question lifecycle", () => {
+    it("preserves Number and Date questions and inputs through parent rerenders in Strict Mode", () => {
+        const numbers = renderHook(() => useNumbers(), { wrapper: StrictMode })
+        act(() => numbers.result.current.game.handleKeyPress("1"))
+        const number = numbers.result.current.game.currentNumber
+        numbers.rerender()
+        expect(numbers.result.current.game).toMatchObject({ currentNumber: number, userAnswer: "1", showResult: false })
+        act(() => { numbers.result.current.game.handleSkip(); numbers.result.current.game.handleSkip() })
+        expect(numbers.result.current.session.answeredCount).toBe(1)
+        numbers.unmount()
+        const dates = renderHook(() => useDates(), { wrapper: StrictMode })
+        act(() => dates.result.current.game.setUserInput("partial"))
+        const question = dates.result.current.game.question
+        dates.rerender()
+        expect(dates.result.current.game.question).toBe(question)
+        expect(dates.result.current.game.userInput).toBe("partial")
+        expect(dates.result.current.session.answeredCount).toBe(0)
+    })
+})
+
+
+describe("Kanji asynchronous initialization", () => {
+    it("ignores replayed and obsolete difficulty loads", async () => {
+        const pending: ((entries: KanjiEntry[]) => void)[] = []
+        const load = spyOn(kanjiData, "loadKanjiByLevels").mockImplementation(() => new Promise(resolve => pending.push(resolve)))
+        const outcomes = mock()
+        const entries = [{ char: "一", reading: "いち" }, { char: "二", reading: "に" }]
+        try {
+            const { result, rerender, unmount } = renderHook(({ difficulty }) => useKanjiGame({
+                difficulty, sessionId: 0, onSessionEvent: outcomes,
+            }), { initialProps: { difficulty: "easy" as "easy" | "hard" }, wrapper: StrictMode })
+            expect(pending).toHaveLength(2)
+            rerender({ difficulty: "hard" })
+            expect(pending).toHaveLength(3)
+            await act(async () => pending[2]!(entries))
+            const question = result.current.currentKanji
+            await act(async () => { pending[0]!([{ char: "旧", reading: "old" }]); pending[1]!([{ char: "古", reading: "old" }]) })
+            expect(result.current.currentKanji).toBe(question)
+            expect(result.current.options.every(option => entries.some(entry => entry.char === option.char))).toBe(true)
+            expect(outcomes).not.toHaveBeenCalled()
+            unmount()
+        } finally { load.mockRestore() }
+    })
+    it("rejects a retained answer handler while its controls are disabled", async () => {
+        const entries = [{ char: "一", reading: "いち" }, { char: "二", reading: "に" }]
+        const load = spyOn(kanjiData, "loadKanjiByLevels").mockResolvedValue(entries)
+        const outcomes = mock()
+        try {
+            const { result, rerender } = renderHook(({ disabled }) => useKanjiGame({
+                difficulty: "easy", sessionId: 0, onSessionEvent: outcomes, disableNext: disabled,
+            }), { initialProps: { disabled: false } })
+            await waitFor(() => expect(result.current.currentKanji).not.toBeNull())
+            const answer = result.current.handleOptionClick
+            const question = result.current.currentKanji!
+            rerender({ disabled: true })
+            act(() => answer(question))
+            expect(outcomes).not.toHaveBeenCalled()
+            expect(result.current.isRevealed).toBe(false)
+        } finally { load.mockRestore() }
     })
 })

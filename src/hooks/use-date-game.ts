@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { generateDateQuestion, type DateMode, type DateQuestion } from "@/lib/japanese/dates"
+import { createRandomSeed, createSeededRandom } from "@/lib/core/random"
+import { useHydrated } from "./use-hydrated"
 import { useBaseGame } from "./use-base-game"
 import type { GameSessionProps } from "@/lib/core/game-session"
 import { useKeyboardNavigation } from "./use-keyboard-navigation"
@@ -37,8 +39,16 @@ export function useDateGame({
     disableNext = false,
     t,
 }: UseDateGameProps): UseDateGameReturn {
-    const [question, setQuestion] = useState<DateQuestion | null>(null)
-    const [userInput, setUserInput] = useState("")
+    const hydrated = useHydrated()
+    const [round, setRound] = useState(() => ({ sessionId, mode, translate: t, id: 1, seed: createRandomSeed(), input: "" }))
+    if (round.sessionId !== sessionId || (!disableNext && (round.mode !== mode || round.translate !== t))) {
+        setRound({ sessionId, mode, translate: t, id: round.id + 1, seed: round.seed + 1, input: "" })
+    }
+    const generated = useMemo(() => generateDateQuestion(round.mode, round.translate, createSeededRandom(round.seed)),
+        [round.mode, round.translate, round.seed])
+    const question = hydrated ? generated : null
+    const userInput = round.input
+    const setUserInput = useCallback((input: string) => setRound(previous => ({ ...previous, input })), [])
     const [numberDisplay, setNumberDisplay] = useState({ sessionId, visible: false })
     const showNumbers = numberDisplay.sessionId === sessionId && numberDisplay.visible
     const setShowNumbers = useCallback((visible: boolean) => {
@@ -49,23 +59,18 @@ export function useDateGame({
     
     const {
         feedback,
-        beginQuestion,
+        isCurrentQuestion,
         submitAnswer,
         skipQuestion
-    } = useBaseGame({ sessionId, onSessionEvent, disabled: disableNext })
+    } = useBaseGame({ sessionId, questionId: round.id, onSessionEvent, disabled: disableNext || !hydrated })
 
     const showResult = feedback !== null
     const isCorrect = feedback === "correct"
 
     const generateNewQuestion = useCallback(() => {
-        setQuestion(generateDateQuestion(mode, t))
-        setUserInput("")
-        beginQuestion()
-    }, [mode, t, beginQuestion])
-
-    useEffect(() => {
-        if (!disableNext) generateNewQuestion()
-    }, [generateNewQuestion, disableNext])
+        if (!isCurrentQuestion()) return
+        setRound({ sessionId, mode, translate: t, id: round.id + 1, seed: createRandomSeed(), input: "" })
+    }, [sessionId, mode, t, round.id, isCurrentQuestion])
 
     useEffect(() => {
         if (!showResult && !disableNext && inputRef.current) {
@@ -98,12 +103,12 @@ export function useDateGame({
     const handleDelete = useCallback(() => {
         if (showResult || disableNext) return
         setUserInput(userInput.slice(0, -1))
-    }, [showResult, disableNext, userInput])
+    }, [showResult, disableNext, userInput, setUserInput])
 
     const handleClear = useCallback(() => {
         if (showResult || disableNext) return
         setUserInput("")
-    }, [showResult, disableNext])
+    }, [showResult, disableNext, setUserInput])
 
     useKeyboardNavigation(
         {

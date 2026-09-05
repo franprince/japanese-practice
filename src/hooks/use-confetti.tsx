@@ -1,4 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
+
+import { createRandomSeed, createSeededRandom } from "@/lib/core/random"
+import { useHydrated } from "./use-hydrated"
 
 export interface ConfettiParticle {
     id: number
@@ -9,21 +12,19 @@ export interface ConfettiParticle {
 }
 
 export function useConfetti(count: number = 50) {
-    const [particles, setParticles] = useState<ConfettiParticle[]>([])
-
-    useEffect(() => {
+    const hydrated = useHydrated()
+    const [seed] = useState(createRandomSeed)
+    const particles = useMemo<ConfettiParticle[]>(() => {
+        const random = createSeededRandom(seed)
         const colors = ["#22c55e", "#eab308", "#3b82f6", "#ef4444", "#a855f7"]
-
-        setParticles(
-            Array.from({ length: count }).map((_, i) => ({
-                id: i,
-                color: colors[Math.floor(Math.random() * colors.length)] ?? "#22c55e",
-                left: `${Math.random() * 100}%`,
-                delay: `${Math.random() * 4}s`,
-                drift: Math.random() * 100 - 50
-            }))
-        )
-    }, [count])
+        return Array.from({ length: count }, (_, id) => ({
+            id,
+            color: colors[Math.floor(random() * colors.length)] ?? "#22c55e",
+            left: `${random() * 100}%`,
+            delay: `${random() * 4}s`,
+            drift: random() * 100 - 50,
+        }))
+    }, [seed, count])
 
     return (
         <div
@@ -37,7 +38,7 @@ export function useConfetti(count: number = 50) {
         }
       `}</style>
 
-            {particles.map((p) => (
+            {hydrated && particles.map((p) => (
                 <div
                     key={p.id}
                     className="absolute w-2 h-2 rounded-sm"
