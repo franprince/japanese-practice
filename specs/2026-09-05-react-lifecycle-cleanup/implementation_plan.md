@@ -1,6 +1,6 @@
 # Implementation plan
 
-**Status:** Implemented and verified on 2026-09-05; ready for PR approval.
+**Status:** Implemented and verified on 2026-09-05; [PR #61](https://github.com/franprince/japanese-practice/pull/61) open against `develop`.
 **Specification:** [Approved on 2026-09-05](spec.md).
 **Branch/base:** `refactor/react-lifecycle-cleanup`, from `develop` at `c2e5862`.
 **Delivery:** One backlog item and one PR against `develop`.
@@ -257,6 +257,11 @@ support the approved lifecycle contract; module decomposition remains PR 6.
 
 - Specification approved by the user on 2026-09-05.
 - Plan and checklist approved by the user on 2026-09-05; implementation complete.
+- PR creation approved by the user on 2026-09-05. Opened
+  [PR #61](https://github.com/franprince/japanese-practice/pull/61) against
+  `develop`; GitHub reports no merge conflicts. CI and preview checks were
+  running at creation. The pre-push typecheck, lint, 191 unit tests, production
+  build and wordset generation passed; generated wordsets remained unchanged.
 - `bun run typecheck` passes.
 - `bun run lint` passes: zero errors and eight unrelated warnings, down from 40.
   All lifecycle/purity/dependency and active-source unused declarations are

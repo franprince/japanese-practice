@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PRs 1–4 and E2E hardening (#58) merged; PR 5 implemented and verified; PR approval pending
+- **Status:** Approved sequence — PRs 1–4 and E2E hardening (#58) merged; PR 5 implemented and verified in open [PR #61](https://github.com/franprince/japanese-practice/pull/61)
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -161,7 +161,8 @@ session contract; visible behavior remains unchanged.
 ## PR 5 — Resolve React lifecycle warnings
 
 **Status:** Implemented and verified on `refactor/react-lifecycle-cleanup`;
-PR approval pending. See the
+[PR #61](https://github.com/franprince/japanese-practice/pull/61) open against
+`develop`, with no merge conflicts at creation. See the
 [specification](2026-09-05-react-lifecycle-cleanup/spec.md),
 [plan](2026-09-05-react-lifecycle-cleanup/implementation_plan.md), and
 [tasks](2026-09-05-react-lifecycle-cleanup/tasks.md).

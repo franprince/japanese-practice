@@ -1,6 +1,6 @@
 # Tasks
 
-**Status:** Implemented and verified; ready for PR approval.
+**Status:** Implemented and verified; [PR #61](https://github.com/franprince/japanese-practice/pull/61) open against `develop`.
 **Plan:** [implementation_plan.md](implementation_plan.md).
 
 ## Preparation
@@ -46,5 +46,7 @@ session; only a fully specified mechanical cleanup is eligible for delegation.
 - [x] T9 — Review the complete diff and check whitespace; update the plan,
   checklist, index and backlog with actual results; commit logical changes and
   their tests with Conventional Commit messages on this task branch.
-- [ ] Ask whether to open the verified PR to `develop`; if authorized, open it
-  with the final scope, validation and visual proof, then verify mergeability.
+- [x] Obtain PR approval, open [PR #61](https://github.com/franprince/japanese-practice/pull/61)
+  against `develop` with the final scope, validation and visual proof, and
+  verify mergeability. GitHub reports no merge conflicts; CI and preview
+  checks were running at creation.

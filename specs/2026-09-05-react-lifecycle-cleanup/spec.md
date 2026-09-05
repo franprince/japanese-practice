@@ -1,6 +1,6 @@
 # Resolve React lifecycle warnings
 
-**Status:** Approved, implemented and verified on 2026-09-05; ready for PR approval.
+**Status:** Implemented and verified on 2026-09-05; [PR #61](https://github.com/franprince/japanese-practice/pull/61) open against `develop`.
 **Backlog:** PR 5, following the merged game-session refactor in
 [PR #60](https://github.com/franprince/japanese-practice/pull/60).
 **Base:** `develop` at `c2e5862`.
