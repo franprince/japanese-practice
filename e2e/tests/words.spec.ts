@@ -113,7 +113,10 @@ test('settings cancel and unchanged Apply preserve the question; Custom has load
     await expect(dialog.getByRole('button', { name: 'Save Settings', exact: true })).toBeDisabled()
     await dialog.getByRole('button', { name: 'Select all', exact: true }).click()
     await expect(dialog.getByRole('button', { name: 'Save Settings', exact: true })).toBeEnabled()
-    await dialog.getByRole('button', { name: 'あ', exact: true }).scrollIntoViewIfNeeded()
+    // Center the scaled button away from the scroll panel's clipped edge.
+    await dialog.getByRole('button', { name: 'あ', exact: true }).evaluate(button => {
+        button.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' })
+    })
     await expect(dialog.getByRole('button', { name: 'あ', exact: true })).toBeInViewport({ ratio: 0.99 })
     await testInfo.attach('lifecycle-settings', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' })
     await dialog.getByRole('button', { name: 'Save Settings', exact: true }).click()

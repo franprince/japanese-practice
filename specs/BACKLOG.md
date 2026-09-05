@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PRs 1–4 and E2E hardening (#58) merged; PR 5 implemented and verified in open [PR #61](https://github.com/franprince/japanese-practice/pull/61)
+- **Status:** Approved sequence — PRs 1–5 and E2E hardening (#58) merged; PR 6 implemented and verified, [#62](https://github.com/franprince/japanese-practice/pull/62) open against `develop`
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -160,9 +160,8 @@ session contract; visible behavior remains unchanged.
 
 ## PR 5 — Resolve React lifecycle warnings
 
-**Status:** Implemented and verified on `refactor/react-lifecycle-cleanup`;
-[PR #61](https://github.com/franprince/japanese-practice/pull/61) open against
-`develop`, with no merge conflicts at creation. See the
+**Status:** Merged in [PR #61](https://github.com/franprince/japanese-practice/pull/61)
+on 2026-09-05. PR 6 starts from `develop` at `a959f8b`. See the
 [specification](2026-09-05-react-lifecycle-cleanup/spec.md),
 [plan](2026-09-05-react-lifecycle-cleanup/implementation_plan.md), and
 [tasks](2026-09-05-react-lifecycle-cleanup/tasks.md).
@@ -205,6 +204,21 @@ purity warnings and no active-source unused-variable warnings; tests and build
 remain green.
 
 ## PR 6 — Decompose feature concentration points
+
+**Status:** Implemented and verified on `refactor/split-large-feature-modules`,
+from `develop` at `a959f8b`; [PR #62](https://github.com/franprince/japanese-practice/pull/62)
+is open against `develop` without merge conflicts. See the
+[specification](2026-09-05-split-large-feature-modules/spec.md),
+[implementation plan](2026-09-05-split-large-feature-modules/implementation_plan.md),
+and [task checklist](2026-09-05-split-large-feature-modules/tasks.md).
+
+**Verification (2026-09-05):** Typecheck, production build and boundary checks
+pass; all 302 unit/integration/contract tests and 49 production Chromium tests
+pass. Lint retains zero errors and eight unrelated existing warnings. Both
+source datasets and the generated manifest retain identical checksums. Four
+inspected desktop/mobile gameplay/settings screenshot pairs have identical
+pixels. Module responsibilities and import rules are documented in
+[Words module boundaries](../docs/words-module-boundaries.md).
 
 **Problem:** Several modules combine orchestration, domain decisions, state
 transitions, presentation, and persistence. The largest concentration points

@@ -3,8 +3,7 @@
 import { useCallback, useState, useEffect, useMemo } from "react"
 import { Settings2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { GameCard } from "@/components/words/game-card"
-import { WordsSettingsOverlay } from "@/components/words/words-settings-overlay"
+import { GameCard, WordsSettingsOverlay, MobileWordsetModal, WordsMobileMenu } from "@/components/words"
 import { StatsDisplay } from "@/components/game/stats-display"
 import { type WordFilter, type CharacterGroup } from "@/lib/japanese/words"
 import { getCharacterGroups, preloadKanaDictionary } from "@/lib/japanese/shared"
@@ -14,8 +13,6 @@ import { GamePageLayout } from "@/components/layouts/game-page-layout"
 import { useSessionProgress } from "@/hooks/use-session-progress"
 import { useI18n } from "@/lib/i18n"
 import { useMobileWordset } from "@/hooks/use-mobile-wordset"
-import { MobileWordsetModal } from "@/components/words/mobile-wordset-modal"
-import { WordsMobileMenu } from "@/components/words/words-mobile-menu"
 
 export default function WordsPage() {
     const { t, lang } = useI18n()

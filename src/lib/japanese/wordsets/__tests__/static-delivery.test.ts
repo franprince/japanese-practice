@@ -5,8 +5,10 @@ import path from "node:path"
 import { createHash } from "node:crypto"
 import { publishWordsets } from "../../../../../scripts/publish-wordsets"
 import { fixtureChecksum, fixtureManifest } from "@/test/wordset-fixture"
-import { downloadWordset, WordsetAcquisition, type WordsetFetch } from "../acquisition"
-import { fetchWordsetMetadata, validateManifest } from "../manifest"
+import { WordsetAcquisition } from "../acquisition"
+import type { WordsetFetch } from "../contracts"
+import { downloadWordset, fetchWordsetMetadata } from "../transport"
+import { validateManifest } from "../manifest"
 
 const data = { version: 1, hiraganaWords: [], katakanaWords: [] }
 const json = (value: unknown) => new Response(JSON.stringify(value))

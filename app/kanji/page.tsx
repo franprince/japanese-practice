@@ -10,7 +10,7 @@ import { SessionSummaryCard } from "@/components/game/session-summary-card"
 import { GamePageLayout } from "@/components/layouts/game-page-layout"
 import { useSessionProgress } from "@/hooks/use-session-progress"
 import { useI18n } from "@/lib/i18n"
-import { preloadKanaDictionary } from "@/lib/japanese/shared/kana-dictionary-loader"
+import { preloadKanaDictionary } from "@/lib/japanese/shared"
 
 export default function KanjiPage() {
     const { t } = useI18n()

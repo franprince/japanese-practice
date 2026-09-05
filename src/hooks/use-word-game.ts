@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback, useTransition, useMemo, useLayoutEffect } from "react"
 import type { JapaneseWord, WordFilter } from "@/lib/japanese/words"
-import { getRandomWord, getRandomCharacter } from "@/lib/japanese/words"
-import { validateAnswer } from "@/lib/japanese/shared/input"
-import { detectErrors, type ErrorDetectionResult } from "@/lib/japanese/shared/error-detection"
-import { shuffleArray } from "@/lib/core/random"
+import { loadWordQuestion, evaluateWordAnswer } from "@/lib/japanese/words"
+import type { ErrorDetectionResult } from "@/types/japanese"
 import type { GameMode, WordsGameType } from "@/types/game"
 import type { GameSessionProps } from "@/lib/core/game-session"
 import type { Language } from "@/lib/i18n/translations"
@@ -44,6 +42,7 @@ export interface UseWordGameReturn {
     loadNewWord: () => Promise<void>
 }
 
+// React owns the local round and admits results; domain helpers only return data.
 export function useWordGame({
     mode,
     filter,
@@ -99,53 +98,11 @@ export function useWordGame({
         if (generation.current !== configKey) return
         const requestId = ++requestIdRef.current
         validationRequestRef.current = null
-        let word: JapaneseWord | null = null
-        let nextOptions: string[] | null = null
-
-        try {
-            if (gameType === "words") {
-                word = await getRandomWord(mode, stableFilter, lang)
-            } else if (gameType === "guess") {
-                // For guess mode (multiple choice), we want single characters
-                word = await getRandomCharacter(mode, {
-                    ...stableFilter,
-                    minLength: 1,
-                    maxLength: 1,
-                })
-            } else {
-                // For character shuffle/practice mode, use the actual filter lengths
-                word = await getRandomCharacter(mode, stableFilter)
-            }
-
-            // Generate distractors for guess mode
-            if (word && gameType === "guess") {
-                const distractors: string[] = []
-                // Try to get 2 unique distractors
-                for (let i = 0; i < 10 && distractors.length < 2; i++) {
-                    const dist = await getRandomCharacter(mode, {
-                        ...stableFilter,
-                        minLength: 1,
-                        maxLength: 1,
-                    })
-                    if (dist && dist.romaji !== word.romaji && !distractors.includes(dist.romaji)) {
-                        distractors.push(dist.romaji)
-                    }
-                }
-
-                // Fallback distractors if we couldn't get unique ones from the pool
-                const fallbacks = ["a", "i", "u", "e", "o", "ka", "ki", "ku", "ke", "ko"]
-                while (distractors.length < 2) {
-                    const fallback = fallbacks[Math.floor(Math.random() * fallbacks.length)]!
-                    if (fallback !== word.romaji && !distractors.includes(fallback)) {
-                        distractors.push(fallback)
-                    }
-                }
-
-                nextOptions = shuffleArray([word.romaji, ...distractors])
-            }
-        } catch (error) {
-            console.error("Failed to load word:", error)
-        }
+        const question = await loadWordQuestion({
+            mode, gameType, filter: stableFilter, lang,
+        })
+        const { word, options: nextOptions } = question
+        if ("error" in question) console.error("Failed to load word:", question.error)
 
         // A newer loadNewWord() call has already superseded this one —
         // discard this (stale) result instead of overwriting newer state.
@@ -186,16 +143,10 @@ export function useWordGame({
         if (validationRequestRef.current === requestId) return
         validationRequestRef.current = requestId
 
-        let isCorrect = validateAnswer(answerToTest, currentWord)
-        let detectionResult: ErrorDetectionResult | null = null
-        if (!isCorrect && gameType !== "guess") {
-            try {
-                detectionResult = await detectErrors(currentWord.kana, answerToTest)
-                if (detectionResult.isFullyCorrect) isCorrect = true
-            } catch (error) {
-                console.error("Validation error:", error)
-            }
-        }
+        const evaluation = evaluateWordAnswer(currentWord, answerToTest, gameType)
+        const outcome = evaluation instanceof Promise ? await evaluation : evaluation
+        const { isCorrect, errorDetails: detectionResult, diagnosticError } = outcome
+        if ("diagnosticError" in outcome) console.error("Validation error:", diagnosticError)
 
         // A skip, new question, restart or unmount invalidates this result.
         if (requestId !== requestIdRef.current || !submitAnswer(isCorrect)) return

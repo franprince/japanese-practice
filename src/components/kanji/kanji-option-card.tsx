@@ -5,7 +5,7 @@ import { Info } from "lucide-react"
 
 import { cn } from "@/lib/core"
 import { kanaToRomaji } from "@/lib/japanese/words"
-import { getKanaRomajiMap } from "@/lib/japanese/shared/kana-dictionary-loader"
+import { getKanaRomajiMap } from "@/lib/japanese/shared"
 import type { KanjiEntry, KanjiDifficulty } from "@/lib/japanese/kanji"
 import type { Language } from "@/lib/i18n"
 

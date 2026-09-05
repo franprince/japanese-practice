@@ -1,20 +1,25 @@
 import { StrictMode } from "react"
-import { describe, expect, it, mock, spyOn } from "bun:test"
-import { renderHook, act } from "@testing-library/react"
+import { describe, expect, it, mock, spyOn, beforeEach, afterEach } from "bun:test"
+import { renderHook, act, waitFor } from "@testing-library/react"
 import type { JapaneseWord, ErrorDetectionResult } from "@/types/japanese"
-import * as detection from "@/lib/japanese/shared/error-detection"
+import * as detection from "@/lib/japanese/shared"
 import { useSessionProgress } from "../use-session-progress"
 
 type Resolver = (word: JapaneseWord) => void
 let resolvers: Resolver[] = []
 
-mock.module("@/lib/japanese/words", () => ({
-    getRandomWord: mock(() => new Promise<JapaneseWord>((resolve) => { resolvers.push(resolve) })),
-    getRandomCharacter: mock(() => new Promise<JapaneseWord>((resolve) => { resolvers.push(resolve) })),
-}))
+import * as words from "@/lib/japanese/words"
+import { useWordGame } from "../use-word-game"
 
-const { useWordGame } = await import("../use-word-game")
-const { getRandomWord } = await import("@/lib/japanese/words")
+let restoreSelectors: () => void
+beforeEach(() => {
+    const pending = () => new Promise<JapaneseWord>(resolve => { resolvers.push(resolve) })
+    const vocabulary = spyOn(words, "getRandomWord").mockImplementation(pending)
+    const characters = spyOn(words, "getRandomCharacter").mockImplementation(pending)
+    restoreSelectors = () => { vocabulary.mockRestore(); characters.mockRestore() }
+})
+afterEach(() => restoreSelectors())
+
 const filter = { selectedGroups: [], minLength: 1, maxLength: 6 }
 const word = (romaji: string): JapaneseWord => ({ kana: "あ", romaji, type: "hiragana", groups: [] })
 const incorrect: ErrorDetectionResult = {
@@ -43,6 +48,16 @@ async function resolveWord(index = resolvers.length - 1, value = "a") {
 }
 
 describe("Words session integration", () => {
+    it("admits a synchronous correct answer before an immediate Skip", async () => {
+        const { result } = renderWordSession()
+        await resolveWord()
+        act(() => {
+            result.current.game.checkAnswer("a")
+            result.current.game.skipWord()
+        })
+        expect(result.current.session).toMatchObject({ answeredCount: 1, correctCount: 1, submittedCount: 1, score: 1 })
+        expect(result.current.game.feedback).toBe("correct")
+    })
     it("keeps the most recent question when loads resolve out of order", async () => {
         const { result } = renderWordSession()
         expect(resolvers).toHaveLength(1)
@@ -105,7 +120,7 @@ describe("Words session integration", () => {
 
         act(() => result.current.session.resetSession())
         expect(resolvers).toHaveLength(2)
-        expect(getRandomWord).toHaveBeenLastCalledWith("hiragana", filter, "en")
+        expect(words.getRandomWord).toHaveBeenLastCalledWith("hiragana", filter, "en")
         await resolveWord(1, "new-language")
         expect(result.current.game.currentWord?.romaji).toBe("new-language")
         expect(result.current.game).toMatchObject({ feedback: null, userInput: "", isLoading: false })
@@ -215,5 +230,25 @@ describe("Words lifecycle stability", () => {
         unmount()
         await resolveWord(2, "unmounted")
         expect(result.current.currentWord).toBe(before)
+    })
+})
+
+
+describe("Guess selection characterization", () => {
+    it("requests one character and falls back after ten repeated distractors", async () => {
+        const selected = spyOn(words, "getRandomCharacter").mockResolvedValue(word("a"))
+        let step = 0
+        const random = spyOn(Math, "random").mockImplementation(() => [0.1, 0.2, 0.3][step++ % 3]!)
+        try {
+            const { result } = renderHook(() => useWordGame({
+                mode: "both", filter: { ...filter, minLength: 3, maxLength: 6 }, gameType: "guess",
+                disableNext: false, suppressFocus: true, lang: "en", sessionId: 0, onSessionEvent: mock(),
+            }))
+            await waitFor(() => expect(result.current.options).toHaveLength(3))
+            expect(selected).toHaveBeenCalledTimes(11)
+            expect(selected).toHaveBeenLastCalledWith("both", { ...filter, minLength: 1, maxLength: 1 })
+            expect(new Set(result.current.options).size).toBe(3)
+            expect(result.current.options).toContain("a")
+        } finally { selected.mockRestore(); random.mockRestore() }
     })
 })

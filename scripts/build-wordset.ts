@@ -3,7 +3,7 @@ import path from "path"
 import kanaDictionaryData from "../src/lib/japanese/shared/kanaDictionary.json"
 import type { KanaDictionary, KanaGroup } from "../src/types/kana"
 import { blacklist } from "../src/lib/japanese/shared/blacklist"
-import type { JapaneseWord } from "../src/lib/japanese/words/words"
+import type { JapaneseWord } from "../src/types/japanese"
 
 const kanaDictionary = kanaDictionaryData as unknown as KanaDictionary
 
