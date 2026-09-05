@@ -21,18 +21,6 @@ export default {
         target: { provider: "anthropic", model: "claude-haiku-4-5-20251001" },
         priority: 10,
       },
-      // The Ollama quiz surface takes untrusted input and shells out to an LLM.
-      {
-        match: { kind: "security" },
-        target: { provider: "anthropic", model: "claude-opus-5" },
-        priority: 100,
-      },
-      // Data-layer and deployment decisions (SQLite persistence, Docker).
-      {
-        match: { kind: "architecture", estimatedComplexity: "high" },
-        target: { provider: "anthropic", model: "claude-opus-5" },
-        priority: 50,
-      },
       // Cross-cutting refactors of the shared game primitives / hooks.
       {
         match: { kind: "refactor", estimatedComplexity: "high" },

@@ -8,8 +8,6 @@
     "heroTitle": "日本語のかなをマスターしよう",
     "heroSubtitle": "ひらがな・カタカナの単語でローマ字入力を練習。連続正解やフィルターで効率アップ。",
     "heroTagline": "練り上げられたゲームで日本語を極めよう。挑戦するたびに流暢さへと近づきます。",
-    "games.ollama.title": "AIクイズ生成",
-    "games.ollama.description": "カリキュラムから動的な多肢選択式日本語問題を作成します。",
     "games.romaji.title": "ローマ字練習",
     "games.romaji.description": "ひらがな・カタカナ単語のローマ字入力を、連続正解やフィルターで効率的に練習できます。",
     "games.numbers.title": "数字チャレンジ",
