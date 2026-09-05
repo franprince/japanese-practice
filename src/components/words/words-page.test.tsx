@@ -1,4 +1,6 @@
 import { describe, expect, it, spyOn } from "bun:test"
+import { AppRouterContext } from "next/dist/shared/lib/app-router-context.shared-runtime"
+import { SearchParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime"
 import { StrictMode } from "react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import WordsPage from "../../../app/words/page"
@@ -10,7 +12,8 @@ import type { CharacterGroup } from "@/types/japanese"
 import { fixtureManifest } from "@/test/wordset-fixture"
 
 const groups: CharacterGroup[] = [{ id: "vowels", label: "Vowels", labelJp: "あ", type: "hiragana", characters: ["あ"] }]
-const ui = <StrictMode><ThemeProvider><I18nProvider initialLang="en"><WordsPage /></I18nProvider></ThemeProvider></StrictMode>
+const router = { back() {}, forward() {}, refresh() {}, push() {}, replace() {}, prefetch() {} }
+const ui = <StrictMode><AppRouterContext.Provider value={router}><SearchParamsContext.Provider value={new URLSearchParams()}><ThemeProvider><I18nProvider initialLang="en"><WordsPage /></I18nProvider></ThemeProvider></SearchParamsContext.Provider></AppRouterContext.Provider></StrictMode>
 
 describe("Words filter initialization", () => {
     for (const applyBeforeLoad of [false, true]) {

@@ -38,7 +38,7 @@ export function ActionBar({
             <div className="flex justify-center pt-2">
                 <Button
                     onClick={onNext}
-                    className="w-full bg-primary hover:bg-primary/90"
+                    className="min-h-11 w-full bg-primary hover:bg-primary/90"
                     disabled={nextDisabled}
                 >
                     {nextLabel || t("common.next")}
@@ -56,7 +56,7 @@ export function ActionBar({
                     variant="outline"
                     onClick={onSkip}
                     disabled={skipDisabled}
-                    className="flex-1 bg-transparent border-border/50 hover:bg-secondary/50"
+                    className="min-h-11 flex-1 bg-transparent border-border/50 hover:bg-secondary/50"
                 >
                     <SkipForward className="w-4 h-4 mr-2" />
                     {skipLabel || t("skip")}
@@ -65,7 +65,7 @@ export function ActionBar({
             {onSubmit && (
                 <Button
                     onClick={onSubmit}
-                    className="flex-1 bg-primary hover:bg-primary/90"
+                    className="min-h-11 flex-[2] bg-primary hover:bg-primary/90"
                     disabled={submitDisabled}
                 >
                     {submitLabel || t("check")}

@@ -14,6 +14,7 @@ interface NumberPadProps {
   onClear: () => void
   onSubmit: () => void
   disabled?: boolean
+  submitDisabled?: boolean
   shuffleNumbers: boolean
   onShuffleChange?: (checked: boolean) => void
   keys?: readonly NumberPadKey[]
@@ -28,6 +29,7 @@ export function NumberPad({
   onClear,
   onSubmit,
   disabled,
+  submitDisabled,
   shuffleNumbers,
   onShuffleChange,
   keys = numberPadKeysKanji,
@@ -89,13 +91,14 @@ export function NumberPad({
           className="h-12 text-sm font-medium hover:bg-muted transition-all bg-transparent"
           onClick={onDelete}
           disabled={disabled}
+          aria-label={t("practice.deleteLast")}
         >
           <Delete className="h-5 w-5" />
         </Button>
         <Button
           className="h-12 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
           onClick={onSubmit}
-          disabled={disabled}
+          disabled={disabled || submitDisabled}
         >
           <CornerDownLeft className="h-5 w-5 mr-1" />
           {t("check")}

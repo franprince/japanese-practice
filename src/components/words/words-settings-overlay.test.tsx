@@ -80,22 +80,17 @@ describe("Words settings drafts", () => {
         fireEvent.click(screen.getByRole("button", { name: "Save Settings" }))
         expect(apply).toHaveBeenCalledWith("hiragana", "characters", "session", 5, filter)
     })
-    it("scrolls only when Custom is selected and retains filter edits", () => {
-        const original = HTMLElement.prototype.scrollIntoView
-        const scroll = mock()
-        HTMLElement.prototype.scrollIntoView = scroll
-        try {
-            const apply = mock()
-            render(<I18nProvider initialLang="en"><WordsSettingsOverlay {...base} open onOpenChange={mock()} onApply={apply} /></I18nProvider>)
-            fireEvent.click(screen.getByRole("button", { name: /custom/i }))
-            expect(scroll).toHaveBeenCalledTimes(1)
-            fireEvent.click(screen.getByRole("button", { name: /deselect all/i }))
-            expect(screen.getByRole("button", { name: "Save Settings" })).toBeDisabled()
-            fireEvent.click(screen.getByRole("button", { name: "Select all" }))
-            fireEvent.click(screen.getByRole("button", { name: "Any" }))
-            act(() => screen.getByRole("button", { name: "Save Settings" }).click())
-            expect(apply).toHaveBeenCalledWith("custom", "characters", "session", 10, { ...filter, minLength: 1, maxLength: 100 })
-            expect(scroll).toHaveBeenCalledTimes(1)
-        } finally { HTMLElement.prototype.scrollIntoView = original }
+    it("reveals advanced filters only for Custom and retains filter edits", () => {
+        const apply = mock()
+        render(<I18nProvider initialLang="en"><WordsSettingsOverlay {...base} open onOpenChange={mock()} onApply={apply} /></I18nProvider>)
+        expect(screen.queryByRole("button", { name: /deselect all/i })).toBeNull()
+        fireEvent.click(screen.getByRole("button", { name: /custom/i }))
+        expect(screen.getByRole("heading", { name: "Advanced options" })).toBeVisible()
+        fireEvent.click(screen.getByRole("button", { name: /deselect all/i }))
+        expect(screen.getByRole("button", { name: "Save Settings" })).toBeDisabled()
+        fireEvent.click(screen.getByRole("button", { name: "Select all" }))
+        fireEvent.click(screen.getByRole("button", { name: "Any" }))
+        fireEvent.click(screen.getByRole("button", { name: "Save Settings" }))
+        expect(apply).toHaveBeenCalledWith("custom", "characters", "session", 10, { ...filter, minLength: 1, maxLength: 100 })
     })
 })

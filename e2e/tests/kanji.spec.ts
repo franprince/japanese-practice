@@ -11,16 +11,22 @@ test.describe('Kanji game', () => {
         const options = page.locator('#kanji-options')
         await expect(options.getByText('sun', { exact: true })).toBeVisible()
         await expect(options.getByText('hi', { exact: true }).first()).toBeVisible()
-        await page.getByRole('button', { name: /^Medium/ }).click()
+        await page.getByTestId('settings-trigger').click()
+        let settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+        await settings.getByRole('button', { name: /^Medium/ }).click()
+        await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
         await expect(options.getByText('sun', { exact: true })).toBeVisible()
         await expect(options.getByText('hi', { exact: true })).toHaveCount(0)
-        await page.getByRole('button', { name: /^Hard/ }).click()
+        await page.getByTestId('settings-trigger').click()
+        settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+        await settings.getByRole('button', { name: /^Hard/ }).click()
+        await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
         await expect(options.getByText('sun', { exact: true })).toHaveCount(0)
         await expect(options.locator('[lang="ja"]')).toHaveCount(3)
     })
     test('correct and incorrect options produce distinct feedback and lock answers', async ({ page }) => {
         for (const correct of [true, false]) {
-            const char = (await page.locator('main .text-7xl').textContent())?.trim()
+            const char = (await page.getByTestId('question-display').textContent())?.trim()
             const expected = kanji.find(entry => entry.char === char)
             expect(expected).toBeDefined()
             const answer = correct ? expected! : kanji.find(entry => entry.char !== char)!
@@ -34,10 +40,11 @@ test.describe('Kanji game', () => {
         }
     })
     test('settings open and dismiss with Escape', async ({ page }) => {
-        await page.getByRole('button', { name: 'Settings', exact: true }).click()
-        await expect(page.getByRole('button', { name: 'Session', exact: true })).toBeVisible()
+        await page.getByTestId('settings-trigger').click()
+        const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+        await expect(settings.getByRole('button', { name: 'Session', exact: true })).toBeVisible()
         await page.keyboard.press('Escape')
-        await expect(page.getByTestId('popover-backdrop')).toBeHidden()
+        await expect(settings).toBeHidden()
     })
     test('completes exactly five answers and restarts the session', async ({ page }) => {
         await fiveQuestionSession(page)

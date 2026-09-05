@@ -27,9 +27,10 @@ export function ResultDisplay({
 }: ResultDisplayProps) {
     return (
         <div
+            role="status" aria-live="polite" aria-atomic="true"
             className={cn(
                 "p-4 rounded-xl border transition-all",
-                isCorrect ? "bg-green-500/10 border-green-500/30" : "bg-red-500/10 border-red-500/30",
+                isCorrect ? "bg-success/10 border-success/30" : "bg-destructive/10 border-destructive/30",
                 className
             )}
         >
@@ -37,28 +38,28 @@ export function ResultDisplay({
                 {}
                 <div className="flex items-center gap-2">
                     {isCorrect ? (
-                        <Check className="w-5 h-5 text-green-500" />
+                        <Check className="w-5 h-5 text-success" />
                     ) : (
-                        <X className="w-5 h-5 text-red-500" />
+                        <X className="w-5 h-5 text-destructive" />
                     )}
-                    <span className={cn("font-medium", isCorrect ? "text-green-500" : "text-red-500")}>
+                    <span className={cn("font-medium", isCorrect ? "text-success" : "text-destructive")}>
                         {isCorrect ? t("correct") : t("incorrect")}
                     </span>
                 </div>
 
                 {}
                 <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
                         <span className="text-muted-foreground">{t("correctAnswer")}:</span>
-                        <div className="text-right">
+                        <div className="min-w-0 break-words text-right [overflow-wrap:anywhere]">
                             <p className="font-bold text-foreground">{expectedAnswer}</p>
                             {romaji && <p className="text-xs text-muted-foreground">{romaji}</p>}
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
                         <span className="text-muted-foreground">{t("yourAnswer")}:</span>
-                        <span className={cn("font-bold", isCorrect ? "text-green-500" : "text-red-500")}>
+                        <span className={cn("min-w-0 break-all font-bold", isCorrect ? "text-success" : "text-destructive")}>
                             {userAnswer || "—"}
                         </span>
                     </div>

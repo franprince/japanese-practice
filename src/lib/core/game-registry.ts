@@ -1,10 +1,12 @@
+import type { TranslationKey } from "@/lib/i18n/translations"
+
 export interface GameDefinition {
     id: string
     href: string
     icon: string
     gradient: string
-    titleKey: string
-    descriptionKey: string
+    titleKey: TranslationKey
+    descriptionKey: TranslationKey
 }
 
 

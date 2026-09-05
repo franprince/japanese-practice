@@ -20,18 +20,19 @@ export async function mockWordset(page: Page) {
     await page.route('**/wordsets/*-*.json', route => route.fulfill({ json: wordset }))
 }
 export async function selectWords(page: Page) {
-    await page.getByRole('button', { name: 'Command Center', exact: true }).click()
+    await page.getByTestId('settings-trigger').click()
     const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
     await settings.getByRole('button', { name: 'Words Vocabulary practice', exact: true }).click()
     await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
     await expect(settings).toBeHidden()
 }
 export async function fiveQuestionSession(page: Page) {
-    await page.getByRole('button', { name: 'Settings', exact: true }).click()
-    await page.getByRole('button', { name: 'Session', exact: true }).click()
-    await page.getByRole('button', { name: '5', exact: true }).click()
-    await page.keyboard.press('Escape')
-    await expect(page.getByTestId('popover-backdrop')).toBeHidden()
+    await page.getByTestId('settings-trigger').click()
+    const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+    await settings.getByRole('button', { name: 'Session', exact: true }).click()
+    await settings.getByRole('button', { name: '5', exact: true }).click()
+    await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
+    await expect(settings).toBeHidden()
     await expect(page.getByTestId('stats-display')).toContainText('5 rounds left')
 }
 export async function finishSession(page: Page, answer: () => Promise<void>, nextLabel: string) {

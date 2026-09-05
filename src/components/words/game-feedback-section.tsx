@@ -18,41 +18,25 @@ export function GameFeedbackSection({
     displayRomaji,
     currentWord,
     errorDetails,
-    gameType,
     t,
 }: GameFeedbackSectionProps) {
     if (!feedback) return null
 
-    const hasMeaning = !!currentWord.meaning
-    const hasKanji = !!currentWord.kanji
-    const hasErrors = feedback === "incorrect" && errorDetails && errorDetails.characters.length > 0
-    const showAnswer = gameType !== "guess"
-
-    if (!hasMeaning && !hasKanji && !hasErrors && !showAnswer) {
-        return null
-    }
-
     return (
-        <div className="text-center p-6 glass-card rounded-2xl animate-in fade-in slide-in-from-top-4 duration-500 border-primary/20 space-y-4 shadow-2xl relative overflow-hidden">
-            {/* Subtle Feedback Background Glow */}
-            <div className={cn(
-                "absolute inset-0 opacity-5 pointer-events-none",
-                feedback === "correct" ? "bg-success" : "bg-destructive"
-            )} />
-            
-            {gameType !== "guess" && (
+        <div role="status" aria-live="polite" aria-atomic="true" className="space-y-3 rounded-xl border bg-background p-4 text-center">
+            <p className={cn("font-semibold", feedback === "correct" ? "text-success" : "text-destructive")}>{t(feedback === "correct" ? "correct" : "incorrect")}</p>
+            {(
                 <div className="relative z-10">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 mb-1">{t("correctAnswer")}</p>
-                    <p className="text-2xl font-black tracking-tight text-primary neon-text-primary underline decoration-primary/20 underline-offset-8">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">{t("correctAnswer")}</p>
+                    <p className="break-words text-xl font-semibold text-foreground [overflow-wrap:anywhere]">
                         {displayRomaji || currentWord.romaji}
                     </p>
                 </div>
             )}
 
-            {}
             {feedback === "incorrect" && errorDetails && errorDetails.characters.length > 0 && (
                 <div className="pt-3 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">{t("yourAnswer") || "Your Answer"}</p>
+                    <p className="text-xs text-muted-foreground mb-2 ">{t("yourAnswer") || "Your Answer"}</p>
                     <div className="flex flex-wrap justify-center gap-1">
                         {errorDetails.characters.map((char, idx) => (
                             <div
@@ -65,7 +49,7 @@ export function GameFeedbackSection({
                                 )}
                             >
                                 <span lang="ja" className="text-lg">{char.kana}</span>
-                                <span className="text-xs opacity-80">
+                                <span className="break-all text-xs opacity-80">
                                     {char.userInput || "—"}
                                     {!char.isCorrect && char.expectedRomaji[0] && (
                                         <span className="text-muted-foreground"> → {char.expectedRomaji[0]}</span>
@@ -73,31 +57,28 @@ export function GameFeedbackSection({
                                 </span>
                             </div>
                         ))}
-                        {}
                         {errorDetails.extraInput && (
                             <div
                                 className="flex flex-col items-center px-2 py-1 rounded-md text-sm font-mono bg-destructive/20 text-destructive border border-destructive/30"
                             >
                                 <span className="text-lg">?</span>
-                                <span className="text-xs opacity-80">{errorDetails.extraInput}</span>
+                                <span className="break-all text-xs opacity-80">{errorDetails.extraInput}</span>
                             </div>
                         )}
                     </div>
                 </div>
             )}
 
-            {}
             {currentWord.meaning && (
                 <div className="pt-2 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("meaning")}</p>
+                    <p className="text-xs text-muted-foreground mb-1 ">{t("meaning")}</p>
                     <p className="text-base text-foreground/90">{currentWord.meaning}</p>
                 </div>
             )}
 
-            {}
             {currentWord.kanji && (
                 <div className="pt-2 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-1 uppercase tracking-wider">{t("word")}</p>
+                    <p className="text-xs text-muted-foreground mb-1 ">{t("word")}</p>
                     <p lang="ja" className="text-lg font-medium text-foreground">{currentWord.kanji}</p>
                     <a
                         href={`https://jisho.org/search/${encodeURIComponent(currentWord.kanji)}`}

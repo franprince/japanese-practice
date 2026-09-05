@@ -1,84 +1,40 @@
 "use client"
-
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { GameSelectorCard } from "@/components/game-selector-card"
+import { Button } from "@/components/ui/button"
 import { useI18n } from "@/lib/i18n"
+import { useStoredPreference } from "@/hooks/use-stored-preference"
+import { useHydrated } from "@/hooks/use-hydrated"
+import { beginnerSettings, practiceKey } from "@/lib/practice-preferences"
 import { GAMES } from "@/lib/core"
-
+const examples: Record<string, string> = { romaji: "ねこ → neko", numbers: "24 → 二十四", kanji: "水 → みず", dates: "月曜日 → getsuyoubi" }
+const isLastPractice = (value: string | null): value is string => value !== null && ["", "words", "numbers", "kanji", "dates"].includes(value)
 export default function HomePage() {
   const { t } = useI18n()
-
-  const games = GAMES.map(game => ({
-    title: t(game.titleKey as any) || game.id,
-    description: t(game.descriptionKey as any) || "",
-    href: game.href,
-    icon: game.icon,
-    gradient: game.gradient,
-  }))
-
-
-  return (
-    <main className="flex-1 flex flex-col bg-background relative overflow-hidden">
-      {/* Subtle wave-like shapes in background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-primary/[0.02] blur-3xl" />
-        <div className="absolute top-1/3 -left-1/4 w-2/3 h-1/2 rounded-full bg-accent/[0.02] blur-3xl" />
-        <div className="absolute -bottom-1/4 right-1/4 w-1/2 h-1/2 rounded-full bg-primary/[0.015] blur-3xl" />
-      </div>
-      <div className="container max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16 relative">
-        <header className="mb-12 md:mb-20">
-          <div className="flex flex-col-reverse md:flex-row md:items-start md:justify-between mb-6 gap-4 md:gap-6">
-            <div className="flex-1">
-              <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-light text-foreground mb-2 sm:mb-3 tracking-tight">
-                <span lang="ja">日本語 練習</span>
-              </h1>
-              <div className="h-1 w-16 sm:w-20 bg-primary" />
-            </div>
-            <div className="flex-shrink-0 flex flex-wrap items-center gap-2 justify-between">
-              <ThemeSwitcher />
-              <LanguageSwitcher />
-            </div>
-          </div>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground md:max-w-md leading-relaxed font-light">
-            {t("heroTagline")}
-          </p>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-20">
-          {games.map((game, index) => (
-            <GameSelectorCard
-              key={game.href}
-              title={game.title}
-              description={game.description}
-              href={game.href}
-              icon={game.icon}
-              gradient={game.gradient}
-              index={index}
-            />
-          ))}
-        </div>
-
-        <section className="pt-12 pb-8 border-t border-border">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-            <div>
-              <div lang="ja" className="text-4xl mb-4 text-foreground">学</div>
-              <h3 className="font-light text-foreground/80 mb-2 text-lg">{t("pillar.learning.title")}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{t("pillar.learning.body")}</p>
-            </div>
-            <div>
-              <div lang="ja" className="text-4xl mb-4 text-foreground">心</div>
-              <h3 className="font-light text-foreground/80 mb-2 text-lg">{t("pillar.mindfulness.title")}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{t("pillar.mindfulness.body")}</p>
-            </div>
-            <div>
-              <div lang="ja" className="text-4xl mb-4 text-foreground">道</div>
-              <h3 className="font-light text-foreground/80 mb-2 text-lg">{t("pillar.path.title")}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{t("pillar.path.body")}</p>
-            </div>
-          </div>
-        </section>
-      </div>
-    </main>
-  )
+  const router = useRouter()
+  const hydrated = useHydrated()
+  const [last] = useStoredPreference("practice-last", "", isLastPractice)
+  const [, setWordsSettings] = useStoredPreference(practiceKey("words"), "", (value): value is string => value !== null)
+  const startBeginner = () => { setWordsSettings(JSON.stringify(beginnerSettings)); router.push("/words?preset=beginner") }
+  const previous = GAMES.find(game => game.href === `/${last}`)
+  return <main className="flex-1 px-4 py-5 sm:px-6 sm:py-8">
+    <div className="mx-auto max-w-4xl">
+      <header className="mb-8">
+        <div className="mb-7 flex flex-wrap items-center justify-between gap-4"><h1 lang="ja" className="text-3xl font-medium tracking-tight sm:text-4xl">日本語 練習</h1><div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div></div>
+        <h2 className="text-2xl font-semibold sm:text-3xl">{t("practice.choose")}</h2><p className="mt-3 max-w-xl leading-relaxed text-muted-foreground">{t("practice.homeSubtitle")}</p>
+      </header>
+      <section className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-primary/40 bg-primary/5 p-5">
+        <div className="max-w-lg"><h2 className="text-lg font-semibold">{t("practice.beginner")}</h2><p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t("practice.beginnerBody")}</p></div>
+        <Button onClick={startBeginner} className="h-auto min-h-11 whitespace-normal" disabled={!hydrated}>{t("practice.startBeginner")}</Button>
+      </section>
+      {previous && <section className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border p-4">
+        <div><h2 className="font-medium">{t("practice.again")} · {t(previous.titleKey)}</h2><p className="mt-1 text-sm text-muted-foreground">{t("practice.againBody")}</p></div>
+        <Button asChild variant="outline" className="min-h-11"><Link href={`${previous.href}?again=1`}>{t("practice.again")}</Link></Button>
+      </section>}
+      <div className="grid gap-4 sm:grid-cols-2">{GAMES.map(game => <GameSelectorCard key={game.id} title={t(game.titleKey)} description={t(game.descriptionKey)} href={game.href} icon={game.icon} example={examples[game.id] || ""} />)}</div>
+    </div>
+  </main>
 }
