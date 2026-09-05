@@ -8,6 +8,9 @@ interface MobileWordsetModalProps {
     title: string
     message: string
     progress: number | null
+    busy?: boolean
+    statusMessage?: string
+    error?: string | null
     onCancel: () => void
     onConfirm: () => void
     confirmDisabled?: boolean
@@ -21,6 +24,9 @@ export function MobileWordsetModal({
     title,
     message,
     progress,
+    busy = false,
+    statusMessage,
+    error,
     onCancel,
     onConfirm,
     confirmDisabled = false,
@@ -38,15 +44,16 @@ export function MobileWordsetModal({
                         <p className="text-sm font-semibold text-foreground">{title}</p>
                         <p className="text-sm text-muted-foreground">{message}</p>
                     </div>
-                    {progress !== null && (
-                        <div className="space-y-2">
+                    {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+                    {busy && (
+                        <div className="space-y-2" role="status" aria-live="polite">
                             <div className="h-2 w-full rounded-full bg-muted/40 overflow-hidden">
                                 <div
-                                    className="h-full bg-primary transition-[width] duration-200"
-                                    style={{ width: `${progress}%` }}
+                                    className={`h-full bg-primary transition-[width] duration-200 ${progress === null ? "animate-pulse" : ""}`}
+                                    style={{ width: progress === null ? "100%" : `${progress}%` }}
                                 />
                             </div>
-                            <p className="text-xs text-muted-foreground text-right tabular-nums">{progress}%</p>
+                            <p className="text-xs text-muted-foreground text-right tabular-nums">{statusMessage}{progress !== null ? ` ${progress}%` : ""}</p>
                         </div>
                     )}
                     <div className="flex justify-end gap-2">

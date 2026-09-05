@@ -10,6 +10,11 @@ export const openDb = (): Promise<IDBDatabase> =>
             return
         }
         const req = indexedDB.open(DB_NAME, DB_VERSION)
+        let blocked = false
+        req.onblocked = () => {
+            blocked = true
+            reject(new Error("IndexedDB upgrade blocked by another tab"))
+        }
         req.onupgradeneeded = () => {
             const db = req.result
 
@@ -23,6 +28,10 @@ export const openDb = (): Promise<IDBDatabase> =>
                 db.createObjectStore(STORE_WORDSETS)
             }
         }
-        req.onsuccess = () => resolve(req.result)
+        req.onsuccess = () => {
+            if (blocked) { req.result.close(); return }
+            req.result.onversionchange = () => req.result.close()
+            resolve(req.result)
+        }
         req.onerror = () => reject(req.error)
     })
