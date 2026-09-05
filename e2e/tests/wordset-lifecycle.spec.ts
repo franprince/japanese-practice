@@ -1,3 +1,4 @@
+import { fixtureManifest } from "../../src/test/wordset-fixture"
 import { test, expect, type Page } from "@playwright/test"
 
 const wordset = {
@@ -7,6 +8,7 @@ const wordset = {
 }
 
 async function openConsent(page: Page) {
+    await page.route("**/wordsets/manifest.json", route => route.fulfill({ json: fixtureManifest(wordset) }))
     await page.setViewportSize({ width: 390, height: 844 })
     await page.addInitScript(() => localStorage.setItem("kana-words-lang", "en"))
     await page.goto("/words")
@@ -19,10 +21,7 @@ async function openConsent(page: Page) {
 
 test("mobile HTTP failure stays open and retry confirms a readable cache", async ({ page }) => {
     let downloads = 0
-    await page.route("**/api/wordset?lang=en", async route => {
-        if (route.request().method() === "HEAD") {
-            await route.fulfill({ status: 200 }); return
-        }
+    await page.route("**/wordsets/en-*.json", async route => {
         downloads++
         await route.fulfill(downloads === 1
             ? { status: 503, body: "unavailable" }
@@ -49,7 +48,7 @@ test("mobile HTTP failure stays open and retry confirms a readable cache", async
             tx.onerror = () => { reject(tx.error); db.close() }
         }
     }))
-    expect(saved).toEqual(wordset)
+    expect(saved).toMatchObject(wordset)
     expect(downloads).toBe(2)
 })
 
@@ -61,9 +60,9 @@ test("mobile storage failure never confirms and cancel keeps character mode usab
             return original.apply(this, args)
         }
     })
-    await page.route("**/api/wordset?lang=en", route => route.fulfill({
+    await page.route("**/wordsets/en-*.json", route => route.fulfill({
         status: 200, contentType: "application/json",
-        body: route.request().method() === "HEAD" ? "" : JSON.stringify(wordset),
+        body: JSON.stringify(wordset),
     }))
     await openConsent(page)
     const modal = page.getByTestId("mobile-wordset-modal")
@@ -75,9 +74,8 @@ test("mobile storage failure never confirms and cancel keeps character mode usab
     await expect(page.locator('input[type="text"]')).toBeVisible()
 })
 
-test("mobile cancellation during an unknown-length download does not show success", async ({ page }) => {
-    await page.route("**/api/wordset?lang=en", async route => {
-        if (route.request().method() === "HEAD") await route.fulfill({ status: 200 })
+test("mobile cancellation during a pending static download does not show success", async ({ page }) => {
+    await page.route("**/wordsets/en-*.json", async () => {
         // Keep GET pending until the user cancels; context teardown releases it.
     })
     await openConsent(page)

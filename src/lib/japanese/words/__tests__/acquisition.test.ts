@@ -4,6 +4,7 @@ import {
   validateWordset, WordsetAcquisition, WordsetError,
   type AcquisitionState, type WordsetEvent, type WordsetFetch, type WordsetStorage,
 } from "../acquisition"
+import { fixtureChecksum, fixtureManifest } from "@/test/wordset-fixture"
 import type { WordSets } from "@/types/api"
 
 const dataset = (version = 1): WordSets => ({
@@ -26,13 +27,14 @@ function harness(mobile = true, cached?: unknown) {
     remove: mock(async lang => { entries.delete(lang) }),
   }
   const fetcher = mock<WordsetFetch>(async () => response())
+  const metadata = mock(async () => response(fixtureManifest(dataset())))
   const confirmation = mock((_lang: string, _value: boolean) => {})
-  const service = new WordsetAcquisition({ storage, fetch: fetcher, mobile: () => mobile, confirmation })
+  const service = new WordsetAcquisition({ storage, fetch: (input, init) => String(input).endsWith("manifest.json") ? metadata() : fetcher(input, init), mobile: () => mobile, confirmation })
   const states: AcquisitionState[] = []
   const events: WordsetEvent[] = []
   service.subscribe(state => states.push(state))
   service.subscribeUpdates(event => events.push(event))
-  return { service, entries, storage, fetcher, confirmation, states, events }
+  return { service, entries, storage, fetcher, metadata, confirmation, states, events }
 }
 
 describe("wordset validation and transport", () => {
@@ -51,33 +53,38 @@ describe("wordset validation and transport", () => {
       expect(validateWordset(data)).toBe(data)
     }
   })
+  const transport = (payload: () => Promise<Response> | Response, data = dataset()): WordsetFetch =>
+    async input => String(input).endsWith("manifest.json") ? response(fixtureManifest(data)) : payload()
   test.each([
     ["http", () => new Response("error", { status: 503 })],
     ["http", () => new Response(null, { status: 304 })],
-    ["parse", () => new Response("{")],
-    ["validation", () => response({ error: "invalid" })],
     ["aborted", () => new Response("")],
-    ["aborted", () => new Response("{}", { headers: { "content-length": "100" } })],
-  ] as const)("rejects %s responses", async (kind, makeResponse) => {
-    await expect(downloadWordset(async () => makeResponse(), "en")).rejects.toMatchObject({ kind })
+    ["aborted", () => new Response("{}")],
+  ] as const)("rejects %s asset responses", async (kind, makeResponse) => {
+    await expect(downloadWordset(transport(makeResponse), "en")).rejects.toMatchObject({ kind })
   })
   test("classifies network and unexpected stream failures", async () => {
-    await expect(downloadWordset(async () => { throw new TypeError("offline") }, "en")).rejects.toMatchObject({ kind: "network" })
+    await expect(downloadWordset(transport(() => { throw new TypeError("offline") }), "en")).rejects.toMatchObject({ kind: "network" })
     const stream = new ReadableStream({ start(controller) { controller.error(new Error("connection lost")) } })
-    await expect(downloadWordset(async () => new Response(stream), "en")).rejects.toMatchObject({ kind: "aborted" })
+    await expect(downloadWordset(transport(() => new Response(stream)), "en")).rejects.toMatchObject({ kind: "aborted" })
   })
-  test("reports known and unknown progress and honors conditional HEAD", async () => {
+  test("uses manifest size for decoded progress even with compressed content length", async () => {
     const body = JSON.stringify(dataset())
     const progress = mock((_received: number, _total: number | null) => {})
-    await downloadWordset(async () => new Response(body, { headers: { "content-length": String(new TextEncoder().encode(body).length) } }), "en", { progress })
-    expect(progress.mock.calls.at(-1)).toEqual([new TextEncoder().encode(body).length, new TextEncoder().encode(body).length])
-    progress.mockClear()
-    await downloadWordset(async () => response(), "en", { progress })
-    expect(progress.mock.calls.at(-1)?.[1]).toBeNull()
-    const fetcher = mock<WordsetFetch>(async () => new Response(null, { status: 304 }))
-    expect(await downloadWordset(fetcher, "en", { version: 1, head: true })).toBe("not-modified")
-    expect(fetcher.mock.calls[0]?.[1]).toMatchObject({ method: "HEAD", headers: { "If-None-Match": '"1"' } })
+    await downloadWordset(transport(() => new Response(body, { headers: { "content-length": "12", "content-encoding": "gzip" } })), "en", { progress })
+    const bytes = new TextEncoder().encode(body).length
+    expect(progress.mock.calls.at(-1)).toEqual([bytes, bytes])
   })
+  test("current checksums fetch only a revalidated manifest; mobile checks never download", async () => {
+    const fetcher = mock<WordsetFetch>(async () => response(fixtureManifest(dataset())))
+    expect(await downloadWordset(fetcher, "en", { checksum: fixtureChecksum(dataset()), metadataOnly: true })).toBe("not-modified")
+    expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(fetcher.mock.calls[0]?.[0]).toBe("/wordsets/manifest.json")
+    expect(fetcher.mock.calls[0]?.[1]).toMatchObject({ cache: "no-cache" })
+    expect(await downloadWordset(fetcher, "en", { checksum: "old", metadataOnly: true })).toBe("update-available")
+    expect(fetcher).toHaveBeenCalledTimes(2)
+  })
+
 })
 
 describe("durable cache transactions", () => {
@@ -142,11 +149,12 @@ describe("acquisition lifecycle", () => {
     await expect(h.service.acquire("en")).rejects.toBeInstanceOf(ConsentRequired)
     expect(h.fetcher).toHaveBeenCalledTimes(1)
   })
-  test("successful mobile HEAD checks announce availability without replacing data", async () => {
+  test("successful mobile manifest checks announce availability without replacing data", async () => {
     const h = harness(true, dataset())
     await h.service.acquire("en")
     await h.service.revalidate("en", dataset())
-    expect(h.fetcher.mock.calls[0]?.[1]?.method).toBe("HEAD")
+    expect(h.metadata).toHaveBeenCalled()
+    expect(h.fetcher).not.toHaveBeenCalled()
     expect(h.events).toContainEqual({ type: "update-available", lang: "en" })
     expect(h.storage.write).not.toHaveBeenCalled()
   })
@@ -175,7 +183,7 @@ describe("acquisition lifecycle", () => {
     expect(h.service.state("en").status).toBe("persisting")
     expect(h.confirmation).not.toHaveBeenCalledWith("en", true)
     commit.resolve()
-    expect(await pending).toEqual(dataset())
+    expect(await pending).toMatchObject(dataset())
     expect(h.storage.read).toHaveBeenCalledTimes(2)
     expect(h.confirmation).toHaveBeenCalledWith("en", true)
     expect(h.service.state("en")).toMatchObject({ status: "ready", persistence: "durable" })
@@ -189,7 +197,7 @@ describe("acquisition lifecycle", () => {
       expect(h.service.state("en").status).toBe("failed")
       expect(h.confirmation).not.toHaveBeenCalledWith("en", true)
     } else {
-      expect(await pending).toEqual(dataset())
+      expect(await pending).toMatchObject(dataset())
       expect(h.service.state("en")).toMatchObject({ status: "ready", persistence: "memory", warning: { kind: "storage" } })
     }
   })
@@ -199,13 +207,19 @@ describe("acquisition lifecycle", () => {
     await expect(h.service.acquire("en", { consent: true })).rejects.toMatchObject({ kind: "storage" })
     expect(h.confirmation).not.toHaveBeenCalledWith("en", true)
   })
+  test("read-back rejects an older asset even when its numeric version matches", async () => {
+    const h = harness()
+    h.storage.write = async (lang, data) => { h.entries.set(lang, { ...data, assetChecksum: "0".repeat(64) }) }
+    await expect(h.service.acquire("en", { consent: true })).rejects.toMatchObject({ kind: "storage" })
+    expect(h.confirmation).not.toHaveBeenCalledWith("en", true)
+  })
   test("failed cache reads are explicit; desktop can continue with a valid download", async () => {
     for (const mobile of [true, false]) {
       const h = harness(mobile)
       h.storage.read = async () => { throw new Error("blocked") }
       const pending = h.service.acquire("en", { consent: true })
       if (mobile) await expect(pending).rejects.toMatchObject({ kind: "storage" })
-      else expect(await pending).toEqual(dataset())
+      else expect(await pending).toMatchObject(dataset())
     }
   })
   test("corrupt cache is evicted and removal errors are observable", async () => {
@@ -219,8 +233,8 @@ describe("acquisition lifecycle", () => {
   test("cache hit survives localStorage failure and background HTTP errors", async () => {
     const h = harness(true, dataset())
     h.confirmation.mockImplementation(() => { throw new Error("localStorage blocked") })
-    h.fetcher.mockImplementation(async () => new Response(null, { status: 500 }))
-    expect(await h.service.acquire("ja")).toEqual(dataset())
+    h.metadata.mockImplementation(async () => new Response(null, { status: 500 }))
+    expect(await h.service.acquire("ja")).toMatchObject(dataset())
     await h.service.revalidate("en", dataset())
     expect(h.service.state("en").status).toBe("ready")
     expect(h.events.some(event => event.type === "revalidation-failed")).toBe(true)
@@ -254,7 +268,7 @@ describe("acquisition lifecycle", () => {
     slow.resolve(response(dataset(2)))
     await new Promise(resolve => setTimeout(resolve, 0))
     expect(h.states).toHaveLength(count)
-    expect(await h.service.acquire("en")).toEqual(dataset())
+    expect(await h.service.acquire("en")).toMatchObject(dataset())
     expect(h.storage.write).toHaveBeenCalledTimes(1)
   })
   test("one cancelled caller does not abort another caller's shared request", async () => {
@@ -270,7 +284,7 @@ describe("acquisition lifecycle", () => {
     controller.abort()
     expect(await outcome).toMatchObject({ name: "AbortError" })
     slow.resolve(response())
-    expect(await second).toEqual(dataset())
+    expect(await second).toMatchObject(dataset())
     expect(h.fetcher.mock.calls[0]?.[1]?.signal?.aborted).toBe(false)
   })
   test("cancelling during persistence prevents confirmation and ready", async () => {
@@ -289,34 +303,35 @@ describe("acquisition lifecycle", () => {
     expect(h.service.state("en").status).toBe("awaiting-consent")
     expect(h.confirmation).not.toHaveBeenCalledWith("en", true)
   })
-  test("background refresh commits before publishing, and 304 leaves data unchanged", async () => {
+  test("background refresh commits before publishing, and current checksums leave data unchanged", async () => {
     const h = harness(false, dataset())
+    h.metadata.mockImplementation(async () => response(fixtureManifest(dataset(2))))
     h.fetcher.mockImplementation(async () => response(dataset(2)))
-    expect(await h.service.acquire("en")).toEqual(dataset())
+    expect(await h.service.acquire("en")).toMatchObject(dataset())
     await h.service.revalidate("en", dataset())
-    expect(await h.service.acquire("en")).toEqual(dataset(2))
-    expect(h.entries.get("en")).toEqual(dataset(2))
+    expect(await h.service.acquire("en")).toMatchObject(dataset(2))
+    expect(h.entries.get("en")).toMatchObject(dataset(2))
     expect(h.events).toContainEqual({ type: "updated", lang: "en" })
-    h.fetcher.mockImplementation(async () => new Response(null, { status: 304 }))
+    h.metadata.mockImplementation(async () => response(fixtureManifest(dataset(2))))
     const count = h.events.length
-    await h.service.revalidate("en", dataset(2))
+    await h.service.revalidate("en", { ...dataset(2), assetChecksum: fixtureChecksum(dataset(2)) })
     expect(h.events).toHaveLength(count)
   })
   test.each(["network", "http", "parse", "validation", "storage"])("failed background %s preserves the previous cache", async kind => {
-    const h = harness(false, dataset())
-    h.fetcher.mockImplementation(async () => new Response(null, { status: 304 }))
+    const h = harness(false, { ...dataset(), assetChecksum: fixtureChecksum(dataset()) })
     await h.service.acquire("en")
     await h.service.revalidate("en", dataset())
-    h.fetcher.mockImplementation(async () => {
+    h.metadata.mockImplementation(async () => {
       if (kind === "network") throw new Error("offline")
       if (kind === "http") return new Response(null, { status: 500 })
       if (kind === "parse") return new Response("{")
-      return response(kind === "validation" ? {} : dataset(2))
+      return response(kind === "validation" ? {} : fixtureManifest(dataset(2)))
     })
+    h.fetcher.mockImplementation(async () => response(dataset(2)))
     if (kind === "storage") h.storage.write = async () => { throw new Error("quota") }
     await h.service.revalidate("en", dataset())
-    expect(await h.service.acquire("en")).toEqual(dataset())
-    expect(h.entries.get("en")).toEqual(dataset())
+    expect(await h.service.acquire("en")).toMatchObject(dataset())
+    expect(h.entries.get("en")).toMatchObject(dataset())
     expect(h.service.state("en").status).toBe("ready")
     expect(h.events.at(-1)).toMatchObject({ type: "revalidation-failed", error: { kind } })
   })
@@ -327,7 +342,7 @@ describe("acquisition lifecycle", () => {
     h.fetcher.mockImplementationOnce(async () => new Response(null, { status: 500 }))
     await expect(h.service.update("en")).rejects.toMatchObject({ kind: "http" })
     expect(listener).not.toHaveBeenCalled()
-    expect(await h.service.update("en")).toEqual(dataset())
+    expect(await h.service.update("en")).toMatchObject(dataset())
     expect(listener).toHaveBeenCalledWith({ type: "updated", lang: "en" })
     unsubscribe()
     await h.service.update("en")

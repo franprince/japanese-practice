@@ -1,3 +1,4 @@
+import { fixtureManifest } from "../../src/test/wordset-fixture"
 import { test, expect } from '../fixtures'
 
 test.describe('Words Game', () => {
@@ -26,13 +27,13 @@ test.describe('Words Game', () => {
     })
 
     test('should handle correct and incorrect romaji input with feedback', async ({ wordsPage, page }) => {
-        await page.route('**/api/wordset?*', route => route.fulfill({
-            status: 200, contentType: 'application/json', body: JSON.stringify({
-                version: 1,
-                hiraganaWords: [{ kana: 'あいう', romaji: 'aiu', type: 'hiragana', groups: ['h1'] }],
-                katakanaWords: [],
-            }),
-        }))
+        const data = {
+            version: 1,
+            hiraganaWords: [{ kana: 'あいう', romaji: 'aiu', type: 'hiragana', groups: ['h1'] }],
+            katakanaWords: [],
+        }
+        await page.route('**/wordsets/manifest.json', route => route.fulfill({ json: fixtureManifest(data) }))
+        await page.route('**/wordsets/*-*.json', route => route.fulfill({ json: data }))
         await wordsPage.goto()
 
         // 1. Get the character being shown

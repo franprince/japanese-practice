@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test"
 import { act, renderHook, waitFor } from "@testing-library/react"
 import { useMobileWordset } from "../use-mobile-wordset"
 import { WordsetAcquisition, type WordsetFetch } from "@/lib/japanese/words/acquisition"
+import { fixtureManifest } from "@/test/wordset-fixture"
 import type { WordSets } from "@/types/api"
 import type { Language } from "@/lib/i18n"
 
@@ -10,7 +11,7 @@ const originalFetch = globalThis.fetch
 const originalMatchMedia = window.matchMedia
 beforeEach(() => {
     window.matchMedia = (query: string) => ({ matches: query.includes("max-width: 768px") }) as MediaQueryList
-    globalThis.fetch = mock(async () => new Response(null)) as unknown as typeof fetch
+    globalThis.fetch = mock(async () => new Response(JSON.stringify(fixtureManifest(data)))) as unknown as typeof fetch
 })
 afterEach(() => {
     globalThis.fetch = originalFetch
@@ -27,7 +28,7 @@ function harness() {
             write: async (lang, value) => { saved.set(lang, value) },
             remove: async lang => { saved.delete(lang) },
         },
-        fetch: fetcher, mobile: () => true, confirmation,
+        fetch: (input, init) => String(input).endsWith("manifest.json") ? Promise.resolve(new Response(JSON.stringify(fixtureManifest(data)))) : fetcher(input, init), mobile: () => true, confirmation,
     })
     return { service, fetcher, confirmation, saved }
 }
@@ -41,6 +42,17 @@ async function openWords(result: { current: ReturnType<typeof useMobileWordset> 
 }
 
 describe("mobile acquisition UI", () => {
+    test("uses manifest byte metadata for consent size without downloading", async () => {
+        const manifest = fixtureManifest(data)
+        manifest.datasets.en.bytes = 12 * 1024 * 1024
+        globalThis.fetch = mock(async () => new Response(JSON.stringify(manifest))) as unknown as typeof fetch
+        const h = harness()
+        const { result } = renderHook(() => useMobileWordset("en", h.service))
+        await openWords(result)
+        await waitFor(() => expect(result.current.wordsetSizeMB).toBe(12))
+        expect(h.fetcher).not.toHaveBeenCalled()
+    })
+
     test("guess mode remains available without downloading a wordset", async () => {
         const h = harness()
         const { result } = renderHook(() => useMobileWordset("en", h.service))
@@ -64,7 +76,7 @@ describe("mobile acquisition UI", () => {
         expect(result.current.downloadError).toBeNull()
         expect(result.current.mobileConfirmOpen).toBe(false)
         expect(result.current.gameType).toBe("words")
-        expect(h.saved.get("en")).toEqual(data)
+        expect(h.saved.get("en")).toMatchObject(data)
     })
     test("cancels a pending download and ignores a late response", async () => {
         const h = harness()
@@ -99,7 +111,7 @@ describe("mobile acquisition UI", () => {
         expect(result.current.downloadProgress).toBeNull()
         expect(result.current.downloadError).toBeNull()
         expect(result.current.gameType).toBe("characters")
-        expect(result.current.wordsetSizeMB).toBe(5)
+        expect(result.current.wordsetSizeMB).toBe(0)
         await act(async () => { await result.current.confirmWordMode() })
         expect(h.saved.has("es")).toBe(true)
         expect(h.saved.has("en")).toBe(false)

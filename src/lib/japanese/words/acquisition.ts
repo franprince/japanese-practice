@@ -1,16 +1,12 @@
 import { openDb, STORE_WORDSETS } from "@/lib/core/db"
 import type { WordSets } from "@/types/api"
 
+import { WordsetError, type FailureKind } from "./errors"
+import { fetchWordsetMetadata } from "./manifest"
+
 export type DatasetLanguage = "en" | "es"
-export type FailureKind = "network" | "http" | "aborted" | "parse" | "validation" | "storage"
+export { WordsetError, type FailureKind } from "./errors"
 export type WordsetFetch = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
-export class WordsetError extends Error {
-  readonly messageKey: `words.downloadError.${FailureKind}`
-  constructor(readonly kind: FailureKind, cause?: unknown) {
-    super(`Wordset ${kind} failure`, { cause })
-    this.messageKey = `words.downloadError.${kind}`
-  }
-}
 export class ConsentRequired extends Error {
   readonly code = "MOBILE_AUTH_REQUIRED"
 }
@@ -41,7 +37,8 @@ export function recordConfirmation(lang: string, confirmed: boolean) {
 const object = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value)
 export function validateWordset(value: unknown): WordSets {
-  if (!object(value) || !Number.isSafeInteger(value.version) || Number(value.version) <= 0) {
+  if (!object(value) || !Number.isSafeInteger(value.version) || Number(value.version) <= 0 ||
+    (value.assetChecksum !== undefined && (typeof value.assetChecksum !== "string" || !/^[a-f0-9]{64}$/.test(value.assetChecksum)))) {
     throw new WordsetError("validation")
   }
   for (const key of ["hiraganaWords", "katakanaWords", "bothForms"]) {
@@ -107,30 +104,26 @@ const failure = (error: unknown, kind: FailureKind) => error instanceof WordsetE
 
 export async function downloadWordset(
   fetcher: WordsetFetch, lang: DatasetLanguage, options: {
-    signal?: AbortSignal; version?: number; head?: boolean
+    signal?: AbortSignal; checksum?: string; metadataOnly?: boolean
     progress?: (received: number, total: number | null) => void
   } = {},
 ): Promise<WordSets | "not-modified" | "update-available"> {
-  const { signal, version, head, progress } = options
+  const { signal, checksum, metadataOnly, progress } = options
+  const metadata = await fetchWordsetMetadata(fetcher, lang, signal)
   checkAbort(signal)
+  if (checksum === metadata.checksum) return "not-modified"
+  if (metadataOnly) return "update-available"
   let response: Response
   try {
-    response = await fetcher(`/api/wordset?lang=${lang}`, {
-      method: head ? "HEAD" : "GET", cache: "no-store", signal,
-      headers: version === undefined ? {} : { "If-None-Match": `"${version}"` },
-    })
+    response = await fetcher(metadata.url, { cache: "default", signal })
   } catch (error) {
     checkAbort(signal)
     throw failure(error, "network")
   }
   checkAbort(signal)
-  if (response.status === 304 && version !== undefined) return "not-modified"
   if (!response.ok) throw new WordsetError("http")
-  if (head) return "update-available"
-  const length = Number(response.headers.get("content-length"))
-  const total = Number.isSafeInteger(length) && length > 0 ? length : null
-  // Browsers decode compressed bodies; Content-Length can describe different bytes.
-  const comparableLength = !response.headers.get("content-encoding")
+  // Manifest bytes describe the decoded asset, unlike compressed Content-Length.
+  const total = metadata.bytes
   const reader = response.body?.getReader()
   if (!reader) throw new WordsetError("aborted")
   const chunks: Uint8Array[] = []
@@ -149,14 +142,22 @@ export async function downloadWordset(
     checkAbort(signal)
     throw failure(error, "aborted")
   } finally { reader.releaseLock() }
-  if (!received || (total !== null && comparableLength && received !== total)) throw new WordsetError("aborted")
+  if (!received || received !== total) throw new WordsetError("aborted")
   const bytes = new Uint8Array(received)
   let offset = 0
   for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length }
   let parsed: unknown
   try { parsed = JSON.parse(new TextDecoder().decode(bytes)) }
   catch (error) { throw new WordsetError("parse", error) }
-  return validateWordset(parsed)
+  const data = validateWordset(parsed)
+  if (data.version !== metadata.version) throw new WordsetError("validation")
+  let digest: ArrayBuffer
+  try { digest = await crypto.subtle.digest("SHA-256", bytes) }
+  catch (error) { throw new WordsetError("validation", error) }
+  checkAbort(signal)
+  const actual = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("")
+  if (actual !== metadata.checksum) throw new WordsetError("validation")
+  return { ...data, assetChecksum: metadata.checksum }
 }
 
 type Options = { consent?: boolean; signal?: AbortSignal; verifyCache?: boolean }
@@ -229,7 +230,7 @@ export class WordsetAcquisition {
     if (this.deps.mobile()) {
       const saved = await this.readCache(lang)
       checkAbort(signal)
-      if (!saved || saved.version !== data.version) throw new WordsetError("storage")
+      if (!saved || saved.version !== data.version || saved.assetChecksum !== data.assetChecksum) throw new WordsetError("storage")
       this.confirm(lang, true)
     }
     this.memory.set(lang, data)
@@ -329,7 +330,7 @@ export class WordsetAcquisition {
     if (existing) return existing
     const pending = (async () => {
       try {
-        const result = await downloadWordset(this.deps.fetch, lang, { version: cached.version, head: this.deps.mobile() })
+        const result = await downloadWordset(this.deps.fetch, lang, { checksum: cached.assetChecksum, metadataOnly: this.deps.mobile() })
         if (result === "not-modified") return
         if (result === "update-available") { this.emit({ type: result, lang }); return }
         await this.prime(lang, result)
