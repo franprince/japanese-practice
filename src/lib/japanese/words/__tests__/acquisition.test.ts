@@ -118,6 +118,8 @@ describe("durable cache transactions", () => {
     await expect(cacheTransaction("en", "readonly", () => { throw new Error("unused") }, async () => { throw new Error("unavailable") })).rejects.toMatchObject({ kind: "storage" })
     const t = transaction()
     await expect(cacheTransaction("en", "readwrite", () => { throw new Error("put failed") }, t.open)).rejects.toMatchObject({ kind: "storage" })
+    // The browser can complete the empty transaction after put throws.
+    expect(() => t.fire(t.tx, "complete")).not.toThrow()
     expect(t.close).toHaveBeenCalled()
   })
   test("cancellation aborts the pending IndexedDB transaction", async () => {
