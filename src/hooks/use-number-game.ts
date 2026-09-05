@@ -10,12 +10,12 @@ import {
     type Difficulty,
 } from "@/lib/japanese/numbers"
 import { useBaseGame } from "./use-base-game"
+import type { GameSessionProps } from "@/lib/core/game-session"
 import { useKeyboardNavigation } from "./use-keyboard-navigation"
 
-export interface UseNumberGameProps {
+export interface UseNumberGameProps extends GameSessionProps {
     difficulty: Difficulty
     mode: "arabicToKanji" | "kanjiToArabic"
-    onScoreUpdate: (score: number, streak: number, correct: boolean) => void
     disableNext?: boolean
 }
 
@@ -43,7 +43,8 @@ export interface UseNumberGameReturn {
 export function useNumberGame({
     difficulty,
     mode,
-    onScoreUpdate,
+    sessionId,
+    onSessionEvent,
     disableNext = false,
 }: UseNumberGameProps): UseNumberGameReturn {
     const [currentNumber, setCurrentNumber] = useState<number>(1)
@@ -52,10 +53,10 @@ export function useNumberGame({
     
     const {
         feedback,
-        setFeedback,
+        beginQuestion,
         submitAnswer,
         skipQuestion
-    } = useBaseGame({ onScoreUpdate })
+    } = useBaseGame({ sessionId, onSessionEvent, disabled: disableNext })
 
     const showResult = feedback !== null
     const isCorrect = feedback === "correct"
@@ -65,8 +66,8 @@ export function useNumberGame({
         const newNumber = generateRandomNumber(range.min, range.max)
         setCurrentNumber(newNumber)
         setUserAnswer("")
-        setFeedback(null)
-    }, [difficulty, setFeedback])
+        beginQuestion()
+    }, [difficulty, beginQuestion])
 
     useEffect(() => {
         generateNewNumber()
@@ -102,9 +103,9 @@ export function useNumberGame({
     }, [disableNext, generateNewNumber])
 
     const handleSkip = useCallback(() => {
-        skipQuestion()
+        if (disableNext || !skipQuestion()) return
         generateNewNumber()
-    }, [skipQuestion, generateNewNumber])
+    }, [disableNext, skipQuestion, generateNewNumber])
 
     useKeyboardNavigation(
         {

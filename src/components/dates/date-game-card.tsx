@@ -1,5 +1,7 @@
 "use client"
 
+import type { GameSessionProps } from "@/lib/core/game-session"
+
 import type React from "react"
 import { Calendar, CalendarDays, Hash, Type } from "lucide-react"
 import type { DateMode } from "@/lib/japanese/dates"
@@ -7,13 +9,12 @@ import { useI18n } from "@/lib/i18n"
 import { useDateGame } from "@/hooks/use-date-game"
 import { GameCardContainer, QuestionDisplay, ResultDisplay, ActionBar } from "@/components/game/primitives"
 
-interface DateGameCardProps {
+interface DateGameCardProps extends GameSessionProps {
   mode: DateMode
-  onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   disableNext?: boolean
 }
 
-export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateGameCardProps) {
+export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = false }: DateGameCardProps) {
   const { t } = useI18n()
   const {
     question,
@@ -27,7 +28,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
     handleSubmit,
     handleSkip,
     generateNewQuestion,
-  } = useDateGame({ mode, onScoreUpdate, disableNext, t })
+  } = useDateGame({ mode, sessionId, onSessionEvent, disableNext, t })
 
   if (!question) return null
 
@@ -63,7 +64,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
   }
 
   const handleInputChange = (value: string) => {
-    if (showResult) return
+    if (showResult || disableNext) return
     setUserInput(value)
   }
 
@@ -104,13 +105,13 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
           type="text"
           value={userInput}
           onChange={(e) => handleInputChange(e.target.value)}
-          readOnly={showResult}
-          aria-disabled={showResult}
+          readOnly={showResult || disableNext}
+          aria-disabled={showResult || disableNext}
           placeholder={t("typeHiraganaOrRomaji")}
           className={`
             w-full px-4 py-3 text-lg text-center rounded-xl border-2 bg-background
             placeholder:text-muted-foreground/50 focus:outline-none transition-all
-            ${showResult ? "border-border opacity-60" : "border-border focus:border-primary"}
+            ${showResult || disableNext ? "border-border opacity-60" : "border-border focus:border-primary"}
           `}
         />
       </div>
@@ -133,9 +134,10 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
       <ActionBar
         showResult={showResult}
         onSubmit={handleSubmit}
-        onNext={() => { if (!disableNext) generateNewQuestion() }}
+        onNext={generateNewQuestion}
         onSkip={handleSkip}
-        submitDisabled={!userInput.trim()}
+        submitDisabled={disableNext || !userInput.trim()}
+        skipDisabled={disableNext}
         nextDisabled={disableNext}
         nextLabel={t("nextDate")}
         t={t}

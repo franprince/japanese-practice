@@ -1,5 +1,7 @@
 "use client"
 
+import type { GameSessionProps } from "@/lib/core/game-session"
+
 import { KanjiOptionCard } from "./kanji-option-card"
 import type { KanjiDifficulty } from "@/lib/japanese/kanji"
 import { Button } from "@/components/ui/button"
@@ -8,13 +10,12 @@ import { useI18n } from "@/lib/i18n"
 import { useKanjiGame } from "@/hooks/use-kanji-game"
 import { ResultDisplay } from "@/components/game/primitives"
 
-interface KanjiGameCardProps {
+interface KanjiGameCardProps extends GameSessionProps {
   difficulty: KanjiDifficulty
-  onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   disableNext?: boolean
 }
 
-export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }: KanjiGameCardProps) {
+export function KanjiGameCard({ difficulty, sessionId, onSessionEvent, disableNext = false }: KanjiGameCardProps) {
   const { t, lang } = useI18n()
   const {
     currentKanji,
@@ -24,7 +25,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
     isCorrect,
     handleOptionClick,
     handleNext,
-  } = useKanjiGame({ difficulty, onScoreUpdate, disableNext })
+  } = useKanjiGame({ difficulty, sessionId, onSessionEvent, disableNext })
 
   if (!currentKanji) return null
 
@@ -87,7 +88,7 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
             isCorrect={isRevealed ? option.char === currentKanji.char : null}
             isRevealed={isRevealed}
             onClick={() => handleOptionClick(option)}
-            disabled={isRevealed}
+            disabled={isRevealed || disableNext}
           />
         ))}
       </div>

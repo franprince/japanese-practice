@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/core"
+import type { GameSessionProps } from "@/lib/core/game-session"
 import type { WordFilter } from "@/lib/japanese/words"
 import { useI18n } from "@/lib/i18n"
 import { Flame, Zap, Type, Shuffle, Trophy } from "lucide-react"
@@ -15,11 +16,12 @@ import { GameCardContainer, QuestionDisplay, AnswerSection, ActionBar } from "@/
 import { useEffect } from "react"
 import { preloadKanaDictionary } from "@/lib/japanese/shared"
 
-interface GameCardProps {
+interface GameCardProps extends GameSessionProps {
   mode: GameMode
   filter: WordFilter
   gameType: WordsGameType
-  onScoreUpdate: (score: number, streak: number, correct: boolean) => void
+  submittedCount: number
+  answerAccuracy: number
   suppressFocus?: boolean
   onRequestCloseSettings?: () => void
   onRequestOpenSettings?: () => void
@@ -31,7 +33,10 @@ export function GameCard({
   mode,
   filter,
   gameType,
-  onScoreUpdate,
+  sessionId,
+  onSessionEvent,
+  submittedCount,
+  answerAccuracy,
   suppressFocus = false,
   onRequestCloseSettings,
   onRequestOpenSettings,
@@ -49,9 +54,6 @@ export function GameCard({
     userInput,
     setUserInput,
     feedback,
-    score,
-    streak,
-    totalAttempts,
     noWordsAvailable,
     isLoading,
     displayRomaji,
@@ -59,7 +61,6 @@ export function GameCard({
     incorrectChars,
     inputRef,
     options,
-    accuracyPercent,
     checkAnswer,
     skipWord,
     handleKeyDown,
@@ -71,7 +72,8 @@ export function GameCard({
     disableNext,
     suppressFocus,
     lang,
-    onScoreUpdate,
+    sessionId,
+    onSessionEvent,
     onIncorrectCharsChange,
   })
 
@@ -155,7 +157,7 @@ export function GameCard({
                       feedback !== null && option !== currentWord.romaji && "opacity-20 scale-95 grayscale"
                     )}
                     onClick={() => feedback === null && checkAnswer(option)}
-                    disabled={feedback !== null}
+                    disabled={feedback !== null || disableNext}
                   >
                     {option}
                   </Button>
@@ -182,7 +184,7 @@ export function GameCard({
                   feedback === "incorrect" && "border-destructive",
                   !feedback && "border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                 )}
-                readOnly={feedback !== null}
+                readOnly={feedback !== null || disableNext}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
@@ -208,7 +210,8 @@ export function GameCard({
             onSubmit={checkAnswer}
             onNext={loadNewWord}
             onSkip={skipWord}
-            submitDisabled={gameType === "guess" || !userInput.trim()}
+            submitDisabled={disableNext || gameType === "guess" || !userInput.trim()}
+            skipDisabled={disableNext}
             nextDisabled={disableNext}
             nextLabel={t("nextWord")}
             t={t}
@@ -217,9 +220,9 @@ export function GameCard({
       </GameCardContainer>
 
       {}
-      {totalAttempts > 0 && (
+      {submittedCount > 0 && (
         <p className="text-center text-xs text-muted-foreground mt-6 tabular-nums">
-          {t("accuracy")}: {accuracyPercent}%
+          {t("accuracy")}: {answerAccuracy}%
         </p>
       )}
 

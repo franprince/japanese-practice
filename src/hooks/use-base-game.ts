@@ -1,54 +1,37 @@
 "use client"
 
-import { useState, useCallback } from "react"
-import { useTheme } from "@/lib/theme"
+import { useState, useCallback, useRef } from "react"
+import type { GameSessionProps, SessionOutcomeEvent } from "@/lib/core/game-session"
 
-export interface UseBaseGameProps {
-    onScoreUpdate: (score: number, streak: number, correct: boolean) => void
+interface UseBaseGameProps extends GameSessionProps {
+    disabled?: boolean
 }
 
-export interface UseBaseGameReturn {
-    score: number
-    streak: number
-    feedback: "correct" | "incorrect" | null
-    setFeedback: (feedback: "correct" | "incorrect" | null) => void
-    submitAnswer: (isCorrect: boolean, basePoints?: number) => void
-    skipQuestion: () => void
-}
-
-export function useBaseGame({ onScoreUpdate }: UseBaseGameProps): UseBaseGameReturn {
-    const [score, setScore] = useState(0)
-    const [streak, setStreak] = useState(0)
+// Owns question feedback and admission only. The session reducer owns scoring.
+export function useBaseGame({ sessionId, onSessionEvent, disabled = false }: UseBaseGameProps) {
     const [feedback, setFeedback] = useState<"correct" | "incorrect" | null>(null)
+    const [questionId, setQuestionId] = useState(0)
+    const question = useRef({ sessionId, id: 0, settled: true })
 
-    const submitAnswer = useCallback((isCorrect: boolean, basePoints = 10) => {
-        setFeedback(isCorrect ? "correct" : "incorrect")
+    const beginQuestion = useCallback(() => {
+        question.current = { sessionId, id: question.current.id + 1, settled: false }
+        setQuestionId(question.current.id)
+        setFeedback(null)
+    }, [sessionId])
 
-        if (isCorrect) {
-            const streakBonus = Math.floor(streak / 5) * 5
-            const newScore = score + basePoints + streakBonus
-            const newStreak = streak + 1
-            setScore(newScore)
-            setStreak(newStreak)
-            onScoreUpdate(newScore, newStreak, true)
-        } else {
-            setStreak(0)
-            onScoreUpdate(score, 0, false)
-        }
-    }, [score, streak, onScoreUpdate])
+    const emitOutcome = useCallback((outcome: { type: "answer-submitted"; correct: boolean } | { type: "question-skipped" }) => {
+        const current = question.current
+        if (disabled || current.settled || current.sessionId !== sessionId || current.id !== questionId) return false
+        // Lock synchronously: two handlers in the same render cannot score twice.
+        current.settled = true
+        setFeedback(outcome.type === "answer-submitted" && outcome.correct ? "correct" : "incorrect")
+        const event: SessionOutcomeEvent = { ...outcome, sessionId, questionId: current.id }
+        onSessionEvent(event)
+        return true
+    }, [disabled, onSessionEvent, sessionId, questionId])
 
-    const skipQuestion = useCallback(() => {
-        setFeedback("incorrect")
-        setStreak(0)
-        onScoreUpdate(score, 0, false)
-    }, [score, onScoreUpdate])
+    const submitAnswer = useCallback((correct: boolean) => emitOutcome({ type: "answer-submitted", correct }), [emitOutcome])
+    const skipQuestion = useCallback(() => emitOutcome({ type: "question-skipped" }), [emitOutcome])
 
-    return {
-        score,
-        streak,
-        feedback,
-        setFeedback,
-        submitAnswer,
-        skipQuestion,
-    }
+    return { feedback, beginQuestion, submitAnswer, skipQuestion }
 }

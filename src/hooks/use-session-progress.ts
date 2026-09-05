@@ -1,112 +1,44 @@
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useReducer } from "react"
 import type { TranslationKey } from "@/lib/i18n"
+import { createSession, sessionReducer, type PlayMode, type SessionOutcomeEvent } from "@/lib/core/game-session"
 
-export type PlayMode = "infinite" | "session"
+export type { PlayMode } from "@/lib/core/game-session"
 
 type SessionProgressOptions = {
     defaultTargetCount?: number
-    
+    basePoints?: number
     t?: (key: TranslationKey) => string
 }
 
-export function useSessionProgress({ defaultTargetCount = 10, t }: SessionProgressOptions = {}) {
-    const [score, setScore] = useState(0)
-    const [streak, setStreak] = useState(0)
-    const [bestStreak, setBestStreak] = useState(0)
-    const [answeredCount, setAnsweredCount] = useState(0)
-    const [correctCount, setCorrectCount] = useState(0)
-    const [sessionId, setSessionId] = useState(0)
-    const [playMode, setPlayMode] = useState<PlayMode>("session")
-    const [targetCount, setTargetCount] = useState<number>(defaultTargetCount)
-    const [sessionComplete, setSessionComplete] = useState(false)
-
-    const handleScoreUpdate = useCallback(
-        (newScore: number, newStreak: number, correct: boolean) => {
-            setScore(newScore)
-            setStreak(newStreak)
-            setBestStreak((prev) => (newStreak > prev ? newStreak : prev))
-
-            setAnsweredCount((prev) => {
-                const next = prev + 1
-                if (playMode === "session" && next >= targetCount) {
-                    setSessionComplete(true)
-                }
-                return next
-            })
-
-            if (correct) {
-                setCorrectCount((prev) => prev + 1)
-            }
-        },
-        [playMode, targetCount],
-    )
-
-    const resetSession = useCallback(
-        (mode?: PlayMode) => {
-            setSessionId((prev) => prev + 1)
-            setScore(0)
-            setStreak(0)
-            setBestStreak(0)
-            setAnsweredCount(0)
-            setCorrectCount(0)
-            setSessionComplete(false)
-            if (mode) setPlayMode(mode)
-        },
-        [],
-    )
-
-    const accuracy = useMemo(
-        () => (answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0),
-        [answeredCount, correctCount],
-    )
-
-    const remainingQuestions = useMemo(
-        () => (playMode === "session" ? Math.max(targetCount - answeredCount, 0) : undefined),
-        [playMode, targetCount, answeredCount],
-    )
-
-    const translate = useCallback(
-        (key: TranslationKey) => (t ? t(key) : key),
-        [t],
-    )
-
+export function useSessionProgress({ defaultTargetCount = 10, basePoints = 10, t }: SessionProgressOptions = {}) {
+    const [state, dispatch] = useReducer(sessionReducer, { targetCount: defaultTargetCount, basePoints }, createSession)
+    const { answeredCount, correctCount, skippedCount, playMode, targetCount } = state
+    const handleSessionEvent = useCallback((event: SessionOutcomeEvent) => dispatch(event), [])
+    const resetSession = useCallback((playMode?: PlayMode, targetCount?: number) => {
+        dispatch({ type: "session-restarted", playMode, targetCount })
+    }, [])
+    const setPlayMode = useCallback((playMode: PlayMode) => dispatch({ type: "mode-changed", playMode }), [])
+    const setTargetCount = useCallback((targetCount: number) => dispatch({ type: "target-changed", targetCount }), [])
+    const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0
+    const submittedCount = answeredCount - skippedCount
+    const answerAccuracy = submittedCount > 0 ? Math.round((correctCount / submittedCount) * 100) : 100
+    const remainingQuestions = playMode === "session" ? Math.max(targetCount - answeredCount, 0) : undefined
+    const translate = (key: TranslationKey) => t ? t(key) : key
     const remainingLabel = playMode === "session"
-        ? translate("roundsLeft").replace("{count}", String(Math.max(remainingQuestions ?? 0, 0)))
+        ? translate("roundsLeft").replace("{count}", String(remainingQuestions))
         : null
-
     const sessionSummaryProps = {
         title: translate("sessionCompleteTitle"),
         targetLabel: translate("sessionTargetLabel"),
         correctLabel: translate("sessionCorrectLabel"),
         accuracyLabel: translate("sessionAccuracyLabel"),
-        targetCount,
-        correctCount,
-        accuracy,
+        targetCount, correctCount, accuracy,
         restartLabel: translate("sessionRestart"),
         switchLabel: translate("sessionSwitchToInfinite"),
     }
-
     return {
-        score,
-        streak,
-        bestStreak,
-        answeredCount,
-        correctCount,
-        sessionId,
-        playMode,
-        targetCount,
-        sessionComplete,
-        accuracy,
-        remainingQuestions,
-        remainingLabel,
-        sessionSummaryProps,
-        handleScoreUpdate,
-        resetSession,
-        setTargetCount,
-        setPlayMode,
-        setSessionComplete,
-        setScore,
-        setStreak,
-        setBestStreak,
+        ...state, accuracy, submittedCount, answerAccuracy, remainingQuestions,
+        remainingLabel, sessionSummaryProps,
+        handleSessionEvent, resetSession, setTargetCount, setPlayMode,
     }
 }

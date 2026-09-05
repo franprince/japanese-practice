@@ -4,7 +4,6 @@ import { useState } from "react"
 import { NumberGameCard } from "@/components/numbers/number-game-card"
 import { DifficultySelector } from "@/components/numbers/difficulty-selector"
 import { StatsDisplay } from "@/components/game/stats-display"
-import { RemainingBadge } from "@/components/game/remaining-badge"
 import type { Difficulty } from "@/lib/japanese/numbers"
 import { GameSettingsPopover } from "@/components/game/game-settings-popover"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
@@ -24,11 +23,10 @@ export default function NumbersPage() {
         playMode,
         targetCount,
         sessionComplete,
-        correctCount,
-        accuracy,
-        handleScoreUpdate: handleSessionScoreUpdate,
+        handleSessionEvent,
         resetSession,
         setTargetCount,
+        setPlayMode,
         remainingLabel,
         sessionSummaryProps,
     } = useSessionProgress({ t })
@@ -54,12 +52,9 @@ export default function NumbersPage() {
                 <>
                     <GameSettingsPopover
                         playMode={playMode}
-                        onSelectMode={resetSession}
+                        onSelectMode={setPlayMode}
                         targetCount={targetCount}
-                        onSelectCount={(count) => {
-                            setTargetCount(count)
-                            resetSession()
-                        }}
+                        onSelectCount={setTargetCount}
                         remainingQuestions={0}
                     />
 
@@ -104,10 +99,10 @@ export default function NumbersPage() {
 
             <div className="mt-6 mb-6">
                 <NumberGameCard
-                    key={sessionId}
+                    sessionId={sessionId}
                     difficulty={difficulty}
                     mode={numbersMode}
-                    onScoreUpdate={handleSessionScoreUpdate}
+                    onSessionEvent={handleSessionEvent}
                     disableNext={sessionComplete && playMode === "session"}
                 />
             </div>

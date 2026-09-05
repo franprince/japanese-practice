@@ -3,7 +3,7 @@
 - **Source:** Architecture assessment performed 2026-09-04
 - **Delivery rule:** One branch and one pull request per backlog item
 - **Base branch:** `develop`
-- **Status:** Approved sequence — PRs 1–2 and E2E hardening (#58) merged; PR 3 open for review
+- **Status:** Approved sequence — PRs 1–3 and E2E hardening (#58) merged; PR 4 open for review
 
 This backlog replaces the earlier recommendation to productionize the
 experimental Ollama practice feature. The feature will instead be removed in
@@ -85,8 +85,8 @@ remain functional.
 
 ## PR 3 — Move wordset payloads to static delivery
 
-**Status:** Implemented and verified; [PR #59](https://github.com/franprince/japanese-practice/pull/59)
-is open against `develop` without merge conflicts. Continue PR 4 after it merges.
+**Status:** Merged in [PR #59](https://github.com/franprince/japanese-practice/pull/59)
+on 2026-09-05. PR 4 continues from `develop` at `7745aeb`.
 See the
 [specification](2026-09-05-static-wordset-delivery/spec.md),
 [plan](2026-09-05-static-wordset-delivery/implementation_plan.md), and
@@ -120,6 +120,17 @@ visits reuse cached immutable assets; the mobile size prompt uses manifest
 metadata; both English and Spanish datasets load correctly.
 
 ## PR 4 — Unify game session state
+
+**Status:** Implemented and verified; [PR #60](https://github.com/franprince/japanese-practice/pull/60)
+is open against `develop` without merge conflicts.
+See the [specification](2026-09-05-unify-game-session-state/spec.md),
+[plan](2026-09-05-unify-game-session-state/implementation_plan.md), and
+[tasks](2026-09-05-unify-game-session-state/tasks.md).
+
+**Verification (2026-09-05):** Typecheck and production build pass; all 167
+unit/integration tests and all 44 production browser tests pass. Lint has zero
+errors and 40 existing warnings, down from 53 on `develop`. The lifecycle
+cleanup remains PR 5 and starts after this item merges.
 
 **Problem:** Feature hooks own score and streak while page-level session state
 mirrors the same values. Absolute-value callbacks, keyed remounts, and reset

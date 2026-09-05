@@ -27,13 +27,13 @@ export default function WordsPage() {
         playMode,
         targetCount,
         sessionComplete,
-        handleScoreUpdate,
+        handleSessionEvent,
+        submittedCount,
+        answerAccuracy,
         resetSession,
-        setTargetCount,
-        setBestStreak,
         remainingLabel,
         sessionSummaryProps,
-    } = useSessionProgress({ t })
+    } = useSessionProgress({ t, basePoints: 1 })
 
     const [characterGroups, setCharacterGroups] = useState<CharacterGroup[]>([])
     const [isLoadingGroups, setIsLoadingGroups] = useState(true)
@@ -75,15 +75,8 @@ export default function WordsPage() {
         cancelConfirm
     } = useMobileWordset(lang)
 
-    const handleScoreUpdateWithUi = useCallback(
-        (newScore: number, newStreak: number, correct: boolean) => {
-            handleScoreUpdate(newScore, newStreak, correct)
-        },
-        [handleScoreUpdate],
-    )
-
-    const handleResetSession = useCallback(() => {
-        resetSession()
+    const handleResetSession = useCallback((nextPlayMode?: "infinite" | "session", nextTargetCount?: number) => {
+        resetSession(nextPlayMode, nextTargetCount)
         setIncorrectChars(new Map())
     }, [resetSession])
 
@@ -105,13 +98,8 @@ export default function WordsPage() {
         if (somethingChanged) {
             setMode(nextMode)
             setGameType(nextGameType)
-            if (nextPlayMode !== playMode) {
-                resetSession(nextPlayMode)
-            }
-            setTargetCount(nextTargetCount)
             setFilter(nextFilter)
-            handleResetSession()
-            setBestStreak(0)
+            handleResetSession(nextPlayMode, nextTargetCount)
         }
     }
 
@@ -173,7 +161,7 @@ export default function WordsPage() {
                     <SessionSummaryCard
                         {...sessionSummaryProps}
                         onRestart={() => handleResetSession()}
-                        onSwitchToInfinite={() => resetSession("infinite")}
+                        onSwitchToInfinite={() => handleResetSession("infinite")}
                         incorrectChars={incorrectChars}
                         incorrectCharsLabel={t("incorrectChars")}
                         tableCharacterLabel={t("tableCharacter")}
@@ -184,10 +172,12 @@ export default function WordsPage() {
 
             {!isLoadingGroups && (
                 <GameCard
-                    key={sessionId}
+                    sessionId={sessionId}
                     mode={mode}
                     filter={filter}
-                    onScoreUpdate={handleScoreUpdateWithUi}
+                    onSessionEvent={handleSessionEvent}
+                    submittedCount={submittedCount}
+                    answerAccuracy={answerAccuracy}
                     onRequestCloseSettings={() => setSettingsOpen(false)}
                     onRequestOpenSettings={() => setSettingsOpen(true)}
                     disableNext={sessionComplete && playMode === "session"}
