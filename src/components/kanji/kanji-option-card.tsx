@@ -58,13 +58,13 @@ export function KanjiOptionCard({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "w-full p-4 rounded-xl border-2 text-left transition-all duration-200",
-        "hover:scale-[1.02] active:scale-[0.98]",
+        "w-full p-3 rounded-xl border-2 text-left transition-all duration-200",
+        "",
         "disabled:cursor-not-allowed disabled:hover:scale-100",
         !isRevealed && !isSelected && "border-border/50 bg-secondary/30 hover:border-primary/50 hover:bg-secondary/50",
         !isRevealed && isSelected && "border-primary bg-primary/10",
-        isRevealed && isCorrect === true && "border-green-500 bg-green-500/10",
-        isRevealed && isCorrect === false && isSelected && "border-red-500 bg-red-500/10",
+        isRevealed && isCorrect === true && "border-success bg-success/10",
+        isRevealed && isCorrect === false && isSelected && "border-destructive bg-destructive/10",
         isRevealed && isCorrect === false && !isSelected && "border-border/30 bg-secondary/20 opacity-50",
       )}
     >
@@ -73,8 +73,8 @@ export function KanjiOptionCard({
         <span lang="ja" className="text-xl font-medium">{kanji.reading}</span>
 
         {}
-        <div className="flex flex-col text-xs text-muted-foreground/80 mt-1 leading-tight gap-1.5">
-          {showReading && <span className="uppercase tracking-wide">{romajiReading}</span>}
+        <div className="flex flex-col text-sm text-muted-foreground mt-1 leading-tight gap-1.5">
+          {showReading && <span className="">{romajiReading}</span>}
           {showMeaning && (
             <span className="inline-flex items-center gap-2">
               {meaning ?? "—"}

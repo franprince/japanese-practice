@@ -1,114 +1,22 @@
 "use client"
-
-import { useEffect, useRef, useState } from "react"
-import { useTheme } from "@/lib/theme"
+import { useState } from "react"
+import * as Popover from "@radix-ui/react-popover"
+import { ChevronDown } from "lucide-react"
+import { useTheme, type Theme } from "@/lib/theme"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
-import { ChevronDown, Moon, Sun } from "lucide-react"
-
+const themes: Theme[] = ["default", "sakura", "ocean", "forest", "sunset", "daylight", "lavender", "mint"]
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme()
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  const darkThemes = [
-    { value: "default", label: t("themes.default.label"), description: t("themes.default.description") },
-    { value: "sakura", label: t("themes.sakura.label"), description: t("themes.sakura.description") },
-    { value: "ocean", label: t("themes.ocean.label"), description: t("themes.ocean.description") },
-    { value: "forest", label: t("themes.forest.label"), description: t("themes.forest.description") },
-    { value: "sunset", label: t("themes.sunset.label"), description: t("themes.sunset.description") },
-  ] as const
-
-  const lightThemes = [
-    { value: "daylight", label: t("themes.daylight.label"), description: t("themes.daylight.description") },
-    { value: "lavender", label: t("themes.lavender.label"), description: t("themes.lavender.description") },
-    { value: "mint", label: t("themes.mint.label"), description: t("themes.mint.description") },
-  ] as const
-
-  const allThemes = [...darkThemes, ...lightThemes]
-  const currentTheme = allThemes.find(t => t.value === theme)
-
-  useEffect(() => {
-    if (!open) return
-    const handleClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClick)
-    return () => document.removeEventListener("mousedown", handleClick)
-  }, [open])
-
-  return (
-    <div className="relative" ref={ref}>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="gap-2 text-foreground/70 hover:text-foreground hover:bg-accent/10"
-        onClick={() => setOpen((prev) => !prev)}
-        aria-expanded={open}
-        aria-haspopup="menu"
-      >
-        <span>{currentTheme?.label}</span>
-        <ChevronDown className="w-4 h-4" />
-      </Button>
-
-      {open && (
-        <div className="absolute top-full mt-1 z-50 w-64 max-w-[calc(100vw-1.5rem)] left-0 sm:left-auto sm:right-0">
-          <div className="bg-background/95 backdrop-blur-sm border border-border/50 rounded-lg shadow-lg overflow-hidden max-h-[70vh] overflow-y-auto">
-            {}
-            <div className="px-3 py-2 border-b border-border/30">
-              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                <Moon className="w-3.5 h-3.5" />
-                <span>{t("themes.dark.title")}</span>
-              </div>
-            </div>
-            {darkThemes.map((themeOption) => (
-              <button
-                key={themeOption.value}
-                onClick={() => {
-                  setTheme(themeOption.value)
-                  setOpen(false)
-                }}
-                className="w-full px-3 py-2.5 text-left hover:bg-accent/20 transition-colors border-b border-border/10 last:border-b-0"
-              >
-                <div className="text-sm font-medium text-foreground">
-                  {themeOption.label}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {themeOption.description}
-                </div>
-              </button>
-            ))}
-
-            {}
-            <div className="px-3 py-2 border-b border-border/30 mt-1">
-              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                <Sun className="w-3.5 h-3.5" />
-                <span>{t("themes.light.title")}</span>
-              </div>
-            </div>
-            {lightThemes.map((themeOption) => (
-              <button
-                key={themeOption.value}
-                onClick={() => {
-                  setTheme(themeOption.value)
-                  setOpen(false)
-                }}
-                className="w-full px-3 py-2.5 text-left hover:bg-accent/20 transition-colors border-b border-border/10 last:border-b-0"
-              >
-                <div className="text-sm font-medium text-foreground">
-                  {themeOption.label}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {themeOption.description}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
+  return <Popover.Root open={open} onOpenChange={setOpen}>
+    <Popover.Trigger asChild><Button variant="ghost" className="min-h-11 gap-1 px-2 text-sm">{t(`themes.${theme}.label`)}<ChevronDown className="size-4" /></Button></Popover.Trigger>
+    <Popover.Portal><Popover.Content align="end" sideOffset={6} className="z-[110] max-h-[70dvh] w-64 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border bg-popover p-2 text-popover-foreground shadow-lg" onKeyDown={event => event.stopPropagation()}>
+      {themes.map((option, index) => <div key={option}>
+        {(index === 0 || index === 5) && <p className="px-3 py-2 text-sm font-semibold text-muted-foreground">{t(index === 0 ? "themes.dark.title" : "themes.light.title")}</p>}
+        <button aria-pressed={theme === option} onClick={() => { setTheme(option); setOpen(false) }} className="min-h-11 w-full rounded-lg px-3 py-2 text-left hover:bg-secondary aria-pressed:bg-secondary"><span className="block text-sm font-medium">{t(`themes.${option}.label`)}</span><span className="block text-xs text-muted-foreground">{t(`themes.${option}.description`)}</span></button>
+      </div>)}
+    </Popover.Content></Popover.Portal>
+  </Popover.Root>
 }

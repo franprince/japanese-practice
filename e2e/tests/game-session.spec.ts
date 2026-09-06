@@ -49,11 +49,11 @@ async function expectFreshQuestion(page: Page, game: Game) {
 }
 
 async function changeSettings(page: Page, selection: string) {
-    await page.getByRole('button', { name: 'Settings', exact: true }).click()
-    await page.getByRole('button', { name: selection, exact: true }).click()
-    // A backdrop click closes settings without triggering the game's Escape handler.
-    await page.getByTestId('popover-backdrop').click({ position: { x: 1, y: 1 } })
-    await expect(page.getByTestId('popover-backdrop')).toBeHidden()
+    await page.getByTestId('settings-trigger').click()
+    const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+    await settings.getByRole('button', { name: selection, exact: true }).click()
+    await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
+    await expect(settings).toBeHidden()
 }
 
 for (const game of games) {
@@ -62,7 +62,11 @@ for (const game of games) {
             await page.goto(game.path)
             await expect(page.getByTestId('question-display')).toBeVisible()
             if (game.name === 'Dates') {
-                await page.getByRole('button', { name: 'Months', exact: true }).click()
+                await page.getByTestId('settings-trigger').click()
+                const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+                await settings.getByRole('button', { name: 'Months', exact: true }).click()
+                await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
+                await expect(settings).toBeHidden()
             }
             await expectFreshQuestion(page, game)
         })
@@ -149,7 +153,7 @@ for (const game of games) {
 test('Words keeps answer accuracy separate from session accuracy when rounds are skipped', async ({ page, wordsPage }, testInfo) => {
     await mockWordset(page)
     await wordsPage.goto()
-    await page.getByTestId('settings-trigger').filter({ visible: true }).click()
+    await page.getByTestId('settings-trigger').click()
     const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
     await settings.getByRole('button', { name: 'Session', exact: true }).click()
     await settings.getByRole('button', { name: '5', exact: true }).click()

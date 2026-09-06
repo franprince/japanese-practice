@@ -30,9 +30,7 @@ for (const [device, viewport] of [
             await testInfo.attach(name, { body, contentType: 'image/png' })
         }
         await capture('gameplay')
-        const open = device === 'mobile'
-            ? page.getByRole('button', { name: 'Command Center', exact: true })
-            : page.getByTestId('settings-trigger').filter({ visible: true })
+        const open = page.getByTestId('settings-trigger')
         await open.click()
         const dialog = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
         await expect(dialog).toBeVisible()

@@ -1,4 +1,5 @@
 "use client"
+import type { PracticeReviewProps } from "./use-mistake-review"
 
 import { useState, useCallback, useMemo } from "react"
 import {
@@ -15,7 +16,7 @@ import { useBaseGame } from "./use-base-game"
 import type { GameSessionProps } from "@/lib/core/game-session"
 import { useKeyboardNavigation } from "./use-keyboard-navigation"
 
-export interface UseNumberGameProps extends GameSessionProps {
+export interface UseNumberGameProps extends GameSessionProps, PracticeReviewProps<number> {
     difficulty: Difficulty
     mode: "arabicToKanji" | "kanjiToArabic"
     disableNext?: boolean
@@ -49,16 +50,19 @@ export function useNumberGame({
     sessionId,
     onSessionEvent,
     disableNext = false,
+    reviewQuestions,
+    onQuestionMissed,
 }: UseNumberGameProps): UseNumberGameReturn {
     const isReady = useHydrated()
-    const [round, setRound] = useState(() => ({ sessionId, difficulty, id: 1, seed: createRandomSeed(), input: "" }))
+    const [round, setRound] = useState(() => ({ sessionId, difficulty, index: 0, id: 1, seed: createRandomSeed(), input: "" }))
     if (round.sessionId !== sessionId || round.difficulty !== difficulty) {
-        setRound({ sessionId, difficulty, id: round.id + 1, seed: round.seed + 1, input: "" })
+        setRound({ sessionId, difficulty, index: 0, id: round.id + 1, seed: round.seed + 1, input: "" })
     }
     const currentNumber = useMemo(() => {
+        if (reviewQuestions?.length) return reviewQuestions[round.index % reviewQuestions.length]!
         const range = difficultyRanges[round.difficulty]
         return generateRandomNumber(range.min, range.max, createSeededRandom(round.seed))
-    }, [round.difficulty, round.seed])
+    }, [round.difficulty, round.seed, round.index, reviewQuestions])
     const userAnswer = round.input
     const setUserAnswer = useCallback((next: string | ((previous: string) => string)) => {
         setRound(previous => ({ ...previous, input: typeof next === "function" ? next(previous.input) : next }))
@@ -70,8 +74,8 @@ export function useNumberGame({
     const isCorrect = feedback === "correct"
     const generateNewNumber = useCallback(() => {
         if (!isCurrentQuestion()) return
-        setRound({ sessionId, difficulty, id: round.id + 1, seed: createRandomSeed(), input: "" })
-    }, [sessionId, difficulty, round.id, isCurrentQuestion])
+        setRound({ sessionId, difficulty, index: round.index + 1, id: round.id + 1, seed: createRandomSeed(), input: "" })
+    }, [sessionId, difficulty, round.index, round.id, isCurrentQuestion])
 
     const handleKeyPress = useCallback((key: string) => {
         if (showResult || disableNext) return
@@ -94,8 +98,8 @@ export function useNumberGame({
         const userValue = mode === "arabicToKanji" ? japaneseToArabic(userAnswer) : Number(userAnswer)
         const correct = userValue === currentNumber
 
-        submitAnswer(correct)
-    }, [showResult, userAnswer, disableNext, mode, currentNumber, submitAnswer])
+        if (submitAnswer(correct) && !correct) onQuestionMissed?.(currentNumber)
+    }, [showResult, userAnswer, disableNext, mode, currentNumber, submitAnswer, onQuestionMissed])
 
     const handleNext = useCallback(() => {
         if (disableNext) return
@@ -104,8 +108,9 @@ export function useNumberGame({
 
     const handleSkip = useCallback(() => {
         if (disableNext || !skipQuestion()) return
+        onQuestionMissed?.(currentNumber)
         generateNewNumber()
-    }, [disableNext, skipQuestion, generateNewNumber])
+    }, [disableNext, skipQuestion, generateNewNumber, onQuestionMissed, currentNumber])
 
     useKeyboardNavigation(
         {

@@ -12,7 +12,7 @@ const idleStates = {
     es: { lang: "es", status: "idle" },
 } as const
 
-export const useMobileWordset = (lang: Language, acquisition: WordsetAcquisition = wordsetAcquisition) => {
+export const useMobileWordset = (lang: Language, acquisition: WordsetAcquisition = wordsetAcquisition, preferredType: WordsGameType | null = null) => {
     const datasetLang = normalizeLang(lang)
     const mobile = useMobileDevice()
     const [selectedType, setSelectedType] = useState<WordsGameType | null>(null)
@@ -36,10 +36,10 @@ export const useMobileWordset = (lang: Language, acquisition: WordsetAcquisition
         acquisition.acquire(datasetLang, { signal: controller.signal, verifyCache: true }).catch(error => {
             if (controller.signal.aborted) return
             if (!(error instanceof ConsentRequired)) console.warn("Wordset cache check failed", error)
-            if (selected.current === "words") setModal({ lang: datasetLang, open: true, dismissed: false })
+            if ((selected.current ?? preferredType) === "words") setModal({ lang: datasetLang, open: true, dismissed: false })
         })
         return () => { controller.abort(); active.current?.abort() }
-    }, [acquisition, datasetLang, mobile])
+    }, [acquisition, datasetLang, mobile, preferredType])
 
     useEffect(() => {
         const controller = new AbortController()
@@ -89,7 +89,7 @@ export const useMobileWordset = (lang: Language, acquisition: WordsetAcquisition
     }, [datasetLang])
 
     const isMobile = mobile === true
-    const gameType = selectedType ?? (mobile === false ? "words" : "characters")
+    const gameType = selectedType ?? preferredType ?? (mobile === false ? "words" : "characters")
     const mobileConfirmOpen = modal.lang === datasetLang && modal.open
     const dismissed = modal.lang === datasetLang && modal.dismissed
     const busy = !dismissed && ["checking-cache", "downloading", "persisting"].includes(currentState.status)

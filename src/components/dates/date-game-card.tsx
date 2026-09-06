@@ -1,4 +1,6 @@
 "use client"
+import type { PracticeReviewProps } from "@/hooks/use-mistake-review"
+import type { DateQuestion } from "@/lib/japanese/dates"
 
 import type { GameSessionProps } from "@/lib/core/game-session"
 
@@ -9,12 +11,12 @@ import { useI18n } from "@/lib/i18n"
 import { useDateGame } from "@/hooks/use-date-game"
 import { GameCardContainer, QuestionDisplay, ResultDisplay, ActionBar } from "@/components/game/primitives"
 
-interface DateGameCardProps extends GameSessionProps {
+interface DateGameCardProps extends GameSessionProps, PracticeReviewProps<DateQuestion> {
   mode: DateMode
   disableNext?: boolean
 }
 
-export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = false }: DateGameCardProps) {
+export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = false, reviewQuestions, onQuestionMissed }: DateGameCardProps) {
   const { t } = useI18n()
   const {
     question,
@@ -28,7 +30,7 @@ export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = fa
     handleSubmit,
     handleSkip,
     generateNewQuestion,
-  } = useDateGame({ mode, sessionId, onSessionEvent, disableNext, t })
+  } = useDateGame({ mode, sessionId, onSessionEvent, disableNext, t, reviewQuestions, onQuestionMissed })
 
   if (!question) return null
 
@@ -66,12 +68,12 @@ export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = fa
 
   return (
     <GameCardContainer feedback={feedback}>
-      {}
       {(mode === "months" || mode === "week_days") && (
-        <div className="absolute top-4 right-4 z-10 md:top-6 md:right-6">
+        <div className="mb-2 flex justify-end">
           <button
             onClick={() => setShowNumbers(!showNumbers)}
-            className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            aria-pressed={showNumbers}
+            className="min-h-11 min-w-11 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
             title={showNumbers ? t("showName") || "Show Name" : t("showNumber") || "Show Number"}
           >
             {showNumbers ? <Type className="w-5 h-5" /> : <Hash className="w-5 h-5" />}
@@ -79,7 +81,6 @@ export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = fa
         </div>
       )}
 
-      {}
       <QuestionDisplay
         value={displayValue || ""}
         prompt={getPromptText()}
@@ -87,9 +88,12 @@ export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = fa
         icon={getModeIcon()}
       />
 
-      {}
       <div className="mb-4">
+        <label htmlFor="date-answer" className="mb-2 block text-sm font-medium">{t("practice.dateLabel")}</label>
         <input
+          id="date-answer"
+          aria-invalid={showResult && !isCorrect}
+          autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
           ref={inputRef}
           type="text"
           value={userInput}
@@ -105,7 +109,6 @@ export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = fa
         />
       </div>
 
-      {}
       {showResult && (
         <div className="mb-4">
           <ResultDisplay
@@ -119,7 +122,6 @@ export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = fa
         </div>
       )}
 
-      {}
       <ActionBar
         showResult={showResult}
         onSubmit={handleSubmit}

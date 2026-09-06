@@ -1,47 +1,51 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
 @custom-variant dark (&:is(.dark *));
 
-/* Modern dark theme with cyan accent - Refined for "WOW" Factor */
 :root {
-  --background: oklch(0.12 0.015 260);
-  --foreground: oklch(0.98 0.01 260);
-  --card: oklch(0.16 0.02 260 / 0.7);
-  --card-foreground: oklch(0.98 0.01 260);
-  --popover: oklch(0.16 0.02 260 / 0.85);
-  --popover-foreground: oklch(0.98 0.01 260);
-  --primary: oklch(0.78 0.18 190); /* Vibrant Cyan */
-  --primary-foreground: oklch(0.12 0.015 260);
-  --secondary: oklch(0.24 0.02 260 / 0.5);
-  --secondary-foreground: oklch(0.98 0.01 260);
-  --muted: oklch(0.24 0.02 260 / 0.5);
-  --muted-foreground: oklch(0.65 0.02 260);
-  --accent: oklch(0.7 0.22 340); /* Vibrant Orchid/Magenta */
-  --accent-foreground: oklch(0.12 0.015 260);
-  --destructive: oklch(0.62 0.22 25);
-  --destructive-foreground: oklch(0.98 0.01 260);
-  --border: oklch(0.3 0.025 260 / 0.4);
-  --input: oklch(0.24 0.02 260 / 0.5);
-  --ring: oklch(0.78 0.18 190);
-  --radius: 1.25rem;
-  --success: oklch(0.75 0.18 150);
-  --success-foreground: oklch(0.12 0.015 260);
+  color-scheme: dark;
+  --background: #10191e;
+  --foreground: #f0f5f5;
+  --card: #19252c;
+  --card-foreground: #f0f5f5;
+  --popover: #19252c;
+  --popover-foreground: #f0f5f5;
+  --primary: #5cddd0;
+  --primary-foreground: #102825;
+  --secondary: #25353e;
+  --secondary-foreground: #f0f5f5;
+  --muted: #25353e;
+  --muted-foreground: #b2c0c7;
+  --accent: #5cddd0;
+  --accent-foreground: #102825;
+  --destructive: #ff9999;
+  --destructive-foreground: #351313;
+  --border: #40535e;
+  --input: #40535e;
+  --ring: #5cddd0;
+  --radius: 0.75rem;
+  --success: #8ae0aa;
+  --success-foreground: #102c1a;
 }
-
-/* Enhanced Themes with deeper contrast and glass support */
-[data-theme="sakura"] {
-  --background: oklch(0.11 0.025 340);
-  --primary: oklch(0.75 0.22 350);
-  --accent: oklch(0.68 0.28 20);
-  --success: oklch(0.7 0.22 160);
+[data-theme="sakura"] { --background: #211922; --card: #302431; --popover: #302431; --primary: #f3b2d4; --primary-foreground: #35202d; --secondary: #433244; --muted: #433244; --border: #645064; --input: #645064; --accent: #f3b2d4; --accent-foreground: #35202d; --ring: #f3b2d4; }
+[data-theme="ocean"] { --background: #101d2b; --card: #1a2c3e; --popover: #1a2c3e; --primary: #9dceff; --primary-foreground: #10283d; --secondary: #263c52; --muted: #263c52; --border: #47617b; --input: #47617b; --accent: #9dceff; --accent-foreground: #10283d; --ring: #9dceff; }
+[data-theme="forest"] { --background: #152019; --card: #213126; --popover: #213126; --primary: #b3d9a3; --primary-foreground: #1e3117; --secondary: #324736; --muted: #324736; --border: #536c57; --input: #536c57; --accent: #b3d9a3; --accent-foreground: #1e3117; --ring: #b3d9a3; }
+[data-theme="sunset"] { --background: #261c18; --card: #362a24; --popover: #362a24; --primary: #ffc095; --primary-foreground: #382215; --secondary: #49382e; --muted: #49382e; --border: #715748; --input: #715748; --accent: #ffc095; --accent-foreground: #382215; --ring: #ffc095; }
+[data-theme="daylight"], [data-theme="lavender"], [data-theme="mint"] {
+  color-scheme: light;
+  --background: #f5f7f7; --foreground: #172c33;
+  --card: #ffffff; --card-foreground: #172c33;
+  --popover: #ffffff; --popover-foreground: #172c33;
+  --primary: #086a63; --primary-foreground: #ffffff;
+  --secondary: #e6eeee; --secondary-foreground: #172c33;
+  --muted: #e6eeee; --muted-foreground: #4c626a;
+  --accent: #086a63; --accent-foreground: #ffffff;
+  --border: #a3b5b9; --input: #82999f; --ring: #086a63;
+  --destructive: #ae2435; --destructive-foreground: #ffffff;
+  --success: #237342; --success-foreground: #ffffff;
 }
-
-[data-theme="ocean"] {
-  --background: oklch(0.1 0.03 230);
-  --primary: oklch(0.7 0.22 220);
-  --accent: oklch(0.65 0.28 180);
-}
+[data-theme="lavender"] { --background: #f5f2fa; --primary: #684298; --primary-foreground: #ffffff; --secondary: #ece4f5; --muted: #ece4f5; --accent: #684298; --ring: #684298; --border: #b8a8c9; --input: #9985af; }
+[data-theme="mint"] { --background: #eff7ef; --primary: #31693b; --primary-foreground: #ffffff; --secondary: #e0efe1; --muted: #e0efe1; --accent: #31693b; --ring: #31693b; --border: #a0bba4; --input: #779a7e; }
 
 @theme inline {
   --font-sans: "Inter", "Inter Fallback", system-ui, sans-serif;
@@ -70,32 +74,20 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground antialiased selection:bg-primary/30 min-h-screen;
-    background-image: 
-      radial-gradient(at 0% 0%, oklch(0.2 0.05 260 / 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, oklch(0.75 0.15 190 / 0.08) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, oklch(0.7 0.2 340 / 0.05) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, oklch(0.75 0.18 150 / 0.08) 0px, transparent 50%);
-    background-attachment: fixed;
-  }
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground antialiased min-h-screen; }
+  button, a, input, summary { touch-action: manipulation; }
+  button:not(:disabled), summary { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+  progress { accent-color: var(--primary); background: var(--secondary); }
+  progress::-webkit-progress-bar { background: var(--secondary); border-radius: 999px; }
+  progress::-webkit-progress-value { background: var(--primary); border-radius: 999px; }
+  progress::-moz-progress-bar { background: var(--primary); border-radius: 999px; }
 }
-
 @layer components {
-  .glass-card {
-    @apply bg-card/90 backdrop-blur-2xl border border-border transition-all duration-300;
-    box-shadow: 0 12px 48px 0 oklch(0 0 0 / 0.5);
-  }
-
-  .neon-glow-primary {
-    @apply shadow-[0_0_20px_rgba(var(--primary),0.2)];
-  }
-
-  .neon-text-primary {
-    @apply [text-shadow:0_0_10px_oklch(var(--primary)/0.5)];
-  }
+  .glass-card { @apply bg-card border border-border; }
+  .practice-settings button { white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }

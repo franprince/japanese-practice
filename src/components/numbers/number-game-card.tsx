@@ -1,4 +1,5 @@
 "use client"
+import type { PracticeReviewProps } from "@/hooks/use-mistake-review"
 
 import type { GameSessionProps } from "@/lib/core/game-session"
 
@@ -13,13 +14,13 @@ import { useI18n } from "@/lib/i18n"
 import { useNumberGame } from "@/hooks/use-number-game"
 import { GameCardContainer, QuestionDisplay, ResultDisplay } from "@/components/game/primitives"
 
-interface NumberGameCardProps extends GameSessionProps {
+interface NumberGameCardProps extends GameSessionProps, PracticeReviewProps<number> {
   difficulty: Difficulty
   mode: "arabicToKanji" | "kanjiToArabic"
   disableNext?: boolean
 }
 
-export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, disableNext = false }: NumberGameCardProps) {
+export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, disableNext = false, reviewQuestions, onQuestionMissed }: NumberGameCardProps) {
   const { t } = useI18n()
   const {
     isReady,
@@ -36,7 +37,7 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
     handleSubmit,
     handleNext,
     handleSkip,
-  } = useNumberGame({ difficulty, mode, sessionId, onSessionEvent, disableNext })
+  } = useNumberGame({ difficulty, mode, sessionId, onSessionEvent, disableNext, reviewQuestions, onQuestionMissed })
 
   if (!isReady) return null
 
@@ -47,21 +48,19 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
 
   return (
     <div className="space-y-4">
-      {}
       <GameCardContainer feedback={feedback} className="backdrop-blur-sm">
-        {}
         <QuestionDisplay
           value={questionText}
           prompt={promptLabel}
           lang={mode === "kanjiToArabic" ? "ja" : undefined}
         />
 
-        {}
-        <div className="min-h-16 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
+        <div role="group" aria-label={t("practice.answerLabel")}
+          className="min-h-12 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
           {userAnswer ? (
             <span
               lang={mode === "arabicToKanji" ? "ja" : undefined}
-              className="text-3xl md:text-4xl font-bold text-foreground"
+              className="break-all text-2xl font-medium text-foreground"
             >
               {userAnswer}
             </span>
@@ -70,7 +69,6 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
           )}
         </div>
 
-        {}
         {showResult && (
           <ResultDisplay
             isCorrect={isCorrect}
@@ -80,9 +78,6 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
             t={t}
           />
         )}
-      </GameCardContainer>
-
-      {}
       <div className="space-y-3">
         {showResult ? (
           <div className="flex justify-center">
@@ -98,6 +93,7 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
         ) : (
           <>
             <NumberPad
+              submitDisabled={!userAnswer.trim()}
               onKeyPress={handleKeyPress}
               onDelete={handleDelete}
               onClear={handleClear}
@@ -116,6 +112,7 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
           </>
         )}
       </div>
+      </GameCardContainer>
     </div>
   )
 }

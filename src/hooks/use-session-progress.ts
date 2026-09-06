@@ -1,24 +1,31 @@
+import { useMistakeReview } from "./use-mistake-review"
 import { useCallback, useReducer } from "react"
 import type { TranslationKey } from "@/lib/i18n"
 import { createSession, sessionReducer, type PlayMode, type SessionOutcomeEvent } from "@/lib/core/game-session"
 
 export type { PlayMode } from "@/lib/core/game-session"
 
-type SessionProgressOptions = {
+type SessionProgressOptions<Question> = {
+    defaultPlayMode?: PlayMode
+    questionKey?: (question: Question) => string
     defaultTargetCount?: number
     basePoints?: number
     t?: (key: TranslationKey) => string
 }
 
-export function useSessionProgress({ defaultTargetCount = 10, basePoints = 10, t }: SessionProgressOptions = {}) {
-    const [state, dispatch] = useReducer(sessionReducer, { targetCount: defaultTargetCount, basePoints }, createSession)
+export function useSessionProgress<Question = never>({ defaultTargetCount = 10, defaultPlayMode = "session", basePoints = 10, t, questionKey }: SessionProgressOptions<Question> = {}) {
+    const [state, dispatch] = useReducer(sessionReducer, { targetCount: defaultTargetCount, playMode: defaultPlayMode, basePoints }, createSession)
     const { answeredCount, correctCount, skippedCount, playMode, targetCount } = state
     const handleSessionEvent = useCallback((event: SessionOutcomeEvent) => dispatch(event), [])
+    const review = useMistakeReview<Question>(state.sessionId, questionKey)
+    const { clearReview } = review
+    const originalTarget = review.review?.originalTarget
     const resetSession = useCallback((playMode?: PlayMode, targetCount?: number) => {
-        dispatch({ type: "session-restarted", playMode, targetCount })
-    }, [])
-    const setPlayMode = useCallback((playMode: PlayMode) => dispatch({ type: "mode-changed", playMode }), [])
-    const setTargetCount = useCallback((targetCount: number) => dispatch({ type: "target-changed", targetCount }), [])
+        clearReview()
+        dispatch({ type: "session-restarted", playMode, targetCount: targetCount ?? originalTarget })
+    }, [clearReview, originalTarget])
+    const setPlayMode = useCallback((playMode: PlayMode) => resetSession(playMode), [resetSession])
+    const setTargetCount = useCallback((targetCount: number) => resetSession(undefined, targetCount), [resetSession])
     const accuracy = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0
     const submittedCount = answeredCount - skippedCount
     const answerAccuracy = submittedCount > 0 ? Math.round((correctCount / submittedCount) * 100) : 100
@@ -27,7 +34,15 @@ export function useSessionProgress({ defaultTargetCount = 10, basePoints = 10, t
     const remainingLabel = playMode === "session"
         ? translate("roundsLeft").replace("{count}", String(remainingQuestions))
         : null
+    const startReview = () => {
+        const questions = review.beginReview()
+        if (!questions) return
+        review.setReview({ questions, originalTarget: review.review?.originalTarget ?? targetCount })
+        dispatch({ type: "session-restarted", playMode: "session", targetCount: questions.length })
+    }
     const sessionSummaryProps = {
+        missedCount: review.missedQuestions.length,
+        onReview: startReview,
         title: translate("sessionCompleteTitle"),
         targetLabel: translate("sessionTargetLabel"),
         accuracyLabel: translate("sessionAccuracyLabel"),
@@ -36,7 +51,7 @@ export function useSessionProgress({ defaultTargetCount = 10, basePoints = 10, t
         switchLabel: translate("sessionSwitchToInfinite"),
     }
     return {
-        ...state, accuracy, submittedCount, answerAccuracy, remainingQuestions,
+        ...state, reviewQuestions: review.review?.questions, onQuestionMissed: playMode === "session" ? review.onQuestionMissed : undefined, reviewing: !!review.review, settingsTargetCount: review.review?.originalTarget ?? targetCount, accuracy, submittedCount, answerAccuracy, remainingQuestions,
         remainingLabel, sessionSummaryProps,
         handleSessionEvent, resetSession, setTargetCount, setPlayMode,
     }

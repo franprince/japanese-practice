@@ -256,3 +256,7 @@ Before starting PRs 2–6, create and approve a dedicated `spec.md`,
 because they touch the same file. Each PR must include its own tests and must
 pass typecheck, lint, unit tests, E2E tests relevant to its scope, and the
 production build.
+
+## Practice UX refactor — approved 2026-09-05
+
+User authorized planning and implementation after the UI assessment. Deliver one feature PR after the module-extraction prerequisite (#62): (1) themes and accessibility; (2) shared layout and settings; (3) missed-question review and home/persisted presets; (4) regression checks and visual proof. See [spec](2026-09-05-practice-ux/spec.md) and [plan](2026-09-05-practice-ux/implementation_plan.md).

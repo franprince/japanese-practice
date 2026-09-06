@@ -31,5 +31,7 @@ export interface GamePageLayoutProps {
     footer?: React.ReactNode
     showEnterHint?: boolean
     remainingLabel?: string | null
+    progress?: React.ReactNode
+    configuration?: React.ReactNode
     settingsTrigger?: React.ReactNode
 }

@@ -8,9 +8,12 @@ test.describe('Dates game', () => {
     })
     test('mode selection changes the prompt and keeps the input usable', async ({ page }) => {
         for (const [label, prompt] of [['Months', 'Write the month'], ['Full Dates', 'Write the full date'], ['Days', 'Write the day']] as const) {
-            const button = page.getByRole('button', { name: label, exact: true })
+            await page.getByTestId('settings-trigger').click()
+            const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+            const button = settings.getByRole('button', { name: label, exact: true })
             await button.click()
-            await expect(button).toHaveClass(/bg-primary/)
+            await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
+            await expect(page.locator("main header")).toContainText(label)
             await expect(page.getByTestId('question-display')).toBeVisible()
             await expect(page.getByText(new RegExp(prompt, 'i')).first()).toBeVisible()
             await expect(page.getByRole('textbox')).toBeEditable()
@@ -29,7 +32,10 @@ test.describe('Dates game', () => {
         await expect(page.getByText('Incorrect', { exact: true })).toBeHidden()
     })
     test('month answer is correct and toggling its display preserves typed input', async ({ page }, testInfo) => {
-        await page.getByRole('button', { name: 'Months', exact: true }).click()
+        await page.getByTestId('settings-trigger').click()
+        const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+        await settings.getByRole('button', { name: 'Months', exact: true }).click()
+        await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
         const input = page.getByRole('textbox')
         await input.fill('partial')
         await page.getByRole('button', { name: 'Show Number', exact: true }).click()

@@ -8,9 +8,14 @@ test.describe('Numbers game', () => {
     })
     test('difficulty selection changes the active range', async ({ page }) => {
         for (const [label, maximum] of [['Easy', 10], ['Medium', 99], ['Hard', 999], ['Expert', 99999]] as const) {
-            const button = page.getByRole('button', { name: new RegExp(`^${label}`) })
+            await page.getByTestId('settings-trigger').click()
+            const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+            const button = settings.getByRole('button', { name: new RegExp(`^${label}`) })
             await button.click()
-            await expect(button).toHaveClass(/bg-primary/)
+            await expect(button).toHaveAttribute('aria-pressed', 'true')
+            await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
+            await expect(settings).toBeHidden()
+            await expect(page.locator("main header")).toContainText(label)
             await expect(page.getByTestId('question-display')).toHaveText(/^\d[\d,]*$/)
             const value = Number((await page.getByTestId('question-display').textContent())?.replaceAll(',', '').trim())
             expect(value).toBeGreaterThanOrEqual(1)
@@ -19,10 +24,16 @@ test.describe('Numbers game', () => {
         }
     })
     test('mode switching changes both prompt and keypad', async ({ page }) => {
-        await page.getByRole('button', { name: '漢 → 123', exact: true }).click()
+        await page.getByTestId('settings-trigger').click()
+        let settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+        await settings.getByRole('button', { name: '漢 → 123', exact: true }).click()
+        await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
         await expect(page.getByText('Write in Arabic', { exact: true })).toBeVisible()
         await expect(page.locator('#number-pad').getByRole('button', { name: '1', exact: true })).toBeVisible()
-        await page.getByRole('button', { name: '123 → 漢', exact: true }).click()
+        await page.getByTestId('settings-trigger').click()
+        settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+        await settings.getByRole('button', { name: '123 → 漢', exact: true }).click()
+        await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
         await expect(page.getByText('Write in Japanese', { exact: true })).toBeVisible()
         await expect(page.locator('#number-pad').getByRole('button', { name: '一', exact: true })).toBeVisible()
     })
@@ -38,6 +49,7 @@ test.describe('Numbers game', () => {
         await expect(page.locator('#number-pad')).toBeVisible()
         // A valid number outside Easy's 1–10 range is always incorrect.
         for (const symbol of ['十', '一']) await page.locator('#number-pad').getByRole('button', { name: symbol, exact: true }).click()
+        await page.locator('main').click({ position: { x: 2, y: 2 } })
         await page.keyboard.press('Enter')
         await expect(page.getByText('Incorrect', { exact: true })).toBeVisible()
         await page.keyboard.press('Enter')
