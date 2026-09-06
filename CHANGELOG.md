@@ -1,3 +1,21 @@
+# [3.6.0](https://github.com/franprince/japanese-practice/compare/v3.5.0...v3.6.0) (2026-09-06)
+
+
+### Bug Fixes
+
+* **words:** handle synchronous cache request failures ([c6f71d1](https://github.com/franprince/japanese-practice/commit/c6f71d17eb3ce19c4866b2cfe332084bb4d39fb2))
+* **words:** make wordset acquisition reliable ([8ed71c8](https://github.com/franprince/japanese-practice/commit/8ed71c8b155324872348b418974ca76e26f6881c))
+
+
+### Features
+
+* **practice:** add saved settings and missed-question review state ([9e170c1](https://github.com/franprince/japanese-practice/commit/9e170c1c3ed030fd0b588d3312e5f899c7f692ad))
+
+
+### Performance Improvements
+
+* **words:** deliver wordsets as immutable static assets ([a5945fe](https://github.com/franprince/japanese-practice/commit/a5945fecc293f944021cdeb508e1ca0c08ef8c95))
+
 # [3.5.0](https://github.com/franprince/japanese-practice/compare/v3.4.0...v3.5.0) (2026-09-05)
 
 
