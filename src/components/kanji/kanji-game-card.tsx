@@ -1,4 +1,8 @@
 "use client"
+import type { PracticeReviewProps } from "@/hooks/use-mistake-review"
+import type { KanjiEntry } from "@/lib/japanese/kanji"
+
+import type { GameSessionProps } from "@/lib/core/game-session"
 
 import { KanjiOptionCard } from "./kanji-option-card"
 import type { KanjiDifficulty } from "@/lib/japanese/kanji"
@@ -8,42 +12,40 @@ import { useI18n } from "@/lib/i18n"
 import { useKanjiGame } from "@/hooks/use-kanji-game"
 import { ResultDisplay } from "@/components/game/primitives"
 
-interface KanjiGameCardProps {
+interface KanjiGameCardProps extends GameSessionProps, PracticeReviewProps<KanjiEntry> {
   difficulty: KanjiDifficulty
-  onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   disableNext?: boolean
 }
 
-export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }: KanjiGameCardProps) {
+export function KanjiGameCard({ difficulty, sessionId, onSessionEvent, disableNext = false, reviewQuestions, onQuestionMissed }: KanjiGameCardProps) {
   const { t, lang } = useI18n()
   const {
-    currentKanji,
+    currentKanji, error, retry,
     options,
     selectedOption,
     isRevealed,
     isCorrect,
     handleOptionClick,
     handleNext,
-  } = useKanjiGame({ difficulty, onScoreUpdate, disableNext })
+  } = useKanjiGame({ difficulty, sessionId, onSessionEvent, disableNext, reviewQuestions, onQuestionMissed })
 
-  if (!currentKanji) return null
+  if (error) return <div role="alert" className="space-y-3 rounded-xl border bg-card p-5"><p>{t("practice.loadingError")}</p><Button onClick={retry} className="min-h-11">{t("practice.retry")}</Button></div>
+  if (!currentKanji) return <p role="status" className="rounded-xl border bg-card p-8 text-center">{t("loading")}</p>
 
   const meaning = lang === "es" ? currentKanji.meaning_es ?? currentKanji.meaning_en : currentKanji.meaning_en ?? currentKanji.meaning_es
   const usedEnglishMeaning = lang === "es" && !currentKanji.meaning_es && !!currentKanji.meaning_en
   const levelLabel = currentKanji.jlpt ? currentKanji.jlpt.toUpperCase().replace("JLPT-", "JLPT ") : null
-  const promptLabel = t("kanji")
+  const promptLabel = t("practice.choosePrompt")
 
   return (
-    <div className="space-y-6">
-      {}
-      <div className="bg-card border border-border/50 rounded-2xl p-6 md:p-8 text-center relative overflow-hidden">
+    <div className="space-y-3">
+      <div className="bg-card border border-border/50 rounded-2xl p-4 sm:p-5 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
 
         <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{promptLabel}</p>
 
-        <div lang="ja" className="text-7xl md:text-9xl font-bold mb-4 relative">{currentKanji.char}</div>
+        <div data-testid="question-display" lang="ja" className="text-6xl sm:text-7xl font-medium mb-4 relative">{currentKanji.char}</div>
 
-        {}
         {isRevealed && (
           <div className="mt-4">
             <ResultDisplay
@@ -75,7 +77,15 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
         )}
       </div>
 
-      {}
+      <div className="flex justify-center">
+        {isRevealed && (
+          <Button onClick={handleNext} size="lg" className="min-h-11 w-full gap-2" disabled={disableNext}>
+            {t("nextKanji")}
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
+
       <div id="kanji-options" className="grid grid-cols-1 gap-3">
         {options.map((option) => (
           <KanjiOptionCard
@@ -87,20 +97,11 @@ export function KanjiGameCard({ difficulty, onScoreUpdate, disableNext = false }
             isCorrect={isRevealed ? option.char === currentKanji.char : null}
             isRevealed={isRevealed}
             onClick={() => handleOptionClick(option)}
-            disabled={isRevealed}
+            disabled={isRevealed || disableNext}
           />
         ))}
       </div>
 
-      {}
-      <div className="flex justify-center">
-        {isRevealed && (
-          <Button onClick={handleNext} size="lg" className="gap-2" disabled={disableNext}>
-            {t("nextKanji")}
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-        )}
-      </div>
     </div>
   )
 }

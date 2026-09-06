@@ -1,4 +1,8 @@
 "use client"
+import type { PracticeReviewProps } from "@/hooks/use-mistake-review"
+import type { DateQuestion } from "@/lib/japanese/dates"
+
+import type { GameSessionProps } from "@/lib/core/game-session"
 
 import type React from "react"
 import { Calendar, CalendarDays, Hash, Type } from "lucide-react"
@@ -7,13 +11,12 @@ import { useI18n } from "@/lib/i18n"
 import { useDateGame } from "@/hooks/use-date-game"
 import { GameCardContainer, QuestionDisplay, ResultDisplay, ActionBar } from "@/components/game/primitives"
 
-interface DateGameCardProps {
+interface DateGameCardProps extends GameSessionProps, PracticeReviewProps<DateQuestion> {
   mode: DateMode
-  onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   disableNext?: boolean
 }
 
-export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateGameCardProps) {
+export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = false, reviewQuestions, onQuestionMissed }: DateGameCardProps) {
   const { t } = useI18n()
   const {
     question,
@@ -27,7 +30,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
     handleSubmit,
     handleSkip,
     generateNewQuestion,
-  } = useDateGame({ mode, onScoreUpdate, disableNext, t })
+  } = useDateGame({ mode, sessionId, onSessionEvent, disableNext, t, reviewQuestions, onQuestionMissed })
 
   if (!question) return null
 
@@ -37,17 +40,6 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         return <CalendarDays className="w-5 h-5 text-primary" />
       case "full":
         return <Calendar className="w-5 h-5 text-primary" />
-    }
-  }
-
-  const getModeLabel = () => {
-    switch (mode) {
-      case "week_days":
-        return t("weekDays")
-      case "months":
-        return t("month")
-      case "full":
-        return t("date")
     }
   }
 
@@ -63,7 +55,7 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
   }
 
   const handleInputChange = (value: string) => {
-    if (showResult) return
+    if (showResult || disableNext) return
     setUserInput(value)
   }
 
@@ -76,12 +68,12 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
 
   return (
     <GameCardContainer feedback={feedback}>
-      {}
       {(mode === "months" || mode === "week_days") && (
-        <div className="absolute top-4 right-4 md:top-6 md:right-6">
+        <div className="mb-2 flex justify-end">
           <button
             onClick={() => setShowNumbers(!showNumbers)}
-            className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            aria-pressed={showNumbers}
+            className="min-h-11 min-w-11 p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
             title={showNumbers ? t("showName") || "Show Name" : t("showNumber") || "Show Number"}
           >
             {showNumbers ? <Type className="w-5 h-5" /> : <Hash className="w-5 h-5" />}
@@ -89,7 +81,6 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         </div>
       )}
 
-      {}
       <QuestionDisplay
         value={displayValue || ""}
         prompt={getPromptText()}
@@ -97,25 +88,27 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         icon={getModeIcon()}
       />
 
-      {}
       <div className="mb-4">
+        <label htmlFor="date-answer" className="mb-2 block text-sm font-medium">{t("practice.dateLabel")}</label>
         <input
+          id="date-answer"
+          aria-invalid={showResult && !isCorrect}
+          autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false}
           ref={inputRef}
           type="text"
           value={userInput}
           onChange={(e) => handleInputChange(e.target.value)}
-          readOnly={showResult}
-          aria-disabled={showResult}
+          readOnly={showResult || disableNext}
+          aria-disabled={showResult || disableNext}
           placeholder={t("typeHiraganaOrRomaji")}
           className={`
             w-full px-4 py-3 text-lg text-center rounded-xl border-2 bg-background
             placeholder:text-muted-foreground/50 focus:outline-none transition-all
-            ${showResult ? "border-border opacity-60" : "border-border focus:border-primary"}
+            ${showResult || disableNext ? "border-border opacity-60" : "border-border focus:border-primary"}
           `}
         />
       </div>
 
-      {}
       {showResult && (
         <div className="mb-4">
           <ResultDisplay
@@ -129,13 +122,13 @@ export function DateGameCard({ mode, onScoreUpdate, disableNext = false }: DateG
         </div>
       )}
 
-      {}
       <ActionBar
         showResult={showResult}
         onSubmit={handleSubmit}
-        onNext={() => { if (!disableNext) generateNewQuestion() }}
+        onNext={generateNewQuestion}
         onSkip={handleSkip}
-        submitDisabled={!userInput.trim()}
+        submitDisabled={disableNext || !userInput.trim()}
+        skipDisabled={disableNext}
         nextDisabled={disableNext}
         nextLabel={t("nextDate")}
         t={t}

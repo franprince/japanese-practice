@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useHydrated } from "@/hooks/use-hydrated"
 import { cn } from "@/lib/core"
 import { useLanguage } from "@/lib/i18n"
 import type { Language } from "@/lib/i18n"
@@ -17,26 +17,21 @@ interface LanguageSwitcherProps {
 
 export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const { language, setLanguage } = useLanguage()
-  const [mounted, setMounted] = useState(false)
-
-  
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useHydrated()
 
   if (!mounted) {
     
     return (
       <div
         className={cn(
-          "inline-flex items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50",
+          "flex flex-wrap items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50",
           className,
         )}
       >
         {languages.map(({ code, label }) => (
           <div
             key={code}
-            className="px-3 py-1.5 rounded-full text-sm font-medium text-muted-foreground"
+            className="min-h-11 px-3 py-1.5 rounded-full text-sm font-medium text-muted-foreground"
           >
             <span>{label}</span>
           </div>
@@ -48,16 +43,17 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50 cursor-pointer",
+        "flex flex-wrap items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50 cursor-pointer",
         className,
       )}
     >
       {languages.map(({ code, label }) => (
-        <button
-          key={code}
-          onClick={() => setLanguage(code)}
-          className={cn(
-            "px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
+          <button
+            key={code}
+            onClick={() => setLanguage(code)}
+            aria-pressed={language === code}
+            className={cn(
+            "min-h-11 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer",
             language === code
               ? "bg-primary text-primary-foreground shadow-lg"
               : "text-muted-foreground hover:text-foreground hover:bg-secondary/80",

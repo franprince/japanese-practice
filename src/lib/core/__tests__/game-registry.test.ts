@@ -1,27 +1,14 @@
 
 import { describe, test, expect } from 'bun:test'
-import { GAMES, buildGamesList } from '@/lib/core'
+import { GAMES } from '@/lib/core'
 
 describe('Game Registry', () => {
-    test('excludes the Ollama practice tile by default (feature flag off)', () => {
-        expect(GAMES).toHaveLength(4)
-        expect(GAMES.find(g => g.id === 'ollama')).toBeUndefined()
-    })
-
-    test('buildGamesList excludes ollama when disabled', () => {
-        const games = buildGamesList(false)
-        expect(games).toHaveLength(4)
-        expect(games.find(g => g.id === 'ollama')).toBeUndefined()
-    })
-
-    test('buildGamesList includes ollama when enabled', () => {
-        const games = buildGamesList(true)
-        expect(games).toHaveLength(5)
-        expect(games.find(g => g.id === 'ollama')).toBeDefined()
+    test('contains exactly the four supported games in display order', () => {
+        expect(GAMES.map(game => game.id)).toEqual(['romaji', 'numbers', 'kanji', 'dates'])
     })
 
     test('each game should have required properties', () => {
-        buildGamesList(true).forEach(game => {
+        GAMES.forEach(game => {
             expect(game).toHaveProperty('id')
             expect(game).toHaveProperty('href')
             expect(game).toHaveProperty('icon')
@@ -59,11 +46,5 @@ describe('Game Registry', () => {
         const datesGame = GAMES.find(g => g.id === 'dates')
         expect(datesGame).toBeDefined()
         expect(datesGame?.href).toBe('/dates')
-    })
-
-    test('should include ollama practice when the flag is enabled', () => {
-        const ollamaGame = buildGamesList(true).find(g => g.id === 'ollama')
-        expect(ollamaGame).toBeDefined()
-        expect(ollamaGame?.href).toBe('/practice/ollama')
     })
 })

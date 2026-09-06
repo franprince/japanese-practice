@@ -17,6 +17,10 @@ export function useKeyboardNavigation(
         if (!enabled) return
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement | null
+            if (e.defaultPrevented || target?.closest("[role=dialog], button, a, select, summary") || e.isComposing) return
+            // Native editing must retain selection, caret and IME behavior.
+            if ((e.key === "Backspace" || e.key === "Escape") && target?.matches("input, textarea, [contenteditable=true]")) return
             if (e.key === "Enter" && handlers.onEnter) {
                 e.preventDefault()
                 handlers.onEnter()

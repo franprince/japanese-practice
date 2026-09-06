@@ -105,12 +105,6 @@ export function validateAnswer(input: string, word: JapaneseWord): boolean {
     if (macronInput === macronAnswer) return true
 
     
-    const particleMap: Record<string, string> = {
-        "は": "wa",
-        "へ": "e",
-        "を": "o"
-    }
-
     if (kana.endsWith("は") && macronAnswer.endsWith("ha") && macronInput.endsWith("wa")) {
         const stem = macronAnswer.slice(0, -2)
         if (macronInput === stem + "wa") return true

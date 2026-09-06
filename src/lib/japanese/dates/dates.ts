@@ -105,8 +105,8 @@ export interface DateQuestion {
 }
 
 
-export function generateMonthQuestion(t?: (key: TranslationKey) => string): DateQuestion {
-  const month = Math.floor(Math.random() * 12) + 1
+export function generateMonthQuestion(t?: (key: TranslationKey) => string, random: () => number = Math.random): DateQuestion {
+  const month = Math.floor(random() * 12) + 1
   const monthData = months[month]
   if (!monthData) {
     throw new Error(`Invalid month generated: ${month}`)
@@ -149,9 +149,9 @@ export function generateMonthQuestion(t?: (key: TranslationKey) => string): Date
 // well-defined.
 const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-export function generateFullDateQuestion(): DateQuestion {
-  const month = Math.floor(Math.random() * 12) + 1
-  const day = Math.floor(Math.random() * daysInMonth[month - 1]!) + 1
+export function generateFullDateQuestion(random: () => number = Math.random): DateQuestion {
+  const month = Math.floor(random() * 12) + 1
+  const day = Math.floor(random() * daysInMonth[month - 1]!) + 1
   const monthData = months[month]
   const dayData = daysOfMonth[day]
   if (!monthData || !dayData) {
@@ -169,8 +169,8 @@ export function generateFullDateQuestion(): DateQuestion {
 }
 
 
-export function generateWeekDayQuestion(t?: (key: TranslationKey) => string): DateQuestion {
-  const dayIndex = Math.floor(Math.random() * 7)
+export function generateWeekDayQuestion(t?: (key: TranslationKey) => string, random: () => number = Math.random): DateQuestion {
+  const dayIndex = Math.floor(random() * 7)
   const dayData = daysOfWeek[dayIndex]
 
   if (!dayData) {
@@ -188,17 +188,17 @@ export function generateWeekDayQuestion(t?: (key: TranslationKey) => string): Da
 }
 
 
-export function generateWeekDaysQuestion(t?: (key: TranslationKey) => string): DateQuestion {
-  return generateWeekDayQuestion(t)
+export function generateWeekDaysQuestion(t?: (key: TranslationKey) => string, random: () => number = Math.random): DateQuestion {
+  return generateWeekDayQuestion(t, random)
 }
 
-export function generateDateQuestion(mode: DateMode, t?: (key: TranslationKey) => string): DateQuestion {
+export function generateDateQuestion(mode: DateMode, t?: (key: TranslationKey) => string, random: () => number = Math.random): DateQuestion {
   switch (mode) {
     case "months":
-      return generateMonthQuestion(t)
+      return generateMonthQuestion(t, random)
     case "full":
-      return generateFullDateQuestion()
+      return generateFullDateQuestion(random)
     case "week_days":
-      return generateWeekDaysQuestion(t)
+      return generateWeekDaysQuestion(t, random)
   }
 }

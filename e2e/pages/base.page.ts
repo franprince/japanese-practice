@@ -1,4 +1,4 @@
-import { test as base, type Page } from '@playwright/test'
+import { test as base, expect, type Page } from '@playwright/test'
 
 /**
  * Base page class with common utilities
@@ -11,7 +11,7 @@ export class BasePage {
     }
 
     async waitForPageLoad() {
-        await this.page.waitForLoadState('networkidle')
+        await expect(this.page.getByRole('heading', { level: 1 })).toBeVisible()
     }
 
     async screenshot(name: string) {

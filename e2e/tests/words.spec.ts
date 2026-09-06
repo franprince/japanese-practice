@@ -1,209 +1,126 @@
 import { test, expect } from '../fixtures'
-import * as fs from 'fs'
-import * as path from 'path'
+import { mockWordset, selectWords, readWordset, finishSession } from '../fixtures/practice'
 
-// Load kana dictionary for deterministic answers
-const kanaDict = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../../src/lib/japanese/shared/kanaDictionary.json'), 'utf-8')
-)
+test('desktop loads the real wordset and exposes game controls', async ({ wordsPage, page }) => {
+    await wordsPage.goto()
+    await expect(page).toHaveURL('/words')
+    await expect(page.getByTestId('question-display')).not.toBeEmpty()
+    await expect(page.getByRole('textbox')).toBeEditable()
+    await expect(page.getByTestId('settings-trigger').filter({ visible: true })).toBeVisible()
+    await expect(page.getByTestId('stats-display')).toContainText('Score')
+})
 
-// Build a lookup map for quick character->romaji conversion
-function buildCharacterMap() {
-    const map: Record<string, string> = {}
+test('correct and incorrect answers lock the input and advance with cleared feedback', async ({ wordsPage, page }) => {
+    await mockWordset(page)
+    await wordsPage.goto()
+    await expect(page.getByTestId('question-display')).toHaveText('あいう')
+    const input = page.getByRole('textbox')
+    await input.fill('aiu')
+    await input.press('Enter')
+    await expect(input).toHaveClass(/border-success/)
+    await expect(input).toHaveAttribute('readonly', '')
+    const next = page.getByRole('button', { name: 'Next Word', exact: true })
+    await next.click()
+    await expect(input).toBeEditable()
+    await expect(input).toHaveValue('')
+    await expect(next).toBeHidden()
+    await input.fill('wronganswer')
+    await page.getByRole('button', { name: 'Check', exact: true }).click()
+    await expect(input).toHaveClass(/border-destructive/)
+    await expect(input).toHaveAttribute('readonly', '')
+    await expect(next).toBeVisible()
+})
 
-    // Add hiragana
-    for (const group of Object.values(kanaDict.hiragana)) {
-        const chars = (group as any).characters
-        if (chars) {
-            for (const [kana, romaji] of Object.entries(chars)) {
-                const firstRomaji = (romaji as string[])[0]
-                if (firstRomaji) {
-                    map[kana] = firstRomaji
-                }
-            }
-        }
-    }
-
-    // Add katakana
-    for (const group of Object.values(kanaDict.katakana)) {
-        const chars = (group as any).characters
-        if (chars) {
-            for (const [kana, romaji] of Object.entries(chars)) {
-                const firstRomaji = (romaji as string[])[0]
-                if (firstRomaji) {
-                    map[kana] = firstRomaji
-                }
-            }
-        }
-    }
-
-    return map
-}
-
-test.describe('Words Game', () => {
-    test('should load the words game page and capture initial state', async ({ wordsPage, page }) => {
-        await wordsPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        await expect(page).toHaveURL('/words')
-        await wordsPage.screenshot('words_initial_load')
+test('mobile downloads the real payload only after consent and saves it', async ({ page }) => {
+    test.setTimeout(60_000)
+    await page.setViewportSize({ width: 390, height: 844 })
+    let downloads = 0
+    page.on('request', request => {
+        if (/\/wordsets\/(en|es)-[a-f0-9]{64}\.json$/.test(new URL(request.url()).pathname) && request.method() === 'GET') downloads++
     })
+    await page.goto('/words')
+    await expect(page.getByRole('textbox')).toBeEditable()
+    await selectWords(page)
+    const modal = page.getByTestId('mobile-wordset-modal')
+    await expect(modal).toBeVisible()
+    expect(downloads).toBe(0)
+    await modal.getByRole('button', { name: 'Download', exact: true }).click()
+    await expect(modal).toBeHidden({ timeout: 30_000 })
+    await expect(page.getByRole('textbox')).toBeEditable()
+    const saved = await readWordset(page) as { hiraganaWords: unknown[] }
+    expect(saved.hiraganaWords.length).toBeGreaterThan(100)
+    expect(downloads).toBe(1)
+})
 
-    test('should display all UI components', async ({ wordsPage, page }) => {
-        await wordsPage.goto()
-        await page.waitForLoadState('networkidle')
-        
-        // Settings button should be visible (either in header or controls)
-        const settingsBtn = page.getByTestId('settings-trigger').filter({ visible: true })
-        await expect(settingsBtn).toBeVisible({ timeout: 15000 })
+test('Guess mode offers three choices and locks them after an answer', async ({ wordsPage, page }) => {
+    await mockWordset(page)
+    await wordsPage.goto()
+    await page.getByTestId('settings-trigger').filter({ visible: true }).click()
+    const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+    await settings.getByRole('button', { name: 'Guess the Char Multiple choice', exact: true }).click()
+    await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
+    await expect(settings).toBeHidden()
+    await expect(page.getByRole('textbox')).toBeHidden()
+    const options = page.getByTestId('guess-option')
+    await expect(options).toHaveCount(3)
+    await options.first().click()
+    for (const option of await options.all()) await expect(option).toBeDisabled()
+    await page.getByRole('button', { name: 'Next Word', exact: true }).click()
+    await expect(options.first()).toBeEnabled()
+})
 
-        // Score HUD should be visible
-        const stats = page.getByTestId('stats-display')
-        await expect(stats).toBeVisible({ timeout: 10000 })
-        
-        // Use a more specific locator for Score text within the Stats display
-        await expect(stats.locator('text=/score|puntaje/i').first()).toBeVisible()
+test('completes exactly five words and restarts with an empty editable answer', async ({ wordsPage, page }) => {
+    await mockWordset(page)
+    await wordsPage.goto()
+    await page.getByTestId('settings-trigger').filter({ visible: true }).click()
+    const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+    await settings.getByRole('button', { name: 'Session', exact: true }).click()
+    await settings.getByRole('button', { name: '5', exact: true }).click()
+    await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
+    await expect(settings).toBeHidden()
+    await expect(page.getByTestId('stats-display')).toContainText('5 rounds left')
+    await finishSession(page, async () => {
+        await page.getByRole('textbox').fill('aiu')
+        await page.getByRole('textbox').press('Enter')
+    }, 'Next Word')
+    await expect(page.getByRole('textbox')).toBeEditable()
+    await expect(page.getByRole('textbox')).toHaveValue('')
+})
+
+
+test('settings cancel and unchanged Apply preserve the question; Custom has loaded filters', async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 1280, height: 1000 })
+    await mockWordset(page)
+    await page.goto('/words')
+    const input = page.getByRole('textbox')
+    await expect(page.getByTestId('question-display')).toHaveText('あいう')
+    await input.fill('partial')
+    const trigger = page.getByTestId('settings-trigger').filter({ visible: true })
+    await trigger.click()
+    const dialog = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+    await dialog.getByRole('button', { name: '20', exact: true }).click()
+    await page.keyboard.press('Escape')
+    await expect(dialog).toBeHidden()
+    await expect(input).toHaveValue('partial')
+    await trigger.click()
+    await dialog.getByRole('button', { name: 'Save Settings', exact: true }).click()
+    await expect(dialog).toBeHidden()
+    await expect(input).toHaveValue('partial')
+    await expect(page.getByTestId('stats-display')).toContainText('10 rounds left')
+    await trigger.click()
+    await dialog.getByRole('button', { name: /Custom/ }).click()
+    await dialog.getByRole('button', { name: 'Deselect all', exact: true }).click()
+    await expect(dialog.getByRole('button', { name: 'Save Settings', exact: true })).toBeDisabled()
+    await dialog.getByRole('button', { name: 'Select all', exact: true }).click()
+    await expect(dialog.getByRole('button', { name: 'Save Settings', exact: true })).toBeEnabled()
+    // Center the scaled button away from the scroll panel's clipped edge.
+    await dialog.getByRole('button', { name: 'あ', exact: true }).evaluate(button => {
+        button.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' })
     })
-
-    test('should handle correct and incorrect romaji input with feedback', async ({ wordsPage, page }) => {
-        const charMap = buildCharacterMap()
-        await wordsPage.goto()
-
-        // 1. Get the character being shown
-        const kanaElement = page.locator('[data-testid="question-display"]')
-        await expect(kanaElement).toBeVisible()
-        const kanaChar = (await kanaElement.textContent())?.trim() || ""
-        const correctRomaji = charMap[kanaChar] || "a"
-
-        // 2. Test CORRECT answer
-        const input = page.locator('input[type="text"]')
-        await input.fill(correctRomaji)
-        await page.keyboard.press('Enter')
-
-        // Wait for feedback
-        await expect(page.locator('[data-testid="game-feedback"]')).toBeVisible()
-        await wordsPage.screenshot('words_feedback_correct')
-
-        // 3. Move to NEXT word
-        const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
-        await nextBtn.click()
-        await expect(nextBtn).not.toBeVisible()
-
-        // 4. Test INCORRECT answer
-        const wrongRomaji = "xyzq"
-        await input.fill(wrongRomaji)
-
-        const checkBtn = page.getByRole('button', { name: /check|comprobar/i }).first()
-        await checkBtn.click({ force: true })
-        
-        // Wait for incorrect feedback
-        await expect(page.locator('[data-testid="game-feedback"]')).toBeVisible()
-
-        // Capture incorrect screenshot
-        await wordsPage.screenshot('words_feedback_incorrect')
-    })
-
-    test('should load words game on mobile with confirmation flow', async ({ wordsPage, page }) => {
-        // Use a mobile viewport width to correctly trigger mobile CSS rules
-        await page.setViewportSize({ width: 390, height: 844 })
-
-        // Mock matchMedia to ensure isMobileDevice returns true
-        await page.addInitScript(() => {
-            // Force English language and clear other storage
-            localStorage.clear()
-            localStorage.setItem('kana-words-lang', 'en')
-
-            // Force matchMedia to true for mobile breadth ONLY
-            Object.defineProperty(window, 'matchMedia', {
-                writable: true,
-                value: (query: string) => ({
-                    matches: query.includes('max-width: 768px'), // Only match the mobile query
-                    media: query,
-                    onchange: null,
-                    addListener: () => { },
-                    removeListener: () => { },
-                    addEventListener: () => { },
-                    removeEventListener: () => { },
-                    dispatchEvent: () => false,
-                }),
-            });
-        })
-
-        await wordsPage.goto()
-
-        // Clear IndexedDB to simulate a fresh mobile user
-        await page.evaluate(async () => {
-            const DB_NAME = "kana-words"
-            return new Promise<void>((resolve, reject) => {
-                const req = indexedDB.deleteDatabase(DB_NAME)
-                req.onsuccess = () => resolve()
-                req.onerror = () => reject(req.error)
-                req.onblocked = () => resolve()
-            })
-        })
-
-        // Reload to apply the cleared DB state
-        await wordsPage.goto()
-        await page.waitForLoadState('networkidle')
-
-        // 1. Should start in Character Mode (input visible immediately, no download)
-        const input = page.locator('input[type="text"]')
-        await expect(input).toBeVisible()
-
-        // Open settings to enable Words mode (default)
-        await page.getByTestId('settings-trigger').filter({ visible: true }).click()
-        await expect(page.getByRole('dialog')).toBeVisible({ timeout: 15000 })
-        
-        const wordsBtn = page.getByRole('button', { name: /words practice|palabras/i }).first()
-        await wordsBtn.click()
-
-        const applyBtn = page.getByRole('button', { name: /apply|save|aplicar/i }).first()
-        await applyBtn.click()
-
-        // 3. Now should see Download Confirmation Modal
-        console.log('Waiting for modal...')
-        const modal = page.locator('[data-testid="mobile-wordset-modal"]')
-        await expect(modal).toBeVisible({ timeout: 10000 })
-        const downloadBtn = modal.locator('button', { hasText: /Download|Descargar/i })
-        await downloadBtn.click()
-
-        // Verify modal closes
-        await expect(modal).toBeHidden({ timeout: 10000 })
-
-        // 4. Input should reappear
-        await expect(input).toBeVisible({ timeout: 10000 })
-    })
-
-    test('should allow playing in Guess mode', async ({ wordsPage, page }) => {
-        await wordsPage.goto()
-        
-        // 1. Open Settings
-        await page.getByTestId('settings-trigger').filter({ visible: true }).click()
-        const modal = page.getByRole('dialog')
-        await expect(modal).toBeVisible()
-        
-        // 2. Switch to Guess mode
-        const guessBtn = page.getByRole('button', { name: /guess|adivina/i }).first()
-        await guessBtn.click()
-        // 3. Apply
-        const applyBtn = page.getByRole('button', { name: /apply|save|aplicar|guardar/i }).first()
-        await applyBtn.click({ force: true })
-        await expect(modal).not.toBeVisible({ timeout: 15000 })
-        
-        // 3. Verify that there is no text input
-        await expect(page.locator('input[type="text"]')).toBeHidden({ timeout: 10000 })
-        
-        // 4. Verify that 3 buttons are displayed (multiple choice options)
-        const options = page.getByTestId('guess-option')
-        await expect(options).toHaveCount(3, { timeout: 10000 })
-        
-        // 5. Click an option and verify feedback appears
-        await options.first().click()
-        const feedback = page.locator('[data-testid="game-feedback"]')
-        await expect(feedback).toBeVisible()
-        
-        // 6. Verify the "Next" button appears
-        const nextBtn = page.getByRole('button', { name: /next|siguiente|次/i }).first()
-        await expect(nextBtn).toBeVisible()
-    })
+    await expect(dialog.getByRole('button', { name: 'あ', exact: true })).toBeInViewport({ ratio: 0.99 })
+    await testInfo.attach('lifecycle-settings', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' })
+    await dialog.getByRole('button', { name: 'Save Settings', exact: true }).click()
+    await expect(input).toBeEditable()
+    await expect(input).toHaveValue('')
+    await expect(page.getByTestId('question-display')).not.toBeEmpty()
 })

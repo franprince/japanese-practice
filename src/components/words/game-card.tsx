@@ -1,13 +1,14 @@
 "use client"
+import type { PracticeReviewProps } from "@/hooks/use-mistake-review"
+import type { WordQuestion } from "@/lib/japanese/words"
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/core"
+import type { GameSessionProps } from "@/lib/core/game-session"
 import type { WordFilter } from "@/lib/japanese/words"
 import { useI18n } from "@/lib/i18n"
-import { Flame, Zap, Type, Shuffle, Trophy } from "lucide-react"
 import type { GameMode, WordsGameType } from "@/types/game"
 import { useWordGame } from "@/hooks/use-word-game"
 import { GameFeedbackSection, FeedbackIcon } from "./game-feedback-section"
@@ -15,13 +16,13 @@ import { GameCardContainer, QuestionDisplay, AnswerSection, ActionBar } from "@/
 import { useEffect } from "react"
 import { preloadKanaDictionary } from "@/lib/japanese/shared"
 
-interface GameCardProps {
+interface GameCardProps extends GameSessionProps, PracticeReviewProps<WordQuestion> {
   mode: GameMode
   filter: WordFilter
   gameType: WordsGameType
-  onScoreUpdate: (score: number, streak: number, correct: boolean) => void
+  submittedCount: number
+  answerAccuracy: number
   suppressFocus?: boolean
-  onRequestCloseSettings?: () => void
   onRequestOpenSettings?: () => void
   disableNext?: boolean
   onIncorrectCharsChange?: (chars: Map<string, { count: number; romaji: string }>) => void
@@ -31,12 +32,16 @@ export function GameCard({
   mode,
   filter,
   gameType,
-  onScoreUpdate,
+  sessionId,
+  onSessionEvent,
+  submittedCount,
+  answerAccuracy,
   suppressFocus = false,
-  onRequestCloseSettings,
   onRequestOpenSettings,
   disableNext = false,
   onIncorrectCharsChange,
+  reviewQuestions,
+  onQuestionMissed,
 }: GameCardProps) {
   const { t, lang } = useI18n()
 
@@ -49,9 +54,6 @@ export function GameCard({
     userInput,
     setUserInput,
     feedback,
-    score,
-    streak,
-    totalAttempts,
     noWordsAvailable,
     isLoading,
     displayRomaji,
@@ -59,7 +61,6 @@ export function GameCard({
     incorrectChars,
     inputRef,
     options,
-    accuracyPercent,
     checkAnswer,
     skipWord,
     handleKeyDown,
@@ -71,8 +72,11 @@ export function GameCard({
     disableNext,
     suppressFocus,
     lang,
-    onScoreUpdate,
+    sessionId,
+    onSessionEvent,
     onIncorrectCharsChange,
+    reviewQuestions,
+    onQuestionMissed,
   })
 
 
@@ -80,7 +84,7 @@ export function GameCard({
   
   if (isLoading) {
     return (
-      <div className="w-full max-w-xl mx-auto">
+      <div className="w-full max-w-none mx-auto">
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground animate-pulse">{t("loading")}</p>
@@ -95,7 +99,7 @@ export function GameCard({
   
   if (noWordsAvailable) {
     return (
-      <div className="w-full max-w-xl mx-auto">
+      <div className="w-full max-w-none mx-auto">
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
           <CardContent className="py-12 text-center space-y-4">
             <div>
@@ -119,43 +123,31 @@ export function GameCard({
   if (!currentWord) return null
 
   return (
-    <div className="w-full max-w-xl mx-auto">
-      {}
+    <div className="w-full max-w-none mx-auto">
 
-      {}
       <GameCardContainer
         feedback={feedback}
         className="backdrop-blur-sm"
       >
-        {}
 
-        {}
         <QuestionDisplay
           value={currentWord.kana}
+          prompt={t(gameType === "guess" ? "practice.choosePrompt" : "practice.readPrompt")}
           lang="ja"
         />
 
-        {}
         <AnswerSection>
           {gameType === "guess" ? (
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 min-h-[4rem] w-full max-w-[340px] sm:max-w-md mx-auto p-4">
+            <div className="grid grid-cols-1 gap-2 w-full sm:grid-cols-3">
               {options ? (
                 options.map((option) => (
                   <Button
                     key={option}
                     data-testid="guess-option"
                     variant={feedback === null ? "outline" : option === currentWord.romaji ? "success" : "secondary"}
-                    className={cn(
-                      "h-14 sm:h-20 text-xl sm:text-3xl font-black tracking-tight transition-all duration-300 active:scale-95",
-                      // High-contrast text and distinct background
-                      "bg-secondary/20 hover:bg-secondary/40 text-foreground border-white/10 shadow-lg shadow-black/20",
-                      feedback === null && "hover:border-primary hover:text-primary hover:shadow-[0_0_20px_oklch(var(--primary)/0.3)]",
-                      feedback === "correct" && option === currentWord.romaji && "bg-success text-success-foreground border-transparent shadow-[0_0_30px_rgba(var(--success-rgb),0.4)] scale-105 opacity-100",
-                      feedback === "incorrect" && option === currentWord.romaji && "bg-success/20 text-success border-success opacity-90",
-                      feedback !== null && option !== currentWord.romaji && "opacity-20 scale-95 grayscale"
-                    )}
+                    className={cn("min-h-12 h-auto whitespace-normal break-words p-3 text-lg", feedback !== null && option === currentWord.romaji && "border-success bg-success/15 text-foreground")}
                     onClick={() => feedback === null && checkAnswer(option)}
-                    disabled={feedback !== null}
+                    disabled={feedback !== null || disableNext}
                   >
                     {option}
                   </Button>
@@ -168,7 +160,10 @@ export function GameCard({
             </div>
           ) : (
             <div className="relative">
+              <label htmlFor="word-answer" className="mb-2 block text-sm font-medium">{t("practice.romajiLabel")}</label>
               <Input
+                id="word-answer"
+                aria-invalid={feedback === "incorrect"}
                 ref={inputRef}
                 type="text"
                 value={userInput}
@@ -182,17 +177,16 @@ export function GameCard({
                   feedback === "incorrect" && "border-destructive",
                   !feedback && "border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                 )}
-                readOnly={feedback !== null}
+                readOnly={feedback !== null || disableNext}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}
               />
-              <FeedbackIcon feedback={feedback} />
+              <div className="pointer-events-none absolute inset-x-0 bottom-7"><FeedbackIcon feedback={feedback} /></div>
             </div>
           )}
 
-          {}
           <GameFeedbackSection
             feedback={feedback}
             displayRomaji={displayRomaji}
@@ -202,13 +196,13 @@ export function GameCard({
             t={t}
           />
 
-          {}
           <ActionBar
             showResult={feedback !== null}
-            onSubmit={checkAnswer}
+            onSubmit={gameType === "guess" ? undefined : checkAnswer}
             onNext={loadNewWord}
             onSkip={skipWord}
-            submitDisabled={gameType === "guess" || !userInput.trim()}
+            submitDisabled={disableNext || gameType === "guess" || !userInput.trim()}
+            skipDisabled={disableNext}
             nextDisabled={disableNext}
             nextLabel={t("nextWord")}
             t={t}
@@ -216,16 +210,15 @@ export function GameCard({
         </AnswerSection>
       </GameCardContainer>
 
-      {}
-      {totalAttempts > 0 && (
+      {submittedCount > 0 && (
         <p className="text-center text-xs text-muted-foreground mt-6 tabular-nums">
-          {t("accuracy")}: {accuracyPercent}%
+          {t("accuracy")}: {answerAccuracy}%
         </p>
       )}
 
-      {}
       {incorrectChars.size > 0 && (
-        <div className="mt-4 text-center">
+        <details className="mt-4 text-sm">
+          <summary className="min-h-11 py-3">{t("practice.reviewDetails")}</summary>
           <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">
             {t("incorrectChars") || "Characters to practice"}
           </p>
@@ -242,7 +235,7 @@ export function GameCard({
                 </div>
               ))}
           </div>
-        </div>
+        </details>
       )}
     </div>
   )

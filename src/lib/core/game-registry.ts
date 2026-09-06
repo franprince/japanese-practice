@@ -1,17 +1,16 @@
-import { isOllamaPracticeEnabled } from "./feature-flags"
-
+import type { TranslationKey } from "@/lib/i18n/translations"
 
 export interface GameDefinition {
     id: string
     href: string
     icon: string
     gradient: string
-    titleKey: string
-    descriptionKey: string
+    titleKey: TranslationKey
+    descriptionKey: TranslationKey
 }
 
 
-const ALL_GAMES: GameDefinition[] = [
+export const GAMES: GameDefinition[] = [
     {
         id: 'romaji',
         href: '/words',
@@ -44,18 +43,4 @@ const ALL_GAMES: GameDefinition[] = [
         titleKey: 'games.dates.title',
         descriptionKey: 'games.dates.description',
     },
-    {
-        id: 'ollama',
-        href: '/practice/ollama',
-        icon: '機',
-        gradient: 'bg-gradient-to-br from-indigo-500/20 via-black to-black',
-        titleKey: 'games.ollama.title',
-        descriptionKey: 'games.ollama.description',
-    },
 ]
-
-export function buildGamesList(ollamaEnabled: boolean): GameDefinition[] {
-    return ALL_GAMES.filter(g => g.id !== 'ollama' || ollamaEnabled)
-}
-
-export const GAMES: GameDefinition[] = buildGamesList(isOllamaPracticeEnabled)

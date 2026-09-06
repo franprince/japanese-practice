@@ -1,4 +1,7 @@
 "use client"
+import type { PracticeReviewProps } from "@/hooks/use-mistake-review"
+
+import type { GameSessionProps } from "@/lib/core/game-session"
 
 import { Button } from "@/components/ui/button"
 import { NumberPad } from "@/components/numbers/number-pad"
@@ -11,16 +14,16 @@ import { useI18n } from "@/lib/i18n"
 import { useNumberGame } from "@/hooks/use-number-game"
 import { GameCardContainer, QuestionDisplay, ResultDisplay } from "@/components/game/primitives"
 
-interface NumberGameCardProps {
+interface NumberGameCardProps extends GameSessionProps, PracticeReviewProps<number> {
   difficulty: Difficulty
   mode: "arabicToKanji" | "kanjiToArabic"
-  onScoreUpdate: (score: number, streak: number, correct: boolean) => void
   disableNext?: boolean
 }
 
-export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = false }: NumberGameCardProps) {
+export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, disableNext = false, reviewQuestions, onQuestionMissed }: NumberGameCardProps) {
   const { t } = useI18n()
   const {
+    isReady,
     userAnswer,
     showResult,
     isCorrect,
@@ -34,7 +37,9 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
     handleSubmit,
     handleNext,
     handleSkip,
-  } = useNumberGame({ difficulty, mode, onScoreUpdate, disableNext })
+  } = useNumberGame({ difficulty, mode, sessionId, onSessionEvent, disableNext, reviewQuestions, onQuestionMissed })
+
+  if (!isReady) return null
 
   const promptLabel = mode === "arabicToKanji" ? t("writeInJapanese") : t("writeInArabic")
 
@@ -43,21 +48,19 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
 
   return (
     <div className="space-y-4">
-      {}
       <GameCardContainer feedback={feedback} className="backdrop-blur-sm">
-        {}
         <QuestionDisplay
           value={questionText}
           prompt={promptLabel}
           lang={mode === "kanjiToArabic" ? "ja" : undefined}
         />
 
-        {}
-        <div className="min-h-16 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
+        <div role="group" aria-label={t("practice.answerLabel")}
+          className="min-h-12 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
           {userAnswer ? (
             <span
               lang={mode === "arabicToKanji" ? "ja" : undefined}
-              className="text-3xl md:text-4xl font-bold text-foreground"
+              className="break-all text-2xl font-medium text-foreground"
             >
               {userAnswer}
             </span>
@@ -66,7 +69,6 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
           )}
         </div>
 
-        {}
         {showResult && (
           <ResultDisplay
             isCorrect={isCorrect}
@@ -76,9 +78,6 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
             t={t}
           />
         )}
-      </GameCardContainer>
-
-      {}
       <div className="space-y-3">
         {showResult ? (
           <div className="flex justify-center">
@@ -94,6 +93,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
         ) : (
           <>
             <NumberPad
+              submitDisabled={!userAnswer.trim()}
               onKeyPress={handleKeyPress}
               onDelete={handleDelete}
               onClear={handleClear}
@@ -104,7 +104,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
               disableShuffle={mode === "kanjiToArabic"}
             />
             <div className="flex justify-center">
-              <Button variant="ghost" onClick={handleSkip} className="text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" onClick={handleSkip} disabled={disableNext} className="text-muted-foreground hover:text-foreground">
                 <SkipForward className="h-4 w-4 mr-1" />
                 {t("skip")}
               </Button>
@@ -112,6 +112,7 @@ export function NumberGameCard({ difficulty, mode, onScoreUpdate, disableNext = 
           </>
         )}
       </div>
+      </GameCardContainer>
     </div>
   )
 }

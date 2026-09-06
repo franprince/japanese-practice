@@ -1,4 +1,4 @@
-import { test as base, type Page, type PlaywrightTestArgs, type PlaywrightTestOptions } from '@playwright/test'
+import { test as base, expect, type PlaywrightTestArgs, type PlaywrightTestOptions } from '@playwright/test'
 import { HomePage } from '../pages/home.page'
 import { WordsPage } from '../pages/words.page'
 import { KanjiPage } from '../pages/kanji.page'
@@ -14,7 +14,22 @@ export const test = base.extend<{
     kanjiPage: KanjiPage
     numbersPage: NumbersPage
     datesPage: DatesPage
+    browserChecks: void
 }>({
+    browserChecks: [async ({ page }, use) => {
+        const errors: string[] = []
+        page.on('pageerror', error => errors.push(error.message))
+        page.on('console', message => {
+            if (message.type() === 'error' && /hydration|hydrated|server rendered HTML|Minified React error #(418|419|421|422|423|425)/i.test(message.text())) {
+                errors.push(message.text())
+            }
+        })
+        await page.addInitScript(() => {
+            if (!localStorage.getItem('kana-words-lang')) localStorage.setItem('kana-words-lang', 'en')
+        })
+        await use()
+        expect(errors, 'uncaught browser exceptions and hydration errors').toEqual([])
+    }, { auto: true }],
     homePage: async ({ page }: PlaywrightTestArgs & PlaywrightTestOptions, use: (r: HomePage) => Promise<void>) => {
         const homePage = new HomePage(page)
         await use(homePage)

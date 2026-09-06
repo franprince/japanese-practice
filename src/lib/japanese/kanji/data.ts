@@ -2,7 +2,7 @@ import { openDb, STORE_KANJI } from "@/lib/core/db"
 import { shuffleArray } from "@/lib/core/random"
 
 
-import type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"
+import type { KanjiEntry } from "@/types/japanese"
 
 
 export type { KanjiEntry, KanjiDifficulty } from "@/types/japanese"

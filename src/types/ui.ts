@@ -1,14 +1,15 @@
 
 
 
+import type { GameSessionProps } from "@/lib/core/game-session"
+
 export type { Language, TranslationKey } from "../lib/i18n"
 
 
 export type Theme = "default" | "sakura" | "ocean" | "forest" | "sunset" | "daylight" | "lavender" | "mint"
 
 
-export interface BaseGameCardProps {
-    onScoreUpdate: (score: number, streak: number, correct: boolean) => void
+export interface BaseGameCardProps extends GameSessionProps {
     disableNext?: boolean
 }
 
@@ -30,5 +31,7 @@ export interface GamePageLayoutProps {
     footer?: React.ReactNode
     showEnterHint?: boolean
     remainingLabel?: string | null
+    progress?: React.ReactNode
+    configuration?: React.ReactNode
     settingsTrigger?: React.ReactNode
 }

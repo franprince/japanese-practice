@@ -18,12 +18,17 @@ export function KanjiDifficultySelector({ difficulty, onDifficultyChange }: Kanj
   const { t } = useI18n()
 
   return (
-    <div className="inline-flex items-center gap-0.5 p-1 rounded-full bg-card/70 border border-border/60">
+    <div
+      role="group"
+      aria-label={t("selectDifficulty")}
+      className="flex flex-wrap items-center gap-0.5 p-1 rounded-full bg-card/70 border border-border/60"
+    >
       {difficulties.map((d) => (
         <button
           key={d.value}
           onClick={() => onDifficultyChange(d.value)}
-          className={`rounded-full px-2 md:px-3 py-1 md:py-1.5 text-xs font-medium transition-colors whitespace-nowrap ${
+          aria-pressed={difficulty === d.value}
+          className={`min-h-11 rounded-full px-2 md:px-3 py-1 md:py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
             difficulty === d.value
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:text-foreground"

@@ -11,6 +11,7 @@ interface ActionBarProps {
     onSkip?: () => void
     submitDisabled?: boolean
     nextDisabled?: boolean
+    skipDisabled?: boolean
     submitLabel?: string
     nextLabel?: string
     skipLabel?: string
@@ -25,6 +26,7 @@ export function ActionBar({
     onSkip,
     submitDisabled = false,
     nextDisabled = false,
+    skipDisabled = false,
     submitLabel,
     nextLabel,
     skipLabel,
@@ -36,7 +38,7 @@ export function ActionBar({
             <div className="flex justify-center pt-2">
                 <Button
                     onClick={onNext}
-                    className="w-full bg-primary hover:bg-primary/90"
+                    className="min-h-11 w-full bg-primary hover:bg-primary/90"
                     disabled={nextDisabled}
                 >
                     {nextLabel || t("common.next")}
@@ -53,7 +55,8 @@ export function ActionBar({
                 <Button
                     variant="outline"
                     onClick={onSkip}
-                    className="flex-1 bg-transparent border-border/50 hover:bg-secondary/50"
+                    disabled={skipDisabled}
+                    className="min-h-11 flex-1 bg-transparent border-border/50 hover:bg-secondary/50"
                 >
                     <SkipForward className="w-4 h-4 mr-2" />
                     {skipLabel || t("skip")}
@@ -62,7 +65,7 @@ export function ActionBar({
             {onSubmit && (
                 <Button
                     onClick={onSubmit}
-                    className="flex-1 bg-primary hover:bg-primary/90"
+                    className="min-h-11 flex-[2] bg-primary hover:bg-primary/90"
                     disabled={submitDisabled}
                 >
                     {submitLabel || t("check")}

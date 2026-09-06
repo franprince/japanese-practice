@@ -21,12 +21,17 @@ export function DateModeSelector({ mode, onModeChange }: DateModeSelectorProps) 
   ]
 
   return (
-    <div className="inline-flex items-center gap-0.5 p-1 rounded-full bg-card/70 border border-border/60">
+    <div
+      role="group"
+      aria-label={t("modeLabel")}
+      className="flex flex-wrap items-center gap-0.5 p-1 rounded-full bg-card/70 border border-border/60"
+    >
       {modes.map(({ value, labelKey, icon }) => (
         <button
           key={value}
           onClick={() => onModeChange(value)}
-          className={`flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${mode === value
+          aria-pressed={mode === value}
+          className={`min-h-11 flex items-center gap-1 px-2 md:px-3 py-1 md:py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${mode === value
             ? "bg-primary text-primary-foreground"
             : "text-muted-foreground hover:text-foreground"
             }`}
