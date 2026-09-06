@@ -1,47 +1,25 @@
 # Japanese Practice (日本語練習)
 
-A comprehensive web application for practicing Japanese language skills including hiragana, katakana, kanji, numbers, and dates with an intuitive, multilingual interface.
+Practice kana, vocabulary, kanji, numbers, and dates with short sessions or unlimited play. Review missed questions, save your settings, and learn on mobile or desktop in English, Spanish, or Japanese.
 
 ## 🎮 Game Modes
 
-### Words Game
-Practice reading and writing Japanese words in hiragana and katakana:
-- **Dictionary Mode**: Learn real Japanese vocabulary with translations
-- **Character Mode**: Practice random character combinations
-- **Custom Settings**: Filter by character groups, word length (3-6 default), and kana type
-- **Particle Support**: Handles は as "wa" particle
-- **Sokuon Rules**: Correctly processes small っ/ッ (doubles consonants)
-
-### Kanji Game
-Master Japanese kanji characters:
-- **JLPT Levels**: Practice N5 through N1 kanji
-- **Difficulty Modes**: Adaptive difficulty based on your level
-- **Readings & Meanings**: Learn both readings and English/Spanish meanings
-- **IndexedDB Caching**: Fast loading with intelligent caching
-
-### Numbers Game
-Learn Japanese number pronunciation:
-- **Interactive Keypad**: Shuffle option for varied practice
-- **Multiple Ranges**: Practice different number sets
-- **Audio Support**: Hear correct pronunciations
-
-### Dates Game
-Practice Japanese date expressions:
-- **Days, Months, Years**: Comprehensive date practice
-- **Hybrid Week Days Mode**: Mixed practice scenarios
-- **Real-world Context**: Learn practical date usage
+- **Words**: Type romaji for hiragana/katakana vocabulary or generated characters, or choose a reading in Guess mode. Custom filters select kana groups and length. A five-question hiragana preset helps beginners start quickly.
+- **Kanji**: Choose readings and see English/Spanish meanings. Difficulty selects N5, N5–N3, or N5–N1 question pools.
+- **Numbers**: Convert between Arabic numerals and Japanese kanji with an interactive keypad and four difficulty ranges.
+- **Dates**: Practice weekday, month, and full month/day readings in hiragana or romaji.
 
 ## ✨ Features
 
-- **🌍 Multilingual**: Full i18n support (English, Spanish, Japanese)
-- **🎯 Session & Infinite Modes**: Practice with goals or endlessly
-- **📊 Progress Tracking**: Track your streaks and performance
-- **🎨 Modern UI**: Beautiful interface with shadcn/ui components
-- **🌓 Theme Support**: Light and dark mode
-- **📱 Responsive**: Optimized for mobile and desktop
-- **⚡ Performance**: IndexedDB caching, Web Workers, ETag optimization
-- **🔄 Smart Caching**: Efficient data loading and versioning
-- **📈 Analytics**: Integrated Vercel Analytics and Speed Insights
+- **Focused practice**: Shared settings with Save/Cancel, completed-question progress, clear answer feedback, and session summaries across all four games.
+- **Missed-question review**: Replay unique incorrect or skipped questions after a finite session, then restart or switch to unlimited practice.
+- **Saved preferences**: Keep validated practice configurations locally and start a fresh session with “Practice again.”
+- **Multilingual interface**: English, Spanish, and Japanese, with eight light/dark theme palettes.
+- **Responsive controls**: Mobile settings sheets, desktop dialogs, visible keyboard focus, and reduced-motion support.
+- **Reliable vocabulary downloads**: Immutable static wordsets, checksum validation, IndexedDB caching, mobile consent, and recovery that preserves existing cached data.
+- **Progress tracking**: Session accuracy, score, streak, and best streak.
+
+The application centers on these four practice games. The experimental Ollama quiz subsystem has been removed.
 
 ## 🛠️ Tech Stack
 
@@ -49,7 +27,7 @@ Practice Japanese date expressions:
 - **Runtime**: Bun
 - **Language**: TypeScript (strict mode)
 - **Styling**: Tailwind CSS 4 + shadcn/ui
-- **Data**: IndexedDB + Web Workers
+- **Data**: Static JSON assets + IndexedDB; procedural numbers and dates
 - **Testing**: Bun Test + Playwright + React Testing Library
 - **CI/CD**: GitHub Actions + Semantic Release
 - **Deployment**: Vercel
@@ -93,13 +71,13 @@ This project uses a comprehensive testing strategy with both unit and E2E tests.
 
 ```bash
 # Run all unit tests
-bun test
+bun test src
 
 # Run unit tests in watch mode
-bun test --watch
+bun test --watch src
 
 # Run specific test file
-bun test src/lib/game-registry.test.ts
+bun test src/lib/core/__tests__/game-registry.test.ts
 ```
 
 **Framework**: Bun Test + React Testing Library + happy-dom
@@ -134,14 +112,16 @@ bun run test:e2e:debug
 - ✅ Words Game (comprehensive UI and interaction tests)
 - ✅ Numbers Game
 - ✅ Dates Game
+- ✅ Kanji Game
+- ✅ Saved settings, missed-item review, and vocabulary download/recovery
 - 📸 Visual documentation with screenshots
 
 E2E tests verify critical user flows including game interactions, settings changes, mode switching, and feedback mechanisms.
 
-### Pre-commit Hooks
+### Git Hooks
 
 The project uses Husky for Git hooks:
-- **Pre-push**: Runs unit tests and builds wordset to ensure code quality
+- **Pre-push**: Runs typecheck, lint, unit tests, the production build, and wordset generation (CI skips the last two).
 
 ## 🔄 CI/CD
 
@@ -159,10 +139,10 @@ docs: update README
 ```
 
 **Release Process**:
-1. Push commits following conventional format
-2. GitHub Actions runs tests and builds
-3. Semantic-release analyzes commits
-4. Automatically generates version, CHANGELOG, and GitHub release
+1. Merge feature and refactor PRs into `develop`.
+2. Create a `release/*` branch from `develop`, incorporate current `main`, and open a PR against `main`.
+3. Verify CI and review the release before merging.
+4. On the merge to `main`, semantic-release analyzes Conventional Commits and updates the version, CHANGELOG, tag, and GitHub release. Do not manually bump the release version in the PR.
 
 ### GitHub Actions
 
@@ -177,8 +157,8 @@ docs: update README
 ## Datasets
 ### Words (kana/romaji)
 - Source: JMdict simplified (see above).
-- Build: filtered and normalized into `data/jmdict-spa-3.6.1.json` with language fields `meaning_en` and `meaning_es`, plus kana/romaji for practice.
-- Storage: shipped via Git LFS; loaded lazily in the browser and cached in IndexedDB.
+- Build: `scripts/build-wordset.ts` filters dictionary sources into `public/wordset-en.json` and `public/wordset-es.json` with kana, romaji, and localized vocabulary meanings.
+- Storage: source dictionaries are tracked with Git LFS; generated wordsets load lazily as static assets and persist in IndexedDB.
 - **Distribution:** Builds publish immutable `/wordsets/<lang>-<sha256>.json` assets and a small revalidated `/wordsets/manifest.json`. See [the artifact and deployment contract](docs/static-wordsets.md).
 
 ### Kanji
@@ -212,6 +192,17 @@ docs: update README
 ### Numbers & Dates
 - Numbers: generated procedurally in-app; no external dataset.
 - Dates: generated procedurally in-app; no external dataset.
+
+## Application Architecture
+
+- **Pages** compose the four practice routes using shared layouts, settings, feedback, and progress components.
+- **Game hooks** manage question/input lifecycles; a shared session reducer admits outcomes once and owns scoring, streaks, and completion. Review queues retain typed missed questions for finite sessions.
+- **Practice domain modules** handle selection, character generation, romaji conversion, and answer evaluation separately from React state.
+- **Dataset services** own consent, transport, integrity checks, durable storage, shared requests, and refresh recovery independently of gameplay.
+- **Preference hooks** initialize from validated browser storage and keep active sessions stable through hydration and external preference updates.
+- **Boundary checks** enforce the public imports between these areas with `bun run check:boundaries`.
+
+See [Words module boundaries](docs/words-module-boundaries.md), [static wordset delivery](docs/static-wordsets.md), and [desktop/mobile visual evidence](specs/2026-09-05-practice-ux/visuals/README.md).
 
 ## Data Architecture
 
@@ -264,7 +255,7 @@ bun run build             # Build for production
 bun start                 # Start production server
 
 # Testing
-bun test                  # Run unit tests
+bun test src              # Run unit tests
 bun run test:unit         # Run unit tests (explicit)
 bun run test:e2e          # Run E2E tests
 bun run test:e2e:ui       # Run E2E tests with UI
@@ -276,6 +267,8 @@ bun run kanji:build       # Build kanji dataset
 
 # Code Quality
 bun run lint              # Run ESLint
+bun run typecheck         # Check TypeScript
+bun run check:boundaries  # Verify feature boundaries
 ```
 
 ## 🤝 Contributing

@@ -8,7 +8,7 @@ return questions/answer evaluations, and the dataset service owns acquisition.
 
 | Consumer | Entry point | Contract |
 | --- | --- | --- |
-| Pages outside the Words UI directory | `@/components/words` | Game card, settings overlay, mobile menu and consent modal |
+| Pages outside the Words UI directory | `@/components/words` | Game card, settings overlay and consent modal |
 | Practice hooks and other game components | `@/lib/japanese/words` | Vocabulary/character selection, conversion, question loading, evaluation and practice types |
 | Runtime dataset consumers | `@/lib/japanese/wordsets` | Acquisition service, errors, lifecycle types, metadata fetch, policy and loader convenience operations |
 | Publisher and static-data fixtures | `@/lib/japanese/wordsets/build` | Dataset/manifest validation and metadata types, with no browser acquisition dependency |
