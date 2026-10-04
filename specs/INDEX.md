@@ -28,3 +28,4 @@ lost.
 | 2026-10-03 | [number-syntax](2026-10-03-number-syntax/spec.md) | Reject malformed Japanese numerals | Verified — stack 4/8; separate topic PR |
 | 2026-10-03 | [date-whitespace](2026-10-03-date-whitespace/spec.md) | Accept spaced full-date answers | Verified — stack 5/8; separate topic PR |
 | 2026-10-03 | [word-filter-scope](2026-10-03-word-filter-scope/spec.md) | Scope advanced filters to Custom practice | Verified — stack 6/8; separate topic PR |
+| 2026-10-03 | [custom-scripts](2026-10-03-custom-scripts/spec.md) | Practice both selected scripts in Custom | Verified — stack 7/8; separate topic PR |

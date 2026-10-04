@@ -45,18 +45,27 @@ describe("character generation contract", () => {
             expect(await getRandomCharacter("hiragana")).toMatchObject({ kana: "あ", romaji: "a", type: "hiragana" })
         } finally { random.mockRestore() }
     })
-    test("mixed generation preserves chosen script order and deduplicates used groups", () => {
+    test.each(["both", "custom"] as const)("%s generation samples both selected scripts and deduplicates used groups", mode => {
         const groups: CharacterGroup[] = [
             { id: "h1", type: "hiragana", characters: ["あ"], label: "a", labelJp: "あ" },
             { id: "k1", type: "katakana", characters: ["ア"], label: "a", labelJp: "ア" },
         ]
         const filter = { selectedGroups: ["h1", "k1"], minLength: 3, maxLength: 3 }
-        const sequence = [0, 0, 0, 0, 0.99, 0, 0, 0]
+        const sequence = mode === "both" ? [0, 0, 0, 0, 0.99, 0, 0, 0] : [0, 0, 0, 0.99, 0, 0, 0]
         let index = 0
         const original = structuredClone({ groups, filter })
-        expect(generateCharacters("both", filter, groups, { "あ": "a", "ア": "a" }, () => sequence[index++]!))
+        expect(generateCharacters(mode, filter, groups, { "あ": "a", "ア": "a" }, () => sequence[index++]!))
             .toEqual({ kana: "あアあ", romaji: "aaa", type: "hiragana", groups: ["h1", "k1"] })
         expect({ groups, filter }).toEqual(original)
+    })
+    test.each(["hiragana", "katakana"] as const)("Custom keeps a single selected %s script", async type => {
+        const groups = await getCharacterGroups()
+        const group = groups.find(group => group.type === type)!
+        const random = spyOn(Math, "random").mockReturnValue(0)
+        try {
+            expect(await getRandomCharacter("custom", { selectedGroups: [group.id], minLength: 1, maxLength: 1 }))
+                .toMatchObject({ type, groups: [group.id] })
+        } finally { random.mockRestore() }
     })
     test("special groups retain the forty-percent inclusion threshold", () => {
         const group: CharacterGroup = { id: "h16_a", type: "hiragana", characters: ["きゃ"], label: "kya", labelJp: "きゃ" }
