@@ -26,3 +26,4 @@ lost.
 | 2026-10-03 | [kanji-options](2026-10-03-kanji-options/spec.md) | Keep Kanji answer choices distinct | Verified — stack 2/8; separate topic PR |
 | 2026-10-03 | [word-particles](2026-10-03-word-particles/spec.md) | Restrict particle reading exceptions | Verified — stack 3/8; separate topic PR |
 | 2026-10-03 | [number-syntax](2026-10-03-number-syntax/spec.md) | Reject malformed Japanese numerals | Verified — stack 4/8; separate topic PR |
+| 2026-10-03 | [date-whitespace](2026-10-03-date-whitespace/spec.md) | Accept spaced full-date answers | Verified — stack 5/8; separate topic PR |

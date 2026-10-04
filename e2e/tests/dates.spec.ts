@@ -1,5 +1,6 @@
 import { test, expect } from '../fixtures'
 import { fiveQuestionSession, finishSession } from '../fixtures/practice'
+import { months, daysOfMonth } from '../../src/lib/japanese/dates'
 
 test.describe('Dates game', () => {
     test.beforeEach(async ({ datesPage, page }) => {
@@ -56,5 +57,19 @@ test.describe('Dates game', () => {
             await page.getByRole('textbox').press('Enter')
         }, 'Next Date')
         await expect(page.getByRole('textbox')).toBeEditable()
+    })
+    test('accepts the spaced romaji form of a full date', async ({ page }) => {
+        await page.getByTestId('settings-trigger').click()
+        const settings = page.getByRole('dialog', { name: 'Practice Settings', exact: true })
+        await settings.getByRole('button', { name: 'Full Dates', exact: true }).click()
+        await settings.getByRole('button', { name: 'Save Settings', exact: true }).click()
+        await expect(page.getByTestId('question-display')).toHaveText(/^\d+\/\d+$/)
+        const [month, day] = (await page.getByTestId('question-display').textContent())!.trim().split('/').map(Number)
+        const romaji = `${months[month!]!.romaji} ${daysOfMonth[day!]!.romaji}`
+        await page.getByRole('textbox').fill(romaji)
+        await page.getByRole('button', { name: 'Check', exact: true }).click()
+        await expect(page.getByText('Correct!', { exact: true })).toBeVisible()
+        await expect(page.getByRole('status').filter({ hasText: 'Correct!' })).toContainText(romaji)
+        await expect(page.getByTestId('stats-display').locator('.tabular-nums').first()).toHaveText('10')
     })
 })
