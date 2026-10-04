@@ -2,7 +2,7 @@
 import { Suspense, useState, useEffect, useMemo } from "react"
 import { GameCard, WordsSettingsOverlay, MobileWordsetModal } from "@/components/words"
 import { StatsDisplay } from "@/components/game/stats-display"
-import { type WordQuestion, type WordFilter, type CharacterGroup } from "@/lib/japanese/words"
+import { resolvePracticeFilter, type WordQuestion, type WordFilter, type CharacterGroup } from "@/lib/japanese/words"
 import { getCharacterGroups, preloadKanaDictionary } from "@/lib/japanese/shared"
 import type { GameMode, WordsGameType } from "@/types/game"
 import { SessionSummaryCard } from "@/components/game/session-summary-card"
@@ -48,6 +48,10 @@ function WordsPractice() {
     () => settings.filter ?? { selectedGroups: characterGroups.map(group => group.id), minLength: 3, maxLength: 6 },
     [settings.filter, characterGroups],
   )
+  const practiceFilter = useMemo(
+    () => resolvePracticeFilter(settings.mode, filter, characterGroups),
+    [settings.mode, filter, characterGroups],
+  )
   useEffect(() => {
     let active = true
     preloadKanaDictionary()
@@ -78,7 +82,7 @@ function WordsPractice() {
     {session.sessionComplete && <SessionSummaryCard {...session.sessionSummaryProps} onRestart={() => reset()} onSwitchToInfinite={() => { saveSettings({ ...settings, playMode: "infinite" }); reset("infinite") }} incorrectChars={incorrectChars} incorrectCharsLabel={t("incorrectChars")} tableCharacterLabel={t("tableCharacter")} tableErrorsLabel={t("tableErrors")} />}
     {groupError ? <div role="alert" className="space-y-3 rounded-xl border p-5"><p>{t("practice.loadingError")}</p><button className="min-h-11 underline" onClick={() => { setGroupError(false); setAttempt(value => value + 1) }}>{t("practice.retry")}</button></div>
       : !groupsReady ? <p role="status" className="p-8 text-center">{t("loading")}</p>
-      : <GameCard sessionId={session.sessionId} mode={settings.mode} filter={filter} onSessionEvent={session.handleSessionEvent} submittedCount={session.submittedCount} answerAccuracy={session.answerAccuracy} onRequestOpenSettings={() => setSettingsOpen(true)} disableNext={session.sessionComplete} suppressFocus={settingsOpen || mobileConfirmOpen} gameType={gameType} onIncorrectCharsChange={setIncorrectChars} reviewQuestions={session.reviewQuestions} onQuestionMissed={session.onQuestionMissed} />}
+      : <GameCard sessionId={session.sessionId} mode={settings.mode} filter={practiceFilter} onSessionEvent={session.handleSessionEvent} submittedCount={session.submittedCount} answerAccuracy={session.answerAccuracy} onRequestOpenSettings={() => setSettingsOpen(true)} disableNext={session.sessionComplete} suppressFocus={settingsOpen || mobileConfirmOpen} gameType={gameType} onIncorrectCharsChange={setIncorrectChars} reviewQuestions={session.reviewQuestions} onQuestionMissed={session.onQuestionMissed} />}
     <MobileWordsetModal open={mobileConfirmOpen} title={t("words.downloadTitle")} message={`${t("words.downloadMessage")} (~${wordsetSizeMB}MB).`} progress={downloadProgress} busy={busy} error={downloadError ? t(downloadError) : null} statusMessage={t(persisting ? "words.downloadPersisting" : "words.downloading")} onCancel={() => { cancelConfirm(); saveSettings({ ...settings, gameType: "characters" }) }} onConfirm={confirmWordMode} confirmLabel={t(downloadError ? "words.downloadRetry" : "common.download")} cancelLabel={t("common.cancel")} confirmDisabled={busy} />
   </GamePageLayout>
 }

@@ -2,10 +2,20 @@
 import { blacklist } from "../shared/blacklist"
 import { shuffleArray } from "@/lib/core/random"
 import type { GameMode } from "@/types/game"
-import type { JapaneseWord, WordFilter } from "@/types/japanese"
+import type { CharacterGroup, JapaneseWord, WordFilter } from "@/types/japanese"
 import type { WordSets } from "@/types/api"
 
 const MOBILE_WORDSET_MAX = 1500
+
+/** Advanced groups and length apply only while the Custom subject is active. */
+export function resolvePracticeFilter(mode: GameMode, customFilter: WordFilter, groups: CharacterGroup[]): WordFilter {
+  if (mode === "custom") return customFilter
+  return {
+    selectedGroups: groups.filter(group => mode === "both" || group.type === mode).map(group => group.id),
+    minLength: 3,
+    maxLength: 6,
+  }
+}
 
 export const buildFilterKey = (type: GameMode, filter: WordFilter | undefined, lang: string, isMobile: boolean) => {
   if (!filter) return `${type}:${lang}:${isMobile ? "mobile" : "desktop"}:none`
