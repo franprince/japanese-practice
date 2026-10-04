@@ -65,6 +65,21 @@ test.describe('Numbers game', () => {
         await expect(page.locator('#number-pad')).toBeVisible()
         await testInfo.attach('restarted-session', { body: await page.screenshot(), contentType: 'image/png' })
     })
+    test('malformed keypad numerals cannot earn points', async ({ page }) => {
+        const value = Number((await page.getByTestId('question-display').textContent())?.trim())
+        expect(value).toBeGreaterThanOrEqual(1)
+        expect(value).toBeLessThanOrEqual(10)
+        const digits = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九']
+        // The old parser discarded preceding digits and treated a zero
+        // coefficient as one, making these malformed answers look correct.
+        const answer = value === 10 ? ['〇', '十'] : ['九', digits[value]!]
+        for (const symbol of answer) {
+            await page.locator('#number-pad').getByRole('button', { name: symbol, exact: true }).click()
+        }
+        await page.getByRole('button', { name: 'Check', exact: true }).click()
+        await expect(page.getByText('Incorrect', { exact: true })).toBeVisible()
+        await expect(page.getByTestId('stats-display').locator('.tabular-nums').first()).toHaveText('0')
+    })
 })
 
 

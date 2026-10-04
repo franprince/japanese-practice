@@ -106,26 +106,37 @@ export function japaneseToArabic(japanese: string): number {
     if (!japanese) return -1
 
     let total = 0
+    let section = 0
     let current = 0
+    let lastUnit = Infinity
+    let hasMan = false
 
     for (const char of japanese) {
         const val = valueMap[char]
-        if (val === undefined) continue
+        // Zero is a standalone numeral; inserting it into unit notation or
+        // ignoring an unknown character must not turn a typo into an answer.
+        if (val === undefined || val === 0) return -1
 
         if (val < 10) {
+            if (current !== 0) return -1
             current = val
         } else {
-            
             if (val === 10000) {
-                total = (total + (current || 1)) * val
+                if (hasMan) return -1
+                total = (section + current || 1) * val
+                hasMan = true
+                section = 0
+                lastUnit = Infinity
                 current = 0
             } else {
-                total += (current || 1) * val
+                if (val >= lastUnit) return -1
+                section += (current || 1) * val
+                lastUnit = val
                 current = 0
             }
         }
     }
-    return total + current
+    return total + section + current
 }
 
 
