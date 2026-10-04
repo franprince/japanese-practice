@@ -29,7 +29,7 @@ export function generateCharacters(
   const hasH = selectedTypes.includes("hiragana")
   const hasK = selectedTypes.includes("katakana")
 
-  const allowMixed = type === "both" && (filter?.selectedGroups?.length ? hasH && hasK : true)
+  const allowMixed = (type === "both" || type === "custom") && (filter?.selectedGroups?.length ? hasH && hasK : true)
 
   let targetType: "hiragana" | "katakana" = modeToType(type)
   if (!allowMixed && filter?.selectedGroups && filter.selectedGroups.length > 0) {

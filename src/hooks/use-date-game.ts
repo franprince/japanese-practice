@@ -84,9 +84,10 @@ export function useDateGame({
     const handleSubmit = useCallback(() => {
         if (!question || showResult || disableNext || !userInput.trim()) return
 
-        const userAnswer = userInput.trim().toLowerCase()
-        const normalizedAnswer = question.answer.toLowerCase()
-        const normalizedRomaji = question.romaji.toLowerCase().replace(/\s+/g, "")
+        const normalize = (answer: string) => answer.toLowerCase().replace(/\s+/g, "")
+        const userAnswer = normalize(userInput)
+        const normalizedAnswer = normalize(question.answer)
+        const normalizedRomaji = normalize(question.romaji)
 
         const correct = userAnswer === normalizedAnswer || userAnswer === normalizedRomaji
 

@@ -54,3 +54,24 @@ test.describe('Kanji game', () => {
         await expect(page.locator('#kanji-options button').first()).toBeEnabled()
     })
 })
+
+test.describe('Kanji answer choices', () => {
+    test('alternate characters never create identical reading choices', async ({ kanjiPage, page }) => {
+        const entries = [
+            { char: '一', reading: 'いち', meaning_en: 'one' },
+            { char: '壱', reading: 'いち', meaning_en: 'one' },
+            { char: '弌', reading: 'いち', meaning_en: 'one' },
+            { char: '二', reading: 'に', meaning_en: 'two' },
+            { char: '三', reading: 'さん', meaning_en: 'three' },
+        ]
+        await page.addInitScript(() => { Math.random = () => 0 })
+        await page.route('**/kanji-n*.json', route => route.fulfill({ json: entries }))
+        await kanjiPage.goto()
+        await expect(page.getByTestId('question-display')).toHaveText('一')
+        const readings = page.locator('#kanji-options button [lang="ja"]')
+        await expect(readings).toHaveCount(3)
+        expect(new Set(await readings.allTextContents())).toEqual(new Set(['いち', 'に', 'さん']))
+        await page.locator('#kanji-options button').filter({ has: page.getByText('いち', { exact: true }) }).click()
+        await expect(page.getByText('Correct!', { exact: true })).toBeVisible()
+    })
+})

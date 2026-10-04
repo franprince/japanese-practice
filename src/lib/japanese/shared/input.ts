@@ -76,12 +76,11 @@ export function toMacronForm(text: string): string {
         .replace(/ou/g, "ō")
 }
 
-export function validateAnswer(input: string, word: JapaneseWord): boolean {
+export function validateAnswer(input: string, word: JapaneseWord, context: "vocabulary" | "kana" = "vocabulary"): boolean {
     if (!input || !word) return false
 
     const rawInput = input.toLowerCase().trim()
     const rawAnswer = word.romaji.toLowerCase().trim()
-    const kana = word.kana
 
     if (rawInput === rawAnswer) return true
 
@@ -104,20 +103,18 @@ export function validateAnswer(input: string, word: JapaneseWord): boolean {
 
     if (macronInput === macronAnswer) return true
 
-    
-    if (kana.endsWith("は") && macronAnswer.endsWith("ha") && macronInput.endsWith("wa")) {
-        const stem = macronAnswer.slice(0, -2)
-        if (macronInput === stem + "wa") return true
-    }
-
-    if (kana.endsWith("へ") && macronAnswer.endsWith("he") && macronInput.endsWith("e")) {
-        const stem = macronAnswer.slice(0, -2)
-        if (macronInput === stem + "e") return true
-    }
-
-    if (kana.endsWith("を") && macronAnswer.endsWith("wo") && macronInput.endsWith("o")) {
-        const stem = macronAnswer.slice(0, -2)
-        if (macronInput === stem + "o") return true
+    if (context === "vocabulary") {
+        // These greetings retain their conventional reading despite the kana は.
+        // A suffix alone cannot identify a particle in a word or random kana.
+        const greetingReadings: Record<string, readonly string[]> = {
+            "こんにちは": ["konnichiha", "konnichiwa"],
+            "こんばんは": ["konbanha", "konbanwa"],
+        }
+        const particleReadings: Record<string, readonly string[]> = {
+            "は": ["ha", "wa"], "へ": ["he", "e"], "を": ["wo", "o"],
+        }
+        const readings = greetingReadings[word.kana] ?? (!word.kanji ? particleReadings[word.kana] : undefined)
+        if (readings?.includes(macronAnswer) && readings.includes(macronInput)) return true
     }
 
     return false

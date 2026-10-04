@@ -57,7 +57,8 @@ Practice Japanese date expressions:
 ## 🚀 Getting Started
 
 ### Prerequisites
-- [Bun](https://bun.sh/) installed on your system
+- [Bun](https://bun.sh/) 1.4.2 or newer installed on your system (CI and Docker use 1.4.2).
+- Node.js 22 or 24 for Node-based tooling and hosted functions; Vercel uses Node while the build and Docker runtime use Bun.
 
 ### Installation
 

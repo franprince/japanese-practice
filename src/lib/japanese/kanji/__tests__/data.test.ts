@@ -33,4 +33,34 @@ describe("getRandomOptions", () => {
         expect(options).toHaveLength(3)
         expect(options.some(o => o.char === correct.char)).toBe(true)
     })
+
+    it("excludes alternate characters with the correct reading", () => {
+        const correct = { char: "一", reading: "いち" }
+        const pool = [correct, { char: "壱", reading: "いち" }, { char: "弌", reading: " いち " },
+            { char: "二", reading: "に" }, { char: "三", reading: "さん" }]
+        for (let attempt = 0; attempt < 20; attempt++) {
+            const options = getRandomOptions(pool, correct)
+            expect(new Set(options.map(option => option.char))).toEqual(new Set(["一", "二", "三"]))
+        }
+    })
+
+    it("does not repeat distractor readings or pad a small pool", () => {
+        const correct = { char: "一", reading: "いち" }
+        const pool = [correct, { char: "二", reading: "に" }, { char: "弐", reading: "に" }]
+        for (let attempt = 0; attempt < 20; attempt++) {
+            const options = getRandomOptions(pool, correct)
+            expect(options).toHaveLength(2)
+            expect(options).toContain(correct)
+            expect(new Set(options.map(option => option.reading)).size).toBe(2)
+        }
+        expect(getRandomOptions([correct, { char: "壱", reading: "いち" }], correct)).toEqual([correct])
+    })
+
+    it("excludes empty and whitespace-only distractor readings", () => {
+        const correct = { char: "一", reading: "いち" }
+        const pool = [correct, { char: "空", reading: "" }, { char: "白", reading: " \t " },
+            { char: "二", reading: "に" }, { char: "三", reading: "さん" }]
+        expect(new Set(getRandomOptions(pool, correct).map(option => option.char)))
+            .toEqual(new Set(["一", "二", "三"]))
+    })
 })

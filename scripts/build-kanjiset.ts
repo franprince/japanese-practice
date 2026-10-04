@@ -101,6 +101,7 @@ const buildKanjiSet = async () => {
 
   
   const previousMeaningLookup: Record<string, string | null> = {}
+  const previousSpanishMeaningLookup: Record<string, string | null> = {}
   const previousReadingLookup: Record<string, string | null> = {}
   const previousJlptLookup: Record<string, string | null> = {}
   try {
@@ -115,6 +116,7 @@ const buildKanjiSet = async () => {
         prev.forEach((entry: any) => {
           if (entry?.char) {
             if (entry?.meaning_en) previousMeaningLookup[entry.char] = entry.meaning_en
+            if (entry?.meaning_es) previousSpanishMeaningLookup[entry.char] = entry.meaning_es
             if (entry?.reading) previousReadingLookup[entry.char] = entry.reading
             if (entry?.jlpt) previousJlptLookup[entry.char] = entry.jlpt
           }
@@ -226,7 +228,7 @@ const buildKanjiSet = async () => {
       apply: (entry) => ({
         ...entry,
         meaning_en: entry.meaning_en ?? engLookup[entry.char] ?? null,
-        meaning_es: entry.meaning_es ?? spaLookup[entry.char] ?? null,
+        meaning_es: entry.meaning_es ?? spaLookup[entry.char] ?? previousSpanishMeaningLookup[entry.char] ?? null,
       }),
     },
     {

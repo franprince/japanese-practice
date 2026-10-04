@@ -39,4 +39,19 @@ describe("answer evaluation", () => {
         const doubled = { ...word, kana: "あんな", romaji: "anna" }
         expect(evaluateWordAnswer(doubled, "ana", "guess")).toEqual({ isCorrect: false, errorDetails: null })
     })
+    test.each(["words", "characters", "guess"] as const)("%s rejects a wrong lexical は reading instead of rewarding it", async gameType => {
+        const mother = { ...word, kana: "はは", romaji: "haha", kanji: "母", meaning: "mother" }
+        expect((await evaluateWordAnswer(mother, "hawa", gameType)).isCorrect).toBe(false)
+        expect((await evaluateWordAnswer(mother, "haha", gameType)).isCorrect).toBe(true)
+    })
+    test.each(["characters", "guess"] as const)("%s does not reinterpret the displayed kana as a particle", async gameType => {
+        const character = { ...word, kana: "は", romaji: "ha" }
+        expect((await evaluateWordAnswer(character, "wa", gameType)).isCorrect).toBe(false)
+        expect((await evaluateWordAnswer(character, "ha", gameType)).isCorrect).toBe(true)
+    })
+    test("Words keeps standalone particle and lexical greeting equivalents", async () => {
+        for (const [kana, romaji, answer] of [["へ", "he", "e"], ["を", "wo", "o"], ["こんにちは", "konnichiha", "konnichiwa"], ["こんばんは", "konbanha", "konbanwa"]]) {
+            expect((await evaluateWordAnswer({ ...word, kana: kana!, romaji: romaji! }, answer!, "words")).isCorrect).toBe(true)
+        }
+    })
 })

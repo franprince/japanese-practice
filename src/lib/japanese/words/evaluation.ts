@@ -15,7 +15,7 @@ export function evaluateWordAnswer(
   detect: typeof detectErrors = detectErrors,
 ): WordAnswerEvaluation | Promise<WordAnswerEvaluation> {
   const input = answer.trim()
-  const isCorrect = validateAnswer(input, word)
+  const isCorrect = validateAnswer(input, word, gameType === "words" ? "vocabulary" : "kana")
   // Preserve synchronous admission for direct matches and all Guess answers.
   if (isCorrect || gameType === "guess") return { isCorrect, errorDetails: null }
   return evaluateDiagnostics(word.kana, input, detect)

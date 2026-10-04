@@ -1,5 +1,6 @@
 /** Public Words practice contract, independent of feature presentation. */
 export { getRandomWord } from "./selection"
+export { resolvePracticeFilter } from "./filtering"
 export { getRandomCharacter, characterGroups } from "./characters"
 export { kanaToRomaji } from "./romaji"
 export type { JapaneseWord, WordFilter, CharacterGroup } from "@/types/japanese"

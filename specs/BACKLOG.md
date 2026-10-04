@@ -260,3 +260,20 @@ production build.
 ## Practice UX refactor — approved 2026-09-05
 
 User authorized planning and implementation after the UI assessment. Deliver one feature PR after the module-extraction prerequisite (#62): (1) themes and accessibility; (2) shared layout and settings; (3) missed-question review and home/persisted presets; (4) regression checks and visual proof. See [spec](2026-09-05-practice-ux/spec.md) and [plan](2026-09-05-practice-ux/implementation_plan.md).
+
+## Review fixes — approved 2026-10-03
+
+The user authorized one PR per reviewed issue, implemented in parallel and delivered as a linear stack. The bottom PR targets `develop`; each later PR targets its predecessor. Merge bottom to top, retargeting the next PR to `develop` after its predecessor merges. Each PR contains only one logical fix, its regressions, and its dated specification/plan/tasks. The topic branches can also be cherry-picked individually where independent.
+
+| Order | Fix | Branch | PR base |
+| --- | --- | --- | --- |
+| 1 | Patch framework security dependencies | `fix/review-01-next-security` | `develop` |
+| 2 | Keep Kanji answer choices distinct | `fix/review-02-kanji-options` | `fix/review-01-next-security` |
+| 3 | Restrict particle reading exceptions | `fix/review-03-word-particles` | `fix/review-02-kanji-options` |
+| 4 | Reject malformed Japanese numerals | `fix/review-04-number-syntax` | `fix/review-03-word-particles` |
+| 5 | Accept spaced full-date answers | `fix/review-05-date-whitespace` | `fix/review-04-number-syntax` |
+| 6 | Scope advanced filters to Custom practice | `fix/review-06-word-filter-scope` | `fix/review-05-date-whitespace` |
+| 7 | Practice both selected scripts in Custom | `fix/review-07-custom-scripts` | `fix/review-06-word-filter-scope` |
+| 8 | Preserve Spanish meanings during Kanji rebuilds | `fix/review-08-kanji-translations` | `fix/review-07-custom-scripts` |
+
+All eight implementation scopes and their plans are covered by the user's explicit request to fix the reviewed issues and open separate stackable PRs.

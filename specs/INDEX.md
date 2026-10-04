@@ -22,3 +22,11 @@ lost.
 | 2026-09-05 | [react-lifecycle-cleanup](2026-09-05-react-lifecycle-cleanup/spec.md) | Resolve React lifecycle warnings | Merged in [PR #61](https://github.com/franprince/japanese-practice/pull/61); see [plan](2026-09-05-react-lifecycle-cleanup/implementation_plan.md) and [tasks](2026-09-05-react-lifecycle-cleanup/tasks.md) |
 | 2026-09-05 | [split-large-feature-modules](2026-09-05-split-large-feature-modules/spec.md) | Decompose feature concentration points | Implemented and verified — [PR #62](https://github.com/franprince/japanese-practice/pull/62) open against `develop`; see [plan](2026-09-05-split-large-feature-modules/implementation_plan.md) and [tasks](2026-09-05-split-large-feature-modules/tasks.md) |
 | 2026-09-05 | [practice-ux](2026-09-05-practice-ux/spec.md) | Unify practice UX and add focused review | Implemented and verified — [PR #63](https://github.com/franprince/japanese-practice/pull/63) open against `develop`; [plan](2026-09-05-practice-ux/implementation_plan.md), [tasks](2026-09-05-practice-ux/tasks.md) |
+| 2026-10-03 | [next-security](2026-10-03-next-security/spec.md) | Patch framework security dependencies | Verified — stack 1/8; separate topic PR |
+| 2026-10-03 | [kanji-options](2026-10-03-kanji-options/spec.md) | Keep Kanji answer choices distinct | Verified — stack 2/8; separate topic PR |
+| 2026-10-03 | [word-particles](2026-10-03-word-particles/spec.md) | Restrict particle reading exceptions | Verified — stack 3/8; separate topic PR |
+| 2026-10-03 | [number-syntax](2026-10-03-number-syntax/spec.md) | Reject malformed Japanese numerals | Verified — stack 4/8; separate topic PR |
+| 2026-10-03 | [date-whitespace](2026-10-03-date-whitespace/spec.md) | Accept spaced full-date answers | Verified — stack 5/8; separate topic PR |
+| 2026-10-03 | [word-filter-scope](2026-10-03-word-filter-scope/spec.md) | Scope advanced filters to Custom practice | Verified — stack 6/8; separate topic PR |
+| 2026-10-03 | [custom-scripts](2026-10-03-custom-scripts/spec.md) | Practice both selected scripts in Custom | Verified — stack 7/8; separate topic PR |
+| 2026-10-03 | [kanji-translations](2026-10-03-kanji-translations/spec.md) | Preserve Spanish meanings during Kanji rebuilds | Verified — stack 8/8; separate topic PR |
