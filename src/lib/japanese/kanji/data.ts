@@ -138,12 +138,16 @@ export function getRandomKanji(list: KanjiEntry[], exclude?: KanjiEntry) {
 
 export function getRandomOptions(list: KanjiEntry[], correct: KanjiEntry, count = 3): KanjiEntry[] {
   const options: KanjiEntry[] = [correct]
-  const available = list.filter(k => k.char !== correct.char)
+  const readingKey = (entry: KanjiEntry) => entry.reading?.trim() ?? ""
+  let available = list.filter(k => k.char !== correct.char && readingKey(k) !== "" && readingKey(k) !== readingKey(correct))
 
   while (options.length < count && available.length > 0) {
     const randomIndex = Math.floor(Math.random() * available.length)
-    options.push(available[randomIndex]!)
-    available.splice(randomIndex, 1)
+    const option = available[randomIndex]!
+    options.push(option)
+    // Readings are the answer shown at every difficulty. Alternate characters
+    // with the same reading cannot be distinguishable distractors.
+    available = available.filter(k => k.char !== option.char && readingKey(k) !== readingKey(option))
   }
 
   return shuffleArray(options)
