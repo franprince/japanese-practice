@@ -24,3 +24,4 @@ lost.
 | 2026-09-05 | [practice-ux](2026-09-05-practice-ux/spec.md) | Unify practice UX and add focused review | Implemented and verified — [PR #63](https://github.com/franprince/japanese-practice/pull/63) open against `develop`; [plan](2026-09-05-practice-ux/implementation_plan.md), [tasks](2026-09-05-practice-ux/tasks.md) |
 | 2026-10-03 | [next-security](2026-10-03-next-security/spec.md) | Patch framework security dependencies | Verified — stack 1/8; separate topic PR |
 | 2026-10-03 | [kanji-options](2026-10-03-kanji-options/spec.md) | Keep Kanji answer choices distinct | Verified — stack 2/8; separate topic PR |
+| 2026-10-03 | [word-particles](2026-10-03-word-particles/spec.md) | Restrict particle reading exceptions | Verified — stack 3/8; separate topic PR |

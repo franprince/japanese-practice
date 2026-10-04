@@ -56,26 +56,36 @@ describe("Japanese Input Validation", () => {
             expect(await validateAnswer("tizu", word2)).toBe(true)
         })
 
-        it("accepts wa for ha particle", async () => {
+        it("accepts conventional greeting readings", async () => {
             const word = mockWord("こんにちは", "konnichiha")
             expect(await validateAnswer("konnichiwa", word)).toBe(true)
             expect(await validateAnswer("konnichiha", word)).toBe(true)
+            expect(validateAnswer("konbanwa", mockWord("こんばんは", "konbanha"))).toBe(true)
         })
 
-        it("accepts e for he particle", async () => {
-            
-            
-            const word = mockWord("どこへ", "dokohe")
-            expect(await validateAnswer("dokoe", word)).toBe(true)
-            expect(await validateAnswer("dokohe", word)).toBe(true)
+        it.each([["は", "ha", "wa"], ["へ", "he", "e"], ["を", "wo", "o"]])("accepts the standalone %s particle equivalent", (kana, romaji, alternate) => {
+            expect(validateAnswer(alternate, mockWord(kana, romaji))).toBe(true)
+            expect(validateAnswer(romaji, mockWord(kana, romaji))).toBe(true)
         })
 
-        it("accepts o for wo particle", async () => {
-            
-            
-            const word = mockWord("みずを", "mizuwo")
-            expect(await validateAnswer("mizuo", word)).toBe(true)
-            expect(await validateAnswer("mizuwo", word)).toBe(true)
+        it.each([
+            ["はは", "haha", "hawa"], ["いろは", "iroha", "irowa"],
+            ["このは", "konoha", "konowa"], ["へへ", "hehe", "hee"],
+            ["どこへ", "dokohe", "dokoe"], ["みずを", "mizuwo", "mizuo"],
+        ])("does not infer a particle from the suffix of %s", (kana, romaji, incorrect) => {
+            expect(validateAnswer(incorrect, mockWord(kana, romaji))).toBe(false)
+            expect(validateAnswer(romaji, mockWord(kana, romaji))).toBe(true)
+        })
+
+        it("does not apply particle or greeting equivalents to generated kana", () => {
+            expect(validateAnswer("wa", mockWord("は", "ha"), "kana")).toBe(false)
+            expect(validateAnswer("e", mockWord("へ", "he"), "kana")).toBe(false)
+            expect(validateAnswer("konnichiwa", mockWord("こんにちは", "konnichiha"), "kana")).toBe(false)
+        })
+
+        it("does not reinterpret a lexical kanji entry as a standalone particle", () => {
+            expect(validateAnswer("wa", { ...mockWord("は", "ha"), kanji: "歯", meaning: "tooth" })).toBe(false)
+            expect(validateAnswer("e", { ...mockWord("へ", "he"), kanji: "屁" })).toBe(false)
         })
 
         it("rejects incorrect answers", async () => {
