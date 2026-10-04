@@ -29,3 +29,4 @@ lost.
 | 2026-10-03 | [date-whitespace](2026-10-03-date-whitespace/spec.md) | Accept spaced full-date answers | Verified — stack 5/8; separate topic PR |
 | 2026-10-03 | [word-filter-scope](2026-10-03-word-filter-scope/spec.md) | Scope advanced filters to Custom practice | Verified — stack 6/8; separate topic PR |
 | 2026-10-03 | [custom-scripts](2026-10-03-custom-scripts/spec.md) | Practice both selected scripts in Custom | Verified — stack 7/8; separate topic PR |
+| 2026-10-03 | [kanji-translations](2026-10-03-kanji-translations/spec.md) | Preserve Spanish meanings during Kanji rebuilds | Verified — stack 8/8; separate topic PR |
