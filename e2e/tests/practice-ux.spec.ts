@@ -15,7 +15,7 @@ for (const game of ['words', 'numbers', 'dates', 'kanji'] as const) {
         const missed = new Set<string>()
         const next = game === 'words' ? 'Next Word' : game === 'numbers' ? 'Next Number' : game === 'dates' ? 'Next Date' : 'Next Kanji'
         for (let index = 0; index < 5; index++) {
-            const prompt = (await question(page).textContent()).trim()
+            const prompt = (await question(page).textContent())!.trim()
             missed.add(prompt)
             if (game === 'words' || game === 'dates') {
                 await page.getByRole('textbox').fill('zzzz')
@@ -36,7 +36,7 @@ for (const game of ['words', 'numbers', 'dates', 'kanji'] as const) {
         await expect(page.getByText('Reviewing missed items', { exact: true })).toBeVisible()
         for (let index = 0; index < missed.size; index++) {
             await expect(question(page)).toBeVisible()
-            const prompt = (await question(page).textContent()).trim()
+            const prompt = (await question(page).textContent())!.trim()
             expect(missed.has(prompt)).toBe(true)
             // Answer correctly where the fixture exposes the expected reading. Dates uses skips to exercise review-of-review.
             if (game === 'words') {
@@ -69,7 +69,7 @@ test('mobile settings cancel preserves input, apply restarts and persists the co
     await page.goto('/dates')
     const input = page.getByRole('textbox', { name: 'Your answer in hiragana or romaji' })
     await input.fill('unfinished')
-    const initial = await question(page).textContent()
+    const initial = (await question(page).textContent())!
     await page.getByTestId('settings-trigger').click()
     await settings(page).getByRole('button', { name: 'Months', exact: true }).click()
     await expect(settings(page).getByText(/Changing settings starts/)).toBeVisible()
