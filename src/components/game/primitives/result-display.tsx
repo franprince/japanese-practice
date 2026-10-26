@@ -37,6 +37,7 @@ export function ResultDisplay({
             <div className="space-y-3">
                 {}
                 <div className="flex items-center gap-2">
+                    {isCorrect && <span lang="ja" aria-hidden="true" className="hanko notebook-only mr-2 size-14 shrink-0 text-2xl">正</span>}
                     {isCorrect ? (
                         <Check className="w-5 h-5 text-success" />
                     ) : (
@@ -52,7 +53,7 @@ export function ResultDisplay({
                     <div className="flex flex-wrap items-start justify-between gap-2">
                         <span className="text-muted-foreground">{t("correctAnswer")}:</span>
                         <div className="min-w-0 break-words text-right [overflow-wrap:anywhere]">
-                            <p className="font-bold text-foreground">{expectedAnswer}</p>
+                            <p className="font-hand text-lg font-bold text-foreground">{expectedAnswer}</p>
                             {romaji && <p className="text-xs text-muted-foreground">{romaji}</p>}
                         </div>
                     </div>

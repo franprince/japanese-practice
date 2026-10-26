@@ -10,7 +10,7 @@ export function PracticeSettingsTrigger({ onClick }: { onClick: () => void }) {
   const { t } = useI18n()
   return <Button
     variant="outline"
-    className="min-h-11 gap-2 rounded-xl"
+    className="ink-button min-h-11 gap-2 rounded-xl"
     onClick={onClick}
     data-testid="settings-trigger"
   >
@@ -38,7 +38,7 @@ export function PracticeSettingsDialog({ open, onOpenChange, children, onApply, 
       >
         <header className="flex shrink-0 items-start justify-between gap-3 border-b p-5">
           <div>
-            <Dialog.Title className="text-xl font-semibold">{t("practiceSettings")}</Dialog.Title>
+            <Dialog.Title className="font-hand text-2xl font-semibold">{t("practiceSettings")}</Dialog.Title>
             <Dialog.Description className="mt-1 text-sm text-muted-foreground">{t("settings.subtitle")}</Dialog.Description>
           </div>
           <Dialog.Close asChild>
@@ -52,7 +52,7 @@ export function PracticeSettingsDialog({ open, onOpenChange, children, onApply, 
           {changed && <p className="text-sm text-muted-foreground" role="status">{t("practice.restartNotice")}</p>}
           <div className="flex gap-3">
             <Button variant="outline" className="min-h-11 flex-1" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
-            <Button className="min-h-11 flex-[2]" onClick={onApply} disabled={invalid}>{t("settings.saveSettings")}</Button>
+            <Button className="ink-button min-h-11 flex-[2]" onClick={onApply} disabled={invalid}>{t("settings.saveSettings")}</Button>
           </div>
         </footer>
       </Dialog.Content>

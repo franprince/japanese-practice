@@ -47,6 +47,24 @@
 [data-theme="lavender"] { --background: #f5f2fa; --primary: #684298; --primary-foreground: #ffffff; --secondary: #ece4f5; --muted: #ece4f5; --accent: #684298; --ring: #684298; --border: #b8a8c9; --input: #9985af; }
 [data-theme="mint"] { --background: #eff7ef; --primary: #31693b; --primary-foreground: #ffffff; --secondary: #e0efe1; --muted: #e0efe1; --accent: #31693b; --ring: #31693b; --border: #a0bba4; --input: #779a7e; }
 
+/* Notebook (genkō yōshi): grid paper, sumi ink, red-pen accents */
+[data-theme="notebook"] {
+  color-scheme: light;
+  --background: #f5f1e6; --foreground: #22201c;
+  --card: #fffdf8; --card-foreground: #22201c;
+  --popover: #fffdf8; --popover-foreground: #22201c;
+  --primary: #b5371f; --primary-foreground: #ffffff;
+  --secondary: #ece5d6; --secondary-foreground: #22201c;
+  --muted: #ece5d6; --muted-foreground: #5c564c;
+  --accent: #b5371f; --accent-foreground: #ffffff;
+  --border: #22201c; --input: #22201c; --ring: #b5371f;
+  --destructive: #b5371f; --destructive-foreground: #ffffff;
+  --success: #2e6b4f; --success-foreground: #ffffff;
+  --radius: 0.25rem;
+  --font-display: var(--font-klee), "Klee One", cursive;
+  --grid-line: rgb(181 55 31 / 0.09);
+}
+
 @theme inline {
   --font-sans: "Inter", "Inter Fallback", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Geist Mono", monospace;
@@ -87,7 +105,85 @@
 @layer components {
   .glass-card { @apply bg-card border border-border; }
   .practice-settings button { white-space: normal; }
+
+  /* Notebook primitives — neutral in other themes, ink-and-paper in [data-theme="notebook"] */
+  .font-hand { font-family: var(--font-display, inherit); }
+  .genko-cell {
+    border: 2px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    background-image:
+      linear-gradient(90deg, transparent calc(50% - .5px), color-mix(in srgb, var(--primary) 30%, transparent) calc(50% - .5px), color-mix(in srgb, var(--primary) 30%, transparent) calc(50% + .5px), transparent calc(50% + .5px)),
+      linear-gradient(transparent calc(50% - .5px), color-mix(in srgb, var(--primary) 30%, transparent) calc(50% - .5px), color-mix(in srgb, var(--primary) 30%, transparent) calc(50% + .5px), transparent calc(50% + .5px));
+  }
+  .genko-trace { color: color-mix(in srgb, var(--foreground) 22%, transparent); }
+  .ink-card { @apply rounded-2xl border bg-card; }
+  .ink-button { @apply rounded-md; }
+  .hanko {
+    display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; text-align: center; line-height: 1.05;
+    font-family: var(--font-mincho), "Shippori Mincho", serif; font-weight: 800; color: var(--primary); background: var(--card);
+    border: 3px solid var(--primary); box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 6px var(--primary); transform: rotate(-10deg);
+  }
 }
+
+[data-theme="notebook"] body {
+  font-family: var(--font-zen), "Zen Kaku Gothic New", system-ui, sans-serif;
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+[data-theme="notebook"] .ink-card,
+[data-theme="notebook"] .glass-card { border: 2px solid var(--foreground); border-radius: 0; box-shadow: 4px 4px 0 var(--foreground); }
+[data-theme="notebook"] .ink-button { border: 2px solid var(--foreground); border-radius: 4px; box-shadow: 3px 3px 0 var(--foreground); }
+[data-theme="notebook"] .ink-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--foreground); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ── Notebook practice screens ─────────────────────────────────────────── */
+.notebook-only { display: none !important; }
+[data-theme="notebook"] .notebook-only { display: inline-flex !important; }
+.session-marks { display: none; }
+[data-theme="notebook"] .session-marks { display: flex; }
+[data-theme="notebook"] .session-progress-bar { display: none; }
+:root:not([data-theme="notebook"]) .question-cells .genko-cell { border: 0; background-image: none; margin: 0; width: auto; height: auto; }
+
+[data-theme="notebook"] .notebook-panel { background: var(--card); border: 2px solid var(--foreground); padding: 0.75rem 1rem; }
+[data-theme="notebook"] .config-tag { display: inline-flex; padding: 0.125rem 0.625rem; border: 1.5px solid var(--foreground); background: var(--card); color: var(--foreground); font-weight: 700; }
+[data-theme="notebook"] .notebook-kicker { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+
+/* Answer written on a ruled line */
+[data-theme="notebook"] .notebook-answer {
+  border-width: 0 0 3px !important; border-color: var(--foreground) !important; border-radius: 0; box-shadow: none !important;
+  background: transparent !important; font-family: var(--font-display); font-weight: 600; font-size: 1.75rem; height: 3.75rem;
+}
+[data-theme="notebook"] .notebook-answer[aria-invalid="true"] { text-decoration: line-through; text-decoration-color: var(--primary); text-decoration-thickness: 3px; color: var(--muted-foreground); }
+[data-theme="notebook"] .answer-ink { color: var(--primary); }
+
+/* Multiple choice: the right answer gets circled in red pen */
+[data-theme="notebook"] .guess-option { border: 2px solid var(--foreground); border-radius: 4px; background: var(--card); color: var(--foreground); }
+[data-theme="notebook"] .guess-option.is-answer { border: 3px solid var(--primary); border-radius: 9999px; background: var(--card); opacity: 1; }
+
+/* Stats as stamped boxes */
+[data-theme="notebook"] .stats-display { border-top: 0; }
+[data-theme="notebook"] .stat-box { border: 2px solid var(--foreground); background: var(--card); padding: 0.25rem 0.5rem; }
+[data-theme="notebook"] .stat-box p:first-child { font-size: 1.75rem; line-height: 1.2; }
+[data-theme="notebook"] .stat-box--accent { border-color: var(--primary); color: var(--primary); }
+[data-theme="notebook"] .stat-box--accent p:first-child { color: var(--primary); }
+
+/* Settings sheet: worksheet form with numbered sections and circled choices */
+[data-theme="notebook"] .practice-settings { border: 2px solid var(--foreground); border-radius: 0; box-shadow: 8px 8px 0 var(--foreground); }
+[data-theme="notebook"] .practice-settings > header,
+[data-theme="notebook"] .practice-settings > footer { border-color: var(--foreground); border-width: 0 0 2px; }
+[data-theme="notebook"] .practice-settings > footer { border-width: 2px 0 0; background: var(--background); }
+[data-theme="notebook"] .practice-settings > div { counter-reset: worksheet; }
+[data-theme="notebook"] .practice-settings h3 { font-size: 0.95rem; font-weight: 700; }
+[data-theme="notebook"] .practice-settings h3::before {
+  counter-increment: worksheet; content: counter(worksheet, cjk-decimal); margin-right: 0.6em;
+  font-family: var(--font-display); color: var(--primary); font-size: 1.15em;
+}
+[data-theme="notebook"] .practice-settings [role="group"] { background: transparent; border: 0; padding: 0; }
+[data-theme="notebook"] .practice-settings button[aria-pressed] {
+  background: var(--card); color: var(--foreground); border: 2px solid var(--foreground); border-radius: 4px; opacity: 1; filter: none;
+}
+[data-theme="notebook"] .practice-settings button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--primary) 7%, var(--card)); border-color: var(--primary); box-shadow: 3px 3px 0 var(--primary);
+}
+[data-theme="notebook"] .practice-settings button[aria-pressed]:disabled { opacity: 0.4; }

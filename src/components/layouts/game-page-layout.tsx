@@ -16,10 +16,10 @@ export function GamePageLayout({ title, subtitle, children, controls, topbarCont
         <div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>
       </nav>
       <header className="mb-5 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>{settingsTrigger}</div>
-        <p className="text-sm leading-relaxed text-muted-foreground">{configuration || subtitle}</p>
+        <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="font-hand text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>{settingsTrigger}</div>
+        <p className={configuration ? "config-tag text-sm leading-relaxed text-muted-foreground" : "text-sm leading-relaxed text-muted-foreground"}>{configuration || subtitle}</p>
         {(controls || topbarContent) && <div className="flex flex-wrap gap-3">{topbarContent || controls}</div>}
-        {progress}
+        {progress && <div className="notebook-panel">{progress}</div>}
       </header>
       <div className="space-y-5">{children}</div>
       {stats && <div className="mt-5">{stats}</div>}

@@ -5,7 +5,7 @@ import { ChevronDown } from "lucide-react"
 import { useTheme, type Theme } from "@/lib/theme"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
-const themes: Theme[] = ["default", "sakura", "ocean", "forest", "sunset", "daylight", "lavender", "mint"]
+const themes: Theme[] = ["default", "sakura", "ocean", "forest", "sunset", "notebook", "daylight", "lavender", "mint"]
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme()
   const { t } = useI18n()
