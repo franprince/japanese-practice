@@ -7,7 +7,7 @@ test.describe('Home Page', () => {
         await homePage.goto()
 
         const title = await homePage.getTitle()
-        expect(title).toContain('日本語')
+        expect(title).toContain(en['practice.homeHeadline'])
     })
 
     test('should display all 4 game cards', async ({ homePage }) => {
