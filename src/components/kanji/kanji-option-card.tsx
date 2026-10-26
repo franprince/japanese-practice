@@ -57,8 +57,9 @@ export function KanjiOptionCard({
     <button
       onClick={onClick}
       disabled={disabled}
+      data-result={isRevealed ? (isCorrect === true ? "correct" : isSelected ? "wrong" : "other") : undefined}
       className={cn(
-        "w-full p-3 rounded-xl border-2 text-left transition-all duration-200",
+        "choice-card w-full p-3 rounded-xl border-2 text-left transition-all duration-200",
         "",
         "disabled:cursor-not-allowed disabled:hover:scale-100",
         !isRevealed && !isSelected && "border-border/50 bg-secondary/30 hover:border-primary/50 hover:bg-secondary/50",

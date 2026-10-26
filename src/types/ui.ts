@@ -6,7 +6,7 @@ import type { GameSessionProps } from "@/lib/core/game-session"
 export type { Language, TranslationKey } from "../lib/i18n"
 
 
-export type Theme = "default" | "sakura" | "ocean" | "forest" | "sunset" | "notebook" | "daylight" | "lavender" | "mint"
+export type Theme = "notebook" | "daylight" | "lavender" | "mint" | "midnight" | "sakura" | "ocean" | "forest" | "sunset"
 
 
 export interface BaseGameCardProps extends GameSessionProps {

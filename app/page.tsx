@@ -26,8 +26,8 @@ export default function HomePage() {
   return <main className="flex-1 px-4 py-5 sm:px-6 sm:py-8">
     <div className="mx-auto max-w-5xl">
       <header className="mb-10 flex flex-wrap items-center justify-between gap-4">
-        <Link href="/" className="ink-card flex items-stretch !rounded-md !shadow-none">
-          <span lang="ja" className="flex items-center border-r-2 border-foreground px-3 py-1.5 font-hand text-xl font-semibold tracking-wider sm:text-2xl">日本語 練習</span>
+        <Link href="/" className="ink-card flex items-stretch overflow-hidden !rounded-xl !shadow-none">
+          <span lang="ja" className="flex items-center border-r border-border px-3 py-1.5 font-hand text-xl font-semibold tracking-wider sm:text-2xl">日本語 練習</span>
           <span className="hidden flex-col justify-center px-3 text-[11px] leading-tight text-muted-foreground sm:flex"><span>Nihongo Renshū</span><span>practice notebook</span></span>
         </Link>
         <div className="flex items-center gap-1"><ThemeSwitcher /><LanguageSwitcher /></div>
@@ -39,7 +39,7 @@ export default function HomePage() {
             <span lang="ja" className="font-hand text-lg">今日の練習</span>
             {language !== "ja" && <><span aria-hidden="true">—</span>{t("practice.todayLabel")}</>}
           </p>
-          <h1 className="font-hand text-4xl font-semibold leading-[1.15] sm:text-6xl">{t("practice.homeHeadline")}</h1>
+          <h1 className="font-hand text-4xl font-semibold leading-[1.12] tracking-tight sm:text-6xl">{t("practice.homeHeadline")}</h1>
           <p className="mt-6 max-w-lg text-lg leading-relaxed text-muted-foreground">{t("practice.homeTagline")}</p>
         </div>
         <div aria-hidden="true" className="relative mr-6 hidden sm:flex">
@@ -63,7 +63,7 @@ export default function HomePage() {
       </section>}
 
       <section className="mt-14" aria-labelledby="choose-heading">
-        <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b-2 border-foreground pb-3">
+        <div className="mb-6 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-border pb-3">
           <h2 id="choose-heading" className="font-hand text-3xl font-semibold">{t("practice.choose")}</h2>
           {language !== "ja" && <span lang="ja" aria-hidden="true" className="font-hand text-lg text-primary">練習を選ぶ</span>}
         </div>

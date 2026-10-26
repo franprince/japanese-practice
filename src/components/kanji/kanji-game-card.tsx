@@ -39,12 +39,12 @@ export function KanjiGameCard({ difficulty, sessionId, onSessionEvent, disableNe
 
   return (
     <div className="space-y-3">
-      <div className="bg-card border border-border/50 rounded-2xl p-4 sm:p-5 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
+      <div className="ink-card relative overflow-hidden p-4 text-center sm:p-5">
+        <div className="theme-wash absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
 
         <p className="text-xs uppercase tracking-widest text-muted-foreground mb-4">{promptLabel}</p>
 
-        <div data-testid="question-display" lang="ja" className="text-6xl sm:text-7xl font-medium mb-4 relative">{currentKanji.char}</div>
+        <div data-testid="question-display" lang="ja" className="question-cells relative mb-4 flex justify-center font-hand text-6xl font-semibold sm:text-7xl"><span className="genko-cell flex size-24 items-center justify-center sm:size-28">{currentKanji.char}</span></div>
 
         {isRevealed && (
           <div className="mt-4">
@@ -79,7 +79,7 @@ export function KanjiGameCard({ difficulty, sessionId, onSessionEvent, disableNe
 
       <div className="flex justify-center">
         {isRevealed && (
-          <Button onClick={handleNext} size="lg" className="min-h-11 w-full gap-2" disabled={disableNext}>
+          <Button onClick={handleNext} size="lg" className="ink-button min-h-11 w-full gap-2" disabled={disableNext}>
             {t("nextKanji")}
             <ArrowRight className="w-4 h-4" />
           </Button>

@@ -56,11 +56,11 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
         />
 
         <div role="group" aria-label={t("practice.answerLabel")}
-          className="min-h-12 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
+          className="notebook-answer-line min-h-12 flex items-center justify-center rounded-xl bg-secondary/30 border border-border/50 mb-4">
           {userAnswer ? (
             <span
               lang={mode === "arabicToKanji" ? "ja" : undefined}
-              className="break-all text-2xl font-medium text-foreground"
+              className="break-all font-hand text-2xl font-medium text-foreground"
             >
               {userAnswer}
             </span>
@@ -78,12 +78,12 @@ export function NumberGameCard({ difficulty, mode, sessionId, onSessionEvent, di
             t={t}
           />
         )}
-      <div className="space-y-3">
+      <div className="mt-5 space-y-3">
         {showResult ? (
           <div className="flex justify-center">
             <Button
               onClick={handleNext}
-              className="w-full max-w-md h-14 text-lg font-medium bg-primary text-primary-foreground hover:bg-primary/90"
+              className="ink-button w-full h-14 text-lg font-medium bg-primary text-primary-foreground hover:bg-primary/90"
               disabled={disableNext}
             >
               {t("nextNumber")}
