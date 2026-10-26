@@ -24,7 +24,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
     return (
       <div
         className={cn(
-          "flex flex-wrap items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50",
+          "lang-switch flex flex-wrap items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50",
           className,
         )}
       >
@@ -43,7 +43,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50 cursor-pointer",
+        "lang-switch flex flex-wrap items-center gap-1 p-1 rounded-full bg-secondary/50 border border-border/50 cursor-pointer",
         className,
       )}
     >

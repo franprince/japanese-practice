@@ -68,7 +68,7 @@ function WordsPractice() {
   }
   const modeLabel = t(settings.mode === "custom" ? "custom" : settings.mode === "hiragana" ? "hiraganaLabel" : settings.mode === "katakana" ? "katakanaLabel" : "bothLabel")
   const typeLabel = t(gameType === "words" ? "modeWords" : gameType === "characters" ? "modeCharacters" : "modeGuess")
-  return <GamePageLayout title={t("wordsLabel")} subtitle={t("tip")}
+  return <GamePageLayout kicker="ローマ字の練習" title={t("wordsLabel")} subtitle={t("tip")}
     configuration={`${modeLabel} · ${typeLabel}`} progress={<SessionProgress {...session} />}
     settingsTrigger={<PracticeSettingsTrigger onClick={() => setSettingsOpen(true)} />}
     stats={<StatsDisplay {...session} />}

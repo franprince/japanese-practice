@@ -16,7 +16,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 const isTheme = (value: string | null): value is Theme => value !== null &&
-  ["notebook", "daylight", "lavender", "mint", "midnight", "sakura", "ocean", "forest", "sunset"].includes(value)
+  ["notebook", "daylight", "lavender", "mint", "notebook-dark", "notebook-indigo", "midnight", "sakura", "ocean", "forest", "sunset"].includes(value)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useStoredPreference<Theme>("theme", "notebook", isTheme)
