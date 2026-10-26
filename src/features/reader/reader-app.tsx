@@ -7,7 +7,7 @@ import { targetOf, type LanguageChoice } from './components/LanguagePicker'
 import { LyricsView } from './components/LyricsView'
 import { SentenceView, Transcriptions, type DisplayOptions, type Translation } from './components/SentenceView'
 import { Card, SpeakButton } from './components/ui'
-import { EntryCard, SegmentCard } from './components/WordCard'
+import { ActiveKanji, EntryCard, KanjiHint, SegmentCard } from './components/WordCard'
 import { analyze, readingLines, transcriptions, type Segment } from './lib/analyze'
 import { getKanji, loadCore, loadRest, searchEnglish, wordCount, type Meta, type Word } from './lib/dictionary'
 import { hasJapanese, looksLikeRomaji, romajiToKana } from './lib/japanese'
@@ -237,7 +237,9 @@ export default function ReaderApp({ title }: { title: string }) {
     return () => mq.removeEventListener('change', on)
   }, [])
   // Recomputed every render: getKanji only answers once the dictionary (dictVersion) has loaded.
-  const firstKanji = result?.kind === 'analysis' ? [...result.text].find((c) => getKanji(c)) : undefined
+  const firstKanji = result?.kind === 'analysis'
+    ? [...result.text].find((c) => getKanji(c))
+    : result?.kind === 'english' ? [...(result.words[0]?.kanji[0] ?? '')].find((c) => getKanji(c)) : undefined
   const panelKanji = kanji ?? firstKanji
   const paste = () => navigator.clipboard?.readText().then((value) => value && setText(value), () => undefined)
 
@@ -264,8 +266,7 @@ export default function ReaderApp({ title }: { title: string }) {
         </div>
       </div>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="min-w-0 space-y-5">
+      <div className="space-y-5">
           <Card className="overflow-hidden">
             {loading && (
               <div className="h-0.5 overflow-hidden bg-primary/10" role="progressbar" aria-label="Loading the dictionary">
@@ -322,19 +323,7 @@ export default function ReaderApp({ title }: { title: string }) {
             </Card>
           )}
 
-          {result?.kind === 'analysis' && (lyrics ? (
-            <LyricsView
-              text={result.text}
-              lines={lines}
-              translation={translation}
-              options={options}
-              onOptions={setOptions}
-              language={language}
-              selected={selected}
-              onSelect={(index) => setSelected((current) => current === index ? undefined : index)}
-              onKanji={setKanji}
-            />
-          ) : (
+          {result?.kind === 'analysis' && !lyrics && (
             <>
               <SentenceView
                 text={result.text}
@@ -350,11 +339,34 @@ export default function ReaderApp({ title }: { title: string }) {
                 language={language}
                 {...transcriptions(result.segments)}
               />
-              {words.length > 0 && (
+            </>
+          )}
+      </div>
+
+      {(lyrics || words.length > 0 || result?.kind === 'english') && (
+        <ActiveKanji.Provider value={wide ? panelKanji : undefined}>
+          <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+            <div className="min-w-0">
+              {result?.kind === 'analysis' && lyrics && (
+                <LyricsView
+                  text={result.text}
+                  lines={lines}
+                  translation={translation}
+                  options={options}
+                  onOptions={setOptions}
+                  language={language}
+                  selected={selected}
+                  onSelect={(index) => setSelected((current) => current === index ? undefined : index)}
+                  onKanji={setKanji}
+                />
+              )}
+
+              {result?.kind === 'analysis' && !lyrics && words.length > 0 && (
                 <section aria-labelledby="reader-words">
-                  <div className="mb-3.5 flex items-baseline gap-3.5 border-b border-border pb-2.5">
+                  <div className="mb-3.5 flex flex-wrap items-baseline gap-x-3.5 gap-y-1 border-b border-border pb-2.5">
                     <h2 id="reader-words" className="font-hand text-2xl font-semibold">Words</h2>
                     <span lang="ja" aria-hidden="true" className="font-hand text-[17px] text-primary">単語</span>
+                    <KanjiHint wide={wide} />
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     {words.map((s) => (
@@ -365,30 +377,33 @@ export default function ReaderApp({ title }: { title: string }) {
                   </div>
                 </section>
               )}
-            </>
-          ))}
 
-          {result?.kind === 'english' && (
-            <section className="grid gap-4 md:grid-cols-2">
-              {result.words.length ? (
-                result.words.map((w) => <EntryCard key={w.id} word={w} onKanji={setKanji} />)
-              ) : (
-                <p className="py-8 text-center text-sm text-muted-foreground md:col-span-2">No matches</p>
+              {result?.kind === 'english' && (
+                <section className="grid gap-4 md:grid-cols-2">
+                  {result.words.length ? (
+                    result.words.map((w) => <EntryCard key={w.id} word={w} onKanji={setKanji} />)
+                  ) : (
+                    <p className="py-8 text-center text-sm text-muted-foreground md:col-span-2">No matches</p>
+                  )}
+                </section>
               )}
-            </section>
-          )}
-        </div>
-
-        {wide && panelKanji && (
-          <aside aria-label="Kanji" className="ink-card sticky top-6 max-h-[calc(100dvh-3rem)] overflow-y-auto p-5">
-            <div className="mb-4 flex items-baseline justify-between">
-              <h2 className="font-hand text-lg font-semibold">Kanji</h2>
-              <span lang="ja" aria-hidden="true" className="font-hand text-[15px] text-primary">漢字</span>
             </div>
-            <KanjiDetails char={panelKanji} onKanji={setKanji} actions={<SpeakButton text={panelKanji} />} />
-          </aside>
-        )}
-      </div>
+
+            {wide && panelKanji && (
+              <aside aria-label="Kanji" className="ink-card sticky top-6 max-h-[calc(100dvh-3rem)] overflow-y-auto p-5">
+                <div className="mb-4 flex items-baseline justify-between">
+                  <h2 className="font-hand text-lg font-semibold">Kanji</h2>
+                  <span lang="ja" aria-hidden="true" className="font-hand text-[15px] text-primary">漢字</span>
+                </div>
+                {/* Keyed so a newly picked kanji fades in, which ties the click in a word card to this panel. */}
+                <div key={panelKanji} className="animate-in fade-in slide-in-from-right-2 duration-300">
+                  <KanjiDetails char={panelKanji} onKanji={setKanji} actions={<SpeakButton text={panelKanji} />} />
+                </div>
+              </aside>
+            )}
+          </div>
+        </ActiveKanji.Provider>
+      )}
 
       <p className="mt-10 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
         {/* Attribution required by the EDRDG and KanjiVG licences. Dictionary versions are in reader/data/meta.json. */}

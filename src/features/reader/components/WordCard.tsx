@@ -1,5 +1,5 @@
-import { ChevronDown } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { ArrowRight, ChevronDown } from 'lucide-react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 import type { Segment } from '../lib/analyze'
 import { getKanji, type Word } from '../lib/dictionary'
 import { furigana, hepburn, isKanji, type FuriganaPart } from '../lib/japanese'
@@ -63,7 +63,22 @@ function Senses({ word, max = 5 }: { word: Word; max?: number }) {
   )
 }
 
+/** The kanji the side panel shows (wide screens only); chips for it are marked as open. */
+export const ActiveKanji = createContext<string | undefined>(undefined)
+
+/** Says where a click on a kanji goes: the side panel on wide screens, a sheet on narrow ones. */
+export function KanjiHint({ wide }: { wide: boolean }) {
+  return (
+    <span className="ml-auto inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+      <span lang="ja" aria-hidden="true" className="inline-flex size-5 items-center justify-center rounded border border-border bg-card font-hand text-[13px] text-foreground">字</span>
+      {wide ? 'Click a kanji to see it in the panel' : 'Tap a kanji for its details'}
+      {wide && <ArrowRight className="size-3.5" aria-hidden="true" />}
+    </span>
+  )
+}
+
 export function KanjiChips({ text, extra = '', onKanji }: { text: string; extra?: string; onKanji: (c: string) => void }) {
+  const active = useContext(ActiveKanji)
   // Kanji from `extra` (another spelling of the word) only appear when KANJIDIC has them.
   const chars = [...new Set([...text].filter(isKanji).concat([...extra].filter((c) => isKanji(c) && getKanji(c))))]
   if (!chars.length) return null
@@ -71,22 +86,32 @@ export function KanjiChips({ text, extra = '', onKanji }: { text: string; extra?
     <div className="flex flex-wrap gap-1.5">
       {chars.map((c) => {
         const k = getKanji(c)
+        const open = active === c
+        const label = active !== undefined ? `Show ${c} in the kanji panel` : `Kanji ${c}`
         return (
           <button
             key={c}
             type="button"
             onClick={() => onKanji(c)}
-            aria-label={`Kanji ${c}`}
-            className="group inline-flex items-center gap-1.5 rounded-lg border border-border bg-background p-1 text-left transition hover:border-primary hover:bg-primary/10"
+            aria-label={label}
+            title={label}
+            aria-pressed={active !== undefined ? open : undefined}
+            className={`group inline-flex items-center gap-1.5 rounded-lg border p-1 text-left transition hover:border-primary hover:bg-primary/10 ${
+              open ? 'border-primary bg-primary/10' : 'border-border bg-background'
+            }`}
           >
             <span className="flex size-7 items-center justify-center rounded-md bg-card font-hand text-lg leading-none shadow-sm">
               {c}
             </span>
             {k && (
-              <span className="max-w-[9rem] truncate pr-1 text-xs text-muted-foreground group-hover:text-primary">
+              <span className={`max-w-[9rem] truncate text-xs group-hover:text-primary ${open ? 'text-primary' : 'text-muted-foreground'}`}>
                 {k.meanings.slice(0, 2).join(', ')}
               </span>
             )}
+            <ArrowRight
+              aria-hidden="true"
+              className={`mr-0.5 size-3.5 shrink-0 transition group-hover:translate-x-0.5 group-hover:text-primary ${open ? 'text-primary' : 'text-muted-foreground/70'}`}
+            />
           </button>
         )
       })}
