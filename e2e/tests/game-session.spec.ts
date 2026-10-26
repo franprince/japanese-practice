@@ -11,8 +11,8 @@ type Game = typeof games[number]
 async function expectStats(page: Page, score: number, streak: number, best: number) {
     const stats = page.getByTestId('stats-display')
     for (const [label, value] of [['Score', score], ['Streak', streak], ['Best', best]] as const) {
-        const column = stats.getByText(label, { exact: true }).locator('..')
-        await expect(column.locator('p').first()).toHaveText(String(value))
+        const box = stats.locator('.stat-box').filter({ hasText: label })
+        await expect(box.locator('.stat-value')).toHaveText(String(value))
     }
 }
 

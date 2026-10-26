@@ -15,7 +15,7 @@ for (const game of ['words', 'numbers', 'dates', 'kanji'] as const) {
         const missed = new Set<string>()
         const next = game === 'words' ? 'Next Word' : game === 'numbers' ? 'Next Number' : game === 'dates' ? 'Next Date' : 'Next Kanji'
         for (let index = 0; index < 5; index++) {
-            const prompt = (await question(page).innerText()).trim()
+            const prompt = (await question(page).textContent()).trim()
             missed.add(prompt)
             if (game === 'words' || game === 'dates') {
                 await page.getByRole('textbox').fill('zzzz')
@@ -36,7 +36,7 @@ for (const game of ['words', 'numbers', 'dates', 'kanji'] as const) {
         await expect(page.getByText('Reviewing missed items', { exact: true })).toBeVisible()
         for (let index = 0; index < missed.size; index++) {
             await expect(question(page)).toBeVisible()
-            const prompt = (await question(page).innerText()).trim()
+            const prompt = (await question(page).textContent()).trim()
             expect(missed.has(prompt)).toBe(true)
             // Answer correctly where the fixture exposes the expected reading. Dates uses skips to exercise review-of-review.
             if (game === 'words') {
@@ -69,7 +69,7 @@ test('mobile settings cancel preserves input, apply restarts and persists the co
     await page.goto('/dates')
     const input = page.getByRole('textbox', { name: 'Your answer in hiragana or romaji' })
     await input.fill('unfinished')
-    const initial = await question(page).innerText()
+    const initial = await question(page).textContent()
     await page.getByTestId('settings-trigger').click()
     await settings(page).getByRole('button', { name: 'Months', exact: true }).click()
     await expect(settings(page).getByText(/Changing settings starts/)).toBeVisible()
@@ -97,7 +97,7 @@ test('beginner preset and practice-again start a fresh saved session', async ({ 
     await expect(page).toHaveURL('/words')
     await expect(page.getByTestId('session-progress')).toContainText('of 5')
     await page.getByTestId('guess-option').first().click()
-    await page.getByRole('link', { name: '← Home', exact: true }).click()
+    await page.getByRole('link', { name: 'Home', exact: true }).click()
     await page.getByRole('link', { name: 'Practice again', exact: true }).click()
     await expect(page.getByTestId('guess-option')).toHaveCount(3)
     await expect(page.getByTestId('session-progress')).toContainText('0 of 5 completed')
@@ -109,14 +109,14 @@ test('every theme defines real colors; mobile feedback stays in normal document 
     await page.goto('/words')
     await expect(question(page)).toBeVisible()
     const colors = new Set<string>()
-    for (const theme of ['default', 'sakura', 'ocean', 'forest', 'sunset', 'daylight', 'lavender', 'mint']) {
+    for (const theme of ['notebook', 'notebook-dark', 'notebook-indigo', 'midnight', 'sakura', 'ocean', 'forest', 'sunset', 'daylight', 'lavender', 'mint']) {
         await page.evaluate(value => { localStorage.setItem('theme', value); window.dispatchEvent(new CustomEvent('kana-words-preference', { detail: 'theme' })) }, theme)
         await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
         const result = await page.evaluate(() => ({ background: getComputedStyle(document.body).backgroundColor, scheme: getComputedStyle(document.documentElement).colorScheme }))
         colors.add(result.background)
-        expect(result.scheme).toBe(['daylight', 'lavender', 'mint'].includes(theme) ? 'light' : 'dark')
+        expect(result.scheme).toBe(['notebook', 'daylight', 'lavender', 'mint'].includes(theme) ? 'light' : 'dark')
     }
-    expect(colors.size).toBe(8)
+    expect(colors.size).toBe(11)
     await expect(page.getByTestId('session-progress')).toBeInViewport()
     await page.getByRole('textbox').fill('zzzz')
     await page.getByRole('button', { name: 'Check', exact: true }).click()

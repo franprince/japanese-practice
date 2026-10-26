@@ -303,3 +303,5 @@
   --nb-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
   --nb-shadow-red: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 18px -10px rgb(240 120 92 / 0.45);
 }
+/* Narrow screens: drop the kanji half of the stat labels so three boxes fit 320px. */
+@media (max-width: 639px) { [data-theme^="notebook"] .stat-box .notebook-only { display: none !important; } }
