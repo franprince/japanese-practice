@@ -17,6 +17,7 @@ type SeoDescriptionKey =
   | "seo.kanji.description"
   | "seo.numbers.description"
   | "seo.dates.description"
+  | "seo.reader.description"
 
 interface PageMetadataOptions {
   title: string

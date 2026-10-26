@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: "standalone",
+    // kuromoji (the reader's tokenizer) imports Node's "path" and zlibjs in the browser; swap in small shims there.
+    turbopack: {
+        resolveAlias: {
+            path: { browser: "./src/features/reader/lib/shims/path.ts" },
+            "zlibjs/bin/gunzip.min.js": { browser: "./src/features/reader/lib/shims/gunzip.ts" },
+        },
+    },
     async headers() {
         return [
             {

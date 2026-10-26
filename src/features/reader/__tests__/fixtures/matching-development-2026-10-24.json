@@ -1,0 +1,312 @@
+[
+  {
+    "name": "complete prose sentences",
+    "target": "EN-US",
+    "source": [
+      "雨が降っています。",
+      "窓を閉めます。"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "It's raining.\nI'll close the window."
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "It's raining.\n\nI'm closing the window.",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "It's raining."
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "I'm closing the window."
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "It's raining.\nI'll close the window.",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "It's raining."
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "I'll close the window."
+        }
+      ]
+    }
+  },
+  {
+    "name": "one sentence spanning multiple source lines",
+    "target": "ES",
+    "source": [
+      "窓を開けると",
+      "冷たい風が入った。",
+      "部屋は静かだった。"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "Al abrir la ventana,\nentró una brisa fría.\nLa habitación estaba en silencio."
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "Al abrir la ventana\n, entró una brisa fría.\n\nLa habitación estaba en silencio.",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Al abrir la ventana"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": ", entró una brisa fría."
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "La habitación estaba en silencio."
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "Al abrir la ventana,\nentró una brisa fría.\nLa habitación estaba en silencio.",
+      "groups": [
+        {
+          "start": 0,
+          "end": 1,
+          "text": "Al abrir la ventana,\nentró una brisa fría."
+        },
+        {
+          "start": 2,
+          "end": 2,
+          "text": "La habitación estaba en silencio."
+        }
+      ]
+    }
+  },
+  {
+    "name": "target expands a sentence into lines",
+    "target": "DE",
+    "source": [
+      "橋を渡った。",
+      "駅で待った。"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "Ich bin über die Brücke gegangen.\nIch habe am Bahnhof gewartet."
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "Ich bin über die Brücke gegangen. Ich\n\nhabe am Bahnhof gewartet.",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Ich bin über die Brücke gegangen. Ich"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "habe am Bahnhof gewartet."
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "Ich bin über die Brücke gegangen.\nIch habe am Bahnhof gewartet.",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "Ich bin über die Brücke gegangen."
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "Ich habe am Bahnhof gewartet."
+        }
+      ]
+    }
+  },
+  {
+    "name": "reordered shared names need one group",
+    "target": "FR",
+    "source": [
+      "ALPHAを先に",
+      "BETAを後に"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "ALPHA d'abord,\nBETA ensuite"
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "ALPHA d'abord,\n\nBETA ensuite",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "ALPHA d'abord,"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "BETA ensuite"
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "ALPHA d'abord,\nBETA ensuite",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "ALPHA d'abord,"
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "BETA ensuite"
+        }
+      ]
+    }
+  },
+  {
+    "name": "formatting shift hidden by equal line counts",
+    "target": "EN-US",
+    "source": [
+      "朝になった。",
+      "鳥が鳴いた。",
+      "家を出た。"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "Morning came.\nThe birds sang.\nI left the house."
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "Morning came.\n\nThe birds sang.\n\nI left the house.",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Morning came."
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "The birds sang."
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "I left the house."
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "Morning came.\nThe birds sang.\nI left the house.",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "Morning came."
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "The birds sang."
+        },
+        {
+          "start": 2,
+          "end": 2,
+          "text": "I left the house."
+        }
+      ]
+    }
+  },
+  {
+    "name": "stanzas preserve boundaries without shared script",
+    "target": "AR",
+    "source": [
+      "夜が明ける",
+      "",
+      "海が光る"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "يطل الفجر\n\nيتلألأ البحر"
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "يطلع الفجر،\n\n\nويتلألأ البحر",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "يطلع الفجر،"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": ""
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "ويتلألأ البحر"
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "يطل الفجر\n\nيتلألأ البحر",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "يطل الفجر"
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": ""
+        },
+        {
+          "start": 2,
+          "end": 2,
+          "text": "يتلألأ البحر"
+        }
+      ]
+    }
+  }
+]

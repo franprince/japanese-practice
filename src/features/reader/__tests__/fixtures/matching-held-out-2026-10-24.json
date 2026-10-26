@@ -1,0 +1,334 @@
+[
+  {
+    "name": "repeated dialogue retains occurrence identity",
+    "target": "FR",
+    "source": [
+      "行こう",
+      "まだ待って",
+      "行こう"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "Allons-y\nAttends encore un peu\nAllons-y"
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "Allons-y,\n\nattends encore,\n\nallons-y",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Allons-y,"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "attends encore,"
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "allons-y"
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "Allons-y\nAttends encore un peu\nAllons-y",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "Allons-y"
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "Attends encore un peu"
+        },
+        {
+          "start": 2,
+          "end": 2,
+          "text": "Allons-y"
+        }
+      ]
+    }
+  },
+  {
+    "name": "merged target sentence followed by independent sentence",
+    "target": "AR",
+    "source": [
+      "本を閉じた。",
+      "電気を消した。",
+      "外は暗かった。"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "أغلقت الكتاب.\nأطفأت الأنوار.\nكان الظلام يعم الخارج."
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "أغلقت الكتاب.\n\nأطفأت الأنوار.\n\nكان الظلام يعم الخارج.",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "أغلقت الكتاب."
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "أطفأت الأنوار."
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "كان الظلام يعم الخارج."
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "أغلقت الكتاب.\nأطفأت الأنوار.\nكان الظلام يعم الخارج.",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "أغلقت الكتاب."
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "أطفأت الأنوار."
+        },
+        {
+          "start": 2,
+          "end": 2,
+          "text": "كان الظلام يعم الخارج."
+        }
+      ]
+    }
+  },
+  {
+    "name": "CJK target with no unchanged anchors",
+    "target": "ZH-HANS",
+    "source": [
+      "春が来た。",
+      "花が咲いた。"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "春天来了。\n花开了。"
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "春天来了。\n花开了。",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "春天来了。"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "花开了。"
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "春天来了。\n花开了。",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "春天来了。"
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "花开了。"
+        }
+      ]
+    }
+  },
+  {
+    "name": "one source line covers several translated sentences",
+    "target": "DE",
+    "source": [
+      "扉を開けた。誰もいなかった。",
+      "階段を下りた。"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "Ich öffnete die Tür. Es war niemand da.\nIch ging die Treppe hinunter."
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "Ich öffnete die Tür. Es war niemand da.\n\nIch ging die Treppe hinunter.",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Ich öffnete die Tür. Es war niemand da."
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "Ich ging die Treppe hinunter."
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "Ich öffnete die Tür. Es war niemand da.\nIch ging die Treppe hinunter.",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "Ich öffnete die Tür. Es war niemand da."
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "Ich ging die Treppe hinunter."
+        }
+      ]
+    }
+  },
+  {
+    "name": "unchanged identifier bounds an otherwise uncertain lyric",
+    "target": "PT-BR",
+    "source": [
+      "名前を呼んで",
+      "遠くまで",
+      "ROOM42で待つ",
+      "夜が明ける"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "Chame meu nome\nAté bem longe\nVou esperar no ROOM42\nAté o amanhecer"
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "Chamo seu nome e\n\nespero\n\nno ROOM42 até bem longe, enquanto\n\no dia amanhece",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Chamo seu nome e"
+          },
+          {
+            "start": 1,
+            "end": 2,
+            "text": "espero\n\nno ROOM42 até bem longe, enquanto"
+          },
+          {
+            "start": 3,
+            "end": 3,
+            "text": "o dia amanhece"
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "Chame meu nome\nAté bem longe\nVou esperar no ROOM42\nAté o amanhecer",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "Chame meu nome"
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "Até bem longe"
+        },
+        {
+          "start": 2,
+          "end": 2,
+          "text": "Vou esperar no ROOM42"
+        },
+        {
+          "start": 3,
+          "end": 3,
+          "text": "Até o amanhecer"
+        }
+      ]
+    }
+  },
+  {
+    "name": "repeated anchors cannot resolve an expanded chorus",
+    "target": "ES-419",
+    "source": [
+      "LUNAと歌う",
+      "LUNAと帰る",
+      "眠る"
+    ],
+    "plain": {
+      "status": 200,
+      "body": {
+        "text": "Cantar con LUNA\nRegresar con LUNA\nDormir"
+      }
+    },
+    "structured": {
+      "status": 200,
+      "body": {
+        "text": "Cantar con LUNA,\n\nvolver con LUNA,\n\ndormir",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Cantar con LUNA,"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "volver con LUNA,"
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "dormir"
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "text": "Cantar con LUNA\nRegresar con LUNA\nDormir",
+      "groups": [
+        {
+          "start": 0,
+          "end": 0,
+          "text": "Cantar con LUNA"
+        },
+        {
+          "start": 1,
+          "end": 1,
+          "text": "Regresar con LUNA"
+        },
+        {
+          "start": 2,
+          "end": 2,
+          "text": "Dormir"
+        }
+      ]
+    }
+  }
+]

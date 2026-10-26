@@ -303,3 +303,17 @@
   --nb-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
   --nb-shadow-red: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 18px -10px rgb(240 120 92 / 0.45);
 }
+
+/* ── Reader (Nihongo Rubi) ─────────────────────────────────────────────── */
+.reader rt, .reader-mark rt { font-family: var(--font-display); font-size: 0.45em; font-weight: 500; color: var(--primary); letter-spacing: 0.04em; }
+.reader .no-furigana rt { visibility: hidden; }
+.seg-switch { display: flex; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: var(--card); }
+.seg-switch > button { min-height: 40px; padding: 0 14px; font-size: 13px; font-weight: 700; color: var(--foreground); transition: background-color .15s; }
+.seg-switch > button[data-detected] { color: var(--primary); }
+.seg-switch > button[aria-checked="true"] { background: var(--foreground); color: var(--card); }
+.reader-tool-button { display: inline-flex; width: 40px; height: 40px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 10px; background: var(--card); color: var(--foreground); }
+.reader-tool-button:hover { color: var(--primary); }
+@keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.stroke-anim path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 0.55s ease-in-out forwards; }
+@media (prefers-reduced-motion: reduce) { .stroke-anim path { animation: none; stroke-dashoffset: 0; } }
