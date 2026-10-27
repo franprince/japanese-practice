@@ -7,6 +7,7 @@ const routes = [
   { path: "/kanji", priority: 0.9 },
   { path: "/numbers", priority: 0.8 },
   { path: "/dates", priority: 0.8 },
+  { path: "/reader", priority: 0.8 },
 ] as const
 
 export default function sitemap(): MetadataRoute.Sitemap {

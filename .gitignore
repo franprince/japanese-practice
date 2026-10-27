@@ -45,3 +45,7 @@ public/wordset-*-v*.json
 
 # Generated immutable delivery assets and manifest
 public/wordsets/
+
+# reader (Nihongo Rubi) generated data
+/public/reader/
+/data-src/
