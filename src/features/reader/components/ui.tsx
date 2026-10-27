@@ -86,6 +86,17 @@ export function Badge({ children, tone = 'neutral' }: { children: ReactNode; ton
   )
 }
 
+/** Placeholder bars for content that is still on its way; `widths` sets one bar per line. */
+export function Skeleton({ widths = ['100%'], className = '' }: { widths?: string[]; className?: string }) {
+  return (
+    <div aria-hidden="true" className={`space-y-2 ${className}`}>
+      {widths.map((width, i) => (
+        <div key={i} style={{ width }} className="h-5 max-w-full animate-pulse rounded-md bg-muted" />
+      ))}
+    </div>
+  )
+}
+
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
     <section

@@ -131,15 +131,15 @@ export function pickLanguage(country: string | undefined, browser: readonly stri
   return available(browser.flatMap(fromBrowser))[0] ?? ENGLISH
 }
 
-/** DeepL code → BCP 47 tag, for Intl and MyMemory: ZH-HANS → zh-Hans, PT-BR → pt-BR. */
+/** DeepL code → BCP 47 tag, for Intl and Google Translate links: ZH-HANS → zh-Hans, PT-BR → pt-BR. */
 export function toTag(code: string): string {
   const [lang = '', sub] = code.split('-')
   if (!sub) return lang.toLowerCase()
   return `${lang.toLowerCase()}-${sub.length === 4 ? sub[0] + sub.slice(1).toLowerCase() : sub}`
 }
 
-const MYMEMORY: Record<string, string> = { 'zh-Hans': 'zh-CN', 'zh-Hant': 'zh-TW', 'es-419': 'es', 'en-US': 'en', 'en-GB': 'en', 'pt-PT': 'pt', nb: 'no' }
-export const myMemoryCode = (code: string) => MYMEMORY[toTag(code)] ?? toTag(code)
+const GOOGLE: Record<string, string> = { 'zh-Hans': 'zh-CN', 'zh-Hant': 'zh-TW', 'es-419': 'es', 'en-US': 'en', 'en-GB': 'en', 'pt-PT': 'pt', nb: 'no' }
+export const googleCode = (code: string) => GOOGLE[toTag(code)] ?? toTag(code)
 
 const capitalize = (s: string, tag: string) => s.charAt(0).toLocaleUpperCase(tag) + s.slice(1)
 

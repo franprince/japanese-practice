@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { FALLBACK_LANGUAGES, filterLanguages, myMemoryCode, nativeName, pickLanguage, toTag } from '../lib/languages'
+import { FALLBACK_LANGUAGES, filterLanguages, googleCode, nativeName, pickLanguage, toTag } from '../lib/languages'
 
 const deepl = new Set(FALLBACK_LANGUAGES.map((l) => l.code))
 const withLatam = new Set([...deepl, 'ES-419', 'HE'])
@@ -44,10 +44,10 @@ describe('language names and codes', () => {
   it('converts DeepL codes to BCP 47 and MyMemory codes', () => {
     expect(toTag('ZH-HANS')).toBe('zh-Hans')
     expect(toTag('ES-419')).toBe('es-419')
-    expect(myMemoryCode('ZH-HANT')).toBe('zh-TW')
-    expect(myMemoryCode('EN-US')).toBe('en')
-    expect(myMemoryCode('PT-BR')).toBe('pt-BR')
-    expect(myMemoryCode('NB')).toBe('no')
+    expect(googleCode('ZH-HANT')).toBe('zh-TW')
+    expect(googleCode('EN-US')).toBe('en')
+    expect(googleCode('PT-BR')).toBe('pt-BR')
+    expect(googleCode('NB')).toBe('no')
   })
   it('finds languages by English name, own name or code, ignoring accents', () => {
     expect(filterLanguages('ger', FALLBACK_LANGUAGES)[0]!.code).toBe('DE')
