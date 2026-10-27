@@ -1,3 +1,18 @@
+# [3.7.0](https://github.com/franprince/japanese-practice/compare/v3.6.0...v3.7.0) (2026-10-27)
+
+
+### Bug Fixes
+
+* **e2e:** align browser tests with the notebook UI and fit stats at 320px ([1af27f8](https://github.com/franprince/japanese-practice/commit/1af27f868d808c4d60887ac1db318b2a9548e0fe))
+* **e2e:** satisfy typecheck for textContent results ([d69c7ec](https://github.com/franprince/japanese-practice/commit/d69c7ece6f283184e4e28d37c1a1afa443754245))
+
+
+### Features
+
+* **ui:** match canvas layout and add Notebook Dark / Indigo themes ([4360435](https://github.com/franprince/japanese-practice/commit/4360435eaa9c5d8f645e445ba82be2b9445e6f4a))
+* **ui:** modern notebook pass across all practice games ([19d0a22](https://github.com/franprince/japanese-practice/commit/19d0a22a19dfb00d447ff32403839baca46627a4))
+* **ui:** notebook (genkō yōshi) theme and practice UX refresh ([0ddbd3d](https://github.com/franprince/japanese-practice/commit/0ddbd3d39abf3700f8aff8359187e760f3d2f673))
+
 # [3.6.0](https://github.com/franprince/japanese-practice/compare/v3.5.0...v3.6.0) (2026-09-06)
 
 
