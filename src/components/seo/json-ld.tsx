@@ -33,9 +33,11 @@ function buildWebApplicationLd(): JsonLdData {
       "Kanji reading and meaning quizzes (N5–N1)",
       "Japanese number writing drills",
       "Japanese date reading exercises",
+      "Reader with furigana, romaji, translation and kanji details for any text or song",
       "Streak tracking and session progress",
       "Multiple difficulty levels",
       "Multilingual interface (EN/ES/JA)",
+      "Notebook-style light and dark themes",
     ],
   }
 }

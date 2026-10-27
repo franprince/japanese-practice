@@ -8,8 +8,18 @@ export const OG_IMAGE = {
   url: "/opengraph-image",
   width: 1200,
   height: 630,
-  alt: `${SITE_NAME} — Japanese Practice App`,
+  alt: `${SITE_NAME} — A little Japanese, every day. Japanese practice notebook.`,
 }
+
+/** Notebook theme palette (see `[data-theme^="notebook"]` in app/globals.css) for assets rendered outside CSS. */
+export const NOTEBOOK = {
+  paper: "#f5f1e6",
+  card: "#fffdf8",
+  ink: "#22201c",
+  muted: "#5c564c",
+  red: "#b5371f",
+  border: "#ddd6c7",
+} as const
 
 type SeoDescriptionKey =
   | "seo.home.description"

@@ -14,6 +14,7 @@ const descriptionKeys = [
   "seo.kanji.description",
   "seo.numbers.description",
   "seo.dates.description",
+  "seo.reader.description",
 ] as const
 
 describe("SEO metadata", () => {
