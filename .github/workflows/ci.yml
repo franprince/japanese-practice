@@ -33,6 +33,9 @@ jobs:
       - name: Lint
         run: bun run lint
 
+      - name: Reader data
+        run: bun run reader:data
+
       - name: Unit tests
         run: bun run test:unit
 

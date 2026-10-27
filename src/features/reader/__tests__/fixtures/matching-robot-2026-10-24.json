@@ -1,0 +1,404 @@
+{
+  "observed": "2026-10-24",
+  "origin": "https://nihongo-rubi.vercel.app",
+  "source": "眉間に小さなチップを埋めるだけ\n決して痛くはないですよ\nロボット\n新しいロボットになろう\n不安や虚無から解放されるなら\n決して高くはないですよ\nロボット oh\n素晴らしいロボットになろうよ\n弁護士ロボ 魚屋ロボ\n歯科助手ロボ お米屋ロボ\n税理士ロボ おもちゃ屋ロボ\nアイドルロボ 警察ロボ\n日本の2割が賛成している (Ooh)\n不安や虚無から解放されるという (Ooh)\nお母さんロボ 赤ちゃんロボ (お母さんロボ 赤ちゃんロボ)\n保育士ロボ 学生ロボ (保育士ロボ 学生ロボ)\n先生ロボ 看護婦ロボ (先生ロボ 看護婦ロボ)\n介護士ロボ 葬儀屋ロボ (介護士ロボ 葬儀屋ロボ)\n日本の5割が賛成している (Ooh)\n危険のランプが点滅している (Ooh)\n弁護士ロボ\n歯科助手ロボ\n税理士ロボ\nアイドルロボ\nお母さんロボ\n保育士ロボ",
+  "sourceLines": 26,
+  "characters": 367,
+  "bytes": 945,
+  "requests": {
+    "structured": {
+      "format": "lines",
+      "v": "3"
+    },
+    "plain": {
+      "v": "2"
+    }
+  },
+  "results": {
+    "ES": {
+      "structured": {
+        "text": "Solo hay que implantar un pequeño chip entre las cejas\n. No duele nada, robot\n.\n\nConviértete en un nuevo robot.\n\nSi eso te libera de la ansiedad y el vacío,\n\nno es nada caro, robot.\n\nOh,\n\n¡qué maravilla! Conviértete en un robot. Robot abogado,\n\nrobot pescadero, robot asistente dental,\n\nrobot arrocero,\n\nrobot asesor fiscal, robot juguetero, robot ídolo,\n\nrobot policía...\n\nEl 20 % de los japoneses está a favor (Ooh)\n\nDicen que nos liberará de la ansiedad y el vacío (Ooh)\n\nRobot-mamá, robot-bebé (Robot-mamá, robot-bebé)\n\nRobot-cuidadora, robot-estudiante (Robot-cuidadora, robot-estudiante)\n\nRobot-profesor, robot-enfermera (Robot profesor, robot enfermera)\n\nRobot cuidador, robot funerario (Robot cuidador, robot funerario)\n. El 50 % de los japoneses está a favor. (Ooh)\n\nLa luz de peligro parpadea. (Ooh)\n\nRobot\n\nabogado\n, robot\n\nasistente dental,\n\nrobot asesor fiscal,\n\nrobot ídolo, robot mamá, robot cuidador de guardería.",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Solo hay que implantar un pequeño chip entre las cejas"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": ". No duele nada, robot"
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "."
+          },
+          {
+            "start": 3,
+            "end": 3,
+            "text": "Conviértete en un nuevo robot."
+          },
+          {
+            "start": 4,
+            "end": 4,
+            "text": "Si eso te libera de la ansiedad y el vacío,"
+          },
+          {
+            "start": 5,
+            "end": 5,
+            "text": "no es nada caro, robot."
+          },
+          {
+            "start": 6,
+            "end": 6,
+            "text": "Oh,"
+          },
+          {
+            "start": 7,
+            "end": 7,
+            "text": "¡qué maravilla! Conviértete en un robot. Robot abogado,"
+          },
+          {
+            "start": 8,
+            "end": 8,
+            "text": "robot pescadero, robot asistente dental,"
+          },
+          {
+            "start": 9,
+            "end": 9,
+            "text": "robot arrocero,"
+          },
+          {
+            "start": 10,
+            "end": 10,
+            "text": "robot asesor fiscal, robot juguetero, robot ídolo,"
+          },
+          {
+            "start": 11,
+            "end": 11,
+            "text": "robot policía..."
+          },
+          {
+            "start": 12,
+            "end": 12,
+            "text": "El 20 % de los japoneses está a favor (Ooh)"
+          },
+          {
+            "start": 13,
+            "end": 13,
+            "text": "Dicen que nos liberará de la ansiedad y el vacío (Ooh)"
+          },
+          {
+            "start": 14,
+            "end": 14,
+            "text": "Robot-mamá, robot-bebé (Robot-mamá, robot-bebé)"
+          },
+          {
+            "start": 15,
+            "end": 15,
+            "text": "Robot-cuidadora, robot-estudiante (Robot-cuidadora, robot-estudiante)"
+          },
+          {
+            "start": 16,
+            "end": 16,
+            "text": "Robot-profesor, robot-enfermera (Robot profesor, robot enfermera)"
+          },
+          {
+            "start": 17,
+            "end": 17,
+            "text": "Robot cuidador, robot funerario (Robot cuidador, robot funerario)"
+          },
+          {
+            "start": 18,
+            "end": 18,
+            "text": ". El 50 % de los japoneses está a favor. (Ooh)"
+          },
+          {
+            "start": 19,
+            "end": 19,
+            "text": "La luz de peligro parpadea. (Ooh)"
+          },
+          {
+            "start": 20,
+            "end": 20,
+            "text": "Robot"
+          },
+          {
+            "start": 21,
+            "end": 25,
+            "text": "abogado\n, robot\n\nasistente dental,\n\nrobot asesor fiscal,\n\nrobot ídolo, robot mamá, robot cuidador de guardería."
+          }
+        ]
+      },
+      "plain": {
+        "text": "Solo hay que implantar un pequeño chip entre las cejas.\nNo duele nada, de verdad.\nRobot.\nConviértete en un nuevo robot.\nSi eso te libera de la ansiedad y el vacío,\nno es nada caro.\nRobot, oh.\nConviértete en un robot maravilloso.\nRobot abogado, robot pescadero,\nrobot asistente dental, robot arrocero,\nrobot asesor fiscal, robot juguetero,\nrobot ídolo, robot policía\nEl 20 % de los japoneses está a favor (Ooh)\nDicen que nos liberará de la ansiedad y el vacío (Ooh)\nRobot-mamá, robot-bebé (Robot-mamá, robot-bebé)\nRobot-cuidador, robot-estudiante (Robot-cuidador, robot-estudiante)\nRobot-profesor, robot-enfermera (Robot-profesor, robot-enfermera)\nRobot cuidador, robot funerario (robot cuidador, robot funerario)\nEl 50 % de los japoneses está a favor (Ooh)\nLa luz de peligro parpadea (Ooh)\nRobot abogado\nRobot asistente dental\nRobot asesor fiscal\nRobot ídolo\nRobot mamá\nRobot cuidador de guardería"
+      }
+    },
+    "ES-419": {
+      "structured": {
+        "text": "Solo hay que implantar un pequeño chip entre las cejas\n. No duele para nada. Robot\n.\n\nConviértete en un nuevo robot.\n\nSi eso te libera de la ansiedad y el vacío,\n\nno es nada caro. Robot.\n\nOh,\n\n¡qué maravilloso! Conviértete en un robot. Robot abogado,\n\nrobot pescadero, robot asistente dental,\n\nrobot vendedor de arroz,\n\nrobot contador, robot de juguetería, robot ídolo,\n\nrobot policía.\n\nEl 20 % de los japoneses está de acuerdo. (Ooh)\n\nDicen que nos liberará de la ansiedad y el vacío (Ooh)\n\nRobot mamá, robot bebé (Robot mamá, robot bebé)\n\nRobot guardería, robot estudiante (Robot guardería, robot estudiante)\n\nRobot maestro, robot enfermera (Robot maestro, robot enfermera)\n\nRobot cuidador, robot funerario (Robot cuidador, robot funerario)\n. El 50 % de los japoneses está de acuerdo. (Ooh)\n\nLa luz de peligro está parpadeando. (Ooh)\n\nRobot abogado\n, robot asistente dental, robot\n\ncontador, robot í\ndolo,\n\nrobot\n\nmamá, robot guardería",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "Solo hay que implantar un pequeño chip entre las cejas"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": ". No duele para nada. Robot"
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "."
+          },
+          {
+            "start": 3,
+            "end": 3,
+            "text": "Conviértete en un nuevo robot."
+          },
+          {
+            "start": 4,
+            "end": 4,
+            "text": "Si eso te libera de la ansiedad y el vacío,"
+          },
+          {
+            "start": 5,
+            "end": 5,
+            "text": "no es nada caro. Robot."
+          },
+          {
+            "start": 6,
+            "end": 6,
+            "text": "Oh,"
+          },
+          {
+            "start": 7,
+            "end": 7,
+            "text": "¡qué maravilloso! Conviértete en un robot. Robot abogado,"
+          },
+          {
+            "start": 8,
+            "end": 8,
+            "text": "robot pescadero, robot asistente dental,"
+          },
+          {
+            "start": 9,
+            "end": 9,
+            "text": "robot vendedor de arroz,"
+          },
+          {
+            "start": 10,
+            "end": 10,
+            "text": "robot contador, robot de juguetería, robot ídolo,"
+          },
+          {
+            "start": 11,
+            "end": 11,
+            "text": "robot policía."
+          },
+          {
+            "start": 12,
+            "end": 12,
+            "text": "El 20 % de los japoneses está de acuerdo. (Ooh)"
+          },
+          {
+            "start": 13,
+            "end": 13,
+            "text": "Dicen que nos liberará de la ansiedad y el vacío (Ooh)"
+          },
+          {
+            "start": 14,
+            "end": 14,
+            "text": "Robot mamá, robot bebé (Robot mamá, robot bebé)"
+          },
+          {
+            "start": 15,
+            "end": 15,
+            "text": "Robot guardería, robot estudiante (Robot guardería, robot estudiante)"
+          },
+          {
+            "start": 16,
+            "end": 16,
+            "text": "Robot maestro, robot enfermera (Robot maestro, robot enfermera)"
+          },
+          {
+            "start": 17,
+            "end": 17,
+            "text": "Robot cuidador, robot funerario (Robot cuidador, robot funerario)"
+          },
+          {
+            "start": 18,
+            "end": 18,
+            "text": ". El 50 % de los japoneses está de acuerdo. (Ooh)"
+          },
+          {
+            "start": 19,
+            "end": 19,
+            "text": "La luz de peligro está parpadeando. (Ooh)"
+          },
+          {
+            "start": 20,
+            "end": 20,
+            "text": "Robot abogado"
+          },
+          {
+            "start": 21,
+            "end": 21,
+            "text": ", robot asistente dental, robot"
+          },
+          {
+            "start": 22,
+            "end": 25,
+            "text": "contador, robot í\ndolo,\n\nrobot\n\nmamá, robot guardería"
+          }
+        ]
+      },
+      "plain": {
+        "text": "Solo hay que implantar un pequeño chip entre las cejas\nNo duele para nada\nRobot\nConviértete en un nuevo robot\nSi eso te libera de la ansiedad y el vacío\nNo es nada caro\nRobot, oh\nConviértete en un robot maravilloso\nRobot abogado, robot pescadero\nRobot asistente dental, robot vendedor de arroz\nRobot contador, robot vendedor de juguetes\nRobot ídolo, robot policía\nEl 20 % de los japoneses está de acuerdo (Ooh)\nDicen que nos liberará de la ansiedad y el vacío (Ooh)\nRobot mamá, robot bebé (Robot mamá, robot bebé)\nRobot guardería, robot estudiante (Robot guardería, robot estudiante)\nRobot maestro, robot enfermera (Robot maestro, robot enfermera)\nRobot cuidador, robot funerario (robot cuidador, robot funerario)\nEl 50 % de los japoneses está de acuerdo (Ooh)\nLa luz de peligro está parpadeando (Ooh)\nRobot abogado\nRobot asistente dental\nRobot contador\nRobot ídolo\nRobot mamá\nRobot guardería"
+      }
+    },
+    "EN-US": {
+      "structured": {
+        "text": "All you have to do is implant a tiny chip between your eyebrows\n—it doesn’t hurt at all\n.\n\nRobot. Let’s become a new kind of robot.\n\nIf it means being freed from anxiety and emptiness,\n\nit’s definitely not too expensive.\nRobot. Oh\n, let’s become amazing robots!\n\nLawyer robots, fishmonger robots\n, dental assistant robots, rice shop robots\n, tax accountant robots, toy store robots\n, idol robots, police robots\n—20% of Japan is in favor of this. (Ooh)\n\nThey say it’ll free us from anxiety and emptiness (Ooh)\n\nMom robots, baby robots (Mom robots, baby robots)\n\nDaycare worker robots, student robots (Daycare worker robots, student robots)\n\nTeacher robots, nurse robots (Teacher robot, Nurse robot)\n\nCaregiver robot, Funeral director robot (Caregiver robot, Funeral director robot)\n\n50% of Japan is in favor (Ooh)\n\nThe danger light is flashing (Ooh)\n\nLawyer robot\n, Dental assistant robot, Tax\n\naccountant\n\nrobot,\n\nIdol robot, Mom\n\nrobot, Daycare worker robot",
+        "groups": [
+          {
+            "start": 0,
+            "end": 0,
+            "text": "All you have to do is implant a tiny chip between your eyebrows"
+          },
+          {
+            "start": 1,
+            "end": 1,
+            "text": "—it doesn’t hurt at all"
+          },
+          {
+            "start": 2,
+            "end": 2,
+            "text": "."
+          },
+          {
+            "start": 3,
+            "end": 3,
+            "text": "Robot. Let’s become a new kind of robot."
+          },
+          {
+            "start": 4,
+            "end": 4,
+            "text": "If it means being freed from anxiety and emptiness,"
+          },
+          {
+            "start": 5,
+            "end": 5,
+            "text": "it’s definitely not too expensive."
+          },
+          {
+            "start": 6,
+            "end": 6,
+            "text": "Robot. Oh"
+          },
+          {
+            "start": 7,
+            "end": 7,
+            "text": ", let’s become amazing robots!"
+          },
+          {
+            "start": 8,
+            "end": 8,
+            "text": "Lawyer robots, fishmonger robots"
+          },
+          {
+            "start": 9,
+            "end": 9,
+            "text": ", dental assistant robots, rice shop robots"
+          },
+          {
+            "start": 10,
+            "end": 10,
+            "text": ", tax accountant robots, toy store robots"
+          },
+          {
+            "start": 11,
+            "end": 11,
+            "text": ", idol robots, police robots"
+          },
+          {
+            "start": 12,
+            "end": 12,
+            "text": "—20% of Japan is in favor of this. (Ooh)"
+          },
+          {
+            "start": 13,
+            "end": 13,
+            "text": "They say it’ll free us from anxiety and emptiness (Ooh)"
+          },
+          {
+            "start": 14,
+            "end": 14,
+            "text": "Mom robots, baby robots (Mom robots, baby robots)"
+          },
+          {
+            "start": 15,
+            "end": 15,
+            "text": "Daycare worker robots, student robots (Daycare worker robots, student robots)"
+          },
+          {
+            "start": 16,
+            "end": 16,
+            "text": "Teacher robots, nurse robots (Teacher robot, Nurse robot)"
+          },
+          {
+            "start": 17,
+            "end": 17,
+            "text": "Caregiver robot, Funeral director robot (Caregiver robot, Funeral director robot)"
+          },
+          {
+            "start": 18,
+            "end": 18,
+            "text": "50% of Japan is in favor (Ooh)"
+          },
+          {
+            "start": 19,
+            "end": 19,
+            "text": "The danger light is flashing (Ooh)"
+          },
+          {
+            "start": 20,
+            "end": 20,
+            "text": "Lawyer robot"
+          },
+          {
+            "start": 21,
+            "end": 21,
+            "text": ", Dental assistant robot, Tax"
+          },
+          {
+            "start": 22,
+            "end": 22,
+            "text": "accountant"
+          },
+          {
+            "start": 23,
+            "end": 23,
+            "text": "robot,"
+          },
+          {
+            "start": 24,
+            "end": 24,
+            "text": "Idol robot, Mom"
+          },
+          {
+            "start": 25,
+            "end": 25,
+            "text": "robot, Daycare worker robot"
+          }
+        ]
+      },
+      "plain": {
+        "text": "All you have to do is have a tiny chip implanted between your eyebrows.\nIt doesn’t hurt at all.\nRobot\nLet’s become a new kind of robot.\nIf it means being freed from anxiety and emptiness,\nit’s definitely not expensive.\nRobot, oh\nLet’s become amazing robots.\nLawyer robot, fishmonger robot,\ndental assistant robot, rice shop robot,\ntax accountant robot, toy store robot,\nidol robot, police robot\n20% of Japan is in favor (Ooh)\nThey say it’ll free us from anxiety and emptiness (Ooh)\nMom robots, baby robots (Mom robots, baby robots)\nDaycare worker robots, student robots (Daycare worker robots, student robots)\nTeacher robots, nurse robots (Teacher robots, nurse robots)\nCaregiver Robots, Undertaker Robots (Caregiver Robots, Undertaker Robots)\n50% of Japan is in favor (Ooh)\nThe danger lights are flashing (Ooh)\nLawyer Robots\nDental Assistant Robots\nTax Accountant Robots\nIdol Robots\nMom Robots\nDaycare Teacher Robots"
+      }
+    }
+  }
+}

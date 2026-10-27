@@ -240,5 +240,11 @@
     "practice.loadingError": "Could not load this practice. Try again.",
     "practice.retry": "Try again",
     "practice.minimumLength": "Minimum length",
-    "practice.maximumLength": "Maximum length"
+    "practice.maximumLength": "Maximum length",
+    "reader.title": "Reader",
+    "practice.tools": "Tools",
+    "tools.reader.title": "Reader",
+    "tools.reader.description": "Paste any Japanese text, romaji or a song link: furigana, romaji, a translation, every word and every kanji.",
+    "tools.reader.open": "Open reader",
+    "seo.reader.description": "Paste Japanese text, romaji or a Spotify song link and get furigana, romaji, a translation, a word-by-word breakdown and kanji details with stroke order."
 }

@@ -240,5 +240,11 @@
     "practice.loadingError": "練習を読み込めませんでした。もう一度お試しください。",
     "practice.retry": "再試行",
     "practice.minimumLength": "最小文字数",
-    "practice.maximumLength": "最大文字数"
+    "practice.maximumLength": "最大文字数",
+    "reader.title": "リーダー",
+    "practice.tools": "ツール",
+    "tools.reader.title": "リーダー",
+    "tools.reader.description": "日本語の文章、ローマ字、曲のリンクを貼り付けると、ふりがな・ローマ字・翻訳・単語と漢字の解説を表示します。",
+    "tools.reader.open": "リーダーを開く",
+    "seo.reader.description": "日本語の文章、ローマ字、Spotifyの曲のリンクを貼り付けて、ふりがな、ローマ字、翻訳、単語ごとの解説、書き順付きの漢字情報を表示します。"
 }
