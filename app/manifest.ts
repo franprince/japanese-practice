@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next"
-import { HOME_DESCRIPTION, SITE_NAME } from "@/lib/seo"
+import { HOME_DESCRIPTION, NOTEBOOK, SITE_NAME } from "@/lib/seo"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -9,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#0f0f1a",
-    theme_color: "#0f0f1a",
+    background_color: NOTEBOOK.paper,
+    theme_color: NOTEBOOK.paper,
     lang: "en",
     categories: ["education"],
     icons: [

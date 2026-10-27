@@ -1,12 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" fill="#1a1a1a" rx="20"/>
+  <rect width="100" height="100" fill="#fffdf8" rx="20"/>
+  <rect x="8" y="8" width="84" height="84" fill="none" stroke="#b5371f" stroke-opacity="0.55" stroke-width="3"/>
+  <path d="M50 8v84M8 50h84" stroke="#b5371f" stroke-opacity="0.3" stroke-width="1.5"/>
   <text 
     x="50" 
-    y="50" 
-    font-family="'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', sans-serif" 
-    font-size="60" 
-    font-weight="500"
-    fill="#ffffff" 
+    y="52" 
+    font-family="'Klee One', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif" 
+    font-size="62" 
+    font-weight="600"
+    fill="#22201c" 
     text-anchor="middle" 
     dominant-baseline="central"
   >練</text>

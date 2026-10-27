@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Inter, Inter_Tight, Klee_One, Shippori_Mincho, Zen_Kaku_Gothic_New } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next"
@@ -12,6 +12,7 @@ import { JsonLd } from "@/components/seo/json-ld"
 import {
   DEFAULT_TITLE,
   HOME_DESCRIPTION,
+  NOTEBOOK,
   OG_IMAGE,
   SITE_NAME,
   SITE_URL,
@@ -43,6 +44,7 @@ export const metadata: Metadata = {
     "kanji practice",
     "Japanese numbers",
     "Japanese dates",
+    "furigana reader",
     "romaji to kana",
     "JLPT study",
     "nihongo renshuu",
@@ -86,6 +88,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: NOTEBOOK.paper,
 };
 
 import { Footer } from "@/components/layouts/footer"
