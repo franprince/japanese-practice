@@ -24,11 +24,14 @@ export function GameFeedbackSection({
 
     return (
         <div role="status" aria-live="polite" aria-atomic="true" className="space-y-3 rounded-xl border bg-background p-4 text-center">
-            <p className={cn("font-semibold", feedback === "correct" ? "text-success" : "text-destructive")}>{t(feedback === "correct" ? "correct" : "incorrect")}</p>
+            <div className="flex items-center justify-center gap-4">
+                {feedback === "correct" && <span lang="ja" aria-hidden="true" className="hanko notebook-only size-16 shrink-0 text-3xl">正</span>}
+                <p className={cn("font-hand text-lg font-semibold", feedback === "correct" ? "text-success" : "text-destructive")}>{t(feedback === "correct" ? "correct" : "incorrect")}</p>
+            </div>
             {(
                 <div className="relative z-10">
                     <p className="text-sm font-medium text-muted-foreground mb-1">{t("correctAnswer")}</p>
-                    <p className="break-words text-xl font-semibold text-foreground [overflow-wrap:anywhere]">
+                    <p className="answer-ink break-words font-hand text-2xl font-semibold text-foreground [overflow-wrap:anywhere]">
                         {displayRomaji || currentWord.romaji}
                     </p>
                 </div>

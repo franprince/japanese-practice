@@ -19,7 +19,7 @@ function Practice() {
   const { t } = useI18n()
   const [settings, saveSettings] = usePracticePreferences("numbers")
   const session = useSessionProgress<number>({ t, defaultTargetCount: settings.targetCount, defaultPlayMode: settings.playMode })
-  return <GamePageLayout
+  return <GamePageLayout kicker="数字の練習"
     title={t("numbersTitle")}
     subtitle={t("numbersSubtitle")}
     configuration={`${t(settings.difficulty)} (${difficultyRanges[settings.difficulty].label}) · ${t(settings.mode === "arabicToKanji" ? "numbersModeArabicToKanji" : "numbersModeKanjiToArabic")}`}

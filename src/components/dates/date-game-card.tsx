@@ -102,7 +102,7 @@ export function DateGameCard({ mode, sessionId, onSessionEvent, disableNext = fa
           aria-disabled={showResult || disableNext}
           placeholder={t("typeHiraganaOrRomaji")}
           className={`
-            w-full px-4 py-3 text-lg text-center rounded-xl border-2 bg-background
+            notebook-answer w-full px-4 py-3 text-lg text-center rounded-xl border-2 bg-background
             placeholder:text-muted-foreground/50 focus:outline-none transition-all
             ${showResult || disableNext ? "border-border opacity-60" : "border-border focus:border-primary"}
           `}

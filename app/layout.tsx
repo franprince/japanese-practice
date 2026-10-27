@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Inter, Inter_Tight, Klee_One, Shippori_Mincho, Zen_Kaku_Gothic_New } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { I18nProvider } from "@/lib/i18n"
@@ -17,6 +18,14 @@ import {
 } from "@/lib/seo"
 
 import "./globals.css";
+
+// Notebook theme typefaces. Inter / Inter Tight carry no Japanese glyphs, so kana and kanji fall
+// through to Klee One (handwritten) in display text and Zen Kaku Gothic in body text; mincho is for stamps.
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
+const interTight = Inter_Tight({ weight: ["300", "400", "500", "600", "700"], subsets: ["latin"], display: "swap", variable: "--font-inter-tight" });
+const kleeOne = Klee_One({ weight: ["400", "600"], subsets: ["latin"], display: "swap", variable: "--font-klee", preload: false });
+const zenKaku = Zen_Kaku_Gothic_New({ weight: ["400", "500", "700"], subsets: ["latin"], display: "swap", variable: "--font-zen", preload: false });
+const shippori = Shippori_Mincho({ weight: ["800"], subsets: ["latin"], display: "swap", variable: "--font-mincho", preload: false });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -83,7 +92,7 @@ import { Footer } from "@/components/layouts/footer"
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-theme="notebook" className={`${inter.variable} ${interTight.variable} ${kleeOne.variable} ${zenKaku.variable} ${shippori.variable}`} suppressHydrationWarning>
       <body className="min-h-screen bg-background text-foreground antialiased flex flex-col">
         <ThemeProvider>
           <I18nProvider>

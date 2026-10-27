@@ -6,7 +6,7 @@ import type { GameSessionProps } from "@/lib/core/game-session"
 export type { Language, TranslationKey } from "../lib/i18n"
 
 
-export type Theme = "default" | "sakura" | "ocean" | "forest" | "sunset" | "daylight" | "lavender" | "mint"
+export type Theme = "notebook" | "daylight" | "lavender" | "mint" | "notebook-dark" | "notebook-indigo" | "midnight" | "sakura" | "ocean" | "forest" | "sunset"
 
 
 export interface BaseGameCardProps extends GameSessionProps {
@@ -23,6 +23,8 @@ export interface GamePageConfig {
 
 export interface GamePageLayoutProps {
     title: string
+    /** Japanese name shown above the title, e.g. ローマ字の練習 */
+    kicker?: string
     subtitle: string
     children: React.ReactNode
     controls?: React.ReactNode

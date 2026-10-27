@@ -47,6 +47,24 @@
 [data-theme="lavender"] { --background: #f5f2fa; --primary: #684298; --primary-foreground: #ffffff; --secondary: #ece4f5; --muted: #ece4f5; --accent: #684298; --ring: #684298; --border: #b8a8c9; --input: #9985af; }
 [data-theme="mint"] { --background: #eff7ef; --primary: #31693b; --primary-foreground: #ffffff; --secondary: #e0efe1; --muted: #e0efe1; --accent: #31693b; --ring: #31693b; --border: #a0bba4; --input: #779a7e; }
 
+/* Notebook (genkō yōshi): grid paper, sumi ink, red-pen accents */
+[data-theme^="notebook"] {
+  color-scheme: light;
+  --background: #f5f1e6; --foreground: #22201c;
+  --card: #fffdf8; --card-foreground: #22201c;
+  --popover: #fffdf8; --popover-foreground: #22201c;
+  --primary: #b5371f; --primary-foreground: #ffffff;
+  --secondary: #ece5d6; --secondary-foreground: #22201c;
+  --muted: #ece5d6; --muted-foreground: #5c564c;
+  --accent: #b5371f; --accent-foreground: #ffffff;
+  --border: #22201c; --input: #22201c; --ring: #b5371f;
+  --destructive: #b5371f; --destructive-foreground: #ffffff;
+  --success: #2e6b4f; --success-foreground: #ffffff;
+  --radius: 0.25rem;
+  --font-display: var(--font-inter-tight), "Inter Tight", var(--font-klee), "Klee One", sans-serif;
+  --grid-line: rgb(181 55 31 / 0.09);
+}
+
 @theme inline {
   --font-sans: "Inter", "Inter Fallback", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Geist Mono", monospace;
@@ -87,7 +105,203 @@
 @layer components {
   .glass-card { @apply bg-card border border-border; }
   .practice-settings button { white-space: normal; }
+
+  /* Notebook primitives — neutral in other themes, ink-and-paper in [data-theme^="notebook"] */
+  .font-hand { font-family: var(--font-display, inherit); }
+  .genko-cell {
+    border: 2px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    background-image:
+      linear-gradient(90deg, transparent calc(50% - .5px), color-mix(in srgb, var(--primary) 30%, transparent) calc(50% - .5px), color-mix(in srgb, var(--primary) 30%, transparent) calc(50% + .5px), transparent calc(50% + .5px)),
+      linear-gradient(transparent calc(50% - .5px), color-mix(in srgb, var(--primary) 30%, transparent) calc(50% - .5px), color-mix(in srgb, var(--primary) 30%, transparent) calc(50% + .5px), transparent calc(50% + .5px));
+  }
+  .genko-trace { color: color-mix(in srgb, var(--foreground) 22%, transparent); }
+  .ink-card { @apply rounded-2xl border bg-card; }
+  .ink-button { @apply rounded-md; }
+  .hanko {
+    display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; text-align: center; line-height: 1.05;
+    font-family: var(--font-mincho), "Shippori Mincho", serif; font-weight: 800; color: var(--primary); background: var(--card);
+    border: 3px solid var(--primary); box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 6px var(--primary); transform: rotate(-10deg);
+  }
 }
+
+[data-theme^="notebook"] body {
+  font-family: var(--font-inter), "Inter", var(--font-zen), "Zen Kaku Gothic New", system-ui, sans-serif;
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+[data-theme^="notebook"] .ink-card,
+[data-theme^="notebook"] .glass-card { border: 2px solid var(--foreground); border-radius: 0; box-shadow: 4px 4px 0 var(--foreground); }
+[data-theme^="notebook"] .ink-button { border: 2px solid var(--foreground); border-radius: 4px; box-shadow: 3px 3px 0 var(--foreground); }
+[data-theme^="notebook"] .ink-button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--foreground); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ── Notebook practice screens ─────────────────────────────────────────── */
+.notebook-only { display: none !important; }
+[data-theme^="notebook"] .notebook-only { display: inline-flex !important; }
+.session-marks { display: none; }
+[data-theme^="notebook"] .session-marks { display: flex; }
+[data-theme^="notebook"] .session-progress-bar { display: none; }
+:root:not([data-theme^="notebook"]) .question-cells .genko-cell { border: 0; background-image: none; margin: 0; width: auto; height: auto; }
+
+[data-theme^="notebook"] .notebook-panel { background: var(--card); border: 2px solid var(--foreground); padding: 0.75rem 1rem; }
+[data-theme^="notebook"] .config-tag { display: inline-flex; padding: 0.125rem 0.625rem; border: 1.5px solid var(--foreground); background: var(--card); color: var(--foreground); font-weight: 700; }
+[data-theme^="notebook"] .notebook-kicker { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
+
+/* Answer written on a ruled line */
+[data-theme^="notebook"] .notebook-answer {
+  border-width: 0 0 3px !important; border-color: var(--foreground) !important; border-radius: 0; box-shadow: none !important;
+  background: transparent !important; font-family: var(--font-display); font-weight: 400; font-size: 1.75rem; height: 3.75rem;
+}
+[data-theme^="notebook"] .notebook-answer[aria-invalid="true"] { text-decoration: line-through; text-decoration-color: var(--primary); text-decoration-thickness: 3px; color: var(--muted-foreground); }
+[data-theme^="notebook"] .answer-ink { color: var(--primary); }
+
+/* Multiple choice: the right answer gets circled in red pen */
+[data-theme^="notebook"] .guess-option { border: 2px solid var(--foreground); border-radius: 4px; background: var(--card); color: var(--foreground); }
+[data-theme^="notebook"] .guess-option.is-answer { border: 3px solid var(--primary); border-radius: 9999px; background: var(--card); opacity: 1; }
+
+/* Stats as stamped boxes */
+[data-theme^="notebook"] .stats-display { border-top: 0; }
+[data-theme^="notebook"] .stat-box { border: 2px solid var(--foreground); background: var(--card); padding: 0.25rem 0.5rem; }
+
+[data-theme^="notebook"] .stat-box--accent { border-color: var(--primary); color: var(--primary); }
+[data-theme^="notebook"] .stat-box--accent .stat-value { color: var(--primary); }
+
+/* Settings sheet: worksheet form with numbered sections and circled choices */
+[data-theme^="notebook"] .practice-settings { border: 2px solid var(--foreground); border-radius: 0; box-shadow: 8px 8px 0 var(--foreground); }
+[data-theme^="notebook"] .practice-settings > header,
+[data-theme^="notebook"] .practice-settings > footer { border-color: var(--foreground); border-width: 0 0 2px; }
+[data-theme^="notebook"] .practice-settings > footer { border-width: 2px 0 0; background: var(--background); }
+[data-theme^="notebook"] .practice-settings > div { counter-reset: worksheet; }
+[data-theme^="notebook"] .practice-settings h3 { font-size: 0.95rem; font-weight: 700; }
+[data-theme^="notebook"] .practice-settings h3::before {
+  counter-increment: worksheet; content: counter(worksheet, cjk-decimal); margin-right: 0.6em;
+  font-family: var(--font-display); color: var(--primary); font-size: 1.15em;
+}
+[data-theme^="notebook"] .practice-settings [role="group"] { background: transparent; border: 0; padding: 0; }
+[data-theme^="notebook"] .practice-settings button[aria-pressed] {
+  background: var(--card); color: var(--foreground); border: 2px solid var(--foreground); border-radius: 4px; opacity: 1; filter: none;
+}
+[data-theme^="notebook"] .practice-settings button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--primary) 7%, var(--card)); border-color: var(--primary); box-shadow: 3px 3px 0 var(--primary);
+}
+[data-theme^="notebook"] .practice-settings button[aria-pressed]:disabled { opacity: 0.4; }
+
+/* Numbers / dates / kanji in the notebook */
+[data-theme^="notebook"] .notebook-answer-line { border-width: 0 0 3px; border-color: var(--foreground); border-radius: 0; background: transparent; }
+[data-theme^="notebook"] .notebook-answer-line > span:first-child { font-family: var(--font-display); }
+[data-theme^="notebook"] .pad-key { background: var(--card); color: var(--foreground); border: 2px solid var(--foreground); border-radius: 4px; box-shadow: 2px 2px 0 var(--foreground); }
+[data-theme^="notebook"] .pad-key:hover:not(:disabled) { background: color-mix(in srgb, var(--primary) 8%, var(--card)); color: var(--primary); }
+[data-theme^="notebook"] .pad-key:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: none; }
+[data-theme^="notebook"] .pad-key.bg-primary { background: var(--primary); color: var(--primary-foreground); }
+[data-theme^="notebook"] .result-sheet { background: var(--card); border: 1.5px dashed color-mix(in srgb, var(--foreground) 45%, transparent); border-radius: 0; }
+[data-theme^="notebook"] .result-sheet .text-success { color: var(--success); }
+[data-theme^="notebook"] .result-user[data-correct="true"] { color: var(--foreground); }
+[data-theme^="notebook"] .result-user[data-correct="false"] { color: var(--muted-foreground); text-decoration: line-through; text-decoration-color: var(--primary); text-decoration-thickness: 2px; }
+[data-theme^="notebook"] .theme-wash { display: none; }
+[data-theme^="notebook"] .choice-card { background: var(--card); border: 2px solid var(--foreground); border-radius: 4px; opacity: 1; }
+[data-theme^="notebook"] .choice-card[data-result="correct"] { border: 3px solid var(--primary); border-radius: 2rem; }
+[data-theme^="notebook"] .choice-card[data-result="wrong"] { border-color: var(--muted-foreground); text-decoration: line-through; text-decoration-color: var(--primary); }
+[data-theme^="notebook"] .choice-card[data-result="other"] { opacity: .55; }
+[data-theme^="notebook"] .ink-button:disabled { box-shadow: none; opacity: .45; }
+
+/* Keypad glyphs use mincho: in the handwriting face 一 reads like a dash */
+[data-theme^="notebook"] .pad-key-glyph { font-family: var(--font-mincho), "Shippori Mincho", serif; font-weight: 800; font-size: 1.75rem; }
+
+/* ── Notebook · modern pass ──────────────────────────────────────────────
+   Same paper, ink and red pen; softer chrome: hairline borders, rounded
+   corners and soft shadows instead of hard offset ink blocks.
+   Delete this block to get the original heavier notebook look back. */
+[data-theme^="notebook"] {
+  --border: #ddd6c7; --input: #b9b09f;
+  --grid-line: rgb(181 55 31 / 0.055);
+  --nb-hair: color-mix(in srgb, var(--foreground) 13%, transparent);
+  --nb-radius: 16px; --nb-radius-sm: 10px;
+  --nb-shadow: 0 1px 2px rgb(34 32 28 / 0.05), 0 14px 32px -18px rgb(34 32 28 / 0.28);
+  --nb-shadow-sm: 0 1px 2px rgb(34 32 28 / 0.07);
+  --nb-shadow-red: 0 1px 2px rgb(181 55 31 / 0.2), 0 8px 18px -10px rgb(181 55 31 / 0.55);
+}
+[data-theme^="notebook"] .ink-card,
+[data-theme^="notebook"] .glass-card { border: 1px solid var(--nb-hair); border-radius: var(--nb-radius); box-shadow: var(--nb-shadow); }
+[data-theme^="notebook"] .ink-button { border: 1px solid var(--nb-hair); border-radius: var(--nb-radius-sm); box-shadow: var(--nb-shadow-sm); transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
+[data-theme^="notebook"] .ink-button.bg-primary,
+[data-theme^="notebook"] .ink-button[data-variant="default"] { border-color: transparent; box-shadow: var(--nb-shadow-red); }
+[data-theme^="notebook"] .ink-button:hover:not(:disabled) { transform: translateY(-1px); }
+[data-theme^="notebook"] .ink-button:active:not(:disabled) { transform: translateY(0); box-shadow: var(--nb-shadow-sm); }
+[data-theme^="notebook"] .ink-button:disabled { box-shadow: none; opacity: .45; }
+
+[data-theme^="notebook"] .genko-cell { border-width: 1.5px; }
+[data-theme^="notebook"] .notebook-panel { border: 1px solid var(--nb-hair); border-radius: var(--nb-radius); box-shadow: var(--nb-shadow-sm); }
+[data-theme^="notebook"] .config-tag { border: 1px solid var(--nb-hair); border-radius: 999px; padding: 0.125rem 0.75rem; font-weight: 600; font-size: 0.8125rem; }
+[data-theme^="notebook"] .notebook-answer,
+[data-theme^="notebook"] .notebook-answer-line { border-bottom-width: 2px !important; }
+
+[data-theme^="notebook"] .guess-option,
+[data-theme^="notebook"] .choice-card { border: 1px solid var(--nb-hair); border-radius: 12px; box-shadow: var(--nb-shadow-sm); }
+[data-theme^="notebook"] .guess-option.is-answer,
+[data-theme^="notebook"] .choice-card[data-result="correct"] { border: 2.5px solid var(--primary); border-radius: 2rem; box-shadow: none; }
+[data-theme^="notebook"] .choice-card[data-result="wrong"] { border-color: var(--nb-hair); }
+
+[data-theme^="notebook"] .stat-box { border: 1px solid var(--nb-hair); border-radius: 12px; box-shadow: var(--nb-shadow-sm); padding: 0.375rem 0.5rem; }
+[data-theme^="notebook"] .stat-box--accent { border-color: color-mix(in srgb, var(--primary) 45%, transparent); background: color-mix(in srgb, var(--primary) 4%, var(--card)); }
+
+[data-theme^="notebook"] .pad-key { border: 1px solid var(--nb-hair); border-radius: 12px; box-shadow: var(--nb-shadow-sm); }
+[data-theme^="notebook"] .pad-key:active:not(:disabled) { transform: scale(.97); box-shadow: none; }
+[data-theme^="notebook"] .pad-key.bg-primary { border-color: transparent; box-shadow: var(--nb-shadow-red); }
+[data-theme^="notebook"] .result-sheet { border: 1px dashed color-mix(in srgb, var(--foreground) 28%, transparent); border-radius: 12px; }
+
+[data-theme^="notebook"] .practice-settings { border: 1px solid var(--nb-hair); border-radius: 20px 20px 0 0; box-shadow: 0 24px 60px -20px rgb(34 32 28 / 0.4); overflow: hidden; }
+@media (min-width: 640px) { [data-theme^="notebook"] .practice-settings { border-radius: 20px; } }
+[data-theme^="notebook"] .practice-settings > header,
+[data-theme^="notebook"] .practice-settings > footer { border-color: var(--nb-hair); border-width: 0 0 1px; }
+[data-theme^="notebook"] .practice-settings > footer { border-width: 1px 0 0; }
+[data-theme^="notebook"] .practice-settings button[aria-pressed] { border: 1px solid var(--nb-hair); border-radius: 12px; box-shadow: var(--nb-shadow-sm); }
+[data-theme^="notebook"] .practice-settings button[aria-pressed="true"] { border: 1.5px solid var(--primary); background: color-mix(in srgb, var(--primary) 6%, var(--card)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 12%, transparent); }
+
+/* Header controls: bordered theme menu + segmented language switch (canvas design) */
+[data-theme^="notebook"] .theme-trigger { border: 1px solid var(--nb-hair); border-radius: 12px; background: var(--card); padding: 0 12px; font-weight: 700; }
+[data-theme^="notebook"] .lang-switch { gap: 0; padding: 0; border: 1px solid var(--nb-hair); border-radius: 12px; background: var(--card); overflow: hidden; }
+[data-theme^="notebook"] .lang-switch > * { min-height: 40px; min-width: 48px; border-radius: 0; font-size: 13px; font-weight: 700; box-shadow: none; display: flex; align-items: center; justify-content: center; }
+[data-theme^="notebook"] .lang-switch > [aria-pressed="true"] { background: var(--foreground); color: var(--card); }
+[data-theme^="notebook"] .lang-switch > [aria-pressed="false"] { color: var(--foreground); }
+[data-theme^="notebook"] .stats-display .stat-box { box-shadow: none; }
+
+/* ── Notebook dark variants ──────────────────────────────────────────────
+   Same notebook components (they match [data-theme^="notebook"]); only the palette changes. */
+[data-theme="notebook-dark"] {
+  color-scheme: dark;
+  --background: #161412; --foreground: #ede6d8;
+  --card: #211e1b; --card-foreground: #ede6d8;
+  --popover: #211e1b; --popover-foreground: #ede6d8;
+  --primary: #e06a50; --primary-foreground: #1a1210;
+  --secondary: #2a2622; --secondary-foreground: #ede6d8;
+  --muted: #2a2622; --muted-foreground: #a9a193;
+  --accent: #e06a50; --accent-foreground: #1a1210;
+  --border: #34302b; --input: #4a443d; --ring: #e06a50;
+  --destructive: #e06a50; --destructive-foreground: #1a1210;
+  --success: #6dbb94; --success-foreground: #0f1a14;
+  --grid-line: rgb(224 106 80 / 0.06);
+  --nb-shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 14px 32px -18px rgb(0 0 0 / 0.55);
+  --nb-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --nb-shadow-red: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 18px -10px rgb(224 106 80 / 0.45);
+}
+[data-theme="notebook-indigo"] {
+  color-scheme: dark;
+  --background: #0f1320; --foreground: #e4e7ef;
+  --card: #181e2c; --card-foreground: #e4e7ef;
+  --popover: #181e2c; --popover-foreground: #e4e7ef;
+  --primary: #f0785c; --primary-foreground: #1a0f0c;
+  --secondary: #20283a; --secondary-foreground: #e4e7ef;
+  --muted: #20283a; --muted-foreground: #9aa3b5;
+  --accent: #f0785c; --accent-foreground: #1a0f0c;
+  --border: #262e40; --input: #3a4357; --ring: #f0785c;
+  --destructive: #f0785c; --destructive-foreground: #1a0f0c;
+  --success: #7cc7a0; --success-foreground: #0d1a13;
+  --grid-line: rgb(143 176 240 / 0.065);
+  --nb-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 14px 32px -18px rgb(0 0 0 / 0.6);
+  --nb-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35);
+  --nb-shadow-red: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 18px -10px rgb(240 120 92 / 0.45);
+}
+/* Narrow screens: drop the kanji half of the stat labels so three boxes fit 320px. */
+@media (max-width: 639px) { [data-theme^="notebook"] .stat-box .notebook-only { display: none !important; } }

@@ -68,7 +68,8 @@ export function NumberPad({
           <Button
             key={char}
             variant="secondary"
-            className="h-14 text-2xl font-bold hover:bg-primary/20 hover:text-primary transition-all active:scale-95 disabled:opacity-50"
+            lang="ja"
+            className="pad-key pad-key-glyph h-14 text-2xl font-bold hover:bg-primary/20 hover:text-primary transition-all active:scale-95 disabled:opacity-50"
             onClick={() => onKeyPress(value)}
             disabled={disabled}
           >
@@ -80,7 +81,7 @@ export function NumberPad({
       <div className="grid grid-cols-3 gap-2 mt-3">
         <Button
           variant="outline"
-          className="h-12 text-sm font-medium hover:bg-destructive/20 hover:text-destructive hover:border-destructive/50 transition-all bg-transparent"
+          className="pad-key h-12 text-sm font-medium hover:bg-destructive/20 hover:text-destructive hover:border-destructive/50 transition-all bg-transparent"
           onClick={onClear}
           disabled={disabled}
         >
@@ -88,7 +89,7 @@ export function NumberPad({
         </Button>
         <Button
           variant="outline"
-          className="h-12 text-sm font-medium hover:bg-muted transition-all bg-transparent"
+          className="pad-key h-12 text-sm font-medium hover:bg-muted transition-all bg-transparent"
           onClick={onDelete}
           disabled={disabled}
           aria-label={t("practice.deleteLast")}
@@ -96,7 +97,7 @@ export function NumberPad({
           <Delete className="h-5 w-5" />
         </Button>
         <Button
-          className="h-12 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
+          className="pad-key h-12 text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
           onClick={onSubmit}
           disabled={disabled || submitDisabled}
         >

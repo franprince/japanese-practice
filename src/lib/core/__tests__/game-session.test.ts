@@ -91,4 +91,14 @@ describe("game session reducer", () => {
         expect(sessionReducer(state, { type: "target-changed", targetCount })).toBe(state)
         expect(sessionReducer(state, { type: "session-restarted", targetCount, playMode: "infinite" })).toBe(state)
     })
+
+    it("records each outcome in order and clears them on restart", () => {
+        let state = createSession({ targetCount: 5 })
+        state = sessionReducer(state, { type: "answer-submitted", sessionId: 0, questionId: 0, correct: true })
+        state = sessionReducer(state, { type: "answer-submitted", sessionId: 0, questionId: 1, correct: false })
+        state = sessionReducer(state, { type: "question-skipped", sessionId: 0, questionId: 2 })
+        expect(state.outcomes).toEqual(["correct", "incorrect", "skipped"])
+        state = sessionReducer(state, { type: "session-restarted" })
+        expect(state.outcomes).toEqual([])
+    })
 })

@@ -19,7 +19,7 @@ function Practice() {
   const { t } = useI18n()
   const [settings, saveSettings] = usePracticePreferences("kanji")
   const session = useSessionProgress<KanjiEntry>({ t, defaultTargetCount: settings.targetCount, defaultPlayMode: settings.playMode })
-  return <GamePageLayout
+  return <GamePageLayout kicker="漢字の練習"
     title={t("kanjiTitle")}
     subtitle={t("kanjiSubtitle")}
     configuration={`${t(settings.difficulty)} · ${settings.difficulty === "easy" ? "N5" : settings.difficulty === "medium" ? "N5–N3" : "N5–N1"}`}

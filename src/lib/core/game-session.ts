@@ -1,5 +1,7 @@
 export type PlayMode = "infinite" | "session"
 
+export type SessionOutcome = "correct" | "incorrect" | "skipped"
+
 export interface SessionOptions {
     targetCount?: number
     playMode?: PlayMode
@@ -13,6 +15,8 @@ export interface SessionState {
     answeredCount: number
     correctCount: number
     skippedCount: number
+    /** Per-question results in answer order, used to draw the marked progress row. */
+    outcomes: SessionOutcome[]
     targetCount: number
     playMode: PlayMode
     sessionComplete: boolean
@@ -43,7 +47,7 @@ function validTarget(target: number) {
 export function createSession({ targetCount = 10, playMode = "session", basePoints = 10 }: SessionOptions = {}): SessionState {
     return {
         score: 0, streak: 0, bestStreak: 0,
-        answeredCount: 0, correctCount: 0, skippedCount: 0,
+        answeredCount: 0, correctCount: 0, skippedCount: 0, outcomes: [],
         targetCount: validTarget(targetCount) ? targetCount : 10,
         playMode, basePoints, sessionComplete: false, sessionId: 0, lastQuestionId: -1,
     }
@@ -77,6 +81,7 @@ export function sessionReducer(state: SessionState, event: SessionEvent): Sessio
                 answeredCount,
                 correctCount: state.correctCount + Number(correct),
                 skippedCount: state.skippedCount + Number(event.type === "question-skipped"),
+                outcomes: [...state.outcomes, event.type === "question-skipped" ? "skipped" : correct ? "correct" : "incorrect"],
                 sessionComplete: state.playMode === "session" && answeredCount >= state.targetCount,
                 lastQuestionId: event.questionId,
             }

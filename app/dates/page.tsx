@@ -19,7 +19,7 @@ function Practice() {
   const { t } = useI18n()
   const [settings, saveSettings] = usePracticePreferences("dates")
   const session = useSessionProgress<DateQuestion>({ t, defaultTargetCount: settings.targetCount, defaultPlayMode: settings.playMode })
-  return <GamePageLayout
+  return <GamePageLayout kicker="日付の練習"
     title={t("datesTitle")}
     subtitle={t("datesSubtitle")}
     configuration={t(settings.mode === "week_days" ? "weekDays" : settings.mode === "months" ? "monthsOnly" : "fullDates")}

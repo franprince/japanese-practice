@@ -37,11 +37,12 @@ export function SessionSummaryCard({
   tableErrorsLabel,
 }: SessionSummaryCardProps) {
   const { t } = useI18n()
-  return <section className="space-y-4 rounded-2xl border bg-card p-5" aria-label={title}>
+  return <section className="ink-card relative space-y-4 p-5" aria-label={title}>
+    <span lang="ja" aria-hidden="true" className="hanko notebook-only absolute right-5 top-5 size-20 text-4xl">完</span>
     <div role="status">
-      <h2 className="text-xl font-semibold">{title}</h2>
+      <h2 className="font-hand text-2xl font-semibold">{title}</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        {targetCount} {targetLabel} · <span>{accuracy}% {accuracyLabel}</span>
+        {targetCount} {targetLabel} · <span><span className="font-hand text-xl font-semibold text-primary">{accuracy}%</span> {accuracyLabel}</span>
       </p>
     </div>
     {missedCount > 0 && <p className="text-sm">{t("practice.missedCount").replace("{count}", String(missedCount))}</p>}

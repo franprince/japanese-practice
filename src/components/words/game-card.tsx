@@ -145,7 +145,7 @@ export function GameCard({
                     key={option}
                     data-testid="guess-option"
                     variant={feedback === null ? "outline" : option === currentWord.romaji ? "success" : "secondary"}
-                    className={cn("min-h-12 h-auto whitespace-normal break-words p-3 text-lg", feedback !== null && option === currentWord.romaji && "border-success bg-success/15 text-foreground")}
+                    className={cn("guess-option min-h-12 h-auto whitespace-normal break-words p-3 font-hand text-xl", feedback !== null && option === currentWord.romaji && "is-answer border-success bg-success/15 text-foreground")}
                     onClick={() => feedback === null && checkAnswer(option)}
                     disabled={feedback !== null || disableNext}
                   >
@@ -171,7 +171,7 @@ export function GameCard({
                 onKeyDown={handleKeyDown}
                 placeholder={t("placeholder")}
                 className={cn(
-                  "text-center text-lg h-14 font-mono bg-background/50 border-2",
+                  "notebook-answer text-center text-lg h-14 font-mono bg-background/50 border-2",
                   "transition-[box-shadow,background-color] duration-200", // Focused transition only for specific props
                   feedback === "correct" && "border-success",
                   feedback === "incorrect" && "border-destructive",

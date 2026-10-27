@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Dice5, Shuffle, Type } from "lucide-react"
+import { Dice5, Shuffle, SlidersHorizontal, Type } from "lucide-react"
 import { cn } from "@/lib/core"
 import { useI18n } from "@/lib/i18n"
 import type { GameMode, WordsGameType } from "@/types/game"
@@ -15,11 +15,11 @@ interface ModeSectionProps {
 
 export function ModeSection({ mode, gameType, onModeChange, onGameTypeChange }: ModeSectionProps) {
   const { t } = useI18n()
-  const gameModes: { value: GameMode; label: string; icon: string }[] = [
+  const gameModes: { value: GameMode; label: string; icon: React.ReactNode }[] = [
     { value: "hiragana", label: t("hiraganaLabel"), icon: "あ" },
     { value: "katakana", label: t("katakanaLabel"), icon: "ア" },
     { value: "both", label: t("bothLabel"), icon: "あア" },
-    { value: "custom", label: t("custom"), icon: "⚙️" },
+    { value: "custom", label: t("custom"), icon: <SlidersHorizontal className="size-5" aria-hidden="true" /> },
   ]
   const gameTypes = [
     { value: "words", label: t("modeWords"), icon: Type, description: t("games.words.description") || "Vocabulary practice" },
@@ -38,7 +38,7 @@ export function ModeSection({ mode, gameType, onModeChange, onGameTypeChange }: 
             "group flex min-h-11 items-center justify-center gap-2 p-3 rounded-xl border transition-colors duration-300",
             mode === m.value ? "bg-primary text-primary-foreground border-primary" : "bg-secondary border-border hover:border-primary/30 text-muted-foreground hover:text-foreground"
           )}>
-            <span className="text-xl">{m.icon}</span>
+            <span lang="ja" aria-hidden="true" className="font-hand text-xl">{m.icon}</span>
             <span className="text-sm font-medium">{m.label}</span>
           </button>
         ))}
