@@ -49,6 +49,21 @@ export function alignSpans(lines: string[], text: string): TranslationSpan[] {
     if (indices.length === 1 && other?.length === 1) points.push({ source: indices[0]!, target: other[0]! })
   }
   points.sort((a, b) => a.source - b.source || a.target - b.target)
+  // A token shared once by chance ("THE" in a band name, "the" in an untranslated phrase) must not outvote
+  // the anchors around it. Of two crossing anchors, drop the one that crosses more, then the one farther
+  // from its own row; equally supported crossings are real reorders and still merge below.
+  const crosses = (a: Cut, b: Cut) => (a.source < b.source) !== (a.target < b.target)
+  const rank = (p: Cut) => [points.filter(q => crosses(p, q)).length, Math.abs(p.source - p.target)] as const
+  const worse = (a: Cut, b: Cut) => {
+    const [ac, ad] = rank(a)
+    const [bc, bd] = rank(b)
+    return ac > bc || ac === bc && ad > bd
+  }
+  for (let dropped = true; dropped;) {
+    const outlier = points.find(p => points.some(q => crosses(p, q) && worse(p, q)))
+    dropped = outlier !== undefined
+    if (outlier) points.splice(points.indexOf(outlier), 1)
+  }
   const blocks: Block[] = []
   for (const point of points) {
     const block = { start: point.source, end: point.source, from: point.target, to: point.target }
