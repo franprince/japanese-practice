@@ -1,11 +1,11 @@
-import { ExternalLink, LoaderCircle } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import type { Segment } from '../lib/analyze'
 import type { Provider } from '../lib/translate'
 import type { TranslationGroup } from '../lib/translationTypes'
 import { hiraToKata } from '../lib/japanese'
-import { myMemoryCode, toTag, type Language } from '../lib/languages'
+import { googleCode, toTag, type Language } from '../lib/languages'
 import { LanguagePicker, type LanguageChoice } from './LanguagePicker'
-import { Badge, Card, CopyButton, Ruby, SpeakButton, ToggleChip } from './ui'
+import { Badge, Card, CopyButton, Ruby, Skeleton, SpeakButton, ToggleChip } from './ui'
 
 export type DisplayOptions = { furigana: boolean; romaji: boolean }
 
@@ -91,7 +91,6 @@ export function SentenceView({ text, segments, options, onOptions, selected, onS
 
 const PROVIDER_URL: Record<Provider, string> = {
   DeepL: 'https://www.deepl.com/',
-  MyMemory: 'https://mymemory.translated.net/',
 }
 
 export type Translation =
@@ -114,7 +113,7 @@ export function TranslationLinks({ text, target }: { text: string; target?: stri
   return (
     <div className="flex items-center">
       {[
-        ['Google Translate', 'Google', `https://translate.google.com/?sl=ja&tl=${myMemoryCode(to)}&op=translate&text=${q}`],
+        ['Google Translate', 'Google', `https://translate.google.com/?sl=ja&tl=${googleCode(to)}&op=translate&text=${q}`],
         ['DeepL', 'DeepL', `https://www.deepl.com/translator#ja/${toTag(to).toLowerCase()}/${q}`],
       ].map(([name, short, href]) => (
         <a
@@ -149,14 +148,18 @@ export function ProviderBadge({ provider }: { provider: Provider }) {
   )
 }
 
-export function TranslationContent({ translation, attribution = true }: {
+export function TranslationContent({ translation, attribution = true, skeleton = ['95%', '70%'] }: {
   translation?: Translation
   attribution?: boolean
+  /** Bar widths shown while the translation is loading. */
+  skeleton?: string[]
 }) {
   return (
     <div className="min-h-7" aria-live="polite">
       {translation?.status === 'loading' && (
-        <LoaderCircle className="my-1 size-4 animate-spin text-muted-foreground" aria-label="Translating" />
+        <div role="status" aria-label="Translating">
+          <Skeleton widths={skeleton} className="py-1" />
+        </div>
       )}
       {translation?.status === 'done' && (
         <p className="whitespace-pre-line break-words text-lg">

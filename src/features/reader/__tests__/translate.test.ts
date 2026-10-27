@@ -144,24 +144,12 @@ describe('line translations', () => {
       .toEqual(['First line.', '', 'Second line.'])
   })
 
-  it('sends the passage together to MyMemory when DeepL is unavailable', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {})
-    vi.stubGlobal('DOMParser', class {
-      parseFromString(text: string) { return { documentElement: { textContent: text } } }
-    })
-    const fetch = vi.fn(async (url: string) => url.startsWith('https://api.mymemory')
-      ? Response.json({ responseStatus: 200, responseData: { translatedText: 'Here with you.\nLet’s play together.' } })
-      : new Response('<html></html>', { headers: { 'Content-Type': 'text/html' } }))
+  it('reports an error instead of falling back when the translation function is missing', async () => {
+    const fetch = vi.fn(async () => new Response('<html></html>', { headers: { 'Content-Type': 'text/html' } }))
     vi.stubGlobal('fetch', fetch)
     const { translateLines } = await service()
-    const source = ['此処に貴方と居るコト', '今 貴方と奏でよう']
-    expect(await translateLines(source, 'EN-US')).toMatchObject({
-      text: 'Here with you.\nLet’s play together.',
-      lines: ['Here with you.', 'Let’s play together.'],
-      provider: 'MyMemory',
-    })
-    expect(fetch).toHaveBeenCalledTimes(2)
-    expect(new URL(fetch.mock.calls[1]![0]).searchParams.get('q')).toBe(source.join('\n'))
+    await expect(translateLines(['此処に貴方と居るコト', '今 貴方と奏でよう'], 'EN-US')).rejects.toThrow(/isn't available/)
+    expect(fetch).toHaveBeenCalledTimes(1)
   })
 
   it('reports a passage failure rather than retrying its phrases independently', async () => {
@@ -170,8 +158,8 @@ describe('line translations', () => {
     vi.stubGlobal('fetch', fetch)
     const { translateLines } = await service()
     await expect(translateLines(['そして耳を塞いでも', '今 貴方と奏でよう'], 'EN-US'))
-      .rejects.toThrow('the free daily limit')
-    expect(fetch).toHaveBeenCalledTimes(2)
+      .rejects.toThrow('Unavailable')
+    expect(fetch).toHaveBeenCalledTimes(1)
   })
 
   it('does not cache or publish an aborted passage translation', async () => {
@@ -211,19 +199,13 @@ describe('line translations', () => {
   })
 
   it('rejects structured responses that duplicate or omit translated words', async () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => {})
-    vi.stubGlobal('DOMParser', class {
-      parseFromString(text: string) { return { documentElement: { textContent: text } } }
-    })
-    const fetch = vi.fn(async (url: string) => url.startsWith('https://api.mymemory')
-      ? Response.json({ responseStatus: 200, responseData: { translatedText: 'Cat.\nDog.' } })
-      : Response.json({ text: 'Cat.\nDog.', groups: [
-        { start: 0, end: 0, text: 'Cat.' }, { start: 1, end: 1, text: 'Cat.' },
-      ] }))
+    const fetch = vi.fn(async () => Response.json({ text: 'Cat.\nDog.', groups: [
+      { start: 0, end: 0, text: 'Cat.' }, { start: 1, end: 1, text: 'Cat.' },
+    ] }))
     vi.stubGlobal('fetch', fetch)
     const { translateLines } = await service()
-    expect(await translateLines(['猫。', '犬。'], 'EN-US')).toMatchObject({ provider: 'MyMemory', text: 'Cat.\nDog.' })
-    expect(fetch).toHaveBeenCalledTimes(2)
+    await expect(translateLines(['猫。', '犬。'], 'EN-US')).rejects.toThrow('incomplete lyric groups')
+    expect(fetch).toHaveBeenCalledTimes(1)
   })
 
   it('chunks an oversized line within provider limits', async () => {

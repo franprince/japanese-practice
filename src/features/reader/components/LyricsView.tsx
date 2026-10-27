@@ -1,4 +1,4 @@
-import { ChevronDown, LoaderCircle, X } from 'lucide-react'
+import { ChevronDown, X } from 'lucide-react'
 import { transcriptions, type ReadingLine } from '../lib/analyze'
 import { toTag } from '../lib/languages'
 import { LanguagePicker } from './LanguagePicker'
@@ -15,7 +15,7 @@ import {
   type Translation,
 } from './SentenceView'
 import { SegmentCard } from './WordCard'
-import { Card, CopyButton, IconButton, SpeakButton } from './ui'
+import { Card, CopyButton, IconButton, Skeleton, SpeakButton } from './ui'
 
 export function LyricsView({ text, lines, translation, options, onOptions, language, selected, onSelect, onKanji }: {
   text: string
@@ -35,15 +35,14 @@ export function LyricsView({ text, lines, translation, options, onOptions, langu
       : [{ start: 0, end: lines.length - 1, text: translation.value }])
     : lines.map((_, i) => ({ start: i, end: i, text: '' }))
 
+  const pending = !translation || translation.status === 'loading'
+
   return (
     <Card>
       <div className="sticky top-14 z-20 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-t-2xl border-b border-border bg-card/95 px-3 py-3 backdrop-blur-md sm:px-4">
         <div className="flex items-center gap-1">
           <LanguagePicker {...language} />
           {translation?.status === 'done' && <CopyButton text={translation.value} label="Copy translation" />}
-          {(!translation || translation.status === 'loading') && (
-            <LoaderCircle className="mx-2 size-4 animate-spin text-muted-foreground" aria-label="Translating" />
-          )}
         </div>
         <DisplayControls text={text} options={options} onOptions={onOptions} />
       </div>
@@ -64,7 +63,7 @@ export function LyricsView({ text, lines, translation, options, onOptions, langu
               role="listitem"
               className="border-b border-border px-4 py-4 last:border-b-0 sm:px-5"
             >
-              <div className={`grid min-w-0 gap-3 ${translation?.status === 'done' ? 'md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-8' : ''}`}>
+              <div className={`grid min-w-0 gap-3 ${translation?.status === 'done' || pending ? 'md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-8' : ''}`}>
                 <div className="min-w-0 space-y-3">
                   {source.map((line, offset) => {
                     const i = group.start + offset
@@ -103,6 +102,11 @@ export function LyricsView({ text, lines, translation, options, onOptions, langu
                     )
                   })}
                 </div>
+                {pending && (
+                  <div role="status" aria-label="Translating" className="min-w-0 self-center">
+                    <Skeleton widths={source.map((_, i) => ['90%', '65%', '78%'][i % 3]!)} className="py-1" />
+                  </div>
+                )}
                 {translation?.status === 'done' && (
                   <div className="min-w-0 self-center" lang={language.target ? toTag(language.target) : undefined} dir="auto">
                     <TranslationContent translation={{ ...translation, value: group.text }} attribution={false} />

@@ -416,7 +416,7 @@ export default function ReaderApp({ title }: { title: string }) {
         </a>
         <a className="hover:text-foreground" href="https://kanjivg.tagaini.net/">KanjiVG, CC BY-SA 3.0</a>
         <a className="hover:text-foreground" href="http://www.tanos.co.uk/jlpt/">JLPT lists © Jonathan Waller</a>
-        <span>Translations by DeepL, or MyMemory as a fallback</span>
+        <span>Translations by DeepL</span>
       </p>
 
       {kanji && !wide && <KanjiSheet char={kanji} onClose={() => setKanji(undefined)} onKanji={setKanji} />}
