@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, ResolvingMetadata } from "next"
 import en from "@/locales/en.json"
 
 export const SITE_URL = "https://www.nihongo-renshuu.app"
@@ -38,12 +38,16 @@ interface PageMetadataOptions {
 
 export const HOME_DESCRIPTION = en["seo.home.description"]
 
-export function createPageMetadata({
-  title,
-  descriptionKey,
-  path,
-  keywords,
-}: PageMetadataOptions): Metadata {
+type OpenGraphImages = NonNullable<NonNullable<Metadata["openGraph"]>["images"]>
+
+/**
+ * `images` defaults to the root OG image; pages pass the parent's resolved images instead (see
+ * `pageMetadata`). Twitter has no images of its own, so Next copies the Open Graph ones.
+ */
+export function createPageMetadata(
+  { title, descriptionKey, path, keywords }: PageMetadataOptions,
+  images: OpenGraphImages = [OG_IMAGE],
+): Metadata {
   const description = en[descriptionKey]
   const socialTitle = `${title} | ${SITE_NAME}`
 
@@ -59,13 +63,23 @@ export function createPageMetadata({
       siteName: SITE_NAME,
       title: socialTitle,
       description,
-      images: [OG_IMAGE],
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title: socialTitle,
       description,
-      images: [OG_IMAGE.url],
     },
+  }
+}
+
+/**
+ * `generateMetadata` for a route layout. It reuses the root's file-based OG image URL, which carries
+ * a content hash (`/opengraph-image?<hash>`), so social caches such as X's refetch when it changes.
+ */
+export function pageMetadata(options: PageMetadataOptions) {
+  return async (_props: unknown, parent: ResolvingMetadata): Promise<Metadata> => {
+    const { openGraph } = await parent
+    return createPageMetadata(options, openGraph?.images ?? [OG_IMAGE])
   }
 }
