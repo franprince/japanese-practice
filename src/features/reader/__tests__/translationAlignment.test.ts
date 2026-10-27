@@ -133,4 +133,22 @@ describe('captured independent translations', () => {
       expect(alignSpans(source, text).map(span => text.slice(span.from, span.to)).join('')).toBe(text)
     })
   }
+
+  it('does not let a stray shared word merge a whole page of lyrics into one row', () => {
+    // MyMemory leaves "the" in "Lock of the Squeaky Ones", which matched THE in the band name three paragraphs later.
+    const source = [
+      '金髪 阿婆擦れの ソープランドごっこ', 'うずくまるそいつらの腹黒ロック', 'テーブル押す 満員', '',
+      'グラップラー クラッシャー', '酸素漏れにクラクション', '現実 都会のお前が 誰と何を犯した?',
+      'TVの前のダディーとマミーが泣き過ごすがった', 'ダーリン血まみれのバレンタイン', 'フローリングにバターナイフ', '',
+      'You might also like', 'Patrol Car Moyasu', 'マキシマム ザ ホルモン (MAXIMUM THE HORMONE)', 'Creep',
+    ]
+    const text = [
+      'Póker Soapland con fricción rubia', 'Squeaky Sneaky Lock of the Squeaky Ones', 'Table Press Full', '',
+      'Trituradora Grappler', 'Fuga de oxígeno en la bocina', '¿Quién y qué hizo en la ciudad real?',
+      'Papá y mamá querían llorar frente al televisor', 'Darling Bloody Valentine', 'Suelo con cuchillo de mantequilla', '',
+      'También te puede interesar', 'Coche patrulla Moyasu', 'Máxima la hormona', 'Creep',
+    ].join('\n')
+    expect(alignTranslation(source, text).groups.map(({ start, end }) => [start, end]))
+      .toEqual(source.map((_, i) => [i, i]))
+  })
 })
