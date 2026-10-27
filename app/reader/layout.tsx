@@ -1,8 +1,7 @@
-import type { Metadata } from "next"
 import type { ReactNode } from "react"
-import { createPageMetadata } from "@/lib/seo"
+import { pageMetadata } from "@/lib/seo"
 
-export const metadata: Metadata = createPageMetadata({
+export const generateMetadata = pageMetadata({
   title: "Reader — Furigana, Romaji and Translation",
   descriptionKey: "seo.reader.description",
   path: "/reader",

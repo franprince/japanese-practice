@@ -6,7 +6,9 @@ import {
   OG_IMAGE,
   SITE_NAME,
   createPageMetadata,
+  pageMetadata,
 } from "@/lib/seo"
+import type { ResolvedMetadata } from "next"
 
 const descriptionKeys = [
   "seo.home.description",
@@ -38,9 +40,23 @@ describe("SEO metadata", () => {
       },
       twitter: {
         card: "summary_large_image",
-        images: [OG_IMAGE.url],
       },
     })
+    // Next copies the Open Graph images into Twitter, keeping the hashed URL.
+    expect(metadata.twitter).not.toHaveProperty("images")
+  })
+
+  test("reuses the parent's hashed OG image for route pages", async () => {
+    const hashed = [{ url: new URL("https://example.com/opengraph-image?abc123") }]
+    const parent = Promise.resolve({ openGraph: { images: hashed } } as unknown as ResolvedMetadata)
+    const metadata = await pageMetadata({
+      title: "Reader",
+      descriptionKey: "seo.reader.description",
+      path: "/reader",
+      keywords: [],
+    })({}, parent)
+
+    expect(metadata.openGraph?.images).toBe(hashed)
   })
 
   test("keeps SEO descriptions available in every supported locale", () => {

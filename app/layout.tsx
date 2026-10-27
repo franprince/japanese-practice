@@ -13,7 +13,6 @@ import {
   DEFAULT_TITLE,
   HOME_DESCRIPTION,
   NOTEBOOK,
-  OG_IMAGE,
   SITE_NAME,
   SITE_URL,
 } from "@/lib/seo"
@@ -66,13 +65,12 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: DEFAULT_TITLE,
     description: HOME_DESCRIPTION,
-    images: [OG_IMAGE],
+    // images come from app/opengraph-image.tsx, whose URL carries a content hash for cache busting
   },
   twitter: {
     card: "summary_large_image",
     title: "Nihongo Renshū | 日本語 練習",
     description: HOME_DESCRIPTION,
-    images: [OG_IMAGE.url],
   },
   robots: {
     index: true,
