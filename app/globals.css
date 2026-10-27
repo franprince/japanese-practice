@@ -261,6 +261,7 @@
 
 /* Header controls: bordered theme menu + segmented language switch (canvas design) */
 [data-theme^="notebook"] .theme-trigger { border: 1px solid var(--nb-hair); border-radius: 12px; background: var(--card); padding: 0 12px; font-weight: 700; }
+[data-theme^="notebook"] .theme-trigger:hover, [data-theme^="notebook"] .theme-trigger[data-state="open"] { background: var(--secondary); color: var(--foreground); }
 [data-theme^="notebook"] .lang-switch { gap: 0; padding: 0; border: 1px solid var(--nb-hair); border-radius: 12px; background: var(--card); overflow: hidden; }
 [data-theme^="notebook"] .lang-switch > * { min-height: 40px; min-width: 48px; border-radius: 0; font-size: 13px; font-weight: 700; box-shadow: none; display: flex; align-items: center; justify-content: center; }
 [data-theme^="notebook"] .lang-switch > [aria-pressed="true"] { background: var(--foreground); color: var(--card); }
