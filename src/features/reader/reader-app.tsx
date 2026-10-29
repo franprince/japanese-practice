@@ -1,12 +1,12 @@
 'use client'
 // Nihongo Rubi's reader, ported from github.com/franprince/nihongo-traductor and restyled for the notebook themes.
-import { ClipboardPaste, Clock, ExternalLink, LoaderCircle, Music, X } from 'lucide-react'
+import { ClipboardPaste, Clock, ExternalLink, LoaderCircle, Music, PanelRightClose, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { KanjiDetails, KanjiSheet } from './components/KanjiSheet'
 import { targetOf, type LanguageChoice } from './components/LanguagePicker'
 import { LyricsView } from './components/LyricsView'
 import { SentenceView, Transcriptions, type DisplayOptions, type Translation } from './components/SentenceView'
-import { Card, SpeakButton } from './components/ui'
+import { Card, IconButton, SpeakButton } from './components/ui'
 import { ActiveKanji, EntryCard, KanjiHint, SegmentCard } from './components/WordCard'
 import { analyze, readingLines, transcriptions, type Segment } from './lib/analyze'
 import { getKanji, loadCore, loadRest, searchEnglish, wordCount, type Meta, type Word } from './lib/dictionary'
@@ -75,6 +75,8 @@ export default function ReaderApp({ title }: { title: string }) {
   const [rawResult, setResult] = useState<Result>()
   const [rawBusy, setBusy] = useState(false)
   const [kanji, setKanji] = useState<string>()
+  // Song mode can fold the kanji panel away to give the lyrics the full width.
+  const [kanjiOpen, setKanjiOpen] = useState(() => store.get('reader-kanjiOpen', true))
   const [selected, setSelected] = useState<number>()
   const [options, setOptions] = useState<DisplayOptions>(() => store.get('reader-display', { furigana: true, romaji: true }))
   const [history, setHistory] = useState<string[]>(() => store.get('reader-history', []))
@@ -103,6 +105,7 @@ export default function ReaderApp({ title }: { title: string }) {
   }, [])
 
   useEffect(() => store.set('reader-display', options), [options])
+  useEffect(() => store.set('reader-kanjiOpen', kanjiOpen), [kanjiOpen])
   // Only the mode is kept for "auto", so the language follows the visitor's country.
   useEffect(() => store.set('reader-translateTo', choice), [choice])
   useEffect(() => {
@@ -241,6 +244,7 @@ export default function ReaderApp({ title }: { title: string }) {
     ? [...result.text].find((c) => getKanji(c))
     : result?.kind === 'english' ? [...(result.words[0]?.kanji[0] ?? '')].find((c) => getKanji(c)) : undefined
   const panelKanji = kanji ?? firstKanji
+  const folded = lyrics && !kanjiOpen
   const paste = () => navigator.clipboard?.readText().then((value) => value && setText(value), () => undefined)
 
   return (
@@ -345,7 +349,7 @@ export default function ReaderApp({ title }: { title: string }) {
 
       {(lyrics || words.length > 0 || result?.kind === 'english') && (
         <ActiveKanji.Provider value={wide ? panelKanji : undefined}>
-          <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className={`mt-8 grid items-start gap-6 ${folded ? '' : 'lg:grid-cols-[minmax(0,1fr)_340px]'}`}>
             <div className="min-w-0">
               {result?.kind === 'analysis' && lyrics && (
                 <LyricsView
@@ -357,7 +361,11 @@ export default function ReaderApp({ title }: { title: string }) {
                   language={language}
                   selected={selected}
                   onSelect={(index) => setSelected((current) => current === index ? undefined : index)}
-                  onKanji={setKanji}
+                  onShowKanji={wide && folded && panelKanji ? () => setKanjiOpen(true) : undefined}
+                  onKanji={(char) => {
+                    setKanji(char)
+                    setKanjiOpen(true)
+                  }}
                 />
               )}
 
@@ -389,11 +397,18 @@ export default function ReaderApp({ title }: { title: string }) {
               )}
             </div>
 
-            {wide && panelKanji && (
+            {wide && panelKanji && !folded && (
               <aside aria-label="Kanji" className="ink-card sticky top-6 max-h-[calc(100dvh-3rem)] overflow-y-auto p-5">
-                <div className="mb-4 flex items-baseline justify-between">
-                  <h2 className="font-hand text-lg font-semibold">Kanji</h2>
-                  <span lang="ja" aria-hidden="true" className="font-hand text-[15px] text-primary">漢字</span>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="flex items-baseline gap-2">
+                    <h2 className="font-hand text-lg font-semibold">Kanji</h2>
+                    <span lang="ja" aria-hidden="true" className="font-hand text-[15px] text-primary">漢字</span>
+                  </div>
+                  {lyrics && (
+                    <IconButton label="Hide kanji panel" onClick={() => setKanjiOpen(false)}>
+                      <PanelRightClose className="size-4" />
+                    </IconButton>
+                  )}
                 </div>
                 {/* Keyed so a newly picked kanji fades in, which ties the click in a word card to this panel. */}
                 <div key={panelKanji} className="animate-in fade-in slide-in-from-right-2 duration-300">
