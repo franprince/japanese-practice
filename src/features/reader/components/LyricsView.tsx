@@ -1,4 +1,4 @@
-import { ChevronDown, X } from 'lucide-react'
+import { ChevronDown, PanelRightOpen, X } from 'lucide-react'
 import { transcriptions, type ReadingLine } from '../lib/analyze'
 import { toTag } from '../lib/languages'
 import { LanguagePicker } from './LanguagePicker'
@@ -17,7 +17,7 @@ import {
 import { SegmentCard } from './WordCard'
 import { Card, CopyButton, IconButton, Skeleton, SpeakButton } from './ui'
 
-export function LyricsView({ text, lines, translation, options, onOptions, language, selected, onSelect, onKanji }: {
+export function LyricsView({ text, lines, translation, options, onOptions, language, selected, onSelect, onKanji, onShowKanji }: {
   text: string
   lines: ReadingLine[]
   translation?: Translation
@@ -27,6 +27,8 @@ export function LyricsView({ text, lines, translation, options, onOptions, langu
   selected?: number
   onSelect: (index: number) => void
   onKanji: (char: string) => void
+  /** Set while the kanji panel is folded away; the toolbar then offers a way to bring it back. */
+  onShowKanji?: () => void
 }) {
   const readings = lines.map((line) => transcriptions(line.segments))
   const groups = translation?.status === 'done'
@@ -39,12 +41,19 @@ export function LyricsView({ text, lines, translation, options, onOptions, langu
 
   return (
     <Card>
-      <div className="sticky top-14 z-20 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-t-2xl border-b border-border bg-card/95 px-3 py-3 backdrop-blur-md sm:px-4">
+      <div className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-t-2xl border-b border-border bg-card/95 px-3 py-3 backdrop-blur-md sm:px-4">
         <div className="flex items-center gap-1">
           <LanguagePicker {...language} />
           {translation?.status === 'done' && <CopyButton text={translation.value} label="Copy translation" />}
         </div>
-        <DisplayControls text={text} options={options} onOptions={onOptions} />
+        <div className="flex items-center gap-1">
+          <DisplayControls text={text} options={options} onOptions={onOptions} />
+          {onShowKanji && (
+            <IconButton label="Show kanji panel" onClick={onShowKanji}>
+              <PanelRightOpen className="size-4" />
+            </IconButton>
+          )}
+        </div>
       </div>
       {translation?.status === 'error' && (
         <div className="border-b border-border px-5 py-4">
@@ -54,9 +63,7 @@ export function LyricsView({ text, lines, translation, options, onOptions, langu
       <div role="list" aria-label="Lyrics">
         {groups.map((group) => {
           const source = lines.slice(group.start, group.end + 1)
-          if (source.every((line) => !line.text.trim())) {
-            return <div key={group.start} aria-hidden="true" className="h-6 bg-background" />
-          }
+          if (source.every((line) => !line.text.trim())) return null
           return (
             <div
               key={group.start}
