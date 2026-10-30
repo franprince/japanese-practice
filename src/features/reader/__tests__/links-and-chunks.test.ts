@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'bun:test'
-import { parseSpotifyLink } from '../lib/spotify'
+import { afterEach, describe, expect, it } from 'bun:test'
+import { fetchSpotifyInfo, parseLrc, parseSpotifyLink } from '../lib/spotify'
 import { chunk } from '../lib/translate'
+import { vi } from './vi'
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
 
 describe('parseSpotifyLink', () => {
   const canonical = { kind: 'track', url: 'https://open.spotify.com/track/2hoKhipu6bG2FpYDXLUk7v' }
@@ -15,6 +20,53 @@ describe('parseSpotifyLink', () => {
     expect(parseSpotifyLink('https://evil.example/track/2hoKhipu6bG2FpYDXLUk7v')).toBeUndefined()
     expect(parseSpotifyLink('https://open.spotify.com/track/short')).toBeUndefined()
     expect(parseSpotifyLink('花鬘')).toBeUndefined()
+  })
+})
+
+describe('parseLrc', () => {
+  it('strips timestamps and credit headers and inserts stanza breaks on long pauses', () => {
+    const raw = [
+      '[00:00.00] 作词 : 植田真梨恵',
+      '[00:01.00]作詞：植田真梨恵',
+      '[00:02.00]作曲：植田真梨恵',
+      '[00:09.95]手放した 花びらが',
+      '[00:19.51]音も無く 流れてく',
+      '[00:49.29]そっと愛をしって',
+      '[01:08.96]遠くなる あの日には もう',
+    ].join('\n')
+
+    expect(parseLrc(raw)).toBe(
+      ['手放した 花びらが', '音も無く 流れてく', '', 'そっと愛をしって', '', '遠くなる あの日には もう'].join('\n'),
+    )
+  })
+
+  it('preserves explicit blank lines from synced lyrics', () => {
+    const raw = ['[00:05.00]一行目', '[00:08.00]', '[00:11.00]二行目'].join('\n')
+    expect(parseLrc(raw)).toBe('一行目\n\n二行目')
+  })
+})
+
+describe('fetchSpotifyInfo', () => {
+  it('reads track title, artist and lyrics from /api/reader/spotify', async () => {
+    const fetch = vi.fn().mockResolvedValue(
+      Response.json({
+        title: '花鬘',
+        artist: '植田真梨恵',
+        thumbnail: 'https://i.scdn.co/x',
+        lyrics: '手放した 花びらが\n音も無く 流れてく',
+      }),
+    )
+    vi.stubGlobal('fetch', fetch)
+    const link = { kind: 'track', url: 'https://open.spotify.com/track/2hoKhipu6bG2FpYDXLUk7v' }
+    expect(await fetchSpotifyInfo(link)).toEqual({
+      title: '花鬘',
+      artist: '植田真梨恵',
+      thumbnail: 'https://i.scdn.co/x',
+      lyrics: '手放した 花びらが\n音も無く 流れてく',
+    })
+    expect(fetch.mock.calls[0]![0]).toBe(
+      `/api/reader/spotify?url=${encodeURIComponent(link.url)}`,
+    )
   })
 })
 

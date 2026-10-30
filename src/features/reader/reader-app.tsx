@@ -6,7 +6,7 @@ import { KanjiDetails, KanjiSheet } from './components/KanjiSheet'
 import { targetOf, type LanguageChoice } from './components/LanguagePicker'
 import { LyricsView } from './components/LyricsView'
 import { SentenceView, Transcriptions, type DisplayOptions, type Translation } from './components/SentenceView'
-import { Card, IconButton, SpeakButton } from './components/ui'
+import { Card, IconButton, SpeakButton, ToggleChip } from './components/ui'
 import { ActiveKanji, EntryCard, KanjiHint, SegmentCard } from './components/WordCard'
 import { analyze, readingLines, transcriptions, type Segment } from './lib/analyze'
 import { getKanji, loadCore, loadRest, searchEnglish, wordCount, type Meta, type Word } from './lib/dictionary'
@@ -24,7 +24,7 @@ const MODES: { id: Mode; label: string }[] = [
   { id: 'english', label: 'English' },
 ]
 
-type SpotifyState =
+export type SpotifyState =
   | { status: 'loading'; link: SpotifyLink }
   | { status: 'error'; link: SpotifyLink; message: string }
   | ({ status: 'done'; link: SpotifyLink } & SpotifyInfo)
@@ -119,14 +119,14 @@ export default function ReaderApp({ title }: { title: string }) {
   // In Auto mode, the tab of the detected input type is tinted.
   const detected = mode === 'auto' && input && !spotifyLink ? resolved : undefined
 
-  // A pasted Spotify link is replaced by the title of the song, album or playlist.
+  // A pasted Spotify link is replaced by the track lyrics (when available) or the title of the song, album or playlist.
   useEffect(() => {
     if (!spotifyLink) return
     const controller = new AbortController()
     fetchSpotifyInfo(spotifyLink, controller.signal).then(
       (info) => {
         setSpotify({ status: 'done', link: spotifyLink, ...info })
-        setText(info.title)
+        setText(info.lyrics ?? info.title)
       },
       (err) => {
         if (!controller.signal.aborted) setSpotify({ status: 'error', link: spotifyLink, message: err.message })
@@ -317,8 +317,11 @@ export default function ReaderApp({ title }: { title: string }) {
             </div>
           </Card>
 
-          {spotifyView && (spotifyView.status !== 'done' ? spotifyLink?.url === spotifyView.link.url : input === spotifyView.title) && (
-            <SpotifySource state={spotifyView} />
+          {spotifyView &&
+            (spotifyView.status !== 'done'
+              ? spotifyLink?.url === spotifyView.link.url
+              : input === spotifyView.title || (!!spotifyView.lyrics && input === spotifyView.lyrics.trim())) && (
+            <SpotifySource state={spotifyView} activeText={input} onSelectText={setText} />
           )}
 
           {loadError && (
@@ -440,10 +443,24 @@ export default function ReaderApp({ title }: { title: string }) {
 
 }
 
-function SpotifySource({ state }: { state: SpotifyState }) {
+export function SpotifySource({
+  state,
+  activeText,
+  onSelectText,
+}: {
+  state: SpotifyState
+  activeText?: string
+  onSelectText?: (value: string) => void
+}) {
   if (state.status === 'loading') return null
+  const lyricsText = state.status === 'done' ? state.lyrics?.trim() : undefined
+  const label = state.status === 'error'
+    ? `Spotify: ${state.message}`
+    : state.artist
+      ? `${state.title} · ${state.artist}`
+      : state.title
   return (
-    <div className="ink-card flex items-center gap-3 px-3 py-2.5 text-sm">
+    <div className="ink-card flex flex-wrap items-center gap-3 px-3 py-2.5 text-sm">
       {state.status === 'done' && state.thumbnail ? (
         // The thumbnail is Spotify's CDN image at its own size; next/image would need a remote pattern for it.
         // eslint-disable-next-line @next/next/no-img-element
@@ -459,8 +476,26 @@ function SpotifySource({ state }: { state: SpotifyState }) {
         </span>
       )}
       <p className={`min-w-0 flex-1 truncate ${state.status === 'error' ? 'text-primary' : 'font-hand font-medium'}`}>
-        {state.status === 'error' ? `Spotify: ${state.message}` : state.title}
+        {label}
       </p>
+      {state.status === 'done' && lyricsText && onSelectText && (
+        <div className="flex items-center gap-1" role="group" aria-label="Song content">
+          <ToggleChip
+            label="Show song lyrics"
+            pressed={activeText === lyricsText}
+            onChange={() => onSelectText(lyricsText)}
+          >
+            Lyrics
+          </ToggleChip>
+          <ToggleChip
+            label="Show song title"
+            pressed={activeText === state.title}
+            onChange={() => onSelectText(state.title)}
+          >
+            Title
+          </ToggleChip>
+        </div>
+      )}
       <a
         href={state.link.url}
         target="_blank"
