@@ -143,110 +143,111 @@ describe('api/spotify', () => {
     expect(fetch.mock.calls[0]![0]).toBe(`https://open.spotify.com/oembed?url=${url}`)
   })
 
-  it('enriches a track with artist and plain lyrics from LRCLIB when available', async () => {
-    const embedHtml = `<script id="__NEXT_DATA__" type="application/json">${JSON.stringify({
-      props: {
-        pageProps: {
-          state: {
-            data: {
-              entity: {
-                title: '夜に駆ける',
-                artists: [{ name: 'YOASOBI' }],
-                duration: 261000,
-              },
-            },
-          },
-        },
-      },
-    })}</script>`
-    const fetch = vi.fn().mockImplementation((input: string) => {
-      if (input.startsWith('https://open.spotify.com/oembed')) {
-        return Promise.resolve(Response.json({ title: '夜に駆ける', thumbnail_url: 'https://i.scdn.co/y' }))
-      }
-      if (input.startsWith('https://open.spotify.com/embed/track/')) {
-        return Promise.resolve(new Response(embedHtml, { status: 200 }))
-      }
-      if (input.startsWith('https://lrclib.net/api/get?')) {
-        return Promise.resolve(
-          Response.json({
-            trackName: '夜に駆ける',
-            artistName: 'YOASOBI',
-            plainLyrics: '沈むように溶けてゆくように\n二人だけの空が広がる夜に',
-          }),
-        )
-      }
-      return Promise.resolve(new Response('', { status: 404 }))
+  const embed = (entity: object) =>
+    new Response(
+      `<script id="__NEXT_DATA__" type="application/json">${JSON.stringify({ props: { pageProps: { state: { data: { entity } } } } })}</script>`,
+    )
+  const yoasobi = { title: '夜に駆ける', artists: [{ name: 'YOASOBI' }], duration: 261000 }
+  const yoasobiUrl = encodeURIComponent('https://open.spotify.com/track/3dPtXHP0oXQ4HCWHsOA9js')
+
+  /** A fake upstream: the first matching prefix answers, everything else is a 404. */
+  const upstream = (routes: Record<string, () => Response | Promise<Response>>) =>
+    vi.fn().mockImplementation((input: string) => {
+      const hit = Object.keys(routes).find((prefix) => input.startsWith(prefix))
+      return Promise.resolve(hit ? routes[hit]!() : new Response('', { status: 404 }))
+    })
+
+  it('adds the artist to a track without looking up lyrics', async () => {
+    const fetch = upstream({
+      'https://open.spotify.com/oembed': () => Response.json({ title: '夜に駆ける', thumbnail_url: 'https://i.scdn.co/y' }),
+      'https://open.spotify.com/embed/track/': () => embed(yoasobi),
     })
     vi.stubGlobal('fetch', fetch)
-    const url = encodeURIComponent('https://open.spotify.com/track/3dPtXHP0oXQ4HCWHsOA9js')
-    expect(await call(spotify, `/api/spotify?url=${url}`)).toEqual({
+    expect(await call(spotify, `/api/spotify?url=${yoasobiUrl}`)).toEqual({
       status: 200,
-      body: {
-        title: '夜に駆ける',
-        artist: 'YOASOBI',
-        thumbnail: 'https://i.scdn.co/y',
-        lyrics: '沈むように溶けてゆくように\n二人だけの空が広がる夜に',
-      },
+      body: { title: '夜に駆ける', artist: 'YOASOBI', thumbnail: 'https://i.scdn.co/y' },
+    })
+    expect(fetch.mock.calls.some(([input]) => !String(input).startsWith('https://open.spotify.com/'))).toBe(false)
+  })
+
+  it('returns plain lyrics from LRCLIB when asked for them', async () => {
+    const fetch = upstream({
+      'https://open.spotify.com/embed/track/': () => embed(yoasobi),
+      'https://lrclib.net/api/get?': () =>
+        Response.json({ trackName: '夜に駆ける', artistName: 'YOASOBI', plainLyrics: '沈むように溶けてゆくように\r\n二人だけの空が広がる夜に' }),
+    })
+    vi.stubGlobal('fetch', fetch)
+    const res = await spotify(new Request(`https://site.example/api/spotify?url=${yoasobiUrl}&lyrics=1`))
+    expect(await res.json()).toEqual({ lyrics: '沈むように溶けてゆくように\n二人だけの空が広がる夜に' })
+    expect(res.headers.get('cache-control')).toContain('s-maxage=86400')
+    expect(fetch.mock.calls.some(([input]) => String(input).startsWith('https://open.spotify.com/oembed'))).toBe(false)
+  })
+
+  it('ignores LRCLIB search results for other songs and caches the miss only briefly', async () => {
+    vi.stubGlobal('fetch', upstream({
+      'https://open.spotify.com/embed/track/': () => embed(yoasobi),
+      'https://lrclib.net/api/search?': () =>
+        Response.json([
+          { trackName: '夜に駆ける (Cover)', artistName: 'Someone', plainLyrics: 'wrong' },
+          { trackName: '夜に駆ける', artistName: 'Someone Else', plainLyrics: 'also wrong' },
+        ]),
+    }))
+    const res = await spotify(new Request(`https://site.example/api/spotify?url=${yoasobiUrl}&lyrics=1`))
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({})
+    expect(res.headers.get('cache-control')).toBe('public, s-maxage=600')
+  })
+
+  it('takes a LRCLIB search result by the same artist', async () => {
+    vi.stubGlobal('fetch', upstream({
+      'https://open.spotify.com/embed/track/': () => embed(yoasobi),
+      'https://lrclib.net/api/search?': () =>
+        Response.json([
+          { trackName: '夜に駆ける', artistName: 'Someone Else', plainLyrics: 'wrong' },
+          { trackName: '夜に駆ける', artistName: 'YOASOBI', syncedLyrics: '[00:01.00]沈むように' },
+        ]),
+    }))
+    expect(await call(spotify, `/api/spotify?url=${yoasobiUrl}&lyrics=1`)).toEqual({ status: 200, body: { lyrics: '沈むように' } })
+  })
+
+  it('falls back to NetEase LRC lyrics when LRCLIB is down', async () => {
+    vi.stubGlobal('fetch', upstream({
+      'https://open.spotify.com/embed/track/': () => embed({ title: '花鬘', artists: [{ name: '植田真梨恵' }], duration: 279551 }),
+      'https://lrclib.net/': () => Promise.reject(new DOMException('timed out', 'TimeoutError')),
+      'https://music.163.com/api/search/get': () =>
+        Response.json({
+          result: {
+            songs: [
+              { id: 1, name: '花鬘', artists: [{ name: 'Cover Band' }] },
+              { id: 1365032009, name: '花鬘', artists: [{ name: '植田真梨恵' }] },
+            ],
+          },
+        }),
+      'https://music.163.com/api/song/lyric?id=1365032009': () =>
+        Response.json({ lrc: { lyric: '[ar:植田真梨恵]\n[00:01.00]作詞：植田真梨恵\n[00:09.95]手放した 花びらが\n[00:19.51]音も無く 流れてく' } }),
+    }))
+    const url = encodeURIComponent('https://open.spotify.com/track/2hoKhipu6bG2FpYDXLUk7v')
+    expect(await call(spotify, `/api/spotify?url=${url}&lyrics=1`)).toEqual({
+      status: 200,
+      body: { lyrics: '手放した 花びらが\n音も無く 流れてく' },
     })
   })
 
-  it('falls back to NetEase LRC lyrics when LRCLIB does not have the song', async () => {
-    const embedHtml = `<script id="__NEXT_DATA__" type="application/json">${JSON.stringify({
-      props: {
-        pageProps: {
-          state: {
-            data: {
-              entity: {
-                title: '花鬘',
-                artists: [{ name: '植田真梨恵' }],
-                duration: 279551,
-              },
-            },
-          },
-        },
-      },
-    })}</script>`
-    const fetch = vi.fn().mockImplementation((input: string) => {
-      if (input.startsWith('https://open.spotify.com/oembed')) {
-        return Promise.resolve(Response.json({ title: '花鬘', thumbnail_url: 'https://i.scdn.co/x' }))
-      }
-      if (input.startsWith('https://open.spotify.com/embed/track/')) {
-        return Promise.resolve(new Response(embedHtml, { status: 200 }))
-      }
-      if (input.startsWith('https://lrclib.net/')) {
-        return Promise.resolve(new Response('', { status: 404 }))
-      }
-      if (input === 'https://music.163.com/api/search/get') {
-        return Promise.resolve(
-          Response.json({
-            result: {
-              songs: [{ id: 1365032009, name: '花鬘', artists: [{ name: '植田真梨恵' }] }],
-            },
-          }),
-        )
-      }
-      if (input.startsWith('https://music.163.com/api/song/lyric')) {
-        return Promise.resolve(
-          Response.json({
-            lrc: {
-              lyric: '[00:01.00]作詞：植田真梨恵\n[00:09.95]手放した 花びらが\n[00:19.51]音も無く 流れてく',
-            },
-          }),
-        )
-      }
-      return Promise.resolve(new Response('', { status: 404 }))
+  it('uses the oEmbed title for lyrics when the embed page cannot be read', async () => {
+    const fetch = upstream({
+      'https://open.spotify.com/oembed': () => Response.json({ title: '夜に駆ける' }),
+      'https://lrclib.net/api/search?': () => Response.json([{ trackName: '夜に駆ける', plainLyrics: '沈むように' }]),
     })
     vi.stubGlobal('fetch', fetch)
-    const url = encodeURIComponent('https://open.spotify.com/track/2hoKhipu6bG2FpYDXLUk7v')
-    expect(await call(spotify, `/api/spotify?url=${url}`)).toEqual({
-      status: 200,
-      body: {
-        title: '花鬘',
-        artist: '植田真梨恵',
-        thumbnail: 'https://i.scdn.co/x',
-        lyrics: '手放した 花びらが\n音も無く 流れてく',
-      },
-    })
+    expect(await call(spotify, `/api/spotify?url=${yoasobiUrl}&lyrics=1`)).toEqual({ status: 200, body: { lyrics: '沈むように' } })
+  })
+
+  it('only looks up lyrics for songs', async () => {
+    const fetch = vi.fn()
+    vi.stubGlobal('fetch', fetch)
+    const url = encodeURIComponent('https://open.spotify.com/album/2hoKhipu6bG2FpYDXLUk7v')
+    expect((await call(spotify, `/api/spotify?url=${url}&lyrics=1`)).status).toBe(400)
+    expect(fetch).not.toHaveBeenCalled()
   })
 
   it('refuses anything but canonical Spotify links', async () => {

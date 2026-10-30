@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'bun:test'
-import { fetchSpotifyInfo, parseLrc, parseSpotifyLink } from '../lib/spotify'
+import { fetchSpotifyInfo, fetchSpotifyLyrics, parseLrc, parseSpotifyLink } from '../lib/spotify'
 import { chunk } from '../lib/translate'
 import { vi } from './vi'
 
@@ -44,29 +44,74 @@ describe('parseLrc', () => {
     const raw = ['[00:05.00]一行目', '[00:08.00]', '[00:11.00]二行目'].join('\n')
     expect(parseLrc(raw)).toBe('一行目\n\n二行目')
   })
+
+  it('drops LRC header tags, so the credits after them are still stripped', () => {
+    const raw = ['[ti:花鬘]', '[ar:植田真梨恵]', '[offset:+200]', '[00:01.00]作词 : 植田真梨恵', '[00:09.95]手放した 花びらが'].join('\n')
+    expect(parseLrc(raw)).toBe('手放した 花びらが')
+  })
+
+  it("drops NetEase's JSON credit rows and enhanced-LRC word timings", () => {
+    const raw = ['{"t":0,"c":[{"tx":"作词: "},{"tx":"植田真梨恵"}]}', '[00:09.95]<00:09.95>手放した <00:11.00>花びらが'].join('\n')
+    expect(parseLrc(raw)).toBe('手放した 花びらが')
+  })
+
+  it('repeats a line stamped for several moments, in time order', () => {
+    const raw = ['[00:01.00][00:07.00]サビ', '[00:04.00]一番', '[00:10.00]二番'].join('\n')
+    expect(parseLrc(raw)).toBe('サビ\n一番\nサビ\n二番')
+  })
 })
 
 describe('fetchSpotifyInfo', () => {
-  it('reads track title, artist and lyrics from /api/reader/spotify', async () => {
+  const link = { kind: 'track', url: 'https://open.spotify.com/track/2hoKhipu6bG2FpYDXLUk7v' }
+
+  it('reads track title and artist from /api/reader/spotify', async () => {
     const fetch = vi.fn().mockResolvedValue(
-      Response.json({
-        title: '花鬘',
-        artist: '植田真梨恵',
-        thumbnail: 'https://i.scdn.co/x',
-        lyrics: '手放した 花びらが\n音も無く 流れてく',
-      }),
+      Response.json({ title: '花鬘', artist: '植田真梨恵', thumbnail: 'https://i.scdn.co/x' }),
     )
     vi.stubGlobal('fetch', fetch)
-    const link = { kind: 'track', url: 'https://open.spotify.com/track/2hoKhipu6bG2FpYDXLUk7v' }
-    expect(await fetchSpotifyInfo(link)).toEqual({
-      title: '花鬘',
-      artist: '植田真梨恵',
-      thumbnail: 'https://i.scdn.co/x',
-      lyrics: '手放した 花びらが\n音も無く 流れてく',
-    })
-    expect(fetch.mock.calls[0]![0]).toBe(
-      `/api/reader/spotify?url=${encodeURIComponent(link.url)}`,
+    expect(await fetchSpotifyInfo(link)).toEqual({ title: '花鬘', artist: '植田真梨恵', thumbnail: 'https://i.scdn.co/x' })
+    expect(fetch.mock.calls[0]![0]).toBe(`/api/reader/spotify?url=${encodeURIComponent(link.url)}`)
+  })
+
+  it("asks Spotify directly when our function isn't there", async () => {
+    const fetch = vi.fn().mockImplementation((input: string) =>
+      Promise.resolve(
+        input.startsWith('/api/')
+          ? new Response('<html></html>', { status: 404, headers: { 'content-type': 'text/html' } })
+          : Response.json({ title: '花鬘', thumbnail_url: 'https://i.scdn.co/x' }),
+      ),
     )
+    vi.stubGlobal('fetch', fetch)
+    expect(await fetchSpotifyInfo(link)).toEqual({ title: '花鬘', thumbnail: 'https://i.scdn.co/x' })
+    expect(fetch.mock.calls[1]![0]).toStartWith('https://open.spotify.com/oembed?url=')
+  })
+
+  it("reports our function's error instead of retrying Spotify directly", async () => {
+    const fetch = vi.fn().mockResolvedValue(Response.json({ error: 'Spotify answered 500' }, { status: 502 }))
+    vi.stubGlobal('fetch', fetch)
+    await expect(fetchSpotifyInfo(link)).rejects.toThrow('Spotify answered 500')
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('fetchSpotifyLyrics', () => {
+  const link = { kind: 'track', url: 'https://open.spotify.com/track/2hoKhipu6bG2FpYDXLUk7v' }
+
+  it('asks our function for the lyrics', async () => {
+    const fetch = vi.fn().mockResolvedValue(Response.json({ lyrics: '手放した 花びらが\n' }))
+    vi.stubGlobal('fetch', fetch)
+    expect(await fetchSpotifyLyrics(link)).toBe('手放した 花びらが')
+    expect(fetch.mock.calls[0]![0]).toBe(`/api/reader/spotify?url=${encodeURIComponent(link.url)}&lyrics=1`)
+  })
+
+  it('returns undefined when no source has them', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({})))
+    expect(await fetchSpotifyLyrics(link)).toBeUndefined()
+  })
+
+  it('fails clearly without our function', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<html></html>', { headers: { 'content-type': 'text/html' } })))
+    await expect(fetchSpotifyLyrics(link)).rejects.toThrow('Lyrics are not available on this site')
   })
 })
 

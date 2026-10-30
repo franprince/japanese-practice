@@ -12,7 +12,7 @@ import { analyze, readingLines, transcriptions, type Segment } from './lib/analy
 import { getKanji, loadCore, loadRest, searchEnglish, wordCount, type Meta, type Word } from './lib/dictionary'
 import { hasJapanese, looksLikeRomaji, romajiToKana } from './lib/japanese'
 import { detectLanguages, type Language } from './lib/languages'
-import { fetchSpotifyInfo, parseSpotifyLink, type SpotifyInfo, type SpotifyLink } from './lib/spotify'
+import { fetchSpotifyInfo, fetchSpotifyLyrics, parseSpotifyLink, type SpotifyInfo, type SpotifyLink } from './lib/spotify'
 import { tokenize, warmUp } from './lib/tokenizer'
 import { translate, translateLines } from './lib/translate'
 
@@ -24,10 +24,16 @@ const MODES: { id: Mode; label: string }[] = [
   { id: 'english', label: 'English' },
 ]
 
+export type LyricsState =
+  | { status: 'loading' }
+  | { status: 'missing' }
+  | { status: 'error'; message: string }
+  | { status: 'done'; text: string }
+
 export type SpotifyState =
   | { status: 'loading'; link: SpotifyLink }
   | { status: 'error'; link: SpotifyLink; message: string }
-  | ({ status: 'done'; link: SpotifyLink } & SpotifyInfo)
+  | ({ status: 'done'; link: SpotifyLink; lyrics?: LyricsState } & SpotifyInfo)
 
 type Result =
   | { kind: 'analysis'; text: string; segments: Segment[] }
@@ -119,14 +125,14 @@ export default function ReaderApp({ title }: { title: string }) {
   // In Auto mode, the tab of the detected input type is tinted.
   const detected = mode === 'auto' && input && !spotifyLink ? resolved : undefined
 
-  // A pasted Spotify link is replaced by the track lyrics (when available) or the title of the song, album or playlist.
+  // A pasted Spotify link is replaced by the title of the song, album or playlist; a song's lyrics load on request.
   useEffect(() => {
     if (!spotifyLink) return
     const controller = new AbortController()
     fetchSpotifyInfo(spotifyLink, controller.signal).then(
       (info) => {
         setSpotify({ status: 'done', link: spotifyLink, ...info })
-        setText(info.lyrics ?? info.title)
+        setText(info.title)
       },
       (err) => {
         if (!controller.signal.aborted) setSpotify({ status: 'error', link: spotifyLink, message: err.message })
@@ -134,6 +140,28 @@ export default function ReaderApp({ title }: { title: string }) {
     )
     return () => controller.abort()
   }, [spotifyLink])
+
+  const lyricsRequest = useRef<AbortController | undefined>(undefined)
+  useEffect(() => () => lyricsRequest.current?.abort(), [])
+  const requestLyrics = (link: SpotifyLink, title: string) => {
+    lyricsRequest.current?.abort()
+    const controller = new AbortController()
+    lyricsRequest.current = controller
+    // Later results only land while the card still shows this song.
+    const update = (lyrics: LyricsState) =>
+      setSpotify((s) => (s?.status === 'done' && s.link.url === link.url ? { ...s, lyrics } : s))
+    update({ status: 'loading' })
+    fetchSpotifyLyrics(link, controller.signal).then(
+      (text) => {
+        update(text ? { status: 'done', text } : { status: 'missing' })
+        // Swap the title for the lyrics unless the visitor has typed something else meanwhile.
+        if (text) setText((current) => (current.trim() === title ? text : current))
+      },
+      (err) => {
+        if (!controller.signal.aborted) update({ status: 'error', message: err.message })
+      },
+    )
+  }
 
   // Empty input or a pending Spotify link shows no analysis; derived here rather than reset from an effect.
   const result = !input || spotifyLink ? undefined : rawResult
@@ -320,8 +348,13 @@ export default function ReaderApp({ title }: { title: string }) {
           {spotifyView &&
             (spotifyView.status !== 'done'
               ? spotifyLink?.url === spotifyView.link.url
-              : input === spotifyView.title || (!!spotifyView.lyrics && input === spotifyView.lyrics.trim())) && (
-            <SpotifySource state={spotifyView} activeText={input} onSelectText={setText} />
+              : input === spotifyView.title || (spotifyView.lyrics?.status === 'done' && input === spotifyView.lyrics.text)) && (
+            <SpotifySource
+              state={spotifyView}
+              activeText={input}
+              onSelectText={setText}
+              onRequestLyrics={() => spotifyView.status === 'done' && requestLyrics(spotifyView.link, spotifyView.title)}
+            />
           )}
 
           {loadError && (
@@ -447,13 +480,15 @@ export function SpotifySource({
   state,
   activeText,
   onSelectText,
+  onRequestLyrics,
 }: {
   state: SpotifyState
   activeText?: string
   onSelectText?: (value: string) => void
+  onRequestLyrics?: () => void
 }) {
   if (state.status === 'loading') return null
-  const lyricsText = state.status === 'done' ? state.lyrics?.trim() : undefined
+  const lyrics = state.status === 'done' && state.link.kind === 'track' ? (state.lyrics ?? { status: 'idle' as const }) : undefined
   const label = state.status === 'error'
     ? `Spotify: ${state.message}`
     : state.artist
@@ -478,12 +513,26 @@ export function SpotifySource({
       <p className={`min-w-0 flex-1 truncate ${state.status === 'error' ? 'text-primary' : 'font-hand font-medium'}`}>
         {label}
       </p>
-      {state.status === 'done' && lyricsText && onSelectText && (
+      {lyrics?.status === 'missing' && <span className="text-muted-foreground">No lyrics found</span>}
+      {lyrics?.status === 'error' && <span className="min-w-0 truncate text-primary">{lyrics.message}</span>}
+      {lyrics && lyrics.status !== 'done' && lyrics.status !== 'missing' && onRequestLyrics && (
+        <button
+          type="button"
+          onClick={onRequestLyrics}
+          disabled={lyrics.status === 'loading'}
+          aria-label={lyrics.status === 'error' ? 'Try loading the lyrics again' : 'Load song lyrics'}
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-muted-foreground transition hover:bg-secondary hover:text-foreground disabled:opacity-60"
+        >
+          {lyrics.status === 'loading' && <LoaderCircle className="size-3.5 animate-spin" />}
+          {lyrics.status === 'loading' ? 'Loading lyrics…' : lyrics.status === 'error' ? 'Retry' : 'Lyrics'}
+        </button>
+      )}
+      {state.status === 'done' && lyrics?.status === 'done' && onSelectText && (
         <div className="flex items-center gap-1" role="group" aria-label="Song content">
           <ToggleChip
             label="Show song lyrics"
-            pressed={activeText === lyricsText}
-            onChange={() => onSelectText(lyricsText)}
+            pressed={activeText === lyrics.text}
+            onChange={() => onSelectText(lyrics.text)}
           >
             Lyrics
           </ToggleChip>
