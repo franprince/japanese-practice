@@ -1,6 +1,7 @@
 // Reader API: fetches a Spotify link's metadata server-side, and a track's lyrics when asked with `&lyrics=1`.
 // Only canonical open.spotify.com links are accepted, so it cannot be used as an open proxy.
 
+import { japaneseGlyphs } from '@/features/reader/lib/japanese'
 import { parseLrc } from '@/features/reader/lib/spotify'
 
 const ALLOWED = /^https:\/\/open\.spotify\.com\/(track|album|playlist|episode|show|artist)\/([A-Za-z0-9]{22})$/
@@ -160,7 +161,8 @@ async function lyricsResponse(url: string, kind: string, id: string): Promise<Re
   const title = meta.title
   if (!title) return Response.json({}, { headers: { 'Cache-Control': MISS } })
   const known = { ...meta, title }
-  const lyrics = (await fetchFromLrcLib(known)) ?? (await fetchFromNetEase(known))
+  const found = (await fetchFromLrcLib(known)) ?? (await fetchFromNetEase(known))
+  const lyrics = found && japaneseGlyphs(found)
   return Response.json(lyrics ? { lyrics } : {}, { headers: { 'Cache-Control': lyrics ? CACHED : MISS } })
 }
 

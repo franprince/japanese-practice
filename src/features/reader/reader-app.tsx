@@ -10,7 +10,7 @@ import { Card, IconButton, SpeakButton, ToggleChip } from './components/ui'
 import { ActiveKanji, EntryCard, KanjiHint, SegmentCard } from './components/WordCard'
 import { analyze, readingLines, transcriptions, type Segment } from './lib/analyze'
 import { getKanji, loadCore, loadRest, searchEnglish, wordCount, type Meta, type Word } from './lib/dictionary'
-import { hasJapanese, looksLikeRomaji, romajiToKana } from './lib/japanese'
+import { hasJapanese, japaneseGlyphs, looksLikeRomaji, romajiToKana } from './lib/japanese'
 import { detectLanguages, type Language } from './lib/languages'
 import { fetchSpotifyInfo, fetchSpotifyLyrics, parseSpotifyLink, type SpotifyInfo, type SpotifyLink } from './lib/spotify'
 import { tokenize, warmUp } from './lib/tokenizer'
@@ -181,7 +181,7 @@ export default function ReaderApp({ title }: { title: string }) {
         if (resolved === 'english') {
           next = { kind: 'english', query: input, words: searchEnglish(input) }
         } else {
-          const normalized = input.replace(/\r\n?/g, '\n')
+          const normalized = japaneseGlyphs(input.replace(/\r\n?/g, '\n'))
           const source = resolved === 'romaji' ? romajiToKana(normalized) : normalized
           next = { kind: 'analysis', text: source, segments: analyze(await tokenize(source)) }
         }
