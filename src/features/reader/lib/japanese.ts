@@ -1,4 +1,5 @@
 import { toHiragana as wkToHiragana, toRomaji as wkToRomaji } from 'wanakana'
+import { GLYPH_PAIRS } from './glyph-map'
 
 const KANJI = /[\p{Script=Han}々〆ヶ]/u
 const JAPANESE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々〆ー]/u
@@ -6,6 +7,23 @@ const JAPANESE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々〆ー
 export const hasKanji = (s: string) => KANJI.test(s)
 export const hasJapanese = (s: string) => JAPANESE.test(s)
 export const isKanji = (ch: string) => KANJI.test(ch)
+
+const KANA = /[\p{Script=Hiragana}\p{Script=Katakana}]/u
+let glyphs: Map<string, string> | undefined
+
+/**
+ * Swaps the Chinese-only glyphs some lyric sites use for the kanji Japanese writes (步いて → 歩いて),
+ * which the tokenizer would otherwise not recognise. Text without kana is taken as not Japanese and kept.
+ */
+export function japaneseGlyphs(text: string): string {
+  if (!KANA.test(text)) return text
+  if (!glyphs) {
+    const chars = [...GLYPH_PAIRS]
+    glyphs = new Map()
+    for (let i = 0; i < chars.length; i += 2) glyphs.set(chars[i]!, chars[i + 1]!)
+  }
+  return text.replace(/\p{Script=Han}/gu, (c) => glyphs!.get(c) ?? c)
+}
 
 /** Katakana to hiragana by code point; unlike wanakana it keeps ー as written. */
 export function kataToHira(s: string): string {

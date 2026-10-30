@@ -70,55 +70,57 @@ export function LyricsView({ text, lines, translation, options, onOptions, langu
               role="listitem"
               className="border-b border-border px-4 py-4 last:border-b-0 sm:px-5"
             >
-              <div className={`grid min-w-0 gap-3 ${translation?.status === 'done' || pending ? 'md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-8' : ''}`}>
-                <div className="min-w-0 space-y-3">
-                  {source.map((line, offset) => {
-                    const i = group.start + offset
-                    if (!line.text.trim()) return <div key={i} aria-hidden="true" className="h-6" />
-                    const word = line.segments.find((s) => s.type === 'word' && s.index === selected)
-                    return (
-                      <div key={i}>
-                        <div className="flex items-start gap-2">
-                          <div className="min-w-0 flex-1">
-                            <Reading
-                              segments={line.segments}
-                              options={{ ...options, romaji: false }}
-                              selected={selected}
-                              onSelect={onSelect}
-                              className="text-xl sm:text-2xl"
-                            />
-                            {options.romaji && (
-                              <p className="break-words text-sm leading-relaxed text-muted-foreground">
-                                {readings[i]!.romaji}
-                              </p>
-                            )}
-                          </div>
-                          <SpeakButton text={line.text} label={`Listen to line ${i + 1}`} />
-                        </div>
-                        {word && (
-                          <div id={`word-${word.index}`} className="mt-3 max-w-xl">
-                            <div className="mb-1 flex justify-end">
-                              <IconButton label="Close word details" onClick={() => onSelect(word.index)}>
-                                <X className="size-4" />
-                              </IconButton>
+              <div className="flex items-start gap-2">
+                <div className={`grid min-w-0 flex-1 gap-3 ${translation?.status === 'done' || pending ? 'md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-8' : ''}`}>
+                  <div className="min-w-0 space-y-3">
+                    {source.map((line, offset) => {
+                      const i = group.start + offset
+                      if (!line.text.trim()) return <div key={i} aria-hidden="true" className="h-6" />
+                      const word = line.segments.find((s) => s.type === 'word' && s.index === selected)
+                      return (
+                        <div key={i}>
+                          <Reading
+                            segments={line.segments}
+                            options={{ ...options, romaji: false }}
+                            selected={selected}
+                            onSelect={onSelect}
+                            className="text-xl sm:text-2xl"
+                          />
+                          {options.romaji && (
+                            <p className="break-words text-sm leading-relaxed text-muted-foreground">
+                              {readings[i]!.romaji}
+                            </p>
+                          )}
+                          {word && (
+                            <div id={`word-${word.index}`} className="mt-3 max-w-xl">
+                              <div className="mb-1 flex justify-end">
+                                <IconButton label="Close word details" onClick={() => onSelect(word.index)}>
+                                  <X className="size-4" />
+                                </IconButton>
+                              </div>
+                              <SegmentCard key={word.index} segment={word} onKanji={onKanji} />
                             </div>
-                            <SegmentCard key={word.index} segment={word} onKanji={onKanji} />
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  {pending && (
+                    <div role="status" aria-label="Translating" className="min-w-0 self-start pt-2">
+                      <Skeleton widths={source.map((_, i) => ['90%', '65%', '78%'][i % 3]!)} className="py-1" />
+                    </div>
+                  )}
+                  {translation?.status === 'done' && (
+                    <div className="min-w-0 self-start pt-1 sm:pt-1.5" lang={language.target ? toTag(language.target) : undefined} dir="auto">
+                      <TranslationContent translation={{ ...translation, value: group.text }} attribution={false} />
+                    </div>
+                  )}
                 </div>
-                {pending && (
-                  <div role="status" aria-label="Translating" className="min-w-0 self-center">
-                    <Skeleton widths={source.map((_, i) => ['90%', '65%', '78%'][i % 3]!)} className="py-1" />
-                  </div>
-                )}
-                {translation?.status === 'done' && (
-                  <div className="min-w-0 self-center" lang={language.target ? toTag(language.target) : undefined} dir="auto">
-                    <TranslationContent translation={{ ...translation, value: group.text }} attribution={false} />
-                  </div>
-                )}
+                {/* At the row's edge, so it doesn't sit between the lyrics and their translation. */}
+                <SpeakButton
+                  text={source.map((line) => line.text).join('\n')}
+                  label={group.start === group.end ? `Listen to line ${group.start + 1}` : `Listen to lines ${group.start + 1}–${group.end + 1}`}
+                />
               </div>
             </div>
           )

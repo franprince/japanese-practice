@@ -3,6 +3,7 @@ import {
   furigana,
   hepburn,
   hiraToKata,
+  japaneseGlyphs,
   kataToHira,
   looksLikeRomaji,
   romajiToKana,
@@ -96,5 +97,21 @@ describe('kana and romaji', () => {
   })
   it('romanizes Japanese punctuation', () => {
     expect(romanizePunctuation('はい、そうです。')).toBe('はい,そうです.')
+  })
+})
+
+describe('japaneseGlyphs', () => {
+  it('swaps Chinese-only glyphs in Japanese text for the kanji Japanese uses', () => {
+    expect(japaneseGlyphs('步いてたら')).toBe('歩いてたら')
+    expect(japaneseGlyphs('届かない场所へ')).toBe('届かない場所へ')
+    expect(japaneseGlyphs('说明して、发表した')).toBe('説明して、発表した')
+  })
+
+  it('keeps kanji Japanese also writes, even where Chinese means something else', () => {
+    expect(japaneseGlyphs('夢が叶う、皇后と国')).toBe('夢が叶う、皇后と国')
+  })
+
+  it('leaves text without kana alone', () => {
+    expect(japaneseGlyphs('我们在这里散步')).toBe('我们在这里散步')
   })
 })

@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs'
 import { beforeAll, describe, expect, it } from 'bun:test'
 import { analyze, readingLines, transcriptions } from '../lib/analyze'
 import { addWords, type RawWord } from '../lib/dictionary'
+import { japaneseGlyphs } from '../lib/japanese'
 
 let tokenizer: Tokenizer<IpadicFeatures>
 const run = (text: string) => analyze(tokenizer.tokenize(text))
@@ -18,6 +19,14 @@ beforeAll(async () => {
 })
 
 describe('analyze', () => {
+  it('reads lyrics written with Chinese glyphs once they are swapped for Japanese ones', () => {
+    // NetEase lyrics write 步 (U+6B65), which the tokenizer does not know, for 歩 (U+6B69).
+    const verb = words(japaneseGlyphs('步いてたら夜風が'))[0]
+    expect(verb!.surface).toBe('歩いてたら')
+    expect(verb!.base).toBe('歩く')
+    expect(verb!.reading).toBe('あるいてたら')
+  })
+
   it('joins an inflected verb into one word traced to its dictionary form', () => {
     const verb = words('本を読んでいました')[2]
     expect(verb!.surface).toBe('読んでいました')
