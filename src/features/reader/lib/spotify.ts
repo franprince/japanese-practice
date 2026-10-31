@@ -14,7 +14,8 @@ export interface SpotifyInfo {
   thumbnail?: string
 }
 
-const CREDIT_LINE = /^\s*(?:作[詞词]|作曲|[編编]曲|唄|歌|Lyricist|Composer|Arranger|Vocals?|Produced\s+by)\s*[:：]/i
+// A `label : name` credit (作詞 : Ayase, 制作人 : …, Produced by: …): a short label without kana, then a colon.
+const CREDIT_LINE = /^(?:[^\s:：\p{Script=Hiragana}\p{Script=Katakana}]{1,12}\s?){1,3}[:：]\s*\S/u
 const TIME_TAG = /\[(\d+):(\d+(?:\.\d+)?)\]/g
 // `[ar:Artist]`, `[offset:+200]`… header tags, and the JSON credit rows NetEase sometimes puts first.
 const ID_TAG = /^\[[a-z#]+:[^\]]*\]$|^\{.*\}$/i

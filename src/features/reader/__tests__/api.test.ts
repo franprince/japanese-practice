@@ -233,6 +233,32 @@ describe('api/spotify', () => {
     })
   })
 
+  it("matches the artist under Spotify's Japanese name as well as its romanized one", async () => {
+    // Spotify names the artist Leo Ieiri by default and 家入レオ with locale=ja; NetEase only knows the latter.
+    const fetch = upstream({
+      'https://open.spotify.com/embed/track/6KcVn17IwE2D4HqZ70yYUL?locale=ja': () =>
+        embed({ title: 'Pain', artists: [{ name: '家入レオ' }], duration: 236000 }),
+      'https://open.spotify.com/embed/track/': () => embed({ title: 'Pain', artists: [{ name: 'Leo Ieiri' }], duration: 236000 }),
+      'https://music.163.com/api/search/get': () =>
+        Response.json({
+          result: {
+            songs: [
+              { id: 1984693780, name: 'Pain', artists: [{ name: '家入レオ' }] },
+              { id: 2022415806, name: 'Pain', artists: [{ name: '家入レオ' }] },
+            ],
+          },
+        }),
+      // The first copy has no lyrics; the album one does.
+      'https://music.163.com/api/song/lyric?id=1984693780': () => Response.json({ lrc: { lyric: '' } }),
+      'https://music.163.com/api/song/lyric?id=2022415806': () => Response.json({ lrc: { lyric: '[00:10.00]痛みを抱えて' } }),
+    })
+    vi.stubGlobal('fetch', fetch)
+    const url = encodeURIComponent('https://open.spotify.com/track/6KcVn17IwE2D4HqZ70yYUL')
+    expect(await call(spotify, `/api/spotify?url=${url}&lyrics=1`)).toEqual({ status: 200, body: { lyrics: '痛みを抱えて' } })
+    const lrclib = fetch.mock.calls.map(([input]) => String(input)).filter((u) => u.startsWith('https://lrclib.net/api/get'))
+    expect(lrclib.map((u) => new URL(u).searchParams.get('artist_name'))).toEqual(['家入レオ', 'Leo Ieiri'])
+  })
+
   it('uses the oEmbed title for lyrics when the embed page cannot be read', async () => {
     const fetch = upstream({
       'https://open.spotify.com/oembed': () => Response.json({ title: '夜に駆ける' }),
