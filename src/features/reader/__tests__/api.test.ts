@@ -129,6 +129,35 @@ describe('api/translate', () => {
       body: { error: 'the DeepL monthly quota is used up' },
     })
   })
+
+  it('gives up on DeepL after a few seconds', async () => {
+    vi.stubEnv('DEEPL_API_KEY', 'key:fx')
+    const fetch = vi.fn().mockRejectedValue(new DOMException('The operation timed out.', 'TimeoutError'))
+    vi.stubGlobal('fetch', fetch)
+    expect(await call(translate, '/api/translate?text=花鬘')).toEqual({
+      status: 504,
+      body: { error: 'DeepL took too long to answer' },
+    })
+    expect(fetch.mock.calls[0]![1].signal).toBeInstanceOf(AbortSignal)
+  })
+
+  it('reports an unreachable DeepL', async () => {
+    vi.stubEnv('DEEPL_API_KEY', 'key:fx')
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('fetch failed')))
+    expect(await call(translate, '/api/translate?text=花鬘')).toEqual({
+      status: 502,
+      body: { error: "DeepL couldn't be reached" },
+    })
+  })
+
+  it('treats a non-JSON DeepL answer as no translation', async () => {
+    vi.stubEnv('DEEPL_API_KEY', 'key:fx')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<html>busy</html>')))
+    expect(await call(translate, '/api/translate?text=花鬘')).toEqual({
+      status: 502,
+      body: { error: 'DeepL sent no translation' },
+    })
+  })
 })
 
 describe('api/spotify', () => {
@@ -337,5 +366,27 @@ describe('api/languages', () => {
   it('needs the DEEPL_API_KEY variable', async () => {
     vi.stubEnv('DEEPL_API_KEY', '')
     expect((await languages()).status).toBe(501)
+  })
+
+  it('gives up on DeepL after a few seconds', async () => {
+    vi.stubEnv('DEEPL_API_KEY', 'key:fx')
+    const fetch = vi.fn().mockRejectedValue(new DOMException('The operation timed out.', 'TimeoutError'))
+    vi.stubGlobal('fetch', fetch)
+    const res = await languages()
+    expect({ status: res.status, body: await res.json() }).toEqual({
+      status: 504,
+      body: { error: 'DeepL took too long to answer' },
+    })
+    expect(fetch.mock.calls[0]![1].signal).toBeInstanceOf(AbortSignal)
+  })
+
+  it('rejects a DeepL answer that is not a language list', async () => {
+    vi.stubEnv('DEEPL_API_KEY', 'key:fx')
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('<html>busy</html>')))
+    const res = await languages()
+    expect({ status: res.status, body: await res.json() }).toEqual({
+      status: 502,
+      body: { error: 'DeepL sent no languages' },
+    })
   })
 })
