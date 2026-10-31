@@ -5,6 +5,8 @@
 
 import { alignTranslation } from '@/features/reader/lib/translationAlignment'
 
+import { fetchDeepL, unreachable } from '../deepl'
+
 const MAX_CHARS = 1000
 const JAPANESE = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u
 // DeepL target codes: ES, PT-BR, ZH-HANS, ES-419…
@@ -25,20 +27,23 @@ export async function GET(request: Request): Promise<Response> {
   }
   if (!TARGET.test(to)) return Response.json({ error: `Unknown target language ${to}` }, { status: 400 })
 
-  // Free-plan keys end in ":fx" and use their own host.
-  const host = key.endsWith(':fx') ? 'https://api-free.deepl.com' : 'https://api.deepl.com'
-  const res = await fetch(`${host}/v2/translate`, {
-    method: 'POST',
-    headers: { Authorization: `DeepL-Auth-Key ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      text: [text],
-      source_lang: 'JA',
-      target_lang: to,
-      // Lyric line breaks can divide one sentence; preserve them without isolating each phrase.
-      split_sentences: 'nonewlines',
-      preserve_formatting: true,
-    }),
-  })
+  let res: Response
+  try {
+    res = await fetchDeepL(key, '/v2/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: [text],
+        source_lang: 'JA',
+        target_lang: to,
+        // Lyric line breaks can divide one sentence; preserve them without isolating each phrase.
+        split_sentences: 'nonewlines',
+        preserve_formatting: true,
+      }),
+    })
+  } catch (error) {
+    return unreachable(error)
+  }
   if (!res.ok) {
     const error =
       res.status === 456 ? 'the DeepL monthly quota is used up'
@@ -49,7 +54,7 @@ export async function GET(request: Request): Promise<Response> {
     return Response.json({ error }, { status: res.status === 429 ? 429 : 502 })
   }
 
-  const data = await res.json()
+  const data = await res.json().catch(() => undefined)
   const translated = data?.translations?.[0]?.text
   if (typeof translated !== 'string' || !translated.trim()) {
     return Response.json({ error: 'DeepL sent no translation' }, { status: 502 })
