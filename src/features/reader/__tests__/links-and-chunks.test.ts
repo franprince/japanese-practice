@@ -55,6 +55,21 @@ describe('parseLrc', () => {
     expect(parseLrc(raw)).toBe('手放した 花びらが')
   })
 
+  it('strips any leading `label : name` credits, in Chinese or English too, but keeps lyrics with colons later', () => {
+    const raw = [
+      '[00:00.00] 制作人 : Ayase',
+      '[00:00.50] 作詞 : Ayase',
+      '[00:01.00] Produced by: Ayase',
+      '[00:02.00] 沈むように溶けてゆくように',
+      '[00:05.00] 理由：君がいたから',
+    ].join('\n')
+    expect(parseLrc(raw)).toBe('沈むように溶けてゆくように\n理由：君がいたから')
+  })
+
+  it('keeps a first lyric line that has a colon after kana', () => {
+    expect(parseLrc('[00:01.00]ねえ：聞いて')).toBe('ねえ：聞いて')
+  })
+
   it('repeats a line stamped for several moments, in time order', () => {
     const raw = ['[00:01.00][00:07.00]サビ', '[00:04.00]一番', '[00:10.00]二番'].join('\n')
     expect(parseLrc(raw)).toBe('サビ\n一番\nサビ\n二番')
