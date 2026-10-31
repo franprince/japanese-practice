@@ -3,6 +3,7 @@
 
 import { japaneseGlyphs } from '@/features/reader/lib/japanese'
 import { parseLrc } from '@/features/reader/lib/spotify'
+import { SITE_URL } from '@/lib/seo'
 
 const ALLOWED = /^https:\/\/open\.spotify\.com\/(track|album|playlist|episode|show|artist)\/([A-Za-z0-9]{22})$/
 const NEXT_DATA = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/
@@ -11,6 +12,16 @@ const TIMEOUT_MS = 5000
 const CACHED = 'public, s-maxage=86400, stale-while-revalidate=604800'
 // A missed lyrics lookup may be a provider hiccup; retry it soon instead of caching the miss for days.
 const MISS = 'public, s-maxage=600'
+// LRCLIB asks clients to name themselves, as registered there (nihongo-renshuu). A registered app raises our rate limit: the secret server key
+// (LRCLIB_API_KEY) when it is set, else the app ID, which is public by design.
+const LRCLIB_APP_ID = '3g92CwLUzSih4IfD2oSha_bj3FOfschwREUDIe3pSLM'
+const lrclibHeaders = (): Record<string, string> => {
+  const key = process.env.LRCLIB_API_KEY
+  return {
+    'User-Agent': `nihongo-renshuu (${SITE_URL}/reader)`,
+    ...(key ? { 'Lrclib-Api-Key': key } : { 'Lrclib-App-Id': LRCLIB_APP_ID }),
+  }
+}
 
 interface TrackMeta {
   title?: string
@@ -106,14 +117,14 @@ async function lrcLibGet(song: Song, { title, artist }: Song['names'][number]): 
   if (!artist) return undefined
   const params = new URLSearchParams({ track_name: title, artist_name: artist })
   if (song.durationSec) params.set('duration', String(song.durationSec))
-  const res = await get(`https://lrclib.net/api/get?${params}`)
+  const res = await get(`https://lrclib.net/api/get?${params}`, { headers: lrclibHeaders() })
   return res.ok ? extractLrcLibText((await res.json()) as LrcLibItem) : undefined
 }
 
 async function lrcLibSearch(song: Song, { title, artist }: Song['names'][number]): Promise<string | undefined> {
   const params = new URLSearchParams({ track_name: title })
   if (artist) params.set('artist_name', artist)
-  const res = await get(`https://lrclib.net/api/search?${params}`)
+  const res = await get(`https://lrclib.net/api/search?${params}`, { headers: lrclibHeaders() })
   if (!res.ok) return undefined
   const list = (await res.json()) as unknown
   if (!Array.isArray(list)) return undefined

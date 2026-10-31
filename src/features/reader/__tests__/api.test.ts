@@ -171,6 +171,7 @@ describe('api/spotify', () => {
   })
 
   it('returns plain lyrics from LRCLIB when asked for them', async () => {
+    vi.stubEnv('LRCLIB_API_KEY', '')
     const fetch = upstream({
       'https://open.spotify.com/embed/track/': () => embed(yoasobi),
       'https://lrclib.net/api/get?': () =>
@@ -179,8 +180,22 @@ describe('api/spotify', () => {
     vi.stubGlobal('fetch', fetch)
     const res = await spotify(new Request(`https://site.example/api/spotify?url=${yoasobiUrl}&lyrics=1`))
     expect(await res.json()).toEqual({ lyrics: '沈むように溶けてゆくように\n二人だけの空が広がる夜に' })
+    const [, init] = fetch.mock.calls.find(([input]) => String(input).startsWith('https://lrclib.net/api/get'))!
+    expect(init.headers['User-Agent']).toBe('nihongo-renshuu (https://www.nihongo-renshuu.app/reader)')
+    expect(init.headers['Lrclib-App-Id']).toBeTruthy()
+    expect(init.headers['Lrclib-Api-Key']).toBeUndefined()
     expect(res.headers.get('cache-control')).toContain('s-maxage=86400')
     expect(fetch.mock.calls.some(([input]) => String(input).startsWith('https://open.spotify.com/oembed'))).toBe(false)
+  })
+
+  it('sends the LRCLIB server key instead of the app ID when one is set', async () => {
+    vi.stubEnv('LRCLIB_API_KEY', 'secret')
+    const fetch = upstream({ 'https://open.spotify.com/embed/track/': () => embed(yoasobi) })
+    vi.stubGlobal('fetch', fetch)
+    await call(spotify, `/api/spotify?url=${yoasobiUrl}&lyrics=1`)
+    const [, init] = fetch.mock.calls.find(([input]) => String(input).startsWith('https://lrclib.net/'))!
+    expect(init.headers['Lrclib-Api-Key']).toBe('secret')
+    expect(init.headers['Lrclib-App-Id']).toBeUndefined()
   })
 
   it('ignores LRCLIB search results for other songs and caches the miss only briefly', async () => {
