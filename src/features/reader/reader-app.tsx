@@ -1,7 +1,8 @@
 'use client'
 // Nihongo Rubi's reader, ported from github.com/franprince/nihongo-traductor and restyled for the notebook themes.
 import { ClipboardPaste, Clock, ExternalLink, LoaderCircle, Music, PanelRightClose, X } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { JapaneseTextarea } from './components/JapaneseTextarea'
 import { KanjiDetails, KanjiSheet } from './components/KanjiSheet'
 import { targetOf, type LanguageChoice } from './components/LanguagePicker'
 import { LyricsView } from './components/LyricsView'
@@ -10,7 +11,6 @@ import { Card, IconButton, SpeakButton, ToggleChip } from './components/ui'
 import { ActiveKanji, EntryCard, KanjiHint, SegmentCard } from './components/WordCard'
 import { analyze, readingLines, transcriptions, type Segment } from './lib/analyze'
 import { getKanji, loadCore, loadRest, searchEnglish, wordCount, type Meta, type Word } from './lib/dictionary'
-import { convertible, imeInput, type Pending } from './lib/ime'
 import { hasJapanese, japaneseGlyphs, looksLikeRomaji, romajiToKana } from './lib/japanese'
 import { detectLanguages, type Language } from './lib/languages'
 import { fetchSpotifyInfo, fetchSpotifyLyrics, parseSpotifyLink, type SpotifyInfo, type SpotifyLink } from './lib/spotify'
@@ -99,8 +99,6 @@ export default function ReaderApp({ title }: { title: string }) {
   // The input method turns typed romaji into kana as it is typed, like a Japanese keyboard.
   const [ime, setIme] = useState(() => store.get('reader-ime', false))
   const textarea = useRef<HTMLTextAreaElement>(null)
-  const pending = useRef<Pending | undefined>(undefined)
-  const caret = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     loadCore()
@@ -120,30 +118,7 @@ export default function ReaderApp({ title }: { title: string }) {
   useEffect(() => store.set('reader-kanjiOpen', kanjiOpen), [kanjiOpen])
   useEffect(() => store.set('reader-ime', ime), [ime])
 
-  // A converted keystroke rewrites the value, which sends the caret to the end; put it back after the kana.
-  useLayoutEffect(() => {
-    if (caret.current === undefined) return
-    textarea.current?.setSelectionRange(caret.current, caret.current)
-    caret.current = undefined
-  }, [text])
-
-  const onType = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const el = e.target
-    const native = e.nativeEvent as InputEvent
-    // Keystrokes only: pastes, deletions and a system input method's own composition pass through as they are.
-    if (ime && native.inputType === 'insertText' && !native.isComposing && convertible(native.data) && el.selectionStart === el.selectionEnd) {
-      const next = imeInput(el.value, el.selectionEnd, native.data, pending.current)
-      pending.current = next.pending
-      caret.current = next.caret
-      setText(next.value)
-      return
-    }
-    pending.current = undefined
-    setText(el.value)
-  }
-
   const toggleIme = () => {
-    pending.current = undefined
     // Kana typed with it on is Japanese, so a Romaji or English tab would read it wrongly.
     if (!ime && (mode === 'romaji' || mode === 'english')) setMode('auto')
     setIme(!ime)
@@ -343,17 +318,16 @@ export default function ReaderApp({ title }: { title: string }) {
               </div>
             )}
             <div className="relative">
-              <textarea
-                ref={textarea}
+              <JapaneseTextarea
+                textareaRef={textarea}
+                ime={ime}
                 value={text}
-                onChange={onType}
+                onValueChange={setText}
                 placeholder="日本語"
                 aria-label="Text to read"
                 rows={3}
                 autoFocus
                 spellCheck={false}
-                autoCapitalize={ime ? 'off' : undefined}
-                autoComplete={ime ? 'off' : undefined}
                 lang="ja"
                 className="block min-h-28 w-full resize-y bg-transparent px-6 py-5 pr-12 font-hand text-[22px] leading-relaxed placeholder:text-muted-foreground focus:outline-none sm:text-[26px]"
               />
@@ -387,7 +361,7 @@ export default function ReaderApp({ title }: { title: string }) {
                 onClick={toggleIme}
                 aria-pressed={ime}
                 aria-label={ime ? 'Turn off input method' : 'Turn on input method'}
-                title={ime ? 'Turn off input method' : 'Turn on input method: type romaji to write kana (capitals for katakana)'}
+                title={ime ? 'Turn off input method' : 'Turn on input method: type romaji for kana, Space for kanji (↓ for other spellings)'}
                 className="reader-tool-button reader-ime-button ml-auto"
               >
                 <span lang="ja" aria-hidden="true">あ</span>
