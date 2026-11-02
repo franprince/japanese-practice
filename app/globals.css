@@ -314,6 +314,8 @@
 .seg-switch > button[aria-checked="true"] { background: var(--foreground); color: var(--card); }
 .reader-tool-button { display: inline-flex; width: 40px; height: 40px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 10px; background: var(--card); color: var(--foreground); }
 .reader-tool-button:hover { color: var(--primary); }
+.reader-ime-button { font-family: var(--font-display); font-size: 19px; font-weight: 600; }
+.reader-ime-button[aria-pressed="true"] { border-color: var(--foreground); background: var(--foreground); color: var(--card); }
 @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(300%); } }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 .stroke-anim path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 0.55s ease-in-out forwards; }
