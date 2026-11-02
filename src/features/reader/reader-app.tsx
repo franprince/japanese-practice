@@ -361,7 +361,7 @@ export default function ReaderApp({ title }: { title: string }) {
                 onClick={toggleIme}
                 aria-pressed={ime}
                 aria-label={ime ? 'Turn off input method' : 'Turn on input method'}
-                title={ime ? 'Turn off input method' : 'Turn on input method: type romaji for kana, Space for kanji (↓ for other spellings)'}
+                title={ime ? 'Turn off input method' : 'Turn on input method: type romaji for kana, then ↓ or Space for kanji'}
                 className="reader-tool-button reader-ime-button ml-auto"
               >
                 <span lang="ja" aria-hidden="true">あ</span>

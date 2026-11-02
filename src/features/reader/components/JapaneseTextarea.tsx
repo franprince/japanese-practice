@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { toKana } from 'wanakana'
 import type { Phrase } from '../lib/convert'
 import { convertible, imeInput, type Pending } from '../lib/ime'
+import { hasJapanese } from '../lib/japanese'
 import { convertKana, prepareConversion } from '../lib/tokenizer'
 
 const PAGE = 9
@@ -197,11 +198,11 @@ export function JapaneseTextarea({
       if (e.key.length === 1 || e.key === 'Tab' || e.key.startsWith('Arrow') || e.key === 'Home' || e.key === 'End') commit()
       return
     }
-    if (converting && e.key === ' ') return e.preventDefault()
+    if (converting && (e.key === ' ' || e.key === 'ArrowDown')) return e.preventDefault()
     const el = e.currentTarget
     const atEnd = composition && el.selectionStart === composition.end && el.selectionEnd === composition.end
     if (!composition) return
-    if (atEnd && e.key === ' ' && !e.shiftKey) {
+    if (atEnd && ((e.key === ' ' && !e.shiftKey) || e.key === 'ArrowDown')) {
       e.preventDefault()
       startConversion()
     } else if (atEnd && e.key === 'Enter') {
@@ -246,9 +247,12 @@ export function JapaneseTextarea({
     onValueChange(el.value)
   }
 
-  // The candidate list sits under the phrase being converted, outside the card so it is never clipped.
+  // The candidate list (or, while typing, a hint that kana can become kanji) sits under the marked
+  // text, outside the card so it is never clipped.
   const marking = conversion ?? composition
-  const open = !!conversion || converting
+  const composed = composition && !conversion ? value.slice(composition.start, composition.end) : ''
+  const hint = !converting && hasJapanese(composed)
+  const open = !!conversion || converting || hint
   useLayoutEffect(() => {
     if (!open) return
     const place = () => {
@@ -316,7 +320,21 @@ export function JapaneseTextarea({
         aria-controls={phrase ? 'ime-candidates' : undefined}
         className={className}
       />
-      {open && popup && createPortal(
+      {open && popup && hint && createPortal(
+        <button
+          type="button"
+          tabIndex={-1}
+          className="ime-hint"
+          style={{ left: popup.left, top: popup.top }}
+          // Keeps the focus in the text, so the conversion opens where the visitor is typing.
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={startConversion}
+        >
+          <kbd>↓</kbd> or <kbd>Space</kbd> for kanji
+        </button>,
+        document.body,
+      )}
+      {open && popup && !hint && createPortal(
         <div
           id="ime-candidates"
           role="listbox"
