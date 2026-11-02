@@ -18,7 +18,7 @@ const LRCLIB_APP_ID = '3g92CwLUzSih4IfD2oSha_bj3FOfschwREUDIe3pSLM'
 const lrclibHeaders = (): Record<string, string> => {
   const key = process.env.LRCLIB_API_KEY
   return {
-    'User-Agent': `nihongo-renshuu (${SITE_URL}/reader)`,
+    'User-Agent': `nihongo-renshuu (${SITE_URL}/analyzer)`,
     ...(key ? { 'Lrclib-Api-Key': key } : { 'Lrclib-App-Id': LRCLIB_APP_ID }),
   }
 }

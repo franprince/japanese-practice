@@ -210,7 +210,7 @@ describe('api/spotify', () => {
     const res = await spotify(new Request(`https://site.example/api/spotify?url=${yoasobiUrl}&lyrics=1`))
     expect(await res.json()).toEqual({ lyrics: '沈むように溶けてゆくように\n二人だけの空が広がる夜に' })
     const [, init] = fetch.mock.calls.find(([input]) => String(input).startsWith('https://lrclib.net/api/get'))!
-    expect(init.headers['User-Agent']).toBe('nihongo-renshuu (https://www.nihongo-renshuu.app/reader)')
+    expect(init.headers['User-Agent']).toBe('nihongo-renshuu (https://www.nihongo-renshuu.app/analyzer)')
     expect(init.headers['Lrclib-App-Id']).toBeTruthy()
     expect(init.headers['Lrclib-Api-Key']).toBeUndefined()
     expect(res.headers.get('cache-control')).toContain('s-maxage=86400')

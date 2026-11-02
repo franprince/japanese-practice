@@ -12,7 +12,7 @@ const HEADLINE = ["A little Japanese,", "every"] as const
 const HANKO = ["よく", "できた"]
 const BRAND = "日本語 練習"
 const KICKER_EN = "Today's practice"
-const TAGLINE = ["Kana, kanji, numbers and dates —", "plus a furigana reader."]
+const TAGLINE = ["Kana, kanji, numbers and dates —", "plus a Japanese text analyzer."]
 const BRAND_LINES = ["Nihongo Renshū", "nihongo-renshuu.app"]
 
 /** Fetches a Google Font subset containing only `text`, as TTF (satori can't read woff2). */

@@ -241,10 +241,10 @@
     "practice.retry": "Reintentar",
     "practice.minimumLength": "Longitud mínima",
     "practice.maximumLength": "Longitud máxima",
-    "reader.title": "Lector",
+    "reader.title": "Analizador de textos",
     "practice.tools": "Herramientas",
-    "tools.reader.title": "Lector",
+    "tools.reader.title": "Analizador de textos",
     "tools.reader.description": "Pega cualquier texto en japonés, rōmaji o el enlace de una canción: furigana, rōmaji, una traducción, cada palabra y cada kanji.",
-    "tools.reader.open": "Abrir lector",
+    "tools.reader.open": "Abrir analizador",
     "seo.reader.description": "Pega texto en japonés, rōmaji o el enlace de una canción de Spotify y obtén furigana, rōmaji, una traducción, el desglose de cada palabra y los kanji con su orden de trazos."
 }
