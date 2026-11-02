@@ -50,9 +50,9 @@ describe("SEO metadata", () => {
     const hashed = [{ url: new URL("https://example.com/opengraph-image?abc123") }]
     const parent = Promise.resolve({ openGraph: { images: hashed } } as unknown as ResolvedMetadata)
     const metadata = await pageMetadata({
-      title: "Reader",
+      title: "Text Analyzer",
       descriptionKey: "seo.reader.description",
-      path: "/reader",
+      path: "/analyzer",
       keywords: [],
     })({}, parent)
 

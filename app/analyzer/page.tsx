@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/layouts/site-header"
 import { Button } from "@/components/ui/button"
 import { useI18n } from "@/lib/i18n"
 
-// The reader reads location/localStorage on start and runs kuromoji in a worker, so it renders on the client only.
+// The analyzer reads location/localStorage on start and runs kuromoji in a worker, so it renders on the client only.
 const ReaderApp = dynamic(() => import("@/features/reader/reader-app"), {
   ssr: false,
   loading: () => <p role="status" className="py-16 text-center text-muted-foreground">…</p>,

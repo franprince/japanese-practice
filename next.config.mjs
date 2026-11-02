@@ -8,6 +8,10 @@ const nextConfig = {
             "zlibjs/bin/gunzip.min.js": { browser: "./src/features/reader/lib/shims/gunzip.ts" },
         },
     },
+    // The reader was renamed to the text analyzer; keep old links and search results working.
+    async redirects() {
+        return [{ source: "/reader", destination: "/analyzer", permanent: true }]
+    },
     async headers() {
         return [
             {

@@ -2,6 +2,7 @@
 // Nihongo Rubi's reader, ported from github.com/franprince/nihongo-traductor and restyled for the notebook themes.
 import { ClipboardPaste, Clock, ExternalLink, LoaderCircle, Music, PanelRightClose, X } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { JapaneseTextarea } from './components/JapaneseTextarea'
 import { KanjiDetails, KanjiSheet } from './components/KanjiSheet'
 import { targetOf, type LanguageChoice } from './components/LanguagePicker'
 import { LyricsView } from './components/LyricsView'
@@ -95,6 +96,9 @@ export default function ReaderApp({ title }: { title: string }) {
   })
   const target = targetOf(choice, langs?.detected)
   const run = useRef(0)
+  // The input method turns typed romaji into kana as it is typed, like a Japanese keyboard.
+  const [ime, setIme] = useState(() => store.get('reader-ime', false))
+  const textarea = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     loadCore()
@@ -112,6 +116,14 @@ export default function ReaderApp({ title }: { title: string }) {
 
   useEffect(() => store.set('reader-display', options), [options])
   useEffect(() => store.set('reader-kanjiOpen', kanjiOpen), [kanjiOpen])
+  useEffect(() => store.set('reader-ime', ime), [ime])
+
+  const toggleIme = () => {
+    // Kana typed with it on is Japanese, so a Romaji or English tab would read it wrongly.
+    if (!ime && (mode === 'romaji' || mode === 'english')) setMode('auto')
+    setIme(!ime)
+    textarea.current?.focus()
+  }
   // Only the mode is kept for "auto", so the language follows the visitor's country.
   useEffect(() => store.set('reader-translateTo', choice), [choice])
   useEffect(() => {
@@ -306,9 +318,11 @@ export default function ReaderApp({ title }: { title: string }) {
               </div>
             )}
             <div className="relative">
-              <textarea
+              <JapaneseTextarea
+                textareaRef={textarea}
+                ime={ime}
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onValueChange={setText}
                 placeholder="日本語"
                 aria-label="Text to read"
                 rows={3}
@@ -342,6 +356,16 @@ export default function ReaderApp({ title }: { title: string }) {
                   <span className="truncate">{ex.label ?? ex.value}</span>
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={toggleIme}
+                aria-pressed={ime}
+                aria-label={ime ? 'Turn off input method' : 'Turn on input method'}
+                title={ime ? 'Turn off input method' : 'Turn on input method: type romaji for kana, then ↓ or Space for kanji'}
+                className="reader-tool-button reader-ime-button ml-auto"
+              >
+                <span lang="ja" aria-hidden="true">あ</span>
+              </button>
             </div>
           </Card>
 
