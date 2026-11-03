@@ -61,7 +61,7 @@
   --destructive: #b5371f; --destructive-foreground: #ffffff;
   --success: #2e6b4f; --success-foreground: #ffffff;
   --radius: 0.25rem;
-  --font-display: var(--font-inter-tight), "Inter Tight", var(--font-klee), "Klee One", sans-serif;
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", var(--font-klee), "Klee One", sans-serif;
   --grid-line: rgb(181 55 31 / 0.09);
 }
 
