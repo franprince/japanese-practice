@@ -49,7 +49,7 @@ export function NumberPad({
   }, [keys, shuffleNumbers, hydrated, seed, order.revision])
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="@container w-full max-w-md mx-auto">
       {onShuffleChange && (
         <label className="flex items-center gap-2 mb-2 text-sm text-muted-foreground cursor-pointer select-none">
           <input
@@ -78,7 +78,10 @@ export function NumberPad({
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-2 mt-3">
+      {/* On phones the backspace key shrinks to its icon, leaving Clear and Check room for their
+          labels: in equal thirds "Comprobar" overflows its button below about 400px. On the
+          narrowest pads (320px phones) Check also drops its icon to fit. */}
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-2 mt-3 sm:grid-cols-3">
         <Button
           variant="outline"
           className="pad-key h-12 text-sm font-medium hover:bg-destructive/20 hover:text-destructive hover:border-destructive/50 transition-all bg-transparent"
@@ -101,7 +104,7 @@ export function NumberPad({
           onClick={onSubmit}
           disabled={disabled || submitDisabled}
         >
-          <CornerDownLeft className="h-5 w-5 mr-1" />
+          <CornerDownLeft className="h-5 w-5 mr-1 @max-[17rem]:hidden" />
           {t("check")}
         </Button>
       </div>
