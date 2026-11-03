@@ -22,6 +22,8 @@ export function Reading({
   onSelect: (index: number) => void
   className?: string
 }) {
+  // Words sit on the baseline of their text: furigana can make a word taller above it, and top
+  // alignment would push that word's text and romaji below its neighbours'.
   return (
     <p lang="ja" className={`font-hand leading-relaxed ${className} ${options.furigana ? '' : 'no-furigana'}`}>
       {segments.map((s) =>
@@ -31,7 +33,7 @@ export function Reading({
             type="button"
             aria-pressed={selected === s.index}
             onClick={() => onSelect(s.index)}
-            className={`mx-px mb-2 inline-flex max-w-full flex-col items-center rounded-lg px-1 align-top transition hover:bg-primary/10 ${selected === s.index ? 'bg-primary/10' : ''}`}
+            className={`mx-px mb-2 inline-flex max-w-full flex-col items-center rounded-lg px-1 align-baseline transition hover:bg-primary/10 ${selected === s.index ? 'bg-primary/10' : ''}`}
           >
             <span className="max-w-full break-words leading-[1.9]">
               <Ruby parts={s.furigana} />
@@ -43,7 +45,7 @@ export function Reading({
         ) : s.type === 'space' ? (
           <span key={s.index} className="whitespace-pre-wrap">{s.surface}</span>
         ) : (
-          <span key={s.index} className="inline-block px-0.5 align-top leading-[1.9]">
+          <span key={s.index} className="inline-block px-0.5 align-baseline leading-[1.9]">
             {s.surface}
           </span>
         ),
