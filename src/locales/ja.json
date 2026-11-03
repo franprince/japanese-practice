@@ -242,7 +242,7 @@
     "practice.minimumLength": "最小文字数",
     "practice.maximumLength": "最大文字数",
     "reader.title": "テキスト解析",
-    "practice.tools": "ツール",
+    "practice.tools": "生の日本語を読む",
     "tools.reader.title": "テキスト解析",
     "tools.reader.description": "日本語の文章、ローマ字、曲のリンクを貼り付けると、ふりがな・ローマ字・翻訳・単語と漢字の解説を表示します。",
     "tools.reader.open": "テキスト解析を開く",

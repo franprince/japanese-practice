@@ -78,7 +78,7 @@ export default function HomePage() {
         <section className="pb-24" aria-labelledby="tools-heading">
           <div className="mb-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-border pb-3.5">
             <h2 id="tools-heading" className="font-hand text-4xl font-semibold leading-[1.2]">{t("practice.tools")}</h2>
-            {language !== "ja" && <span lang="ja" aria-hidden="true" className="font-hand text-xl text-primary">道具</span>}
+            {language !== "ja" && <span lang="ja" aria-hidden="true" className="font-hand text-xl text-primary">読解</span>}
           </div>
           <Link href="/analyzer" className="ink-card group flex flex-wrap items-center gap-7 px-7 py-6 transition-transform hover:-translate-y-0.5">
             <span lang="ja" aria-hidden="true" className="reader-mark flex shrink-0 items-end gap-1 font-hand text-[44px] font-semibold leading-none"><ruby>読<rt>よ</rt></ruby>む</span>
