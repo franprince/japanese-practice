@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowRight } from "lucide-react"
@@ -13,6 +14,13 @@ import { GAMES } from "@/lib/core"
 const examples: Record<string, [string, string]> = { romaji: ["ねこ", "neko"], numbers: ["24", "二十四"], kanji: ["水", "みず"], dates: ["月曜日", "getsuyoubi"] }
 const heroColumn = ["毎", "日", "練", "習"]
 const kanaRow = ["あ", "い", "う", "え", "お"]
+// Real screens of the app mid-use, one per language: public/landing/<id>-<language>.webp, made by
+// scripts/capture-landing-screenshots.mjs.
+const screens = [
+  { id: "romaji", caption: "practice.screens.romaji", alt: "practice.screens.romajiAlt" },
+  { id: "numbers", caption: "practice.screens.numbers", alt: "practice.screens.numbersAlt" },
+  { id: "analyzer", caption: "practice.screens.analyzer", alt: "practice.screens.analyzerAlt" },
+] as const
 const isLastPractice = (value: string | null): value is string => value !== null && ["", "words", "numbers", "kanji", "dates"].includes(value)
 
 /** Renders the headline with its last word in red ink, e.g. "A little Japanese, every <day>." */
@@ -66,6 +74,20 @@ export default function HomePage() {
           <div><h2 className="font-medium">{t("practice.again")} · {t(previous.titleKey)}</h2><p className="mt-1 text-sm text-muted-foreground">{t("practice.againBody")}</p></div>
           <Button asChild variant="outline" className="ink-button min-h-11"><Link href={`${previous.href}?again=1`}>{t("practice.again")}</Link></Button>
         </section>}
+
+        <section className="pt-[88px]" aria-labelledby="screens-heading">
+          <div className="mb-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-border pb-3.5">
+            <h2 id="screens-heading" className="font-hand text-4xl font-semibold leading-[1.2]">{t("practice.screens")}</h2>
+            {language !== "ja" && <span lang="ja" aria-hidden="true" className="font-hand text-xl text-primary">実際の画面</span>}
+          </div>
+          {/* On phones the screens scroll sideways rather than stacking three tall images. */}
+          <div className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
+            {screens.map(screen => <figure key={screen.id} className="w-[78%] shrink-0 snap-start sm:w-auto">
+              <Image src={`/landing/${screen.id}-${language}.webp`} alt={t(screen.alt)} width={828} height={1080} unoptimized className="ink-card h-auto w-full" />
+              <figcaption className="mt-3 text-[15px] text-muted-foreground">{t(screen.caption)}</figcaption>
+            </figure>)}
+          </div>
+        </section>
 
         <section className="pb-20 pt-[88px]" aria-labelledby="choose-heading">
           <div className="mb-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-border pb-3.5">
