@@ -84,4 +84,17 @@ describe.skipIf(!existsSync(`${DICT}base.dat.gz`) || !existsSync(COMMON))('conve
     const [phrase] = convert('かんじを', lexicon)
     expect(phrase!.candidates).toEqual(expect.arrayContaining(['漢字を', '感じを', '幹事を', 'かんじを', 'カンジを']))
   })
+
+  it('gives conjugated verbs the bonus of their dictionary form', () => {
+    const verb = (surface: string, base: string): Entry => ({ surface, base, left: 0, right: 0, cost: 0, pos: '動詞', sub: '自立' })
+    expect(lexicon.verbBonus!(verb('弾き', '弾く'), 'ひき')).toBeGreaterThan(0)
+    // A potential verb (弾ける, can play) takes the bonus of the verb it is made from (弾く).
+    expect(lexicon.verbBonus!(verb('弾け', '弾ける'), 'ひけ')).toBeGreaterThan(0)
+    expect(lexicon.verbBonus!(verb('曳け', '曳ける'), 'ひけ')).toBe(0)
+  })
+
+  it.each(['ひきます', 'ひけます'])('offers common verbs before rare spellings for %s', (kana) => {
+    const [phrase] = convert(kana, lexicon)
+    expect(phrase!.candidates.slice(0, 2).map((c) => c[0]).sort()).toEqual(['弾', '引'].sort())
+  })
 })
