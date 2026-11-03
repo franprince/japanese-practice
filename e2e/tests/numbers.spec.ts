@@ -81,3 +81,41 @@ test('keypad and question stay stable while entering and clearing input', async 
     await expect(pad.getByRole('button')).toHaveText(order)
     await testInfo.attach('lifecycle-keypad', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' })
 })
+
+// Clear / backspace / Check share one row under the keypad; on narrow phones "Comprobar" used to run
+// past its button.
+for (const width of [320, 360, 390]) {
+    test(`keypad actions keep their labels inside their buttons at ${width}px`, async ({ page }) => {
+        await page.setViewportSize({ width, height: 800 })
+        for (const language of ['es', 'en', 'ja']) {
+            await page.goto('/numbers')
+            await page.evaluate((lang) => localStorage.setItem('kana-words-lang', lang), language)
+            await page.reload()
+            const pad = page.locator('#number-pad')
+            await expect(pad).toBeVisible()
+            await pad.getByRole('button').first().click()
+            await page.evaluate(() => document.fonts.ready)
+            const buttons = await pad.evaluate((keys) => {
+                const row = keys.nextElementSibling!
+                const rowBox = row.getBoundingClientRect()
+                return Array.from(row.querySelectorAll('button')).map((button) => {
+                    const box = button.getBoundingClientRect()
+                    const style = getComputedStyle(button)
+                    const range = document.createRange()
+                    range.selectNodeContents(button)
+                    const content = range.getBoundingClientRect()
+                    return {
+                        label: button.textContent?.trim() || button.getAttribute('aria-label'),
+                        // How far the icon and label reach into the padding, and the button past the row.
+                        content: Math.max(box.left + parseFloat(style.borderLeftWidth) + parseFloat(style.paddingLeft) - content.left, content.right - (box.right - parseFloat(style.borderRightWidth) - parseFloat(style.paddingRight))),
+                        row: Math.max(rowBox.left - box.left, box.right - rowBox.right),
+                    }
+                })
+            })
+            for (const { label, content, row } of buttons) {
+                expect(content, `${language}: "${label}" reaches into its padding`).toBeLessThanOrEqual(0.5)
+                expect(row, `${language}: "${label}" sticks out of the row`).toBeLessThanOrEqual(0.5)
+            }
+        }
+    })
+}
