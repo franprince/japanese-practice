@@ -11,16 +11,11 @@ import { useStoredPreference } from "@/hooks/use-stored-preference"
 import { useHydrated } from "@/hooks/use-hydrated"
 import { beginnerSettings, practiceKey } from "@/lib/practice-preferences"
 import { GAMES } from "@/lib/core"
-const examples: Record<string, [string, string]> = { romaji: ["ねこ", "neko"], numbers: ["24", "二十四"], kanji: ["水", "みず"], dates: ["月曜日", "getsuyoubi"] }
 const heroColumn = ["毎", "日", "練", "習"]
 const kanaRow = ["あ", "い", "う", "え", "お"]
-// Real screens of the app mid-use, one per language: public/landing/<id>-<language>.webp, made by
-// scripts/capture-landing-screenshots.mjs.
-const screens = [
-  { id: "romaji", caption: "practice.screens.romaji", alt: "practice.screens.romajiAlt" },
-  { id: "numbers", caption: "practice.screens.numbers", alt: "practice.screens.numbersAlt" },
-  { id: "analyzer", caption: "practice.screens.analyzer", alt: "practice.screens.analyzerAlt" },
-] as const
+// Real screens of each practice and of the analyzer mid-use, public/landing/<id>[-<language>].webp,
+// made by scripts/capture-landing-screenshots.mjs. Those with UI text in view come per language.
+const localizedScreens = new Set(["romaji", "kanji", "dates"])
 const isLastPractice = (value: string | null): value is string => value !== null && ["", "words", "numbers", "kanji", "dates"].includes(value)
 
 /** Renders the headline with its last word in red ink, e.g. "A little Japanese, every <day>." */
@@ -39,6 +34,7 @@ export default function HomePage() {
   const [, setWordsSettings] = useStoredPreference(practiceKey("words"), "", (value): value is string => value !== null)
   const startBeginner = () => { setWordsSettings(JSON.stringify(beginnerSettings)); router.push("/words?preset=beginner") }
   const previous = GAMES.find(game => game.href === `/${last}`)
+  const screenOf = (id: string) => `/landing/${id}${localizedScreens.has(id) ? `-${language}` : ""}.webp`
   return <>
     <SiteHeader start={<Link href="/" className="flex items-stretch border border-border bg-card no-underline">
       <span lang="ja" className="flex items-center border-r border-border px-3.5 py-1.5 font-hand text-[22px] font-semibold tracking-[0.06em]">日本語 練習</span>
@@ -75,26 +71,12 @@ export default function HomePage() {
           <Button asChild variant="outline" className="ink-button min-h-11"><Link href={`${previous.href}?again=1`}>{t("practice.again")}</Link></Button>
         </section>}
 
-        <section className="pt-[88px]" aria-labelledby="screens-heading">
-          <div className="mb-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-border pb-3.5">
-            <h2 id="screens-heading" className="font-hand text-4xl font-semibold leading-[1.2]">{t("practice.screens")}</h2>
-            {language !== "ja" && <span lang="ja" aria-hidden="true" className="font-hand text-xl text-primary">実際の画面</span>}
-          </div>
-          {/* On phones the screens scroll sideways rather than stacking three tall images. */}
-          <div className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
-            {screens.map(screen => <figure key={screen.id} className="w-[78%] shrink-0 snap-start sm:w-auto">
-              <Image src={`/landing/${screen.id}-${language}.webp`} alt={t(screen.alt)} width={828} height={1080} unoptimized className="ink-card h-auto w-full" />
-              <figcaption className="mt-3 text-[15px] text-muted-foreground">{t(screen.caption)}</figcaption>
-            </figure>)}
-          </div>
-        </section>
-
         <section className="pb-20 pt-[88px]" aria-labelledby="choose-heading">
           <div className="mb-8 flex flex-wrap items-baseline gap-x-5 gap-y-2 border-b border-border pb-3.5">
             <h2 id="choose-heading" className="font-hand text-4xl font-semibold leading-[1.2]">{t("practice.choose")}</h2>
             {language !== "ja" && <span lang="ja" aria-hidden="true" className="font-hand text-xl text-primary">練習を選ぶ</span>}
           </div>
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">{GAMES.map((game, i) => <GameSelectorCard key={game.id} index={i + 1} title={t(game.titleKey)} description={t(game.descriptionKey)} href={game.href} icon={game.icon} examplePrompt={examples[game.id]?.[0] ?? ""} exampleAnswer={examples[game.id]?.[1] ?? ""} />)}</div>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">{GAMES.map((game, i) => <GameSelectorCard key={game.id} index={i + 1} title={t(game.titleKey)} description={t(game.descriptionKey)} href={game.href} screen={screenOf(game.id)} />)}</div>
         </section>
 
         <section className="pb-24" aria-labelledby="tools-heading">
@@ -102,13 +84,13 @@ export default function HomePage() {
             <h2 id="tools-heading" className="font-hand text-4xl font-semibold leading-[1.2]">{t("practice.tools")}</h2>
             {language !== "ja" && <span lang="ja" aria-hidden="true" className="font-hand text-xl text-primary">読解</span>}
           </div>
-          <Link href="/analyzer" className="ink-card group flex flex-wrap items-center gap-7 px-7 py-6 transition-transform hover:-translate-y-0.5">
-            <span lang="ja" aria-hidden="true" className="reader-mark flex shrink-0 items-end gap-1 font-hand text-[44px] font-semibold leading-none"><ruby>読<rt>よ</rt></ruby>む</span>
-            <span className="flex min-w-0 flex-[1_1_22rem] flex-col gap-1">
+          <Link href="/analyzer" className="ink-card group flex flex-col overflow-hidden transition-transform hover:-translate-y-0.5 md:flex-row">
+            <Image src={screenOf("analyzer")} alt="" width={960} height={540} unoptimized className="aspect-video w-full shrink-0 border-b border-border bg-background object-cover md:w-[24rem] md:border-b-0 md:border-r" />
+            <span className="flex min-w-0 flex-col justify-center gap-1 px-7 py-6">
               <span className="font-hand text-2xl font-semibold">{t("tools.reader.title")}</span>
               <span className="text-[15px] text-muted-foreground">{t("tools.reader.description")}</span>
+              <span className="mt-3 inline-flex items-center gap-2 font-bold text-primary">{t("tools.reader.open")}<ArrowRight className="size-[18px] transition-transform group-hover:translate-x-0.5" aria-hidden="true" /></span>
             </span>
-            <span className="inline-flex items-center gap-2 font-bold text-primary">{t("tools.reader.open")}<ArrowRight className="size-[18px] transition-transform group-hover:translate-x-0.5" aria-hidden="true" /></span>
           </Link>
         </section>
       </div>
