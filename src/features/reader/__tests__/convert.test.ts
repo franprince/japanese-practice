@@ -75,6 +75,7 @@ describe.skipIf(!existsSync(`${DICT}base.dat.gz`) || !existsSync(COMMON))('conve
     ['でんしゃでがっこうにいきます', '電車で|学校に|行きます'],
     ['あたらしいくつをかいました', '新しい|靴を|買いました'],
     ['りんごをみっつください', 'りんごを|三つ|ください'],
+    ['くつをはいてください', '靴を|履いてください'],
     ['らーめん', 'ラーメン'],
   ])('%s → %s', (kana, expected) => {
     expect(best(kana)).toBe(expected)
