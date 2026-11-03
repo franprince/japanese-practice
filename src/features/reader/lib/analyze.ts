@@ -1,7 +1,7 @@
 import type { IpadicFeatures } from 'kuromoji'
 import { lookup, rankEntries, type Word, type WordClass } from './dictionary'
 import { describePos, grammarNote } from './grammar'
-import { furigana, hasKanji, kataToHira, romanizePunctuation, toRomaji, type FuriganaPart } from './japanese'
+import { baseReading, furigana, hasKanji, kataToHira, romanizePunctuation, toRomaji, type FuriganaPart } from './japanese'
 
 type Tok = {
   surface: string
@@ -101,17 +101,6 @@ function groupTokens(toks: Tok[]): Tok[][] {
   return groups
 }
 
-/** Reading of the dictionary form, from the surface reading: 食べ/たべ + る → たべる. */
-function baseReading(t: Tok): string {
-  if (!t.reading) return ''
-  if (t.surface === t.base) return t.reading
-  let common = 0
-  while (common < t.surface.length && t.surface[common] === t.base[common]) common++
-  const kanaTail = t.surface.slice(common)
-  const stem = kataToHira(t.reading).slice(0, t.reading.length - kataToHira(kanaTail).length)
-  return stem + kataToHira(t.base.slice(common))
-}
-
 /**
  * A token as Hepburn spells it, in kana: the pronunciation's long vowels
  * (東京 → とーきょー → tōkyō) and particles as said (は → わ, を → お), except
@@ -149,7 +138,7 @@ function toSegment(group: Tok[], index: number): Segment {
 
   let entries = lookup(head.base)
   if (!entries.length && head.surface !== head.base) entries = lookup(head.surface)
-  entries = rankEntries(entries, { form: head.base, reading: baseReading(head), cls: cls as WordClass | undefined })
+  entries = rankEntries(entries, { form: head.base, reading: baseReading(head.surface, head.base, head.reading), cls: cls as WordClass | undefined })
 
   // Words outside the tokenizer's dictionary come back without a reading; borrow JMdict's.
   if (!readings[0] && entries[0]) readings[0] = entries[0].kana[0]!

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test'
 import {
+  baseReading,
   furigana,
   hepburn,
   hiraToKata,
@@ -113,5 +114,19 @@ describe('japaneseGlyphs', () => {
 
   it('leaves text without kana alone', () => {
     expect(japaneseGlyphs('我们在这里散步')).toBe('我们在这里散步')
+  })
+})
+
+describe('baseReading', () => {
+  it('reads the dictionary form from a conjugated one', () => {
+    expect(baseReading('食べ', '食べる', 'たべ')).toBe('たべる')
+    expect(baseReading('弾け', '弾ける', 'ひけ')).toBe('ひける')
+    expect(baseReading('行っ', '行く', 'いっ')).toBe('いく')
+    expect(baseReading('し', 'する', 'し')).toBe('する')
+    expect(baseReading('高かっ', '高い', 'たかかっ')).toBe('たかい')
+  })
+
+  it('keeps the reading of a word that does not conjugate', () => {
+    expect(baseReading('漢字', '漢字', 'かんじ')).toBe('かんじ')
   })
 })
