@@ -38,6 +38,38 @@ for (const v of bundled.datasets.vocab) {
   if (!v.jlpt) continue
   for (const w of [v.word, v.altWord]) if (w) jlpt.set(`${w}\t${v.reading}`, v.jlpt)
 }
+
+// Some JLPT list rows that kotobako-data could not match to a JMdict entry (ids vocab_waller_*) are
+// words the list writes in kana and JMdict in kanji: はく, N5, "to put on (items below your waist)",
+// is 履く. Each passes its level on to the one kanji word read the same way whose glosses share the
+// most words with it, unless that word has a level of its own.
+const UNMATCHED = 'vocab_waller_'
+const passedOn = new Map()
+const glossWords = (meanings) =>
+  new Set(
+    meanings
+      .join(' ')
+      .toLowerCase()
+      .replace(/\([^)]*\)/g, ' ')
+      .split(/[^a-z']+/)
+      .filter((w) => w.length > 2 && !['the', 'and', 'for', 'one', "one's", 'etc', 'something', 'someone'].includes(w)),
+  )
+const kanjiWords = new Map()
+for (const v of bundled.datasets.vocab) {
+  if (v.id.startsWith(UNMATCHED) || v.word === v.reading) continue
+  kanjiWords.set(v.reading, [...(kanjiWords.get(v.reading) ?? []), v])
+}
+for (const row of bundled.datasets.vocab) {
+  if (!row.id.startsWith(UNMATCHED) || row.word !== row.reading || !row.jlpt) continue
+  const want = glossWords(row.meanings)
+  const [best, next] = (kanjiWords.get(row.reading) ?? [])
+    .map((v) => ({ v, shared: [...glossWords(v.meanings)].filter((w) => want.has(w)).length }))
+    .sort((a, b) => b.shared - a.shared)
+  if (!best?.shared || next?.shared === best.shared || best.v.jlpt) continue
+  passedOn.set(best.v.id, row.jlpt)
+  for (const w of [best.v.word, best.v.altWord]) if (w) jlpt.set(`${w}\t${row.reading}`, row.jlpt)
+  console.log(`jlpt: ${row.reading} (${row.jlpt}) → ${best.v.word}`)
+}
 const jlptOf = (kanji, kana) => {
   for (const r of kana) {
     for (const k of kanji.length ? kanji : [r]) {
@@ -72,7 +104,7 @@ function fromBundled() {
     if (seen.has(key)) continue
     seen.add(key)
     const pos = v.pos ? v.pos.split(' · ').map((p) => POS_LABELS[p] ?? p) : []
-    words.push([kanji, [v.reading], [[pos, v.meanings, []]], COMMON, v.jlpt ?? ''])
+    words.push([kanji, [v.reading], [[pos, v.meanings, []]], COMMON, v.jlpt ?? passedOn.get(v.id) ?? ''])
   }
   return { source: `JMdict common subset (jmdict-simplified ${bundled.version.split(' ')[0]})`, words }
 }

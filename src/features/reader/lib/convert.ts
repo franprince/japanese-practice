@@ -23,6 +23,8 @@ export type Lexicon = {
   connect(right: number, left: number): number
   /** Subtracted from a word's cost: common and JLPT vocabulary, for learners. */
   bonus?(entry: Entry, reading: string): number
+  /** The same for a verb's dictionary form (弾き as 弾く), which ranks it among verbs read alike. */
+  verbBonus?(entry: Entry, reading: string): number
 }
 
 /** A phrase of the conversion: the kana it was read from and its spellings, best first. */
@@ -58,6 +60,27 @@ function lookup(lexicon: Lexicon, reading: string): Entry[] {
   return copies.length ? [...entries, ...copies] : entries
 }
 
+/** The cost of each of `entries`, the words read as `reading`. */
+function costsOf(lexicon: Lexicon, entries: Entry[], reading: string, typed: string): number[] {
+  const costs = entries.map((entry) => costOf(lexicon, entry, reading, typed))
+  if (!lexicon.verbBonus) return costs
+  // Verbs in kanji that fit the same slot (same reading and connection ids) are ranked by how common
+  // their dictionary form is: 書き over 欠き. The slot still costs what its cheapest verb did, so verbs
+  // do not outbid other words (いえに → 言えに instead of 家に).
+  const slots = new Map<string, number[]>()
+  entries.forEach((e, k) => {
+    if (e.pos !== '動詞' || DEPENDENT.has(e.sub) || !hasKanji(e.spelling ?? e.surface)) return
+    const slot = `${e.left},${e.right}`
+    slots.set(slot, [...(slots.get(slot) ?? []), k])
+  })
+  for (const verbs of slots.values()) {
+    const ranked = verbs.map((k) => costs[k]! - lexicon.verbBonus!({ ...entries[k]!, surface: entries[k]!.spelling ?? entries[k]!.surface }, reading))
+    const lift = Math.min(...verbs.map((k) => costs[k]!)) - Math.min(...ranked)
+    verbs.forEach((k, i) => (costs[k] = ranked[i]! + lift))
+  }
+  return costs
+}
+
 function costOf(lexicon: Lexicon, entry: Entry, reading: string, typed: string) {
   let cost = entry.cost
   // Only words that stand on their own get the bonus, a single kanji half of it: in full it would
@@ -91,8 +114,9 @@ function bestPath(kana: string, lexicon: Lexicon): Node[] {
       let entries = lookup(lexicon, reading)
       // A character no word starts with is kept as typed, so every input has a path.
       if (!entries.length && j === i + 1) entries = [{ surface: typed, left: 0, right: 0, cost: UNKNOWN, pos: '', sub: '', base: '' }]
-      for (const entry of entries) {
-        const cost = costOf(lexicon, entry, reading, typed)
+      const costs = costsOf(lexicon, entries, reading, typed)
+      for (const [k, entry] of entries.entries()) {
+        const cost = costs[k]!
         for (const [right, step] of best[i]!) {
           const total = step.cost + lexicon.connect(right, entry.left) + cost
           const current = best[j]!.get(entry.right)
@@ -142,8 +166,10 @@ export function convert(kana: string, lexicon: Lexicon, limit = 30): Phrase[] {
     const after = rest[0]?.left ?? groups[g + 1]?.[0]?.left ?? 0
     // The other words read like the head, ranked by how well they fit between their neighbours.
     const scored = new Map<string, number>()
-    for (const entry of lookup(lexicon, reading)) {
-      const cost = lexicon.connect(before, entry.left) + costOf(lexicon, entry, reading, typed) + lexicon.connect(entry.right, after)
+    const entries = lookup(lexicon, reading)
+    const costs = costsOf(lexicon, entries, reading, typed)
+    for (const [k, entry] of entries.entries()) {
+      const cost = lexicon.connect(before, entry.left) + costs[k]! + lexicon.connect(entry.right, after)
       if (cost < (scored.get(entry.surface) ?? Infinity)) scored.set(entry.surface, cost)
     }
     const heads = [...new Set([head.surface, ...[...scored].sort((a, b) => a[1] - b[1]).map(([s]) => s)])]

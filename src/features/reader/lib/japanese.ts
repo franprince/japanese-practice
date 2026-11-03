@@ -34,6 +34,16 @@ export function hiraToKata(s: string): string {
   return s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60))
 }
 
+/** Reading of the dictionary form, from the surface reading: 食べ/たべ + る → たべる. */
+export function baseReading(surface: string, base: string, reading: string): string {
+  if (!reading || surface === base) return reading
+  let common = 0
+  while (common < surface.length && surface[common] === base[common]) common++
+  const kanaTail = surface.slice(common)
+  const stem = kataToHira(reading).slice(0, reading.length - kataToHira(kanaTail).length)
+  return stem + kataToHira(base.slice(common))
+}
+
 const PUNCTUATION: Record<string, string> = {
   '。': '.', '、': ',', '！': '!', '？': '?', '「': '"', '」': '"', '『': '"', '』': '"',
   '（': '(', '）': ')', '・': ' ', '…': '...', '～': '~', '：': ':', '；': ';', '　': ' ',

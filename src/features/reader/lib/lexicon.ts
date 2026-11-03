@@ -3,7 +3,7 @@
 import type { IpadicFeatures, Tokenizer } from 'kuromoji'
 import type { Entry, Lexicon } from './convert'
 import type { RawWord } from './dictionary'
-import { kataToHira } from './japanese'
+import { baseReading, kataToHira } from './japanese'
 
 // kuromoji's dictionary internals, which its types do not describe.
 type Buffer = { buffer: Uint8Array; getShort(i: number): number; getInt(i: number): number }
@@ -25,6 +25,10 @@ const COMMON_BONUS = 800
 export type CommonWords = Map<string, { bonus: number; noun: boolean }>
 
 const key = (surface: string, reading: string) => `${surface}\t${reading}`
+
+// JMdict has no potential verbs (弾ける, can play), which IPADIC lists as words of their own; they
+// take the bonus of the verb they are made from, found by turning the e-row ending back: ける → く.
+const POTENTIAL: Record<string, string> = { え: 'う', け: 'く', げ: 'ぐ', せ: 'す', て: 'つ', ね: 'ぬ', べ: 'ぶ', め: 'む', れ: 'る' }
 
 export function commonWords(raw: RawWord[]): CommonWords {
   const words: CommonWords = new Map()
@@ -84,6 +88,7 @@ export function kuromojiLexicon(tokenizer: Tokenizer<IpadicFeatures>, common: Co
   }
   const decoded = new Map<string, Entry[]>()
   const costs = searcher.connection_costs
+  const bonusOf = (surface: string, reading: string) => common.get(key(surface, reading))?.bonus ?? 0
   return {
     lookup(reading) {
       let entries = decoded.get(reading)
@@ -106,6 +111,14 @@ export function kuromojiLexicon(tokenizer: Tokenizer<IpadicFeatures>, common: Co
       return entries
     },
     connect: (right, left) => costs.get(right, left),
-    bonus: (entry, reading) => common.get(key(entry.surface, reading))?.bonus ?? 0,
+    bonus: (entry, reading) => bonusOf(entry.surface, reading),
+    // JMdict lists dictionary forms, so a conjugated verb is looked up as one: 弾き/ひき as 弾く/ひく.
+    verbBonus({ surface, base }, reading) {
+      const read = baseReading(surface, base, reading)
+      const bonus = bonusOf(base, read)
+      const u = POTENTIAL[base.at(-2) ?? '']
+      if (!u || !base.endsWith('る') || read.at(-2) !== base.at(-2)) return bonus
+      return Math.max(bonus, bonusOf(base.slice(0, -2) + u, read.slice(0, -2) + u))
+    },
   }
 }
